@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provify — Your cases. Your proof. Your career.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #080F1E;
+    --navy-2: #0D1828;
+    --navy-3: #111F35;
+    --teal: #00C4B4;
+    --teal-dim: #00C4B420;
+    --teal-mid: #00C4B440;
+    --white: #F4F7F9;
+    --white-dim: #F4F7F960;
+    --white-faint: #F4F7F920;
+    --gray: #8892A4;
+    --card: #0D1828CC;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+
+  /* AMBIENT GLOW */
+  .glow-1 {
+    position: fixed;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #00C4B415 0%, transparent 70%);
+    top: -200px; right: -200px;
+    pointer-events: none;
+    animation: drift1 20s ease-in-out infinite;
+  }
+  .glow-2 {
+    position: fixed;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #00C4B410 0%, transparent 70%);
+    bottom: 10%; left: -150px;
+    pointer-events: none;
+    animation: drift2 25s ease-in-out infinite;
+  }
+  @keyframes drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-40px, 60px); } }
+  @keyframes drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(60px, -40px); } }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 50;
+    padding: 20px 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(180deg, var(--navy) 0%, transparent 100%);
+  }
+
+  .logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.5rem;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+  .logo span { color: var(--teal); }
+
+  .nav-cta {
+    background: var(--teal);
+    color: var(--navy);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 10px 24px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .nav-cta:hover { background: #00ddd0; transform: translateY(-1px); box-shadow: 0 8px 30px #00C4B430; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 5% 80px;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--teal-dim);
+    border: 1px solid var(--teal-mid);
+    color: var(--teal);
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 40px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--white);
+    max-width: 900px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--teal);
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--gray);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .btn-primary {
+    background: var(--teal);
+    color: var(--navy);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 16px 36px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s;
+    letter-spacing: -0.01em;
+  }
+  .btn-primary:hover { background: #00ddd0; transform: translateY(-2px); box-shadow: 0 12px 40px #00C4B440; }
+
+  .btn-secondary {
+    color: var(--white-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-size: 0.95rem;
+    padding: 16px 24px;
+    border-radius: 100px;
+    border: 1px solid var(--white-faint);
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover { border-color: var(--teal-mid); color: var(--teal); }
+
+  /* STATS BAR */
+  .stats-bar {
+    margin-top: 80px;
+    display: flex; gap: 48px; flex-wrap: wrap; justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+
+  .stat {
+    text-align: center;
+  }
+  .stat-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: 2rem;
+    color: var(--white);
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  .stat-divider {
+    width: 1px;
+    background: var(--white-faint);
+    align-self: stretch;
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--gray);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(180deg, var(--teal) 0%, transparent 100%);
+    animation: scrollDown 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollDown {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* PROBLEM SECTION */
+  .section {
+    padding: 120px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    max-width: 700px;
+    margin-bottom: 24px;
+  }
+
+  .section-title em { font-style: italic; color: var(--teal); }
+
+  .section-body {
+    font-size: 1.05rem;
+    color: var(--gray);
+    line-height: 1.8;
+    max-width: 560px;
+  }
+
+  /* PROBLEM CARDS */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    margin-top: 80px;
+    background: var(--white-faint);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .problem-card {
+    background: var(--navy-2);
+    padding: 40px 36px;
+    transition: background 0.3s;
+  }
+  .problem-card:hover { background: var(--navy-3); }
+
+  .problem-icon {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .problem-card h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.3rem;
+    color: var(--white);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .problem-card p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 120px 5%;
+    background: var(--navy-2);
+  }
+
+  .how-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 40px;
+    margin-top: 80px;
+  }
+
+  .step {
+    position: relative;
+  }
+
+  .step-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: 4rem;
+    color: var(--teal-dim);
+    line-height: 1;
+    margin-bottom: 20px;
+    border: 1px solid var(--teal-mid);
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 16px;
+    font-size: 1.5rem;
+    color: var(--teal);
+    background: var(--teal-dim);
+  }
+
+  .step h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.4rem;
+    color: var(--white);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .step p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  /* AI FEATURE HIGHLIGHT */
+  .ai-section {
+    padding: 120px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ai-card {
+    background: linear-gradient(135deg, var(--navy-2) 0%, #0A1F35 100%);
+    border: 1px solid var(--teal-mid);
+    border-radius: 24px;
+    padding: 64px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-card::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #00C4B415 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .ai-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--teal-dim);
+    border: 1px solid var(--teal-mid);
+    color: var(--teal);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ai-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 20px;
+  }
+
+  .ai-title em { font-style: italic; color: var(--teal); }
+
+  .ai-body {
+    font-size: 0.95rem;
+    color: var(--gray);
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  /* MOCK REPORT CARD */
+  .report-card {
+    background: var(--navy);
+    border: 1px solid var(--white-faint);
+    border-radius: 16px;
+    padding: 28px;
+    font-size: 0.85rem;
+  }
+
+  .report-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--white-faint);
+  }
+
+  .report-title {
+    font-weight: 500;
+    color: var(--white);
+    font-size: 0.9rem;
+  }
+
+  .report-badge {
+    background: var(--teal-dim);
+    color: var(--teal);
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--teal-mid);
+  }
+
+  .complexity-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .complexity-label { color: var(--gray); font-size: 0.8rem; }
+
+  .complexity-score {
+    font-family: 'Instrument Serif', serif;
+    font-size: 2rem;
+    color: var(--teal);
+    letter-spacing: -0.02em;
+  }
+
+  .complexity-score span {
+    font-size: 1rem;
+    color: var(--gray);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--white-faint);
+    border-radius: 100px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), #00E5D5);
+    border-radius: 100px;
+    width: 82%;
+    animation: fillBar 2s 1s ease-out both;
+  }
+
+  @keyframes fillBar {
+    from { width: 0%; }
+    to { width: 82%; }
+  }
+
+  .report-insight {
+    background: var(--teal-dim);
+    border-left: 3px solid var(--teal);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 12px;
+  }
+
+  .report-insight-label {
+    font-size: 0.7rem;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .report-insight-text {
+    font-size: 0.8rem;
+    color: var(--white-dim);
+    line-height: 1.5;
+  }
+
+  .report-warning {
+    background: #FF8C0010;
+    border-left: 3px solid #FF8C00;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .report-warning .report-insight-label { color: #FF8C00; }
+
+  /* FEATURES GRID */
+  .features-section {
+    padding: 120px 5%;
+    background: var(--navy-2);
+  }
+
+  .features-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 80px;
+  }
+
+  .feature-card {
+    background: var(--navy);
+    border: 1px solid var(--white-faint);
+    border-radius: 20px;
+    padding: 36px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--teal-dim) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .feature-card:hover { border-color: var(--teal-mid); transform: translateY(-4px); box-shadow: 0 20px 60px #00000040; }
+  .feature-card:hover::after { opacity: 1; }
+
+  .feature-icon {
+    width: 48px; height: 48px;
+    background: var(--teal-dim);
+    border: 1px solid var(--teal-mid);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  .feature-card h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.3rem;
+    color: var(--white);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card p {
+    font-size: 0.875rem;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  /* PRICING */
+  .pricing-section {
+    padding: 120px 5%;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .pricing-card {
+    background: var(--navy-2);
+    border: 1px solid var(--teal-mid);
+    border-radius: 24px;
+    padding: 56px;
+    margin-top: 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pricing-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  }
+
+  .pricing-tag {
+    display: inline-block;
+    background: var(--teal-dim);
+    border: 1px solid var(--teal-mid);
+    color: var(--teal);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .price {
+    font-family: 'Instrument Serif', serif;
+    font-size: 5rem;
+    color: var(--white);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .price sup {
+    font-size: 2rem;
+    vertical-align: super;
+    letter-spacing: 0;
+  }
+
+  .price-period {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+  }
+
+  .price-features {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .price-features li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.9rem;
+    color: var(--white-dim);
+    line-height: 1.5;
+  }
+
+  .price-features li::before {
+    content: '✓';
+    color: var(--teal);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .free-tier {
+    margin-top: 24px;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  .free-tier a { color: var(--teal); text-decoration: none; }
+
+  /* CTA SECTION */
+  .cta-section {
+    padding: 120px 5%;
+    text-align: center;
+    position: relative;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, #00C4B408 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section .section-title {
+    max-width: 100%;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    margin: 0 auto 24px;
+  }
+
+  .cta-section .section-body {
+    max-width: 500px;
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+
+  /* WAITLIST FORM */
+  .waitlist-form {
+    display: flex;
+    gap: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .waitlist-input {
+    flex: 1;
+    min-width: 240px;
+    background: var(--navy-2);
+    border: 1px solid var(--white-faint);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 16px 24px;
+    border-radius: 100px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .waitlist-input::placeholder { color: var(--gray); }
+  .waitlist-input:focus { border-color: var(--teal-mid); }
+
+  .waitlist-note {
+    margin-top: 16px;
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 48px 5%;
+    border-top: 1px solid var(--white-faint);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .footer-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.3rem;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .footer-logo span { color: var(--teal); }
+
+  .footer-text {
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+
+  /* SUCCESS STATE */
+  .success-msg {
+    display: none;
+    background: var(--teal-dim);
+    border: 1px solid var(--teal-mid);
+    color: var(--teal);
+    padding: 16px 32px;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    margin: 0 auto;
+    max-width: 480px;
+    text-align: center;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .ai-card { grid-template-columns: 1fr; gap: 40px; padding: 36px 28px; }
+    .price-features { grid-template-columns: 1fr; }
+    .stat-divider { display: none; }
+    nav { padding: 16px 5%; }
+    .pricing-card { padding: 36px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Provify<span>.</span></a>
+  <a href="#waitlist" class="nav-cta">Get Early Access</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Now in early access</div>
+
+  <h1>Your cases.<br><em>Your proof.</em><br>Your career.</h1>
+
+  <p class="hero-sub">
+    Log every clinical case in 3 minutes. Get instant AI feedback. Build the clinical record that proves your excellence — whether you're a student, a graduate, or 10 years into practice.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+    <a href="#how-it-works" class="btn-secondary">See how it works →</a>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-number">3 min</div>
+      <div class="stat-label">To log a case</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-number">AI</div>
+      <div class="stat-label">Feedback instantly</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-number">∞</div>
+      <div class="stat-label">Career record</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-number">$0</div>
+      <div class="stat-label">To start</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="section reveal">
+  <div class="section-label">The problem</div>
+  <h2 class="section-title">You're doing great work.<br><em>Nobody knows it.</em></h2>
+  <p class="section-body">
+    Every case you complete disappears the moment you move to the next patient. Years of clinical work — with nothing to show for it. This affects every dentist at every stage.
+  </p>
+
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-icon">🎓</div>
+      <h3>Applying for masters or residency</h3>
+      <p>Programs want documented case portfolios. Most applicants have scattered notes or nothing. The ones with proof get in.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">💼</div>
+      <h3>Looking for a job or promotion</h3>
+      <p>Employers want evidence of clinical experience. A verified record of 500 logged cases tells your story better than any CV.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">🔍</div>
+      <h3>No feedback after graduation</h3>
+      <p>Your supervisor signed off and moved on. Nobody tells you if your working length was conservative or your technique is improving.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">📈</div>
+      <h3>No way to measure your growth</h3>
+      <p>You've done hundreds of cases. Are you getting better? Are there gaps in your experience? Without data you're guessing.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how-it-works">
+  <div class="how-inner">
+    <div class="reveal">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">Three minutes.<br><em>Lifelong record.</em></h2>
+    </div>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-number">01</div>
+        <h3>Log your case</h3>
+        <p>Right after your procedure. Tooth number, diagnosis, measurements, technique. Clinical tips appear as you fill each field. Upload your X-ray photo for a verified badge.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">02</div>
+        <h3>Get AI feedback</h3>
+        <p>Instantly receive a Case Intelligence Report. Complexity score, clinical strengths, what to watch next time, and how this case compares to your own history.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">03</div>
+        <h3>Track your growth</h3>
+        <p>See your complexity trend, specialty gaps, streaks, and milestones. Provify tells you "you have 0 upper molar cases" before your application does.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">04</div>
+        <h3>Export your portfolio</h3>
+        <p>Select your best cases, choose a template, hit generate. A clean professional PDF portfolio in seconds — ready for any application.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI FEATURE -->
+<section class="ai-section reveal">
+  <div class="ai-card">
+    <div>
+      <div class="ai-label">✦ AI powered</div>
+      <h2 class="ai-title">The feedback you never got <em>after graduation.</em></h2>
+      <p class="ai-body">
+        Every case you log generates a personalized Case Intelligence Report. Complexity score, clinical strengths, what to watch next time. Plus your streak, badges, specialty gaps, and career progression — all in one place. For students, graduates, and experienced dentists equally.
+      </p>
+      <a href="#waitlist" class="btn-primary">Get Early Access</a>
+    </div>
+
+    <div class="report-card">
+      <div class="report-header">
+        <div class="report-title">Case Intelligence Report</div>
+        <div class="report-badge">✓ Verified</div>
+      </div>
+
+      <div class="complexity-row">
+        <div>
+          <div class="complexity-label">Complexity Score</div>
+          <div class="complexity-score">8.2<span>/10</span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="complexity-label">3-month trend</div>
+          <div style="color: var(--teal); font-family: 'Instrument Serif', serif; font-size: 1.3rem;">↑ 34%</div>
+        </div>
+      </div>
+
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+
+      <div class="report-insight">
+        <div class="report-insight-label">✦ Strength</div>
+        <div class="report-insight-text">Successful negotiation of severe curvature (est. 30°) — high-complexity achievement. Canal patency maintained throughout.</div>
+      </div>
+
+      <div class="report-warning" style="margin-top: 10px;">
+        <div class="report-insight-label">⚠ Watch next time</div>
+        <div class="report-insight-text">Working length 1.2mm short of radiographic apex. Confirm with a second periapical at a different angulation.</div>
+      </div>
+
+      <!-- METRICS ROW -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px;">
+        <div style="background: var(--white-faint); border-radius: 10px; padding: 10px; text-align: center;">
+          <div style="font-family: 'Instrument Serif', serif; font-size: 1.4rem; color: var(--teal);">47</div>
+          <div style="font-size: 0.7rem; color: var(--gray); margin-top: 2px;">Day streak 🔥</div>
+        </div>
+        <div style="background: var(--white-faint); border-radius: 10px; padding: 10px; text-align: center;">
+          <div style="font-family: 'Instrument Serif', serif; font-size: 1.4rem; color: var(--white);">213</div>
+          <div style="font-size: 0.7rem; color: var(--gray); margin-top: 2px;">Cases logged</div>
+        </div>
+        <div style="background: var(--white-faint); border-radius: 10px; padding: 10px; text-align: center;">
+          <div style="font-family: 'Instrument Serif', serif; font-size: 1.4rem; color: var(--white);">Lv.4</div>
+          <div style="font-size: 0.7rem; color: var(--gray); margin-top: 2px;">Specialist</div>
+        </div>
+      </div>
+
+      <!-- GAP ALERT -->
+      <div style="margin-top: 10px; background: #FF8C0010; border: 1px solid #FF8C0025; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
+        <div style="font-size: 0.9rem;">⚡</div>
+        <div style="font-size: 0.78rem; color: #FFB347; line-height: 1.4;">You have 0 upper premolar cases. Add before your fellowship application.</div>
+      </div>
+
+      <!-- BADGES ROW -->
+      <div style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
+        <div style="background: var(--teal-dim); border: 1px solid var(--teal-mid); border-radius: 100px; padding: 4px 10px; font-size: 0.7rem; color: var(--teal);">🏆 100 Cases</div>
+        <div style="background: var(--teal-dim); border: 1px solid var(--teal-mid); border-radius: 100px; padding: 4px 10px; font-size: 0.7rem; color: var(--teal);">🔥 30 Day Streak</div>
+        <div style="background: var(--white-faint); border: 1px solid var(--white-faint); border-radius: 100px; padding: 4px 10px; font-size: 0.7rem; color: var(--gray);">🎯 Well Rounded — locked</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="features-inner">
+    <div class="reveal">
+      <div class="section-label">Everything you need</div>
+      <h2 class="section-title">Built for how <em>dentists actually work.</em></h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">📱</div>
+        <h3>Mobile first</h3>
+        <p>Log cases from your phone right after the procedure. No laptop needed. Works perfectly in the clinic between patients.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🦷</div>
+        <h3>Multi-specialty</h3>
+        <p>Endodontics, restorative, oral surgery — each with specialty-specific fields and clinical tips built by a dentist, for dentists.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🏆</div>
+        <h3>Personal milestones</h3>
+        <p>Streaks, badges, complexity progression. Compete against yourself — not others. Your 30-day streak feels earned because it is.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📄</div>
+        <h3>One-click portfolio</h3>
+        <p>Professional PDF portfolio in seconds. Cover page, table of contents, every case on its own page. Ready for any application.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔗</div>
+        <h3>Shareable profile</h3>
+        <p>Your public clinical profile at provify.app/yourname. Share it with employers, program directors, or on LinkedIn.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📈</div>
+        <h3>Gap analysis</h3>
+        <p>"You have 12 lower molar cases but 0 upper premolars." Provify tells you what's missing before your application reviewer does.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section reveal">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title" style="max-width: 100%; font-size: clamp(2rem, 4vw, 3rem);">One price.<br><em>Your entire career.</em></h2>
+
+  <div class="pricing-card">
+    <div class="pricing-tag">Pro — Most Popular</div>
+    <div class="price"><sup>$</sup>49</div>
+    <div class="price-period">per month — cancel anytime</div>
+
+    <ul class="price-features">
+      <li>Unlimited case logging</li>
+      <li>AI Case Intelligence Reports</li>
+      <li>PDF portfolio export</li>
+      <li>Personal progress dashboard</li>
+      <li>All 3 specialties</li>
+      <li>Achievement badges</li>
+      <li>Shareable profile link</li>
+      <li>Social share cards</li>
+      <li>Complexity scoring</li>
+      <li>Gap analysis insights</li>
+    </ul>
+
+    <a href="#waitlist" class="btn-primary" style="display: inline-block; margin-bottom: 20px;">Get Early Access — Free for Beta Users</a>
+    <div class="free-tier">Or start free — <a href="#waitlist">10 cases, no credit card required</a></div>
+  </div>
+</section>
+
+<!-- CTA / WAITLIST -->
+<section class="cta-section" id="waitlist">
+  <div class="reveal">
+    <div class="section-label">Early access</div>
+    <h2 class="section-title">Be first.<br><em>Get it free.</em></h2>
+    <p class="section-body">
+      Beta users get full Pro access free for 3 months. We're building this with early users — your feedback shapes the product.
+    </p>
+  </div>
+
+  <div class="waitlist-form reveal" id="form-container">
+    <input type="email" class="waitlist-input" id="email-input" placeholder="your@email.com">
+    <button class="btn-primary" onclick="handleSubmit()">Join Waitlist</button>
+  </div>
+
+  <div class="success-msg" id="success-msg">
+    ✓ You're on the list. We'll be in touch soon.
+  </div>
+
+  <p class="waitlist-note reveal">No spam. No credit card. Just early access.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">Provify<span>.</span></a>
+  <div class="footer-text">© 2026 Provify. Built for dentists, by a dentist.</div>
+  <div class="footer-text">provify.app</div>
+</footer>
+
+<script>
+  // Intersection Observer for reveal animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Waitlist form
+  function handleSubmit() {
+    const email = document.getElementById('email-input').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('email-input').style.borderColor = '#ff4444';
+      setTimeout(() => document.getElementById('email-input').style.borderColor = '', 2000);
+      return;
+    }
+    document.getElementById('form-container').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }
+
+  // Enter key on email input
+  document.getElementById('email-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleSubmit();
+  });
+</script>
+
+</body>
+</html>
