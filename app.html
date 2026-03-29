@@ -835,7 +835,106 @@ body {
 .tooth-btn:hover { border-color: var(--teal-mid); color: var(--white); }
 .tooth-btn.selected { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
 
-/* PHOTO UPLOADS */
+/* PHOTO SLOTS */
+.xray-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.photo-slot {
+  border: 2px dashed var(--white-faint);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-slot:hover { border-color: var(--teal-mid); background: var(--teal-dim); }
+.photo-slot.has-photo { border-color: var(--teal); border-style: solid; }
+
+.photo-slot-label {
+  font-size: 0.7rem;
+  color: var(--gray);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.photo-slot-preview {
+  font-size: 1.4rem;
+  color: var(--gray);
+}
+
+.photo-slot-img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* ANATOMICAL TOOTH CHART */
+.tooth-chart {
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  border-radius: 14px;
+  padding: 16px 12px;
+}
+
+.arch-container {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0;
+  gap: 2px;
+}
+
+.tooth-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 3px 2px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: all 0.15s;
+  gap: 2px;
+}
+
+.tooth-btn:hover { background: var(--teal-dim); border-color: var(--teal-mid); }
+.tooth-btn.selected { background: var(--teal-dim); border-color: var(--teal); }
+
+.tooth-btn svg { display: block; }
+.tooth-btn.selected svg path { fill: var(--teal); }
+.tooth-btn.selected svg rect { fill: var(--teal); }
+
+.tooth-num {
+  font-size: 0.55rem;
+  color: var(--gray);
+  line-height: 1;
+}
+
+.tooth-btn.selected .tooth-num { color: var(--teal); }
+
+.arch-divider {
+  height: 1px;
+  background: var(--white-faint);
+  margin: 6px 0;
+}
+
+.arch-label {
+  font-size: 0.6rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin: 4px 0 2px;
+}
+
+/* PHOTO UPLOAD (old - keep for compatibility) */
 .photo-upload-box {
   border: 2px dashed var(--white-faint);
   border-radius: 12px;
@@ -872,17 +971,16 @@ body {
   padding: 10px 14px;
 }
 
-.canal-name-badge {
-  background: var(--teal-dim);
+.canal-name-select {
+  background: var(--navy-2);
   border: 1px solid var(--teal-mid);
   color: var(--teal);
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 100px;
-  white-space: nowrap;
-  min-width: 60px;
-  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
 }
 
 .canal-wl-input {
@@ -898,18 +996,6 @@ body {
 }
 
 .canal-wl-input:focus { border-color: var(--teal-mid); }
-
-.canal-name-select {
-  background: var(--navy-2);
-  border: 1px solid var(--teal-mid);
-  color: var(--teal);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.8rem;
-  padding: 6px 10px;
-  border-radius: 8px;
-  outline: none;
-  cursor: pointer;
-}
 </style>
 </head>
 <body>
@@ -1123,12 +1209,11 @@ body {
             <div class="form-group">
               <label class="form-label">Select Tooth</label>
               <div class="tooth-chart" id="tooth-chart">
-                <div class="tooth-chart-label">Upper Right</div>
-                <div class="tooth-chart-label" style="text-align:right">Upper Left</div>
-                <div class="tooth-row" id="upper-row"></div>
-                <div class="tooth-row" id="lower-row"></div>
-                <div class="tooth-chart-label">Lower Right</div>
-                <div class="tooth-chart-label" style="text-align:right">Lower Left</div>
+                <div class="arch-label">Upper Arch</div>
+                <div class="arch-container" id="upper-arch"></div>
+                <div class="arch-divider"></div>
+                <div class="arch-container" id="lower-arch"></div>
+                <div class="arch-label">Lower Arch</div>
               </div>
               <div id="selected-tooth-display" style="margin-top:8px; font-size:0.85rem; color:var(--teal); display:none;">
                 Selected: <span id="selected-tooth-text"></span>
@@ -1362,43 +1447,87 @@ body {
             </div>
           </div>
 
-          <!-- PHOTOS — ALL SPECIALTIES -->
-          <div class="form-section">
-            <div class="form-section-title">Photos & X-Rays</div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Pre-op X-Ray <span style="color:var(--teal); font-size:0.7rem">★ Required for Verified badge</span></label>
-                <div class="photo-upload-box" onclick="document.getElementById('upload-preop').click()">
-                  <div id="preop-preview" class="photo-preview-empty">
-                    <div style="font-size:1.5rem">📷</div>
-                    <div>Tap to upload</div>
-                  </div>
-                  <img id="preop-img" style="display:none; width:100%; border-radius:8px; max-height:140px; object-fit:cover">
+          <!-- X-RAYS — SPECIALTY SPECIFIC -->
+          <div class="form-section" id="xray-section">
+            <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'DM Sans',sans-serif; font-weight:400; letter-spacing:0">★ Pre-op required for Verified badge</span></div>
+            
+            <!-- ENDO XRAYS -->
+            <div id="xray-endo">
+              <div class="xray-grid">
+                <div class="photo-slot" onclick="triggerUpload('xr-preop')">
+                  <div class="photo-slot-label">Pre-op</div>
+                  <div class="photo-slot-preview" id="prev-xr-preop">📷</div>
+                  <img class="photo-slot-img" id="img-xr-preop" style="display:none">
+                  <input type="file" id="xr-preop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-preop')">
                 </div>
-                <input type="file" id="upload-preop" accept="image/*" style="display:none" onchange="previewPhoto(this, 'preop')">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Post-op X-Ray <span style="color:var(--gray); font-size:0.7rem">Optional</span></label>
-                <div class="photo-upload-box" onclick="document.getElementById('upload-postop-xray').click()">
-                  <div id="postop-preview" class="photo-preview-empty">
-                    <div style="font-size:1.5rem">📷</div>
-                    <div>Tap to upload</div>
-                  </div>
-                  <img id="postop-img" style="display:none; width:100%; border-radius:8px; max-height:140px; object-fit:cover">
+                <div class="photo-slot" onclick="triggerUpload('xr-wl')">
+                  <div class="photo-slot-label">Working Length</div>
+                  <div class="photo-slot-preview" id="prev-xr-wl">📷</div>
+                  <img class="photo-slot-img" id="img-xr-wl" style="display:none">
+                  <input type="file" id="xr-wl" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-wl')">
                 </div>
-                <input type="file" id="upload-postop-xray" accept="image/*" style="display:none" onchange="previewPhoto(this, 'postop')">
+                <div class="photo-slot" onclick="triggerUpload('xr-mc')">
+                  <div class="photo-slot-label">Master Cone</div>
+                  <div class="photo-slot-preview" id="prev-xr-mc">📷</div>
+                  <img class="photo-slot-img" id="img-xr-mc" style="display:none">
+                  <input type="file" id="xr-mc" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-mc')">
+                </div>
+                <div class="photo-slot" onclick="triggerUpload('xr-obturation')">
+                  <div class="photo-slot-label">Final Obturation</div>
+                  <div class="photo-slot-preview" id="prev-xr-obturation">📷</div>
+                  <img class="photo-slot-img" id="img-xr-obturation" style="display:none">
+                  <input type="file" id="xr-obturation" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-obturation')">
+                </div>
+                <div class="photo-slot" onclick="triggerUpload('xr-postop')">
+                  <div class="photo-slot-label">Post-op</div>
+                  <div class="photo-slot-preview" id="prev-xr-postop">📷</div>
+                  <img class="photo-slot-img" id="img-xr-postop" style="display:none">
+                  <input type="file" id="xr-postop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-postop')">
+                </div>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Clinical Photo <span style="color:var(--gray); font-size:0.7rem">Optional</span></label>
-              <div class="photo-upload-box" style="max-width:50%" onclick="document.getElementById('upload-clinical').click()">
-                <div id="clinical-preview" class="photo-preview-empty">
-                  <div style="font-size:1.5rem">📷</div>
-                  <div>Tap to upload</div>
+
+            <!-- RESTORATIVE + SURGERY XRAYS -->
+            <div id="xray-general" style="display:none">
+              <div class="xray-grid">
+                <div class="photo-slot" onclick="triggerUpload('xr-gen-preop')">
+                  <div class="photo-slot-label">Pre-op X-Ray</div>
+                  <div class="photo-slot-preview" id="prev-xr-gen-preop">📷</div>
+                  <img class="photo-slot-img" id="img-xr-gen-preop" style="display:none">
+                  <input type="file" id="xr-gen-preop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-gen-preop')">
                 </div>
-                <img id="clinical-img" style="display:none; width:100%; border-radius:8px; max-height:140px; object-fit:cover">
+                <div class="photo-slot" onclick="triggerUpload('xr-gen-postop')">
+                  <div class="photo-slot-label">Post-op X-Ray</div>
+                  <div class="photo-slot-preview" id="prev-xr-gen-postop">📷</div>
+                  <img class="photo-slot-img" id="img-xr-gen-postop" style="display:none">
+                  <input type="file" id="xr-gen-postop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-gen-postop')">
+                </div>
               </div>
-              <input type="file" id="upload-clinical" accept="image/*" style="display:none" onchange="previewPhoto(this, 'clinical')">
+            </div>
+          </div>
+
+          <!-- CLINICAL PHOTOS — ALL SPECIALTIES -->
+          <div class="form-section">
+            <div class="form-section-title">Clinical Photos <span style="color:var(--gray); font-size:0.7rem; font-family:'DM Sans',sans-serif; font-weight:400">Optional</span></div>
+            <div class="xray-grid">
+              <div class="photo-slot" onclick="triggerUpload('cp-preop')">
+                <div class="photo-slot-label">Pre-op</div>
+                <div class="photo-slot-preview" id="prev-cp-preop">📷</div>
+                <img class="photo-slot-img" id="img-cp-preop" style="display:none">
+                <input type="file" id="cp-preop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'cp-preop')">
+              </div>
+              <div class="photo-slot" onclick="triggerUpload('cp-postop')">
+                <div class="photo-slot-label">Post-op</div>
+                <div class="photo-slot-preview" id="prev-cp-postop">📷</div>
+                <img class="photo-slot-img" id="img-cp-postop" style="display:none">
+                <input type="file" id="cp-postop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'cp-postop')">
+              </div>
+              <div class="photo-slot" onclick="triggerUpload('cp-intraoral')">
+                <div class="photo-slot-label">Intraoral</div>
+                <div class="photo-slot-preview" id="prev-cp-intraoral">📷</div>
+                <img class="photo-slot-img" id="img-cp-intraoral" style="display:none">
+                <input type="file" id="cp-intraoral" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'cp-intraoral')">
+              </div>
             </div>
           </div>
 
@@ -1565,11 +1694,19 @@ let allCases = [];
 let selectedSpecialty = 'endo';
 let selectedRating = 0;
 let selectedToothNum = null;
-let photoFiles = { preop: null, postop: null, clinical: null };
+let allPhotoFiles = {};
 
 // ─── TOOTH CHART DATA ───
 const UPPER_TEETH = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
 const LOWER_TEETH = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+
+const TOOTH_TYPE = {
+  18:'M',17:'M',16:'M',15:'P',14:'P',13:'C',12:'I',11:'I',
+  21:'I',22:'I',23:'C',24:'P',25:'P',26:'M',27:'M',28:'M',
+  48:'M',47:'M',46:'M',45:'P',44:'P',43:'C',42:'I',41:'I',
+  31:'I',32:'I',33:'C',34:'P',35:'P',36:'M',37:'M',38:'M',
+};
+
 const TOOTH_CANAL_MAP = {
   11:['B'],12:['B'],13:['B'],21:['B'],22:['B'],23:['B'],
   14:['B','P'],15:['B','P'],24:['B','P'],25:['B','P'],
@@ -1580,7 +1717,8 @@ const TOOTH_CANAL_MAP = {
   36:['MB','ML','D'],37:['MB','ML','D'],38:['MB','D'],
   46:['MB','ML','D'],47:['MB','ML','D'],48:['MB','D'],
 };
-const ALL_CANAL_OPTIONS = ['MB','MB2','MB3','DB','DL','ML','MM','MD','D','B','L','P','Palatal','Buccal','Distal','Mesial'];
+
+const ALL_CANAL_OPTIONS = ['MB','MB2','DB','DL','ML','MM','MD','Distal','Buccal','Lingual','Palatal'];
 
 // ─── INIT ───
 async function init() {
@@ -1597,12 +1735,60 @@ async function init() {
 }
 
 // ─── TOOTH CHART ───
+function getToothSVG(num, arch) {
+  const type = TOOTH_TYPE[num];
+  const isUpper = arch === 'upper';
+  const fill = '#111F35';
+  const stroke = '#F4F7F930';
+  const cusp = '#F4F7F940';
+
+  if (type === 'M') {
+    return `<svg width="22" height="26" viewBox="0 0 22 26" fill="none">
+      <rect x="1" y="${isUpper?5:1}" width="20" height="19" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
+      <rect x="3" y="${isUpper?8:4}" width="5" height="5" rx="1.5" fill="${cusp}"/>
+      <rect x="14" y="${isUpper?8:4}" width="5" height="5" rx="1.5" fill="${cusp}"/>
+      <rect x="3" y="${isUpper?15:11}" width="5" height="5" rx="1.5" fill="${cusp}"/>
+      <rect x="14" y="${isUpper?15:11}" width="5" height="5" rx="1.5" fill="${cusp}"/>
+      ${isUpper?`<path d="M6 5 Q11 1 16 5" stroke="${stroke}" stroke-width="1" fill="none"/>`:`<path d="M6 24 Q11 26 16 24" stroke="${stroke}" stroke-width="1" fill="none"/>`}
+    </svg>`;
+  } else if (type === 'P') {
+    return `<svg width="17" height="26" viewBox="0 0 17 26" fill="none">
+      <rect x="1" y="${isUpper?6:1}" width="15" height="18" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
+      <rect x="2" y="${isUpper?9:4}" width="5" height="7" rx="2" fill="${cusp}"/>
+      <rect x="10" y="${isUpper?9:4}" width="5" height="7" rx="2" fill="${cusp}"/>
+      ${isUpper?`<path d="M4 6 Q8.5 2 13 6" stroke="${stroke}" stroke-width="1" fill="none"/>`:`<path d="M4 24 Q8.5 26 13 24" stroke="${stroke}" stroke-width="1" fill="none"/>`}
+    </svg>`;
+  } else if (type === 'C') {
+    return `<svg width="14" height="26" viewBox="0 0 14 26" fill="none">
+      <path d="${isUpper?'M7 1 L13 9 L13 22 Q13 25 10 25 L4 25 Q1 25 1 22 L1 9 Z':'M7 25 L13 17 L13 4 Q13 1 10 1 L4 1 Q1 1 1 4 L1 17 Z'}" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
+    </svg>`;
+  } else {
+    return `<svg width="13" height="26" viewBox="0 0 13 26" fill="none">
+      <rect x="1" y="${isUpper?7:1}" width="11" height="17" rx="3" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
+      ${isUpper?`<rect x="2" y="2" width="9" height="6" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`:`<rect x="2" y="18" width="9" height="6" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`}
+    </svg>`;
+  }
+}
+
 function buildToothChart() {
-  const upper = document.getElementById('upper-row');
-  const lower = document.getElementById('lower-row');
+  const upper = document.getElementById('upper-arch');
+  const lower = document.getElementById('lower-arch');
   if (!upper || !lower) return;
-  upper.innerHTML = UPPER_TEETH.map(t => `<button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}">${t}</button>`).join('');
-  lower.innerHTML = LOWER_TEETH.map(t => `<button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}">${t}</button>`).join('');
+  upper.innerHTML = UPPER_TEETH.map(t => `
+    <button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}" title="Tooth ${t}">
+      ${getToothSVG(t,'upper')}
+      <span class="tooth-num">${t}</span>
+    </button>`).join('');
+  lower.innerHTML = LOWER_TEETH.map(t => `
+    <button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}" title="Tooth ${t}">
+      ${getToothSVG(t,'lower')}
+      <span class="tooth-num">${t}</span>
+    </button>`).join('');
+}
+
+function getToothName(num) {
+  const names = { M:'Molar', P:'Premolar', C:'Canine', I:'Incisor' };
+  return names[TOOTH_TYPE[num]] || '';
 }
 
 function selectTooth(num) {
@@ -1611,7 +1797,7 @@ function selectTooth(num) {
   selectedToothNum = num;
   document.getElementById('f-tooth').value = num;
   document.getElementById('selected-tooth-display').style.display = 'block';
-  document.getElementById('selected-tooth-text').textContent = `Tooth ${num}`;
+  document.getElementById('selected-tooth-text').textContent = `Tooth ${num} — ${getToothName(num)}`;
   updateCanalFields();
 }
 
@@ -1625,8 +1811,11 @@ function updateCanalFields() {
   let html = '';
   for (let i = 0; i < canals; i++) {
     const defaultName = suggested[i] || ALL_CANAL_OPTIONS[i] || `Canal ${i+1}`;
-    const options = ALL_CANAL_OPTIONS.map(o => `<option value="${o}" ${o === defaultName ? 'selected' : ''}>${o}</option>`).join('');
-    html += `<div class="canal-field-row"><select class="canal-name-select" id="canal-name-${i}">${options}</select><input type="number" class="canal-wl-input" id="canal-wl-${i}" placeholder="WL in mm (e.g. 21.5)" step="0.5"></div>`;
+    const options = ALL_CANAL_OPTIONS.map(o => `<option value="${o}" ${o===defaultName?'selected':''}>${o}</option>`).join('');
+    html += `<div class="canal-field-row">
+      <select class="canal-name-select" id="canal-name-${i}">${options}</select>
+      <input type="number" class="canal-wl-input" id="canal-wl-${i}" placeholder="WL in mm" step="0.5">
+    </div>`;
   }
   fieldsDiv.innerHTML = html;
 }
@@ -1643,35 +1832,54 @@ function getCanalData() {
 }
 
 // ─── PHOTO UPLOADS ───
-function previewPhoto(input, type) {
+let allPhotoFiles = {};
+
+function triggerUpload(id) { document.getElementById(id)?.click(); }
+
+function handlePhotoUpload(input, id) {
   const file = input.files[0];
   if (!file) return;
-  photoFiles[type] = file;
+  allPhotoFiles[id] = file;
   const reader = new FileReader();
   reader.onload = (e) => {
-    const preview = document.getElementById(`${type}-preview`);
-    const img = document.getElementById(`${type}-img`);
+    const preview = document.getElementById(`prev-${id}`);
+    const img = document.getElementById(`img-${id}`);
+    const slot = input.closest('.photo-slot');
     if (preview) preview.style.display = 'none';
     if (img) { img.src = e.target.result; img.style.display = 'block'; }
+    if (slot) slot.classList.add('has-photo');
   };
   reader.readAsDataURL(file);
 }
 
-async function uploadPhotos(caseId) {
+async function uploadAllPhotos(caseId) {
   const urls = {};
-  for (const [type, file] of Object.entries(photoFiles)) {
+  for (const [id, file] of Object.entries(allPhotoFiles)) {
     if (!file) continue;
     try {
       const ext = file.name.split('.').pop();
-      const path = `${currentUser.id}/${caseId}/${type}.${ext}`;
+      const path = `${currentUser.id}/${caseId}/${id}.${ext}`;
       const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
       if (!error) {
         const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
-        urls[type] = publicUrl;
+        urls[id] = publicUrl;
       }
     } catch(e) { console.log('Photo upload error:', e); }
   }
   return urls;
+}
+
+function updateXraySection(specialty) {
+  const endoXrays = document.getElementById('xray-endo');
+  const generalXrays = document.getElementById('xray-general');
+  if (!endoXrays || !generalXrays) return;
+  if (specialty === 'endo') {
+    endoXrays.style.display = 'block';
+    generalXrays.style.display = 'none';
+  } else {
+    endoXrays.style.display = 'none';
+    generalXrays.style.display = 'block';
+  }
 }
 
 function resetForm() {
@@ -1687,13 +1895,10 @@ function resetForm() {
   document.getElementById('f-note').value = '';
   selectedRating = 0;
   document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
-  photoFiles = { preop: null, postop: null, clinical: null };
-  ['preop','postop','clinical'].forEach(type => {
-    const preview = document.getElementById(`${type}-preview`);
-    const img = document.getElementById(`${type}-img`);
-    if (preview) preview.style.display = 'flex';
-    if (img) { img.src = ''; img.style.display = 'none'; }
-  });
+  allPhotoFiles = {};
+  document.querySelectorAll('.photo-slot').forEach(s => s.classList.remove('has-photo'));
+  document.querySelectorAll('.photo-slot-preview').forEach(p => p.style.display = 'block');
+  document.querySelectorAll('.photo-slot-img').forEach(img => { img.src=''; img.style.display='none'; });
 }
 
 function hideLoading() {
@@ -1836,6 +2041,7 @@ function selectSpecialty(spec, btn) {
   document.getElementById('endo-fields').style.display = spec === 'endo' ? 'block' : 'none';
   document.getElementById('restorative-fields').style.display = spec === 'restorative' ? 'block' : 'none';
   document.getElementById('surgery-fields').style.display = spec === 'surgery' ? 'block' : 'none';
+  updateXraySection(spec);
 }
 
 function setRating(n) {
@@ -1977,7 +2183,7 @@ async function submitCase() {
 
   // Upload photos
   if (data[0]?.id) {
-    await uploadPhotos(data[0].id);
+    await uploadAllPhotos(data[0].id);
   }
 
   btn.textContent = 'Generating AI Report...';
