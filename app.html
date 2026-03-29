@@ -1706,30 +1706,13 @@ async function generateAIReport(caseData, complexity) {
   const prompt = buildAIPrompt(caseData, complexity);
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caseData, complexity })
     });
 
-    const result = await response.json();
-    const text = result.content?.[0]?.text || '';
-
-    // Parse JSON response
-    let parsed;
-    try {
-      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    } catch {
-      parsed = {
-        strength: 'Good clinical work on this case.',
-        watch: 'Continue documenting cases to track your progress.',
-        tip: 'Keep logging to build your career record.'
-      };
-    }
+    const parsed = await response.json();
 
     insightsEl.innerHTML = `
       <div class="insight-box insight-strength">
