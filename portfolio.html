@@ -547,9 +547,10 @@ const SUPABASE_KEY = 'sb_publishable_IdTc1xIm34-sfTebJBt4Sg_XX_6U11x';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Get username from URL query parameter ?u=dr-abdullah
+// Get username or user ID from URL
 const params = new URLSearchParams(window.location.search);
 const username = params.get('u') || '';
+const userId = params.get('id') || '';
 
 const PHOTO_LABELS = {
   'xr-preop': 'Pre-op X-Ray',
@@ -565,19 +566,41 @@ const PHOTO_LABELS = {
 };
 
 async function loadPortfolio() {
-  if (!username || username === 'portfolio') {
+  if (!username && !userId) {
     showNotFound();
     return;
   }
 
-  // Find profile by username
-  const { data: profile, error: profileError } = await sb
-    .from('profiles')
-    .select('*')
-    .eq('username', username)
-    .single();
+  let profile = null;
+  let resolvedUserId = userId;
 
-  if (profileError || !profile) {
+  // Try by username
+  if (username) {
+    const { data, error } = await sb
+      .from('profiles')
+      .select('*')
+      .eq('username', username)
+      .single();
+    if (!error && data) { profile = data; resolvedUserId = data.id; }
+  }
+
+  // Try by user ID
+  if (!profile && userId) {
+    const { data, error } = await sb
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    if (!error && data) { profile = data; resolvedUserId = data.id; }
+  }
+
+  // If still no profile but we have userId, create minimal profile
+  if (!profile && userId) {
+    profile = { id: userId, first_name: 'Dr.', last_name: '', role: 'dentist' };
+    resolvedUserId = userId;
+  }
+
+  if (!profile) {
     showNotFound();
     return;
   }
@@ -586,7 +609,7 @@ async function loadPortfolio() {
   const { data: cases, error: casesError } = await sb
     .from('cases')
     .select('*')
-    .eq('user_id', profile.id)
+    .eq('user_id', resolvedUserId)
     .order('created_at', { ascending: false });
 
   if (casesError) { showNotFound(); return; }
@@ -632,7 +655,7 @@ async function loadPortfolio() {
       </div>
     `;
   } else {
-    container.innerHTML = sorted.map((c, i) => renderCaseCard(c, i, profile.id)).join('');
+    container.innerHTML = sorted.map((c, i) => renderCaseCard(c, i, resolvedUserId)).join('');
   }
 
   // Show portfolio

@@ -1139,6 +1139,9 @@ body {
       </button>
 
       <div class="sidebar-bottom">
+        <button onclick="viewMyPortfolio()" style="width:100%; background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'DM Sans',sans-serif; font-size:0.8rem; padding:10px 12px; border-radius:10px; cursor:pointer; margin-bottom:10px; text-align:left; transition:all 0.2s;">
+          🔗 View My Portfolio
+        </button>
         <div class="user-card">
           <div class="user-avatar" id="user-avatar">DR</div>
           <div class="user-info">
@@ -2961,6 +2964,13 @@ async function generatePortfolioPDF() {
 }
 
 
+
+// ─── VIEW PORTFOLIO ───
+function viewMyPortfolio() {
+  if (!currentUser) return;
+  const url = `https://provify.app/portfolio.html?id=${currentUser.id}`;
+  window.open(url, '_blank');
+}
 
 // ─── START ───
 init();
