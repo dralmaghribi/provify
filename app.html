@@ -1045,6 +1045,37 @@ body {
   <div class="loading-spinner"></div>
 </div>
 
+<!-- CASE DETAIL MODAL -->
+<div id="case-detail-modal" style="display:none; position:fixed; inset:0; background:rgba(8,15,30,0.95); z-index:500; align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this)closeCaseDetail()">
+  <div style="background:var(--navy-2); border:1px solid var(--white-faint); border-radius:20px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
+    
+    <!-- Modal Header -->
+    <div style="padding:24px 28px 16px; border-bottom:1px solid var(--white-faint); display:flex; align-items:flex-start; justify-content:space-between; gap:16px; position:sticky; top:0; background:var(--navy-2); z-index:10;">
+      <div>
+        <div style="font-family:'Instrument Serif',serif; font-size:1.4rem; color:var(--white); letter-spacing:-0.02em" id="modal-title">Case Detail</div>
+        <div style="font-size:0.8rem; color:var(--gray); margin-top:4px" id="modal-date"></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="text-align:center; background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:10px; padding:8px 14px;">
+          <div style="font-family:'Instrument Serif',serif; font-size:1.6rem; color:var(--teal); line-height:1" id="modal-score">—</div>
+          <div style="font-size:0.6rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.08em">score</div>
+        </div>
+        <button onclick="closeCaseDetail()" style="background:none; border:none; color:var(--gray); font-size:1.5rem; cursor:pointer; padding:4px; line-height:1; transition:color 0.2s" onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--gray)'">×</button>
+      </div>
+    </div>
+
+    <!-- Narrative -->
+    <div id="modal-narrative-section" style="padding:20px 28px; border-bottom:1px solid var(--white-faint); display:none;">
+      <div style="font-size:0.65rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px">Case Narrative</div>
+      <div style="font-size:0.95rem; color:var(--white-dim); line-height:1.8; font-style:italic; padding-left:16px; border-left:2px solid var(--teal)" id="modal-narrative"></div>
+    </div>
+
+    <!-- Fields -->
+    <div style="padding:8px 28px 24px" id="modal-fields"></div>
+
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -2422,7 +2453,7 @@ function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
   return `
-    <div class="case-item" id="case-row-${c.id}">
+    <div class="case-item" id="case-row-${c.id}" onclick="openCaseDetail('${c.id}')" style="cursor:pointer">
       <div class="case-specialty-badge">${specLabel}</div>
       <div class="case-info">
         <div class="case-tooth">Tooth ${c.tooth_number}</div>
@@ -2433,10 +2464,76 @@ function caseItemHTML(c, showDelete = false) {
           <div class="case-score">${c.complexity_score || '—'}</div>
           <div class="case-score-label">score</div>
         </div>
-        ${showDelete ? `<button onclick="deleteCase('${c.id}')" style="background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.1rem; padding:4px; transition:color 0.2s; line-height:1;" title="Delete case" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='var(--gray)'">🗑</button>` : ''}
+        ${showDelete ? `<button onclick="event.stopPropagation(); deleteCase('${c.id}')" style="background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.1rem; padding:4px; transition:color 0.2s; line-height:1;" title="Delete case" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='var(--gray)'">🗑</button>` : ''}
       </div>
     </div>
   `;
+}
+
+function openCaseDetail(id) {
+  const c = allCases.find(x => x.id === id);
+  if (!c) return;
+
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const fields = [];
+  fields.push(['Specialty', specLabel]);
+  fields.push(['Tooth', c.tooth_number]);
+  fields.push(['Date', date]);
+  fields.push(['Age Range', c.age_range]);
+  fields.push(['Chief Complaint', c.complaint]);
+
+  if (c.specialty === 'endo') {
+    if (c.pulp_diagnosis) fields.push(['Pulp Diagnosis', c.pulp_diagnosis]);
+    if (c.periapical_diagnosis) fields.push(['Periapical Diagnosis', c.periapical_diagnosis]);
+    if (c.case_type) fields.push(['Case Type', c.case_type]);
+    if (c.canals) fields.push(['Number of Canals', c.canals]);
+    if (c.working_length) fields.push(['Working Length', c.working_length]);
+    if (c.curvature) fields.push(['Curvature', c.curvature]);
+    if (c.apical_size) fields.push(['Apical Size', c.apical_size]);
+    if (c.irrigation) fields.push(['Irrigation', c.irrigation]);
+    if (c.obturation) fields.push(['Obturation', c.obturation]);
+    if (c.calcification) fields.push(['Calcification', c.calcification]);
+    if (c.separated) fields.push(['Separated Instrument', c.separated]);
+  } else if (c.specialty === 'restorative') {
+    if (c.cavity_class) fields.push(['Cavity Class', c.cavity_class]);
+    if (c.surfaces) fields.push(['Surfaces', c.surfaces]);
+    if (c.material) fields.push(['Material', c.material]);
+    if (c.isolation) fields.push(['Isolation', c.isolation]);
+  } else if (c.specialty === 'surgery') {
+    if (c.procedure) fields.push(['Procedure', c.procedure]);
+    if (c.impaction) fields.push(['Impaction', c.impaction]);
+    if (c.anaesthesia) fields.push(['Anaesthesia', c.anaesthesia]);
+    if (c.sutures) fields.push(['Sutures', c.sutures]);
+  }
+
+  if (c.post_op) fields.push(['Post-op Symptoms', c.post_op]);
+  if (c.follow_up) fields.push(['Follow-up', c.follow_up]);
+  if (c.difficulty_rating) fields.push(['Difficulty', '★'.repeat(c.difficulty_rating) + '☆'.repeat(5 - c.difficulty_rating)]);
+  if (c.note) fields.push(['Personal Note', c.note]);
+
+  const fieldsHTML = fields.map(([label, value]) => `
+    <div style="padding:10px 0; border-bottom:1px solid var(--white-faint); display:flex; gap:16px;">
+      <div style="font-size:0.75rem; color:var(--gray); min-width:140px; padding-top:2px">${label}</div>
+      <div style="font-size:0.875rem; color:var(--white); flex:1">${value || '—'}</div>
+    </div>
+  `).join('');
+
+  const modal = document.getElementById('case-detail-modal');
+  document.getElementById('modal-title').textContent = `Tooth ${c.tooth_number} — ${specLabel}`;
+  document.getElementById('modal-date').textContent = date;
+  document.getElementById('modal-score').textContent = c.complexity_score || '—';
+  document.getElementById('modal-narrative').textContent = c.narrative || '';
+  document.getElementById('modal-narrative-section').style.display = c.narrative ? 'block' : 'none';
+  document.getElementById('modal-fields').innerHTML = fieldsHTML;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCaseDetail() {
+  document.getElementById('case-detail-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 async function deleteCase(id) {
@@ -2985,6 +3082,11 @@ function viewMyPortfolio() {
   const url = `https://provify.app/portfolio.html?id=${currentUser.id}`;
   window.open(url, '_blank');
 }
+
+// Close modal on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCaseDetail();
+});
 
 // ─── START ───
 init();
