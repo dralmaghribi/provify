@@ -2418,22 +2418,36 @@ function updateDashboard() {
   updateGapAlerts();
 }
 
-function caseItemHTML(c) {
+function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
   return `
-    <div class="case-item">
+    <div class="case-item" id="case-row-${c.id}">
       <div class="case-specialty-badge">${specLabel}</div>
       <div class="case-info">
         <div class="case-tooth">Tooth ${c.tooth_number}</div>
         <div class="case-date">${date}</div>
       </div>
-      <div>
-        <div class="case-score">${c.complexity_score || '—'}</div>
-        <div class="case-score-label">score</div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div>
+          <div class="case-score">${c.complexity_score || '—'}</div>
+          <div class="case-score-label">score</div>
+        </div>
+        ${showDelete ? `<button onclick="deleteCase('${c.id}')" style="background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.1rem; padding:4px; transition:color 0.2s; line-height:1;" title="Delete case" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='var(--gray)'">🗑</button>` : ''}
       </div>
     </div>
   `;
+}
+
+async function deleteCase(id) {
+  if (!confirm('Delete this case? This cannot be undone.')) return;
+  const { error } = await sb.from('cases').delete().eq('id', id).eq('user_id', currentUser.id);
+  if (error) { showToast('Error deleting case.'); return; }
+  allCases = allCases.filter(c => c.id !== id);
+  document.getElementById(`case-row-${id}`)?.remove();
+  updateDashboard();
+  renderBadges();
+  showToast('Case deleted.');
 }
 
 function renderAllCases() {
@@ -2441,7 +2455,7 @@ function renderAllCases() {
   if (allCases.length === 0) {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No cases yet</div><div class="empty-sub">Start logging cases to build your clinical record.</div></div>`;
   } else {
-    el.innerHTML = `<div class="cases-list">${allCases.map(c => caseItemHTML(c)).join('')}</div>`;
+    el.innerHTML = `<div class="cases-list">${allCases.map(c => caseItemHTML(c, true)).join('')}</div>`;
   }
 }
 
