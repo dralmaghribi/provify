@@ -779,15 +779,20 @@ body {
   .nav-item {
     flex-direction: column;
     gap: 2px;
-    font-size: 0.6rem;
-    padding: 8px 10px;
+    font-size: 0.55rem;
+    padding: 6px 4px;
     border-radius: 8px;
-    min-width: 52px;
+    min-width: 0;
+    flex: 1;
     text-align: center;
-    flex-shrink: 0;
   }
 
-  .nav-icon { font-size: 1.1rem; }
+  /* Hide less important nav items on mobile */
+  #nav-progress { display: none; }
+  #nav-badges { display: none; }
+  #nav-portfolio { display: none; }
+
+  .nav-icon { font-size: 1.2rem; }
 
   .nav-item.active {
     background: var(--teal-dim);
