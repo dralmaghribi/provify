@@ -1168,20 +1168,18 @@ body {
         </div>
 
         <div class="log-form">
+
           <!-- SPECIALTY SELECTOR -->
           <div class="form-section-title">Select Specialty</div>
           <div class="specialty-selector">
             <button class="specialty-btn active" onclick="selectSpecialty('endo', this)">
-              <span class="spec-icon">🦷</span>
-              Endodontics
+              <span class="spec-icon">🦷</span>Endodontics
             </button>
             <button class="specialty-btn" onclick="selectSpecialty('restorative', this)">
-              <span class="spec-icon">✨</span>
-              Restorative
+              <span class="spec-icon">✨</span>Restorative
             </button>
             <button class="specialty-btn" onclick="selectSpecialty('surgery', this)">
-              <span class="spec-icon">🔧</span>
-              Oral Surgery
+              <span class="spec-icon">🔧</span>Oral Surgery
             </button>
           </div>
 
@@ -1208,7 +1206,7 @@ body {
             </div>
             <div class="form-group">
               <label class="form-label">Select Tooth</label>
-              <div class="tooth-chart" id="tooth-chart">
+              <div class="tooth-chart">
                 <div class="arch-label">Upper Arch</div>
                 <div class="arch-container" id="upper-arch"></div>
                 <div class="arch-divider"></div>
@@ -1288,10 +1286,9 @@ body {
                 </div>
               </div>
 
-              <!-- DYNAMIC CANAL WORKING LENGTHS -->
               <div id="canal-wl-section" style="display:none">
                 <div class="form-section-title" style="margin-top:8px">Working Length per Canal</div>
-                <div class="tip-box" style="display:block; margin-bottom:12px">💡 Always confirm with both apex locator AND radiograph. Locator readings can be affected by bleeding or NaOCl.</div>
+                <div class="tip-box" style="display:block; margin-bottom:12px">💡 Always confirm with both apex locator AND radiograph.</div>
                 <div id="canal-wl-fields"></div>
               </div>
 
@@ -1305,19 +1302,6 @@ body {
                     <option>45</option><option>50</option>
                   </select>
                 </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Irrigation Solution</label>
-                  <select class="form-select" id="f-irrigation">
-                    <option value="">Select solution</option>
-                    <option>NaOCl only</option>
-                    <option>NaOCl + EDTA</option>
-                    <option>NaOCl + EDTA + CHX</option>
-                    <option>Other</option>
-                  </select>
-                  <div class="tip-box" id="tip-irrigation">💡 NaOCl 2.5-5.25% is most effective. Always use a side-vented needle and never force irrigant apically.</div>
-                </div>
                 <div class="form-group">
                   <label class="form-label">Obturation Technique</label>
                   <select class="form-select" id="f-obturation">
@@ -1330,7 +1314,19 @@ body {
                   <div class="tip-box" id="tip-obturation">💡 Single cone works best with matching taper. Ensure full canal coating with sealer before placing master cone.</div>
                 </div>
               </div>
+
               <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Irrigation Solution</label>
+                  <select class="form-select" id="f-irrigation">
+                    <option value="">Select solution</option>
+                    <option>NaOCl only</option>
+                    <option>NaOCl + EDTA</option>
+                    <option>NaOCl + EDTA + CHX</option>
+                    <option>Other</option>
+                  </select>
+                  <div class="tip-box" id="tip-irrigation">💡 NaOCl 2.5-5.25% is most effective. Always use a side-vented needle.</div>
+                </div>
                 <div class="form-group">
                   <label class="form-label">Calcification Present</label>
                   <select class="form-select" id="f-calcification">
@@ -1338,20 +1334,21 @@ body {
                     <option>No</option>
                     <option>Yes</option>
                   </select>
-                  <div class="tip-box" id="tip-calcification">💡 Use EDTA gel before instrumentation. Patience and smaller file sizes prevent perforation in calcified canals.</div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Separated Instrument</label>
-                  <select class="form-select" id="f-separated">
-                    <option value="">Select</option>
-                    <option>No</option>
-                    <option>Yes</option>
-                  </select>
-                  <div class="tip-box" id="tip-separated">💡 Document this immediately in the patient record. Note location, file type, and whether it affects prognosis.</div>
+                  <div class="tip-box" id="tip-calcification">💡 Use EDTA gel before instrumentation. Patience and smaller file sizes prevent perforation.</div>
                 </div>
               </div>
+
+              <div class="form-group">
+                <label class="form-label">Separated Instrument</label>
+                <select class="form-select" id="f-separated">
+                  <option value="">Select</option>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+                <div class="tip-box" id="tip-separated">💡 Document this immediately in the patient record. Note location, file type, and whether it affects prognosis.</div>
+              </div>
             </div>
-          </div><!-- end endo-fields -->
+          </div>
 
           <!-- RESTORATIVE FIELDS -->
           <div id="restorative-fields" style="display:none">
@@ -1440,7 +1437,8 @@ body {
                   <label class="form-label">Sutures Placed</label>
                   <select class="form-select" id="f-sutures">
                     <option value="">Select</option>
-                    <option>No</option><option>Yes — Resorbable</option>
+                    <option>No</option>
+                    <option>Yes — Resorbable</option>
                     <option>Yes — Non-resorbable</option>
                   </select>
                 </div>
@@ -1448,11 +1446,9 @@ body {
             </div>
           </div>
 
-          <!-- X-RAYS — SPECIALTY SPECIFIC -->
-          <div class="form-section" id="xray-section">
-            <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'DM Sans',sans-serif; font-weight:400; letter-spacing:0">★ Pre-op required for Verified badge</span></div>
-            
-            <!-- ENDO XRAYS -->
+          <!-- X-RAYS -->
+          <div class="form-section">
+            <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'DM Sans',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
             <div id="xray-endo">
               <div class="xray-grid">
                 <div class="photo-slot" onclick="triggerUpload('xr-preop')">
@@ -1487,8 +1483,6 @@ body {
                 </div>
               </div>
             </div>
-
-            <!-- RESTORATIVE + SURGERY XRAYS -->
             <div id="xray-general" style="display:none">
               <div class="xray-grid">
                 <div class="photo-slot" onclick="triggerUpload('xr-gen-preop')">
@@ -1507,7 +1501,7 @@ body {
             </div>
           </div>
 
-          <!-- CLINICAL PHOTOS — ALL SPECIALTIES -->
+          <!-- CLINICAL PHOTOS -->
           <div class="form-section">
             <div class="form-section-title">Clinical Photos <span style="color:var(--gray); font-size:0.7rem; font-family:'DM Sans',sans-serif; font-weight:400">Optional</span></div>
             <div class="xray-grid">
@@ -1532,7 +1526,7 @@ body {
             </div>
           </div>
 
-          <!-- OUTCOME — ALL SPECIALTIES -->
+          <!-- OUTCOME -->
           <div class="form-section">
             <div class="form-section-title">Outcome</div>
             <div class="form-row">
@@ -1543,7 +1537,7 @@ body {
                   <option>None</option><option>Mild Pain</option>
                   <option>Moderate Pain</option><option>Swelling</option><option>Other</option>
                 </select>
-                <div class="tip-box" id="tip-postop">💡 Mild pain for 48-72 hours is normal after instrumentation. Escalating pain after 72 hours warrants review.</div>
+                <div class="tip-box" id="tip-postop">💡 Mild pain for 48-72 hours is normal. Escalating pain after 72 hours warrants review.</div>
               </div>
               <div class="form-group">
                 <label class="form-label">Follow-up Needed</label>
@@ -1580,7 +1574,6 @@ body {
               <div class="ai-report-title">Case Intelligence Report</div>
               <div class="verified-badge">✓ Verified</div>
             </div>
-
             <div class="complexity-display">
               <div>
                 <div style="font-size: 0.75rem; color: var(--gray); margin-bottom: 4px;">Complexity Score</div>
@@ -1590,11 +1583,10 @@ body {
                 <div class="complexity-fill" id="report-bar" style="width:0%"></div>
               </div>
             </div>
-
             <div id="report-insights"></div>
-
             <div class="metrics-mini" id="report-metrics"></div>
           </div>
+
         </div>
       </div>
 
