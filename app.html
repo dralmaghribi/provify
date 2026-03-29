@@ -786,6 +786,130 @@ body {
   color: #FFB347;
   margin-top: 12px;
 }
+
+/* TOOTH CHART */
+.tooth-chart {
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.tooth-chart-label {
+  font-size: 0.65rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 4px;
+}
+
+.tooth-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  margin: 4px 0;
+}
+
+.tooth-btn {
+  width: 28px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--white-faint);
+  background: var(--navy-2);
+  color: var(--gray);
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+  padding: 2px;
+}
+
+.tooth-btn:hover { border-color: var(--teal-mid); color: var(--white); }
+.tooth-btn.selected { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+
+/* PHOTO UPLOADS */
+.photo-upload-box {
+  border: 2px dashed var(--white-faint);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-upload-box:hover { border-color: var(--teal-mid); background: var(--teal-dim); }
+
+.photo-preview-empty {
+  color: var(--gray);
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* CANAL WL FIELDS */
+.canal-field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.canal-name-badge {
+  background: var(--teal-dim);
+  border: 1px solid var(--teal-mid);
+  color: var(--teal);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: center;
+}
+
+.canal-wl-input {
+  flex: 1;
+  background: var(--navy-2);
+  border: 1px solid var(--white-faint);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  outline: none;
+}
+
+.canal-wl-input:focus { border-color: var(--teal-mid); }
+
+.canal-name-select {
+  background: var(--navy-2);
+  border: 1px solid var(--teal-mid);
+  color: var(--teal);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -997,8 +1121,19 @@ body {
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Tooth Number</label>
-              <input type="text" class="form-input" id="f-tooth" placeholder="e.g. 36, 11, 47...">
+              <label class="form-label">Select Tooth</label>
+              <div class="tooth-chart" id="tooth-chart">
+                <div class="tooth-chart-label">Upper Right</div>
+                <div class="tooth-chart-label" style="text-align:right">Upper Left</div>
+                <div class="tooth-row" id="upper-row"></div>
+                <div class="tooth-row" id="lower-row"></div>
+                <div class="tooth-chart-label">Lower Right</div>
+                <div class="tooth-chart-label" style="text-align:right">Lower Left</div>
+              </div>
+              <div id="selected-tooth-display" style="margin-top:8px; font-size:0.85rem; color:var(--teal); display:none;">
+                Selected: <span id="selected-tooth-text"></span>
+              </div>
+              <input type="hidden" id="f-tooth">
             </div>
           </div>
 
@@ -1049,7 +1184,7 @@ body {
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">Number of Canals</label>
-                  <select class="form-select" id="f-canals">
+                  <select class="form-select" id="f-canals" onchange="updateCanalFields()">
                     <option value="">Select</option>
                     <option>1</option><option>2</option><option>3</option>
                     <option>4</option><option>5</option>
@@ -1067,12 +1202,15 @@ body {
                   <div class="tip-box" id="tip-curvature">💡 Severe curvature above 30° — use pre-curved files and frequent recapitulation to avoid ledging.</div>
                 </div>
               </div>
+
+              <!-- DYNAMIC CANAL WORKING LENGTHS -->
+              <div id="canal-wl-section" style="display:none">
+                <div class="form-section-title" style="margin-top:8px">Working Length per Canal</div>
+                <div class="tip-box" style="display:block; margin-bottom:12px">💡 Always confirm with both apex locator AND radiograph. Locator readings can be affected by bleeding or NaOCl.</div>
+                <div id="canal-wl-fields"></div>
+              </div>
+
               <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Working Length (mm)</label>
-                  <input type="number" class="form-input" id="f-wl" placeholder="e.g. 21.5">
-                  <div class="tip-box" id="tip-wl">💡 Always confirm with both apex locator AND radiograph. Locator readings can be affected by bleeding or NaOCl.</div>
-                </div>
                 <div class="form-group">
                   <label class="form-label">Apical Size</label>
                   <select class="form-select" id="f-apical">
@@ -1082,7 +1220,6 @@ body {
                     <option>45</option><option>50</option>
                   </select>
                 </div>
-              </div>
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">Irrigation Solution</label>
@@ -1222,6 +1359,46 @@ body {
                   </select>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- PHOTOS — ALL SPECIALTIES -->
+          <div class="form-section">
+            <div class="form-section-title">Photos & X-Rays</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Pre-op X-Ray <span style="color:var(--teal); font-size:0.7rem">★ Required for Verified badge</span></label>
+                <div class="photo-upload-box" onclick="document.getElementById('upload-preop').click()">
+                  <div id="preop-preview" class="photo-preview-empty">
+                    <div style="font-size:1.5rem">📷</div>
+                    <div>Tap to upload</div>
+                  </div>
+                  <img id="preop-img" style="display:none; width:100%; border-radius:8px; max-height:140px; object-fit:cover">
+                </div>
+                <input type="file" id="upload-preop" accept="image/*" style="display:none" onchange="previewPhoto(this, 'preop')">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Post-op X-Ray <span style="color:var(--gray); font-size:0.7rem">Optional</span></label>
+                <div class="photo-upload-box" onclick="document.getElementById('upload-postop-xray').click()">
+                  <div id="postop-preview" class="photo-preview-empty">
+                    <div style="font-size:1.5rem">📷</div>
+                    <div>Tap to upload</div>
+                  </div>
+                  <img id="postop-img" style="display:none; width:100%; border-radius:8px; max-height:140px; object-fit:cover">
+                </div>
+                <input type="file" id="upload-postop-xray" accept="image/*" style="display:none" onchange="previewPhoto(this, 'postop')">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clinical Photo <span style="color:var(--gray); font-size:0.7rem">Optional</span></label>
+              <div class="photo-upload-box" style="max-width:50%" onclick="document.getElementById('upload-clinical').click()">
+                <div id="clinical-preview" class="photo-preview-empty">
+                  <div style="font-size:1.5rem">📷</div>
+                  <div>Tap to upload</div>
+                </div>
+                <img id="clinical-img" style="display:none; width:100%; border-radius:8px; max-height:140px; object-fit:cover">
+              </div>
+              <input type="file" id="upload-clinical" accept="image/*" style="display:none" onchange="previewPhoto(this, 'clinical')">
             </div>
           </div>
 
@@ -1377,7 +1554,6 @@ body {
 // ─── CONFIG ───
 const SUPABASE_URL = 'https://latbebqtayfvgzgebxam.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_IdTc1xIm34-sfTebJBt4Sg_XX_6U11x';
-const ANTHROPIC_KEY = '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';
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1388,9 +1564,27 @@ let currentProfile = null;
 let allCases = [];
 let selectedSpecialty = 'endo';
 let selectedRating = 0;
+let selectedToothNum = null;
+let photoFiles = { preop: null, postop: null, clinical: null };
+
+// ─── TOOTH CHART DATA ───
+const UPPER_TEETH = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+const LOWER_TEETH = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+const TOOTH_CANAL_MAP = {
+  11:['B'],12:['B'],13:['B'],21:['B'],22:['B'],23:['B'],
+  14:['B','P'],15:['B','P'],24:['B','P'],25:['B','P'],
+  16:['MB','MB2','DB','P'],17:['MB','DB','P'],18:['MB','DB','P'],
+  26:['MB','MB2','DB','P'],27:['MB','DB','P'],28:['MB','DB','P'],
+  31:['B'],32:['B'],33:['B'],41:['B'],42:['B'],43:['B'],
+  34:['B','L'],35:['B','L'],44:['B','L'],45:['B','L'],
+  36:['MB','ML','D'],37:['MB','ML','D'],38:['MB','D'],
+  46:['MB','ML','D'],47:['MB','ML','D'],48:['MB','D'],
+};
+const ALL_CANAL_OPTIONS = ['MB','MB2','MB3','DB','DL','ML','MM','MD','D','B','L','P','Palatal','Buccal','Distal','Mesial'];
 
 // ─── INIT ───
 async function init() {
+  buildToothChart();
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     currentUser = session.user;
@@ -1400,6 +1594,106 @@ async function init() {
     showAuth();
   }
   hideLoading();
+}
+
+// ─── TOOTH CHART ───
+function buildToothChart() {
+  const upper = document.getElementById('upper-row');
+  const lower = document.getElementById('lower-row');
+  if (!upper || !lower) return;
+  upper.innerHTML = UPPER_TEETH.map(t => `<button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}">${t}</button>`).join('');
+  lower.innerHTML = LOWER_TEETH.map(t => `<button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}">${t}</button>`).join('');
+}
+
+function selectTooth(num) {
+  document.querySelectorAll('.tooth-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById(`tooth-${num}`)?.classList.add('selected');
+  selectedToothNum = num;
+  document.getElementById('f-tooth').value = num;
+  document.getElementById('selected-tooth-display').style.display = 'block';
+  document.getElementById('selected-tooth-text').textContent = `Tooth ${num}`;
+  updateCanalFields();
+}
+
+function updateCanalFields() {
+  const canals = parseInt(document.getElementById('f-canals').value) || 0;
+  const section = document.getElementById('canal-wl-section');
+  const fieldsDiv = document.getElementById('canal-wl-fields');
+  if (canals === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  const suggested = selectedToothNum ? (TOOTH_CANAL_MAP[selectedToothNum] || []) : [];
+  let html = '';
+  for (let i = 0; i < canals; i++) {
+    const defaultName = suggested[i] || ALL_CANAL_OPTIONS[i] || `Canal ${i+1}`;
+    const options = ALL_CANAL_OPTIONS.map(o => `<option value="${o}" ${o === defaultName ? 'selected' : ''}>${o}</option>`).join('');
+    html += `<div class="canal-field-row"><select class="canal-name-select" id="canal-name-${i}">${options}</select><input type="number" class="canal-wl-input" id="canal-wl-${i}" placeholder="WL in mm (e.g. 21.5)" step="0.5"></div>`;
+  }
+  fieldsDiv.innerHTML = html;
+}
+
+function getCanalData() {
+  const canals = parseInt(document.getElementById('f-canals').value) || 0;
+  const data = [];
+  for (let i = 0; i < canals; i++) {
+    const name = document.getElementById(`canal-name-${i}`)?.value || '';
+    const wl = document.getElementById(`canal-wl-${i}`)?.value || '';
+    if (name) data.push({ name, wl });
+  }
+  return data;
+}
+
+// ─── PHOTO UPLOADS ───
+function previewPhoto(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  photoFiles[type] = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById(`${type}-preview`);
+    const img = document.getElementById(`${type}-img`);
+    if (preview) preview.style.display = 'none';
+    if (img) { img.src = e.target.result; img.style.display = 'block'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadPhotos(caseId) {
+  const urls = {};
+  for (const [type, file] of Object.entries(photoFiles)) {
+    if (!file) continue;
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `${currentUser.id}/${caseId}/${type}.${ext}`;
+      const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
+      if (!error) {
+        const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
+        urls[type] = publicUrl;
+      }
+    } catch(e) { console.log('Photo upload error:', e); }
+  }
+  return urls;
+}
+
+function resetForm() {
+  document.querySelectorAll('.tooth-btn').forEach(b => b.classList.remove('selected'));
+  selectedToothNum = null;
+  document.getElementById('f-tooth').value = '';
+  document.getElementById('selected-tooth-display').style.display = 'none';
+  document.getElementById('f-age').value = '';
+  document.getElementById('f-complaint').value = '';
+  document.getElementById('f-canals').value = '';
+  document.getElementById('canal-wl-section').style.display = 'none';
+  document.getElementById('canal-wl-fields').innerHTML = '';
+  document.getElementById('f-note').value = '';
+  selectedRating = 0;
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+  photoFiles = { preop: null, postop: null, clinical: null };
+  ['preop','postop','clinical'].forEach(type => {
+    const preview = document.getElementById(`${type}-preview`);
+    const img = document.getElementById(`${type}-img`);
+    if (preview) preview.style.display = 'flex';
+    if (img) { img.src = ''; img.style.display = 'none'; }
+  });
 }
 
 function hideLoading() {
@@ -1616,7 +1910,7 @@ async function submitCase() {
   const complaint = document.getElementById('f-complaint').value;
 
   if (!tooth || !age || !complaint) {
-    showToast('Please fill in patient information first.');
+    showToast('Please select a tooth and fill in patient information first.');
     return;
   }
 
@@ -1625,6 +1919,8 @@ async function submitCase() {
   btn.disabled = true;
 
   const complexity = calculateComplexity();
+  const canalData = getCanalData();
+  const workingLengths = canalData.map(c => `${c.name}: ${c.wl}mm`).join(', ');
 
   // Build case data
   const caseData = {
@@ -1646,7 +1942,7 @@ async function submitCase() {
       case_type: document.getElementById('f-case-type').value,
       canals: document.getElementById('f-canals').value,
       curvature: document.getElementById('f-curvature').value,
-      working_length: document.getElementById('f-wl').value,
+      working_length: workingLengths,
       apical_size: document.getElementById('f-apical').value,
       irrigation: document.getElementById('f-irrigation').value,
       obturation: document.getElementById('f-obturation').value,
@@ -1677,6 +1973,13 @@ async function submitCase() {
   }
 
   allCases.unshift(data[0]);
+  btn.textContent = 'Uploading photos...';
+
+  // Upload photos
+  if (data[0]?.id) {
+    await uploadPhotos(data[0].id);
+  }
+
   btn.textContent = 'Generating AI Report...';
 
   // Show AI report
@@ -1687,6 +1990,7 @@ async function submitCase() {
 
   updateDashboard();
   renderBadges();
+  resetForm();
   showToast('Case logged! ✓ Check your AI report below.');
 }
 
