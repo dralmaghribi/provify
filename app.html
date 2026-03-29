@@ -1197,6 +1197,53 @@ body {
           <div class="page-sub">Here's your clinical overview</div>
         </div>
 
+        <!-- WELCOME CARD — shown only when 0 cases -->
+        <div class="card" id="welcome-card" style="display:none; background:linear-gradient(135deg, #0D1828 0%, #0a1f1e 100%); border-color:var(--teal-mid); margin-bottom:20px;">
+          <div style="display:flex; align-items:flex-start; gap:20px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px">Welcome to Provify</div>
+              <div style="font-family:'Instrument Serif',serif; font-size:1.6rem; color:var(--white); letter-spacing:-0.02em; margin-bottom:12px; line-height:1.2">Your clinical journey starts with one case.</div>
+              <div style="font-size:0.875rem; color:var(--gray); line-height:1.7; margin-bottom:20px;">
+                Log your first case in 3 minutes. Get instant AI feedback on your clinical decisions. Build a portfolio that proves your competence.
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button onclick="showView('log')" style="background:var(--teal); color:var(--navy); font-family:'DM Sans',sans-serif; font-weight:600; font-size:0.9rem; padding:12px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
+                  + Log Your First Case →
+                </button>
+                <button onclick="showView('profile')" style="background:none; border:1px solid var(--white-faint); color:var(--gray); font-family:'DM Sans',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+                  Set Up Profile
+                </button>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px; min-width:180px;">
+              <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+                <span style="font-size:1.2rem">🦷</span>
+                <div>
+                  <div style="font-size:0.8rem; color:var(--white); font-weight:500">Log a case</div>
+                  <div style="font-size:0.7rem; color:var(--gray)">3 minutes</div>
+                </div>
+                <span style="margin-left:auto; color:var(--teal); font-size:0.8rem">①</span>
+              </div>
+              <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px; opacity:0.5;">
+                <span style="font-size:1.2rem">🤖</span>
+                <div>
+                  <div style="font-size:0.8rem; color:var(--white); font-weight:500">Get AI feedback</div>
+                  <div style="font-size:0.7rem; color:var(--gray)">Instant</div>
+                </div>
+                <span style="margin-left:auto; color:var(--gray); font-size:0.8rem">②</span>
+              </div>
+              <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px; opacity:0.5;">
+                <span style="font-size:1.2rem">📄</span>
+                <div>
+                  <div style="font-size:0.8rem; color:var(--white); font-weight:500">Share portfolio</div>
+                  <div style="font-size:0.7rem; color:var(--gray)">One link</div>
+                </div>
+                <span style="margin-left:auto; color:var(--gray); font-size:0.8rem">③</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-card-label">Total Cases</div>
@@ -2489,6 +2536,10 @@ function updateDashboard() {
   const total = allCases.length;
   document.getElementById('stat-total').textContent = total;
 
+  // Show welcome card only when 0 cases
+  const welcomeCard = document.getElementById('welcome-card');
+  if (welcomeCard) welcomeCard.style.display = total === 0 ? 'block' : 'none';
+
   if (total > 0) {
     const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
     document.getElementById('stat-avg').textContent = avg;
@@ -2501,7 +2552,7 @@ function updateDashboard() {
   // Recent cases
   const recentEl = document.getElementById('recent-cases-list');
   if (allCases.length === 0) {
-    recentEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🦷</div><div class="empty-title">No cases logged yet</div><div class="empty-sub">Log your first case to see it here.<br>It only takes 3 minutes.</div></div>`;
+    recentEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🦷</div><div class="empty-title">No cases yet</div><div class="empty-sub">Hit the button above to log your first case.</div></div>`;
   } else {
     const recent = allCases.slice(0, 5);
     recentEl.innerHTML = `<div class="cases-list">${recent.map(c => caseItemHTML(c)).join('')}</div>`;
