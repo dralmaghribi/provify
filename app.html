@@ -1168,6 +1168,9 @@ body {
       <button class="nav-item" onclick="showView('portfolio')" id="nav-portfolio">
         <span class="nav-icon">📄</span> Portfolio
       </button>
+      <button class="nav-item" onclick="showView('profile')" id="nav-profile">
+        <span class="nav-icon">👤</span> My Profile
+      </button>
 
       <div class="sidebar-bottom">
         <button onclick="viewMyPortfolio()" style="width:100%; background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'DM Sans',sans-serif; font-size:0.8rem; padding:10px 12px; border-radius:10px; cursor:pointer; margin-bottom:10px; text-align:left; transition:all 0.2s;">
@@ -1786,6 +1789,64 @@ body {
         </div>
       </div>
 
+      <!-- PROFILE VIEW -->
+      <div class="view" id="view-profile">
+        <div class="page-header">
+          <div class="page-title">My Profile</div>
+          <div class="page-sub">This information appears on your public portfolio</div>
+        </div>
+
+        <div class="card" style="max-width:560px">
+          <div class="form-section-title">Personal Information</div>
+          <div class="form-row" style="margin-bottom:16px">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" id="profile-first" placeholder="Abdullah">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" id="profile-last" placeholder="Almaghribi">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Role</label>
+            <select class="form-select" id="profile-role">
+              <option value="student">Dental Student</option>
+              <option value="intern">Intern / House Officer</option>
+              <option value="resident">Resident</option>
+              <option value="general">General Dentist</option>
+              <option value="specialist">Specialist</option>
+            </select>
+          </div>
+
+          <div class="form-section-title" style="margin-top:24px">Portfolio Settings</div>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Username <span style="color:var(--gray); font-size:0.7rem">— your portfolio URL</span></label>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="color:var(--gray); font-size:0.85rem; white-space:nowrap">provify.app/portfolio.html?u=</span>
+              <input type="text" class="form-input" id="profile-username" placeholder="dr-abdullah" style="flex:1">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:24px">
+            <label class="form-label">Bio <span style="color:var(--gray); font-size:0.7rem">Optional — shown on your portfolio</span></label>
+            <textarea class="form-input" id="profile-bio" rows="3" placeholder="A brief description about you and your clinical focus..." style="resize:vertical; line-height:1.6"></textarea>
+          </div>
+
+          <button onclick="saveProfile()" id="save-profile-btn" class="btn btn-primary" style="width:auto; padding:12px 32px">
+            Save Profile
+          </button>
+
+          <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--white-faint);">
+            <div style="font-size:0.8rem; color:var(--gray); margin-bottom:8px">Your portfolio link:</div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <code id="portfolio-link-display" style="font-size:0.8rem; color:var(--teal); background:var(--teal-dim); padding:6px 12px; border-radius:8px; border:1px solid var(--teal-mid)">provify.app/portfolio.html?id=${currentUser?.id}</code>
+              <button onclick="copyPortfolioLink()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'DM Sans',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Copy Link</button>
+              <button onclick="viewMyPortfolio()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'DM Sans',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Open →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -2137,6 +2198,7 @@ function showView(view) {
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderPortfolioCases();
+  if (view === 'profile') loadProfileForm();
 }
 
 // ─── CASES ───
@@ -3075,6 +3137,70 @@ async function generatePortfolioPDF() {
 }
 
 
+
+// ─── PROFILE SETTINGS ───
+function loadProfileForm() {
+  if (!currentProfile) return;
+  document.getElementById('profile-first').value = currentProfile.first_name || '';
+  document.getElementById('profile-last').value = currentProfile.last_name || '';
+  document.getElementById('profile-role').value = currentProfile.role || 'intern';
+  document.getElementById('profile-username').value = currentProfile.username || '';
+  document.getElementById('profile-bio').value = currentProfile.bio || '';
+  updatePortfolioLinkDisplay();
+}
+
+function updatePortfolioLinkDisplay() {
+  const username = document.getElementById('profile-username')?.value;
+  const el = document.getElementById('portfolio-link-display');
+  if (!el) return;
+  if (username) {
+    el.textContent = `provify.app/portfolio.html?u=${username}`;
+  } else if (currentUser) {
+    el.textContent = `provify.app/portfolio.html?id=${currentUser.id}`;
+  }
+}
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'profile-username') updatePortfolioLinkDisplay();
+});
+
+async function saveProfile() {
+  const btn = document.getElementById('save-profile-btn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  const updates = {
+    id: currentUser.id,
+    first_name: document.getElementById('profile-first').value.trim(),
+    last_name: document.getElementById('profile-last').value.trim(),
+    role: document.getElementById('profile-role').value,
+    username: document.getElementById('profile-username').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+    bio: document.getElementById('profile-bio').value.trim(),
+  };
+
+  const { error } = await sb.from('profiles').upsert(updates);
+
+  if (error) {
+    showToast('Error saving profile. Username may already be taken.');
+  } else {
+    currentProfile = { ...currentProfile, ...updates };
+    document.getElementById('user-display-name').textContent = `Dr. ${updates.first_name}`;
+    document.getElementById('greeting-name').textContent = updates.first_name;
+    document.getElementById('user-avatar').textContent = (updates.first_name?.[0] || 'D') + (updates.last_name?.[0] || 'R');
+    document.getElementById('profile-username').value = updates.username;
+    updatePortfolioLinkDisplay();
+    showToast('Profile saved ✓');
+  }
+
+  btn.textContent = 'Save Profile';
+  btn.disabled = false;
+}
+
+function copyPortfolioLink() {
+  const el = document.getElementById('portfolio-link-display');
+  const text = 'https://' + el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Link copied ✓'));
+}
 
 // ─── VIEW PORTFOLIO ───
 function viewMyPortfolio() {
