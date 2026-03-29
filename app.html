@@ -1833,6 +1833,18 @@ body {
             <div class="metrics-mini" id="report-metrics"></div>
           </div>
 
+          <!-- AUTO CLINICAL NOTE -->
+          <div id="auto-note-section" style="display:none; margin-top:16px; background:var(--navy-2); border:1px solid var(--white-faint); border-radius:16px; overflow:hidden;">
+            <div style="padding:16px 20px; border-bottom:1px solid var(--white-faint); display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-size:0.65rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:2px">📋 Clinical Note — Ready to Copy</div>
+                <div style="font-size:0.75rem; color:var(--gray)">Paste directly into your hospital record system</div>
+              </div>
+              <button onclick="copyAutoNote()" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; padding:8px 18px; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; flex-shrink:0;">Copy Note</button>
+            </div>
+            <div id="auto-note-text" style="padding:20px; font-size:0.85rem; color:var(--white-dim); line-height:1.8;"></div>
+          </div>
+
         </div>
       </div>
 
@@ -1993,13 +2005,14 @@ body {
             Save Profile
           </button>
 
-          <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--white-faint);">
-            <div style="font-size:0.8rem; color:var(--gray); margin-bottom:8px">Your portfolio link:</div>
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <code id="portfolio-link-display" style="font-size:0.8rem; color:var(--teal); background:var(--teal-dim); padding:6px 12px; border-radius:8px; border:1px solid var(--teal-mid)">provify.app/portfolio.html?id=${currentUser?.id}</code>
-              <button onclick="copyPortfolioLink()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Copy Link</button>
-              <button onclick="viewMyPortfolio()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Open →</button>
+          <div style="margin-top:20px; padding:20px; border-radius:14px; background:var(--teal-dim); border:1px solid var(--teal-mid);">
+            <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:12px">🔗 Your Portfolio Link</div>
+            <div style="font-size:0.82rem; color:var(--white); margin-bottom:14px; word-break:break-all; font-family:monospace; background:var(--navy-3); padding:10px 14px; border-radius:8px; border:1px solid var(--white-faint);" id="portfolio-link-display">provify.app/portfolio.html?id=...</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button onclick="copyPortfolioLink()" style="flex:1; background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.85rem; font-weight:600; padding:11px; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s;">📋 Copy Link</button>
+              <button onclick="viewMyPortfolio()" style="flex:1; background:none; border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.85rem; padding:11px; border-radius:8px; cursor:pointer; transition:all 0.2s;">Open Portfolio →</button>
             </div>
+            <div style="font-size:0.72rem; color:var(--gray); margin-top:10px">Share on LinkedIn, WhatsApp, or with program directors. Anyone with this link can view your portfolio.</div>
           </div>
         </div>
       </div>
@@ -2523,13 +2536,17 @@ async function submitCase() {
   // Show AI report
   await generateAIReport(caseData, complexity);
 
+  // Auto-generate clinical note
+  btn.textContent = 'Generating Clinical Note...';
+  await autoGenerateClinicalNote(caseData);
+
   btn.textContent = 'Log Case & Get AI Report →';
   btn.disabled = false;
 
   updateDashboard();
   renderBadges();
   resetForm();
-  showToast('Case logged! ✓ Check your AI report below.');
+  showToast('Case logged! ✓ AI report + clinical note ready below.');
 }
 
 async function generateAIReport(caseData, complexity) {
@@ -3383,7 +3400,72 @@ async function generatePortfolioPDF() {
 
 
 
-// ─── CLINICAL NOTE GENERATOR ───
+// ─── AUTO CLINICAL NOTE (runs after every case submission) ───
+async function autoGenerateClinicalNote(c) {
+  const noteSection = document.getElementById('auto-note-section');
+  const noteText = document.getElementById('auto-note-text');
+  if (!noteSection || !noteText) return;
+
+  noteSection.style.display = 'block';
+  noteText.innerHTML = '<div style="color:var(--gray);font-size:0.85rem">Generating your clinical note...</div>';
+
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery' }[c.specialty] || c.specialty;
+  const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  let clinicalDetails = '';
+  if (c.specialty === 'endo') {
+    clinicalDetails = `Pulp Diagnosis: ${c.pulp_diagnosis || 'Not recorded'}\nPeriapical Diagnosis: ${c.periapical_diagnosis || 'Not recorded'}\nCase Type: ${c.case_type || 'Not recorded'}\nNumber of Canals: ${c.canals || 'Not recorded'}\nWorking Length: ${c.working_length || 'Not recorded'}\nCurvature: ${c.curvature || 'Not recorded'}\nApical Size: ${c.apical_size || 'Not recorded'}\nIrrigation: ${c.irrigation || 'Not recorded'}\nObturation: ${c.obturation || 'Not recorded'}\nCalcification: ${c.calcification || 'Not recorded'}\nSeparated Instrument: ${c.separated || 'No'}`;
+  } else if (c.specialty === 'restorative') {
+    clinicalDetails = `Cavity Classification: ${c.cavity_class || 'Not recorded'}\nNumber of Surfaces: ${c.surfaces || 'Not recorded'}\nMaterial: ${c.material || 'Not recorded'}\nIsolation: ${c.isolation || 'Not recorded'}`;
+  } else {
+    clinicalDetails = `Procedure: ${c.procedure || 'Not recorded'}\nImpaction Level: ${c.impaction || 'Not recorded'}\nAnaesthesia: ${c.anaesthesia || 'Not recorded'}\nSutures: ${c.sutures || 'Not recorded'}`;
+  }
+
+  const prompt = `You are a dental clinical documentation assistant. Generate a professional clinical note for a patient record based on the following case data. The note must be formal, medico-legally appropriate, written in third person past tense, and ready to paste into a hospital dental record system.
+
+Case Data:
+Date: ${date}
+Specialty: ${specLabel}
+Tooth: ${c.tooth_number}
+Patient Age Range: ${c.age_range || 'Not recorded'}
+Chief Complaint: ${c.complaint || 'Not recorded'}
+${clinicalDetails}
+Post-operative Symptoms: ${c.post_op || 'None reported'}
+Follow-up: ${c.follow_up || 'Not specified'}
+${c.narrative ? `Additional Notes: ${c.narrative}` : ''}
+
+Generate a complete clinical note in 3-4 paragraphs covering: (1) presenting complaint and examination findings, (2) diagnosis, (3) treatment performed with clinical details, (4) post-operative instructions and follow-up plan.
+
+Use professional dental terminology. Do not add any preamble or explanation — output the clinical note text only.`;
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'clinical_note', notePrompt: prompt, caseData: c, complexity: c.complexity_score })
+    });
+
+    const data = await response.json();
+    const note = data.note || 'Error generating note.';
+
+    const formatted = note
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '</p><p style="margin-bottom:14px">')
+      .replace(/\n/g, '<br>');
+
+    noteText.innerHTML = '<p style="margin-bottom:14px">' + formatted + '</p>';
+    noteSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  } catch(e) {
+    noteText.innerHTML = '<div style="color:var(--gray)">Could not generate note. Go to My Cases → click the case → Generate Clinical Note.</div>';
+  }
+}
+
+function copyAutoNote() {
+  const el = document.getElementById('auto-note-text');
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Clinical note copied ✓'));
+}
 let currentModalCase = null;
 
 async function generateClinicalNote() {
