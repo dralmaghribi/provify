@@ -3458,7 +3458,7 @@ Use professional dental terminology. Do not add any preamble or explanation — 
 
     const data = await response.json();
     // Handle both response formats
-    const note = data.note || data.content?.[0]?.text || data.strength || 'Error generating note. Please try again.';
+    const note = data.note || data.content?.[0]?.text || 'Error generating note. Please try again.';
 
     noteText.textContent = note;
     output.style.display = 'block';

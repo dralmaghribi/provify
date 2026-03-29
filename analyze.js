@@ -32,7 +32,6 @@ export default async function handler(req, res) {
       const note = data.content?.[0]?.text || 'Unable to generate note.';
       return res.status(200).json({ note });
     }
-
     // ─── CASE ANALYSIS MODE (default) ───
     const { caseData: c, complexity } = body;
     const spec = c.specialty;
