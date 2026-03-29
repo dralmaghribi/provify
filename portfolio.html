@@ -741,7 +741,7 @@ function renderCaseCard(c, index, userId) {
       </div>
       ` : ''}
 
-      <div class="case-photos">
+      <div class="case-photos" id="photos-section-${c.id}">
         <div class="photos-label">Radiographs & Clinical Photos</div>
         <div class="photos-grid">${photosHTML}</div>
       </div>
@@ -755,9 +755,9 @@ function renderCaseCard(c, index, userId) {
 
 function tryNextExt(img, baseUrl, exts, label, slotId) {
   if (exts.length === 0) {
-    // All extensions failed — show empty placeholder
+    // All extensions failed — hide the slot entirely
     const slot = document.getElementById(`photo-${slotId}`);
-    if (slot) slot.innerHTML = `<div class="photo-empty">📷</div><div class="photo-item-label">${label}</div>`;
+    if (slot) slot.style.display = 'none';
     return;
   }
   const next = exts.shift();
