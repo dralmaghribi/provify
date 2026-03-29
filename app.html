@@ -6,24 +6,24 @@
 <title>Provify — Clinical Case Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
-  --navy: #080F1E;
-  --navy-2: #0D1828;
-  --navy-3: #111F35;
-  --teal: #00C4B4;
-  --teal-dim: #00C4B418;
-  --teal-mid: #00C4B435;
-  --white: #F4F7F9;
-  --white-dim: #F4F7F970;
-  --white-faint: #F4F7F915;
-  --gray: #8892A4;
+  --navy: #09090B;
+  --navy-2: #0F0F12;
+  --navy-3: #141418;
+  --teal: #7C6FFF;
+  --teal-dim: rgba(124,111,255,0.08);
+  --teal-mid: rgba(124,111,255,0.22);
+  --white: #FAFAFA;
+  --white-dim: rgba(250,250,250,0.65);
+  --white-faint: rgba(250,250,250,0.06);
+  --gray: #6B7280;
   --danger: #FF4444;
   --warning: #FF8C00;
-  --success: #00C4B4;
+  --success: #7C6FFF;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,7 +32,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--navy);
   color: var(--white);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 300;
   min-height: 100vh;
   overflow-x: hidden;
@@ -53,7 +53,7 @@ body {
 .auth-glow {
   position: fixed;
   width: 500px; height: 500px;
-  background: radial-gradient(circle, #00C4B412 0%, transparent 70%);
+  background: radial-gradient(circle, #7C6FFF12 0%, transparent 70%);
   top: -100px; right: -100px;
   pointer-events: none;
 }
@@ -100,7 +100,7 @@ body {
   border: none;
   background: transparent;
   color: var(--gray);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -130,7 +130,7 @@ body {
   background: var(--navy);
   border: 1px solid var(--white-faint);
   color: var(--white);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   font-weight: 300;
   padding: 12px 16px;
@@ -147,7 +147,7 @@ body {
   background: var(--navy);
   border: 1px solid var(--white-faint);
   color: var(--white);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   padding: 12px 16px;
   border-radius: 12px;
@@ -168,7 +168,7 @@ body {
   padding: 14px;
   border-radius: 12px;
   border: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -180,7 +180,7 @@ body {
   background: var(--teal);
   color: var(--navy);
 }
-.btn-primary:hover { background: #00ddd0; transform: translateY(-1px); }
+.btn-primary:hover { background: #9B91FF; transform: translateY(-1px); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .btn-ghost {
@@ -518,7 +518,7 @@ body {
   border: 1px solid var(--white-faint);
   background: var(--navy);
   color: var(--gray);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -596,7 +596,7 @@ body {
 .complexity-number span {
   font-size: 1.2rem;
   color: var(--gray);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .complexity-bar {
@@ -609,7 +609,7 @@ body {
 
 .complexity-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--teal), #00E5D5);
+  background: linear-gradient(90deg, #7C6FFF, #9B91FF);
   border-radius: 100px;
   transition: width 1s ease;
 }
@@ -862,7 +862,7 @@ body {
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--teal), #00E5D5);
+  background: linear-gradient(90deg, #7C6FFF, #9B91FF);
   border-radius: 100px;
   transition: width 0.8s ease;
 }
@@ -1106,7 +1106,7 @@ body {
   background: var(--navy-2);
   border: 1px solid var(--teal-mid);
   color: var(--teal);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.8rem;
   padding: 6px 10px;
   border-radius: 8px;
@@ -1119,7 +1119,7 @@ body {
   background: var(--navy-2);
   border: 1px solid var(--white-faint);
   color: var(--white);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   padding: 8px 12px;
   border-radius: 8px;
@@ -1265,7 +1265,7 @@ body {
       </button>
 
       <div class="sidebar-bottom">
-        <button onclick="viewMyPortfolio()" style="width:100%; background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'DM Sans',sans-serif; font-size:0.8rem; padding:10px 12px; border-radius:10px; cursor:pointer; margin-bottom:10px; text-align:left; transition:all 0.2s;">
+        <button onclick="viewMyPortfolio()" style="width:100%; background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.8rem; padding:10px 12px; border-radius:10px; cursor:pointer; margin-bottom:10px; text-align:left; transition:all 0.2s;">
           🔗 View My Portfolio
         </button>
         <div class="user-card">
@@ -1290,7 +1290,7 @@ body {
         </div>
 
         <!-- WELCOME CARD — shown only when 0 cases -->
-        <div class="card" id="welcome-card" style="display:none; background:linear-gradient(135deg, #0D1828 0%, #0a1f1e 100%); border-color:var(--teal-mid); margin-bottom:20px;">
+        <div class="card" id="welcome-card" style="display:none; background:linear-gradient(135deg, #0F0F12 0%, #13101F 100%); border-color:var(--teal-mid); margin-bottom:20px;">
           <div style="display:flex; align-items:flex-start; gap:20px; flex-wrap:wrap;">
             <div style="flex:1; min-width:200px;">
               <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px">Welcome to Provify</div>
@@ -1299,10 +1299,10 @@ body {
                 Log your first case in 3 minutes. Get instant AI feedback on your clinical decisions. Build a portfolio that proves your competence.
               </div>
               <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button onclick="showView('log')" style="background:var(--teal); color:var(--navy); font-family:'DM Sans',sans-serif; font-weight:600; font-size:0.9rem; padding:12px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
+                <button onclick="showView('log')" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem; padding:12px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
                   + Log Your First Case →
                 </button>
-                <button onclick="showView('profile')" style="background:none; border:1px solid var(--white-faint); color:var(--gray); font-family:'DM Sans',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+                <button onclick="showView('profile')" style="background:none; border:1px solid var(--white-faint); color:var(--gray); font-family:'Inter',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
                   Set Up Profile
                 </button>
               </div>
@@ -1666,7 +1666,7 @@ body {
 
           <!-- X-RAYS -->
           <div class="form-section">
-            <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'DM Sans',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
+            <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
             <div id="xray-endo">
               <div class="xray-grid">
                 <div class="photo-slot" onclick="triggerUpload('xr-preop')">
@@ -1721,7 +1721,7 @@ body {
 
           <!-- CLINICAL PHOTOS -->
           <div class="form-section">
-            <div class="form-section-title">Clinical Photos <span style="color:var(--gray); font-size:0.7rem; font-family:'DM Sans',sans-serif; font-weight:400">Optional</span></div>
+            <div class="form-section-title">Clinical Photos <span style="color:var(--gray); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">Optional</span></div>
             <div class="xray-grid">
               <div class="photo-slot" onclick="triggerUpload('cp-preop')">
                 <div class="photo-slot-label">Pre-op</div>
@@ -1912,7 +1912,7 @@ body {
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
               <button class="btn-ghost" style="padding:8px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--white-dim)" onclick="selectAllCases()">Select All</button>
               <button class="btn-ghost" style="padding:8px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--white-dim)" onclick="deselectAllCases()">Deselect All</button>
-              <button onclick="generatePortfolioPDF()" id="generate-pdf-btn" style="background:var(--teal); color:var(--navy); font-family:'DM Sans',sans-serif; font-weight:600; font-size:0.9rem; padding:10px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
+              <button onclick="generatePortfolioPDF()" id="generate-pdf-btn" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem; padding:10px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
                 📄 Generate PDF
               </button>
             </div>
@@ -1979,8 +1979,8 @@ body {
             <div style="font-size:0.8rem; color:var(--gray); margin-bottom:8px">Your portfolio link:</div>
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
               <code id="portfolio-link-display" style="font-size:0.8rem; color:var(--teal); background:var(--teal-dim); padding:6px 12px; border-radius:8px; border:1px solid var(--teal-mid)">provify.app/portfolio.html?id=${currentUser?.id}</code>
-              <button onclick="copyPortfolioLink()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'DM Sans',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Copy Link</button>
-              <button onclick="viewMyPortfolio()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'DM Sans',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Open →</button>
+              <button onclick="copyPortfolioLink()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Copy Link</button>
+              <button onclick="viewMyPortfolio()" style="background:none; border:1px solid var(--white-faint); color:var(--gray); padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--gray)'">Open →</button>
             </div>
           </div>
         </div>
@@ -2049,7 +2049,7 @@ async function init() {
 function getToothSVG(num, arch) {
   const type = TOOTH_TYPE[num];
   const isUpper = arch === 'upper';
-  const fill = '#111F35';
+  const fill = '#141418';
   const stroke = '#F4F7F930';
   const cusp = '#F4F7F940';
 
