@@ -3457,10 +3457,15 @@ Use professional dental terminology. Do not add any preamble or explanation — 
     });
 
     const data = await response.json();
-    // Handle both response formats
     const note = data.note || data.content?.[0]?.text || 'Error generating note. Please try again.';
 
-    noteText.textContent = note;
+    // Render markdown bold and line breaks
+    const formatted = note
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '</p><p style="margin-bottom:12px">')
+      .replace(/\n/g, '<br>');
+
+    noteText.innerHTML = '<p style="margin-bottom:12px">' + formatted + '</p>';
     output.style.display = 'block';
     output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
@@ -3475,7 +3480,8 @@ Use professional dental terminology. Do not add any preamble or explanation — 
 }
 
 function copyNote() {
-  const text = document.getElementById('clinical-note-text').textContent;
+  const el = document.getElementById('clinical-note-text');
+  const text = el.innerText || el.textContent;
   navigator.clipboard.writeText(text).then(() => showToast('Clinical note copied ✓'));
 }
 
