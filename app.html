@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --navy: #080F1E;
@@ -787,6 +788,44 @@ body {
   margin-top: 12px;
 }
 
+/* PORTFOLIO */
+.portfolio-case-item {
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.portfolio-case-item:hover { border-color: var(--teal-mid); }
+.portfolio-case-item.selected { border-color: var(--teal); background: var(--teal-dim); }
+
+.portfolio-checkbox {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--white-faint);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--navy);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.portfolio-checkbox.checked {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: var(--navy);
+  font-weight: 700;
+}
+
 /* TOOTH CHART */
 .tooth-chart {
   background: var(--navy);
@@ -1094,6 +1133,9 @@ body {
       </button>
       <button class="nav-item" onclick="showView('badges')" id="nav-badges">
         <span class="nav-icon">🏆</span> Achievements
+      </button>
+      <button class="nav-item" onclick="showView('portfolio')" id="nav-portfolio">
+        <span class="nav-icon">📄</span> Portfolio
       </button>
 
       <div class="sidebar-bottom">
@@ -1668,6 +1710,38 @@ body {
         </div>
       </div>
 
+      <!-- PORTFOLIO VIEW -->
+      <div class="view" id="view-portfolio">
+        <div class="page-header">
+          <div class="page-title">Generate Portfolio</div>
+          <div class="page-sub">Select cases to include in your professional PDF portfolio</div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+            <div>
+              <div style="font-size:0.9rem; color:var(--white); font-weight:500; margin-bottom:4px">Portfolio Settings</div>
+              <div style="font-size:0.8rem; color:var(--gray)"><span id="portfolio-selected-count">0</span> cases selected</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <button class="btn-ghost" style="padding:8px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--white-dim)" onclick="selectAllCases()">Select All</button>
+              <button class="btn-ghost" style="padding:8px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--white-dim)" onclick="deselectAllCases()">Deselect All</button>
+              <button onclick="generatePortfolioPDF()" id="generate-pdf-btn" style="background:var(--teal); color:var(--navy); font-family:'DM Sans',sans-serif; font-weight:600; font-size:0.9rem; padding:10px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
+                📄 Generate PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="portfolio-cases-list">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">No cases yet</div>
+            <div class="empty-sub">Log cases first to generate a portfolio.</div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -2016,6 +2090,7 @@ function showView(view) {
   if (view === 'cases') renderAllCases();
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
+  if (view === 'portfolio') renderPortfolioCases();
 }
 
 // ─── CASES ───
@@ -2472,6 +2547,395 @@ function showToast(msg) {
   t.textContent = msg;
   t.style.display = 'block';
   setTimeout(() => { t.style.display = 'none'; }, 4000);
+}
+
+// ─── PORTFOLIO ───
+let selectedCaseIds = new Set();
+
+function renderPortfolioCases() {
+  const el = document.getElementById('portfolio-cases-list');
+  if (!el) return;
+
+  if (allCases.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No cases yet</div><div class="empty-sub">Log cases first to generate a portfolio.</div></div>`;
+    return;
+  }
+
+  el.innerHTML = allCases.map(c => {
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+    const isSelected = selectedCaseIds.has(c.id);
+    return `
+      <div class="portfolio-case-item ${isSelected ? 'selected' : ''}" onclick="toggleCaseSelection('${c.id}', this)">
+        <div class="portfolio-checkbox ${isSelected ? 'checked' : ''}">
+          ${isSelected ? '✓' : ''}
+        </div>
+        <div class="case-specialty-badge">${specLabel}</div>
+        <div class="case-info" style="flex:1">
+          <div class="case-tooth">Tooth ${c.tooth_number}</div>
+          <div class="case-date">${date}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="case-score">${c.complexity_score || '—'}</div>
+          <div class="case-score-label">score</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updatePortfolioCount();
+}
+
+function toggleCaseSelection(id, el) {
+  if (selectedCaseIds.has(id)) {
+    selectedCaseIds.delete(id);
+    el.classList.remove('selected');
+    el.querySelector('.portfolio-checkbox').classList.remove('checked');
+    el.querySelector('.portfolio-checkbox').textContent = '';
+  } else {
+    selectedCaseIds.add(id);
+    el.classList.add('selected');
+    el.querySelector('.portfolio-checkbox').classList.add('checked');
+    el.querySelector('.portfolio-checkbox').textContent = '✓';
+  }
+  updatePortfolioCount();
+}
+
+function selectAllCases() {
+  allCases.forEach(c => selectedCaseIds.add(c.id));
+  renderPortfolioCases();
+}
+
+function deselectAllCases() {
+  selectedCaseIds.clear();
+  renderPortfolioCases();
+}
+
+function updatePortfolioCount() {
+  const el = document.getElementById('portfolio-selected-count');
+  if (el) el.textContent = selectedCaseIds.size;
+}
+
+async function generatePortfolioPDF() {
+  if (selectedCaseIds.size === 0) {
+    showToast('Please select at least one case.');
+    return;
+  }
+
+  const btn = document.getElementById('generate-pdf-btn');
+  btn.textContent = '⏳ Generating...';
+  btn.disabled = true;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const selectedCases = allCases.filter(c => selectedCaseIds.has(c.id));
+  const name = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Dr.';
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const total = selectedCases.length;
+  const avgScore = total > 0 ? (selectedCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1) : '—';
+
+  // Colors
+  const NAVY = [8, 15, 30];
+  const TEAL = [0, 196, 180];
+  const WHITE = [244, 247, 249];
+  const GRAY = [136, 146, 164];
+
+  // ─── COVER PAGE ───
+  doc.setFillColor(...NAVY);
+  doc.rect(0, 0, 210, 297, 'F');
+
+  // Teal accent bar
+  doc.setFillColor(...TEAL);
+  doc.rect(0, 0, 8, 297, 'F');
+
+  // Title
+  doc.setTextColor(...WHITE);
+  doc.setFontSize(32);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Clinical Case', 24, 80);
+  doc.text('Portfolio', 24, 96);
+
+  // Teal underline
+  doc.setFillColor(...TEAL);
+  doc.rect(24, 100, 60, 1.5, 'F');
+
+  // Doctor name
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...WHITE);
+  doc.text(name, 24, 116);
+
+  // Date
+  doc.setFontSize(11);
+  doc.setTextColor(...GRAY);
+  doc.text(`Generated: ${today}`, 24, 126);
+
+  // Stats boxes
+  const stats = [
+    { label: 'Total Cases', value: total.toString() },
+    { label: 'Avg Complexity', value: `${avgScore}/10` },
+    { label: 'Specialties', value: [...new Set(selectedCases.map(c => c.specialty))].length.toString() },
+  ];
+
+  stats.forEach((s, i) => {
+    const x = 24 + i * 60;
+    doc.setFillColor(20, 35, 60);
+    doc.roundedRect(x, 150, 52, 36, 4, 4, 'F');
+    doc.setTextColor(...TEAL);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text(s.value, x + 8, 168);
+    doc.setTextColor(...GRAY);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(s.label, x + 8, 178);
+  });
+
+  // Powered by
+  doc.setTextColor(...GRAY);
+  doc.setFontSize(9);
+  doc.text('Powered by Provify — provify.app', 24, 270);
+
+  // ─── TABLE OF CONTENTS ───
+  doc.addPage();
+  doc.setFillColor(...NAVY);
+  doc.rect(0, 0, 210, 297, 'F');
+  doc.setFillColor(...TEAL);
+  doc.rect(0, 0, 8, 297, 'F');
+
+  doc.setTextColor(...WHITE);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Table of Contents', 24, 30);
+
+  doc.setFillColor(...TEAL);
+  doc.rect(24, 34, 162, 0.8, 'F');
+
+  // Headers
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...GRAY);
+  doc.text('#', 24, 46);
+  doc.text('Tooth', 36, 46);
+  doc.text('Specialty', 60, 46);
+  doc.text('Date', 110, 46);
+  doc.text('Score', 160, 46);
+  doc.text('Page', 185, 46);
+
+  doc.setFillColor(20, 35, 60);
+  doc.rect(24, 48, 162, 0.5, 'F');
+
+  let yToc = 56;
+  selectedCases.forEach((c, i) => {
+    if (yToc > 270) { doc.addPage(); yToc = 30; }
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+
+    if (i % 2 === 0) {
+      doc.setFillColor(15, 25, 45);
+      doc.rect(24, yToc - 4, 162, 9, 'F');
+    }
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...WHITE);
+    doc.text(`${i + 1}`, 24, yToc + 2);
+    doc.text(`${c.tooth_number}`, 36, yToc + 2);
+    doc.text(specLabel, 60, yToc + 2);
+    doc.text(date, 110, yToc + 2);
+    doc.setTextColor(...TEAL);
+    doc.text(`${c.complexity_score || '—'}/10`, 160, yToc + 2);
+    doc.setTextColor(...GRAY);
+    doc.text(`${i + 3}`, 185, yToc + 2);
+    yToc += 9;
+  });
+
+  // ─── CASE PAGES ───
+  selectedCases.forEach((c, i) => {
+    doc.addPage();
+    doc.setFillColor(...NAVY);
+    doc.rect(0, 0, 210, 297, 'F');
+    doc.setFillColor(...TEAL);
+    doc.rect(0, 0, 8, 297, 'F');
+
+    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Case header
+    doc.setFillColor(20, 35, 60);
+    doc.rect(16, 12, 178, 28, 'F');
+    doc.setTextColor(...TEAL);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`CASE ${i + 1} — ${specLabel.toUpperCase()}`, 24, 22);
+    doc.setTextColor(...WHITE);
+    doc.setFontSize(18);
+    doc.text(`Tooth ${c.tooth_number}`, 24, 34);
+    doc.setTextColor(...GRAY);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(date, 160, 22);
+
+    // Complexity score badge
+    doc.setFillColor(...TEAL);
+    doc.roundedRect(155, 26, 36, 12, 3, 3, 'F');
+    doc.setTextColor(...NAVY);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${c.complexity_score || '—'}/10`, 160, 35);
+
+    let y = 52;
+
+    // Helper to add section
+    const addSection = (title, fields) => {
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.setFillColor(20, 35, 60);
+      doc.rect(16, y - 4, 178, 8, 'F');
+      doc.setTextColor(...TEAL);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text(title, 20, y + 1);
+      y += 10;
+
+      fields.forEach(([label, value]) => {
+        if (!value) return;
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setTextColor(...GRAY);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(label, 20, y);
+        doc.setTextColor(...WHITE);
+        doc.setFont('helvetica', 'bold');
+        const lines = doc.splitTextToSize(value.toString(), 100);
+        doc.text(lines, 90, y);
+        y += Math.max(lines.length * 5, 7);
+      });
+      y += 4;
+    };
+
+    // Patient info
+    addSection('PATIENT INFORMATION', [
+      ['Age Range', c.age_range],
+      ['Chief Complaint', c.complaint],
+    ]);
+
+    // Specialty specific
+    if (c.specialty === 'endo') {
+      addSection('DIAGNOSIS', [
+        ['Pulp Diagnosis', c.pulp_diagnosis],
+        ['Periapical Diagnosis', c.periapical_diagnosis],
+        ['Case Type', c.case_type],
+      ]);
+      addSection('TREATMENT DETAILS', [
+        ['Number of Canals', c.canals],
+        ['Working Length', c.working_length],
+        ['Apical Size', c.apical_size],
+        ['Canal Curvature', c.curvature],
+        ['Irrigation', c.irrigation],
+        ['Obturation', c.obturation],
+        ['Calcification', c.calcification],
+        ['Separated Instrument', c.separated],
+      ]);
+    } else if (c.specialty === 'restorative') {
+      addSection('RESTORATION DETAILS', [
+        ['Cavity Class', c.cavity_class],
+        ['Surfaces', c.surfaces],
+        ['Material', c.material],
+        ['Isolation', c.isolation],
+      ]);
+    } else if (c.specialty === 'surgery') {
+      addSection('SURGICAL DETAILS', [
+        ['Procedure', c.procedure],
+        ['Impaction Level', c.impaction],
+        ['Anaesthesia', c.anaesthesia],
+        ['Sutures', c.sutures],
+      ]);
+    }
+
+    addSection('OUTCOME', [
+      ['Post-op Symptoms', c.post_op],
+      ['Follow-up', c.follow_up],
+      ['Difficulty Rating', c.difficulty_rating ? `${c.difficulty_rating}/5 stars` : null],
+      ['Personal Note', c.note],
+    ]);
+
+    // Complexity bar
+    if (y < 260) {
+      doc.setFillColor(20, 35, 60);
+      doc.rect(16, y, 178, 18, 'F');
+      doc.setTextColor(...GRAY);
+      doc.setFontSize(8);
+      doc.text('Complexity Score', 20, y + 7);
+      doc.setFillColor(30, 50, 80);
+      doc.rect(60, y + 3, 120, 5, 'F');
+      const score = c.complexity_score || 0;
+      doc.setFillColor(...TEAL);
+      doc.rect(60, y + 3, (score / 10) * 120, 5, 'F');
+      doc.setTextColor(...TEAL);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${score}/10`, 185, y + 8);
+    }
+  });
+
+  // ─── SUMMARY PAGE ───
+  doc.addPage();
+  doc.setFillColor(...NAVY);
+  doc.rect(0, 0, 210, 297, 'F');
+  doc.setFillColor(...TEAL);
+  doc.rect(0, 0, 8, 297, 'F');
+
+  doc.setTextColor(...WHITE);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Portfolio Summary', 24, 30);
+  doc.setFillColor(...TEAL);
+  doc.rect(24, 34, 80, 0.8, 'F');
+
+  const endoCases = selectedCases.filter(c => c.specialty === 'endo').length;
+  const restoCases = selectedCases.filter(c => c.specialty === 'restorative').length;
+  const surgCases = selectedCases.filter(c => c.specialty === 'surgery').length;
+  const highComp = selectedCases.filter(c => c.complexity_score >= 7).length;
+
+  const summaryStats = [
+    ['Total Cases', total],
+    ['Endodontic Cases', endoCases],
+    ['Restorative Cases', restoCases],
+    ['Surgical Cases', surgCases],
+    ['High Complexity (7+)', highComp],
+    ['Average Complexity Score', `${avgScore}/10`],
+  ];
+
+  let ySummary = 50;
+  summaryStats.forEach(([label, value], i) => {
+    if (i % 2 === 0) {
+      doc.setFillColor(15, 25, 45);
+      doc.rect(16, ySummary - 4, 178, 10, 'F');
+    }
+    doc.setTextColor(...GRAY);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(label, 24, ySummary + 2);
+    doc.setTextColor(...TEAL);
+    doc.setFont('helvetica', 'bold');
+    doc.text(value.toString(), 170, ySummary + 2);
+    ySummary += 12;
+  });
+
+  doc.setTextColor(...GRAY);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`This portfolio was generated by Provify (provify.app) for ${name} on ${today}.`, 24, 270);
+  doc.text('Provify is a clinical case intelligence platform for dental professionals.', 24, 277);
+
+  // Save
+  const filename = `${name.replace(/\s+/g, '_')}_Portfolio_${new Date().getFullYear()}.pdf`;
+  doc.save(filename);
+
+  btn.textContent = '📄 Generate PDF';
+  btn.disabled = false;
+  showToast('Portfolio downloaded! ✓');
 }
 
 // ─── START ───
