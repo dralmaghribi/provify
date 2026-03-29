@@ -547,10 +547,9 @@ const SUPABASE_KEY = 'sb_publishable_IdTc1xIm34-sfTebJBt4Sg_XX_6U11x';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Get username from URL
-// provify.app/portfolio/dr-abdullah → username = dr-abdullah
-const pathParts = window.location.pathname.split('/');
-const username = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+// Get username from URL query parameter ?u=dr-abdullah
+const params = new URLSearchParams(window.location.search);
+const username = params.get('u') || '';
 
 const PHOTO_LABELS = {
   'xr-preop': 'Pre-op X-Ray',
