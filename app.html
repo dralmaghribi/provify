@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provify — Clinical Case Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --navy: #080F1E;
+  --navy-2: #0D1828;
+  --navy-3: #111F35;
+  --teal: #00C4B4;
+  --teal-dim: #00C4B418;
+  --teal-mid: #00C4B435;
+  --white: #F4F7F9;
+  --white-dim: #F4F7F970;
+  --white-faint: #F4F7F915;
+  --gray: #8892A4;
+  --danger: #FF4444;
+  --warning: #FF8C00;
+  --success: #00C4B4;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SCREENS ─── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; }
+
+/* ─── AUTH SCREEN ─── */
+#auth-screen {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 20px;
+}
+
+.auth-glow {
+  position: fixed;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #00C4B412 0%, transparent 70%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 440px;
+  background: var(--navy-2);
+  border: 1px solid var(--white-faint);
+  border-radius: 24px;
+  padding: 48px 40px;
+  position: relative;
+  animation: fadeUp 0.5s ease both;
+}
+
+.auth-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.8rem;
+  color: var(--white);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.auth-logo span { color: var(--teal); }
+
+.auth-tagline {
+  font-size: 0.85rem;
+  color: var(--gray);
+  margin-bottom: 36px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--white-faint);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--gray);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  background: var(--navy-3);
+  color: var(--white);
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-bottom: 6px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 300;
+  padding: 12px 16px;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus { border-color: var(--teal-mid); }
+.form-input::placeholder { color: var(--gray); }
+
+.form-select {
+  width: 100%;
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  padding: 12px 16px;
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238892A4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.form-select:focus { border-color: var(--teal-mid); }
+.form-select option { background: var(--navy-2); }
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.btn-primary {
+  background: var(--teal);
+  color: var(--navy);
+}
+.btn-primary:hover { background: #00ddd0; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.btn-ghost {
+  background: var(--white-faint);
+  color: var(--white-dim);
+  border: 1px solid var(--white-faint);
+}
+.btn-ghost:hover { background: var(--white-faint); border-color: var(--teal-mid); color: var(--teal); }
+
+.auth-error {
+  background: #FF444415;
+  border: 1px solid #FF444430;
+  color: #FF8888;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* ─── MAIN APP ─── */
+#app-screen {
+  flex-direction: column;
+}
+
+/* SIDEBAR */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--navy-2);
+  border-right: 1px solid var(--white-faint);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 10;
+}
+
+.sidebar-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4rem;
+  color: var(--white);
+  padding: 0 8px;
+  margin-bottom: 32px;
+  letter-spacing: -0.02em;
+}
+.sidebar-logo span { color: var(--teal); }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--gray);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover { background: var(--white-faint); color: var(--white); }
+.nav-item.active { background: var(--teal-dim); color: var(--teal); }
+.nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.user-card {
+  background: var(--white-faint);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 36px; height: 36px;
+  background: var(--teal-dim);
+  border: 1px solid var(--teal-mid);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: var(--teal);
+  font-weight: 500;
+}
+
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 0.8rem; color: var(--white); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-plan { font-size: 0.7rem; color: var(--gray); }
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--gray);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.logout-btn:hover { color: var(--danger); }
+
+/* MAIN CONTENT */
+.main-content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 32px;
+  max-width: calc(100vw - 240px);
+}
+
+/* PAGE HEADER */
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.page-sub {
+  font-size: 0.875rem;
+  color: var(--gray);
+}
+
+/* VIEWS */
+.view { display: none; }
+.view.active { display: block; }
+
+/* STATS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--navy-2);
+  border: 1px solid var(--white-faint);
+  border-radius: 16px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--teal-mid); }
+
+.stat-card-label {
+  font-size: 0.75rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.stat-card-value {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.2rem;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.stat-card-sub {
+  font-size: 0.75rem;
+  color: var(--teal);
+  margin-top: 4px;
+}
+
+/* CARDS */
+.card {
+  background: var(--navy-2);
+  border: 1px solid var(--white-faint);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.2rem;
+  color: var(--white);
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+/* CASES LIST */
+.cases-list { display: flex; flex-direction: column; gap: 12px; }
+
+.case-item {
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.case-item:hover { border-color: var(--teal-mid); transform: translateX(4px); }
+
+.case-specialty-badge {
+  background: var(--teal-dim);
+  border: 1px solid var(--teal-mid);
+  color: var(--teal);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.case-info { flex: 1; }
+.case-tooth { font-size: 0.9rem; color: var(--white); font-weight: 500; }
+.case-date { font-size: 0.75rem; color: var(--gray); margin-top: 2px; }
+
+.case-score {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4rem;
+  color: var(--teal);
+  letter-spacing: -0.02em;
+}
+
+.case-score-label { font-size: 0.65rem; color: var(--gray); text-align: center; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray);
+}
+
+.empty-icon { font-size: 3rem; margin-bottom: 16px; }
+.empty-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; color: var(--white-dim); margin-bottom: 8px; }
+.empty-sub { font-size: 0.875rem; line-height: 1.6; }
+
+/* BADGE GRID */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.badge-item {
+  background: var(--navy);
+  border: 1px solid var(--white-faint);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.badge-item.earned {
+  border-color: var(--teal-mid);
+  background: var(--teal-dim);
+}
+
+.badge-emoji { font-size: 1.8rem; margin-bottom: 8px; }
+.badge-name { font-size: 0.75rem; color: var(--white-dim); font-weight: 500; }
+.badge-desc { font-size: 0.65rem; color: var(--gray); margin-top: 4px; line-height: 1.4; }
+.badge-item.locked { opacity: 0.4; }
+
+/* LOG CASE FORM */
+.log-form {
+  max-width: 720px;
+}
+
+.form-section {
+  margin-bottom: 28px;
+}
+
+.form-section-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--white-faint);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.tip-box {
+  background: var(--teal-dim);
+  border-left: 3px solid var(--teal);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--white-dim);
+  line-height: 1.5;
+  display: none;
+}
+
+.specialty-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.specialty-btn {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--white-faint);
+  background: var(--navy);
+  color: var(--gray);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.specialty-btn:hover { border-color: var(--teal-mid); color: var(--white); }
+.specialty-btn.active { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+.specialty-btn .spec-icon { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+
+.star-rating {
+  display: flex;
+  gap: 8px;
+}
+
+.star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--white-faint);
+  transition: color 0.1s;
+  user-select: none;
+}
+.star.active { color: #FFD700; }
+
+/* AI REPORT */
+.ai-report {
+  background: var(--navy);
+  border: 1px solid var(--teal-mid);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 24px;
+  display: none;
+  animation: fadeUp 0.5s ease both;
+}
+
+.ai-report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--white-faint);
+}
+
+.ai-report-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.2rem;
+  color: var(--white);
+}
+
+.verified-badge {
+  background: var(--teal-dim);
+  border: 1px solid var(--teal-mid);
+  color: var(--teal);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.complexity-display {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.complexity-number {
+  font-family: 'Instrument Serif', serif;
+  font-size: 3.5rem;
+  color: var(--teal);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.complexity-number span {
+  font-size: 1.2rem;
+  color: var(--gray);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.complexity-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--white-faint);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.complexity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), #00E5D5);
+  border-radius: 100px;
+  transition: width 1s ease;
+}
+
+.insight-box {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.insight-strength {
+  background: var(--teal-dim);
+  border-left: 3px solid var(--teal);
+}
+
+.insight-watch {
+  background: #FF8C0012;
+  border-left: 3px solid var(--warning);
+}
+
+.insight-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.insight-strength .insight-label { color: var(--teal); }
+.insight-watch .insight-label { color: var(--warning); }
+
+.metrics-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.metric-mini {
+  background: var(--white-faint);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}
+
+.metric-mini-value {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4rem;
+  color: var(--teal);
+}
+
+.metric-mini-label {
+  font-size: 0.65rem;
+  color: var(--gray);
+  margin-top: 2px;
+}
+
+/* LOADING */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem;
+  color: var(--white);
+}
+.loading-logo span { color: var(--teal); }
+
+.loading-spinner {
+  width: 32px; height: 32px;
+  border: 2px solid var(--white-faint);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy-2);
+  border: 1px solid var(--teal-mid);
+  color: var(--white);
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  z-index: 999;
+  display: none;
+  animation: fadeUp 0.3s ease both;
+  max-width: 320px;
+}
+
+/* AI LOADING */
+.ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  color: var(--gray);
+  font-size: 0.875rem;
+}
+
+.ai-dots span {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--teal);
+  border-radius: 50%;
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+.ai-dots span:nth-child(2) { animation-delay: 0.2s; }
+.ai-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .sidebar { width: 100%; position: relative; height: auto; flex-direction: row; padding: 12px 16px; border-right: none; border-bottom: 1px solid var(--white-faint); overflow-x: auto; }
+  .sidebar-logo { display: none; }
+  .sidebar-bottom { display: none; }
+  .main-content { margin-left: 0; max-width: 100%; padding: 20px 16px; }
+  .app-layout { flex-direction: column; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .specialty-selector { grid-template-columns: repeat(3, 1fr); }
+  .metrics-mini { grid-template-columns: repeat(3, 1fr); }
+}
+
+.progress-bar-track {
+  height: 4px;
+  background: var(--white-faint);
+  border-radius: 100px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), #00E5D5);
+  border-radius: 100px;
+  transition: width 0.8s ease;
+}
+
+.gap-alert {
+  background: #FF8C0010;
+  border: 1px solid #FF8C0025;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: #FFB347;
+  margin-top: 12px;
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-logo">Provify<span>.</span></div>
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ─── AUTH SCREEN ─── -->
+<div class="screen" id="auth-screen">
+  <div class="auth-glow"></div>
+  <div class="auth-box">
+    <div class="auth-logo">Provify<span>.</span></div>
+    <div class="auth-tagline">Clinical case intelligence for dentists</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <div id="auth-error" class="auth-error"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="login-email" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="login-password" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary" onclick="handleLogin()" id="login-btn">Sign In</button>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signup-form" style="display:none">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" id="signup-first" placeholder="Abdullah">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" id="signup-last" placeholder="Al Maghribi">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="signup-email" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="signup-password" placeholder="Min 6 characters">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-select" id="signup-role">
+          <option value="">Select your role</option>
+          <option value="student">Dental Student</option>
+          <option value="intern">Intern / House Officer</option>
+          <option value="resident">Resident</option>
+          <option value="general">General Dentist</option>
+          <option value="specialist">Specialist</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="handleSignup()" id="signup-btn">Create Account — Free</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── APP SCREEN ─── -->
+<div class="screen" id="app-screen">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">Provify<span>.</span></div>
+
+      <button class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">⚡</span> Dashboard
+      </button>
+      <button class="nav-item" onclick="showView('log')" id="nav-log">
+        <span class="nav-icon">➕</span> Log Case
+      </button>
+      <button class="nav-item" onclick="showView('cases')" id="nav-cases">
+        <span class="nav-icon">📋</span> My Cases
+      </button>
+      <button class="nav-item" onclick="showView('progress')" id="nav-progress">
+        <span class="nav-icon">📈</span> Progress
+      </button>
+      <button class="nav-item" onclick="showView('badges')" id="nav-badges">
+        <span class="nav-icon">🏆</span> Achievements
+      </button>
+
+      <div class="sidebar-bottom">
+        <div class="user-card">
+          <div class="user-avatar" id="user-avatar">DR</div>
+          <div class="user-info">
+            <div class="user-name" id="user-display-name">Dr. Abdullah</div>
+            <div class="user-plan">Beta — Pro Free</div>
+          </div>
+          <button class="logout-btn" onclick="handleLogout()" title="Sign out">↩</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- DASHBOARD VIEW -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-header">
+          <div class="page-title">Good morning, <span id="greeting-name">Doctor</span> 👋</div>
+          <div class="page-sub">Here's your clinical overview</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label">Total Cases</div>
+            <div class="stat-card-value" id="stat-total">0</div>
+            <div class="stat-card-sub">Keep logging →</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Avg Complexity</div>
+            <div class="stat-card-value" id="stat-avg">—</div>
+            <div class="stat-card-sub">Out of 10</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Current Streak</div>
+            <div class="stat-card-value" id="stat-streak">0</div>
+            <div class="stat-card-sub">Days 🔥</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Your Level</div>
+            <div class="stat-card-value" id="stat-level">1</div>
+            <div class="stat-card-sub" id="stat-level-name">Intern</div>
+          </div>
+        </div>
+
+        <!-- RECENT CASES -->
+        <div class="card">
+          <div class="card-title">Recent Cases</div>
+          <div id="recent-cases-list">
+            <div class="empty-state">
+              <div class="empty-icon">🦷</div>
+              <div class="empty-title">No cases logged yet</div>
+              <div class="empty-sub">Log your first case to see it here.<br>It only takes 3 minutes.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GAP ALERT -->
+        <div class="card" id="gap-card" style="display:none">
+          <div class="card-title">⚡ Portfolio Insights</div>
+          <div id="gap-alerts"></div>
+        </div>
+      </div>
+
+      <!-- LOG CASE VIEW -->
+      <div class="view" id="view-log">
+        <div class="page-header">
+          <div class="page-title">Log a Case</div>
+          <div class="page-sub">Takes about 3 minutes — your AI report is instant</div>
+        </div>
+
+        <div class="log-form">
+          <!-- SPECIALTY SELECTOR -->
+          <div class="form-section-title">Select Specialty</div>
+          <div class="specialty-selector">
+            <button class="specialty-btn active" onclick="selectSpecialty('endo', this)">
+              <span class="spec-icon">🦷</span>
+              Endodontics
+            </button>
+            <button class="specialty-btn" onclick="selectSpecialty('restorative', this)">
+              <span class="spec-icon">✨</span>
+              Restorative
+            </button>
+            <button class="specialty-btn" onclick="selectSpecialty('surgery', this)">
+              <span class="spec-icon">🔧</span>
+              Oral Surgery
+            </button>
+          </div>
+
+          <!-- PATIENT INFO -->
+          <div class="form-section">
+            <div class="form-section-title">Patient Information</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Age Range</label>
+                <select class="form-select" id="f-age">
+                  <option value="">Select age range</option>
+                  <option>10-20</option><option>20-30</option><option>30-40</option>
+                  <option>40-50</option><option>50+</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Chief Complaint</label>
+                <select class="form-select" id="f-complaint">
+                  <option value="">Select complaint</option>
+                  <option>Pain</option><option>Swelling</option><option>Sensitivity</option>
+                  <option>Routine</option><option>Trauma</option><option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tooth Number</label>
+              <input type="text" class="form-input" id="f-tooth" placeholder="e.g. 36, 11, 47...">
+            </div>
+          </div>
+
+          <!-- ENDO FIELDS -->
+          <div id="endo-fields">
+            <div class="form-section">
+              <div class="form-section-title">Diagnosis</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Pulp Diagnosis</label>
+                  <select class="form-select" id="f-pulp">
+                    <option value="">Select diagnosis</option>
+                    <option>Normal</option>
+                    <option>Reversible Pulpitis</option>
+                    <option>Irreversible Pulpitis</option>
+                    <option>Pulp Necrosis</option>
+                    <option>Previously Treated</option>
+                    <option>Previously Initiated</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Periapical Diagnosis</label>
+                  <select class="form-select" id="f-periapical">
+                    <option value="">Select diagnosis</option>
+                    <option>Normal</option>
+                    <option>Symptomatic Apical Periodontitis</option>
+                    <option>Asymptomatic Apical Periodontitis</option>
+                    <option>Acute Apical Abscess</option>
+                    <option>Chronic Apical Abscess</option>
+                    <option>Condensing Osteitis</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Case Type</label>
+                <select class="form-select" id="f-case-type">
+                  <option value="">Select type</option>
+                  <option>Primary Treatment</option>
+                  <option>Retreatment</option>
+                  <option>Apexification</option>
+                  <option>Pulpotomy</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Treatment Details</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Number of Canals</label>
+                  <select class="form-select" id="f-canals">
+                    <option value="">Select</option>
+                    <option>1</option><option>2</option><option>3</option>
+                    <option>4</option><option>5</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Canal Curvature</label>
+                  <select class="form-select" id="f-curvature">
+                    <option value="">Select curvature</option>
+                    <option>Straight</option>
+                    <option>Slight</option>
+                    <option>Moderate</option>
+                    <option>Severe</option>
+                  </select>
+                  <div class="tip-box" id="tip-curvature">💡 Severe curvature above 30° — use pre-curved files and frequent recapitulation to avoid ledging.</div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Working Length (mm)</label>
+                  <input type="number" class="form-input" id="f-wl" placeholder="e.g. 21.5">
+                  <div class="tip-box" id="tip-wl">💡 Always confirm with both apex locator AND radiograph. Locator readings can be affected by bleeding or NaOCl.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Apical Size</label>
+                  <select class="form-select" id="f-apical">
+                    <option value="">Select size</option>
+                    <option>15</option><option>20</option><option>25</option>
+                    <option>30</option><option>35</option><option>40</option>
+                    <option>45</option><option>50</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Irrigation Solution</label>
+                  <select class="form-select" id="f-irrigation">
+                    <option value="">Select solution</option>
+                    <option>NaOCl only</option>
+                    <option>NaOCl + EDTA</option>
+                    <option>NaOCl + EDTA + CHX</option>
+                    <option>Other</option>
+                  </select>
+                  <div class="tip-box" id="tip-irrigation">💡 NaOCl 2.5-5.25% is most effective. Always use a side-vented needle and never force irrigant apically.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Obturation Technique</label>
+                  <select class="form-select" id="f-obturation">
+                    <option value="">Select technique</option>
+                    <option>Cold Lateral</option>
+                    <option>Warm Vertical</option>
+                    <option>Single Cone</option>
+                    <option>Other</option>
+                  </select>
+                  <div class="tip-box" id="tip-obturation">💡 Single cone works best with matching taper. Ensure full canal coating with sealer before placing master cone.</div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Calcification Present</label>
+                  <select class="form-select" id="f-calcification">
+                    <option value="">Select</option>
+                    <option>No</option>
+                    <option>Yes</option>
+                  </select>
+                  <div class="tip-box" id="tip-calcification">💡 Use EDTA gel before instrumentation. Patience and smaller file sizes prevent perforation in calcified canals.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Separated Instrument</label>
+                  <select class="form-select" id="f-separated">
+                    <option value="">Select</option>
+                    <option>No</option>
+                    <option>Yes</option>
+                  </select>
+                  <div class="tip-box" id="tip-separated">💡 Document this immediately in the patient record. Note location, file type, and whether it affects prognosis.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESTORATIVE FIELDS -->
+          <div id="restorative-fields" style="display:none">
+            <div class="form-section">
+              <div class="form-section-title">Restoration Details</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Cavity Classification</label>
+                  <select class="form-select" id="f-cavity-class">
+                    <option value="">Select class</option>
+                    <option>Class I</option><option>Class II</option><option>Class III</option>
+                    <option>Class IV</option><option>Class V</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Number of Surfaces</label>
+                  <select class="form-select" id="f-surfaces">
+                    <option value="">Select</option>
+                    <option>1 Surface</option><option>2 Surfaces</option>
+                    <option>3 Surfaces</option><option>4+ Surfaces</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Material Used</label>
+                  <select class="form-select" id="f-material">
+                    <option value="">Select material</option>
+                    <option>Composite</option><option>Amalgam</option>
+                    <option>Ceramic / Porcelain</option><option>GIC</option><option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Isolation Method</label>
+                  <select class="form-select" id="f-isolation">
+                    <option value="">Select method</option>
+                    <option>Rubber Dam</option>
+                    <option>Cotton Roll</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SURGERY FIELDS -->
+          <div id="surgery-fields" style="display:none">
+            <div class="form-section">
+              <div class="form-section-title">Surgical Details</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Procedure Type</label>
+                  <select class="form-select" id="f-procedure">
+                    <option value="">Select procedure</option>
+                    <option>Simple Extraction</option>
+                    <option>Surgical Extraction</option>
+                    <option>Impacted Wisdom Tooth</option>
+                    <option>Biopsy</option>
+                    <option>Surgical Endodontics</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Impaction Level</label>
+                  <select class="form-select" id="f-impaction">
+                    <option value="">Select (if applicable)</option>
+                    <option>N/A</option>
+                    <option>Soft Tissue</option>
+                    <option>Partial Bony</option>
+                    <option>Full Bony</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Anaesthesia</label>
+                  <select class="form-select" id="f-anaesthesia">
+                    <option value="">Select</option>
+                    <option>Local — Infiltration</option>
+                    <option>Local — Block</option>
+                    <option>Local — Both</option>
+                    <option>General</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Sutures Placed</label>
+                  <select class="form-select" id="f-sutures">
+                    <option value="">Select</option>
+                    <option>No</option><option>Yes — Resorbable</option>
+                    <option>Yes — Non-resorbable</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- OUTCOME — ALL SPECIALTIES -->
+          <div class="form-section">
+            <div class="form-section-title">Outcome</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Post-op Symptoms</label>
+                <select class="form-select" id="f-postop">
+                  <option value="">Select</option>
+                  <option>None</option><option>Mild Pain</option>
+                  <option>Moderate Pain</option><option>Swelling</option><option>Other</option>
+                </select>
+                <div class="tip-box" id="tip-postop">💡 Mild pain for 48-72 hours is normal after instrumentation. Escalating pain after 72 hours warrants review.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Follow-up Needed</label>
+                <select class="form-select" id="f-followup">
+                  <option value="">Select</option>
+                  <option>No</option><option>Yes — 1 week</option>
+                  <option>Yes — 1 month</option><option>Yes — 6 months</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Difficulty Rating</label>
+              <div class="star-rating" id="star-rating">
+                <span class="star" onclick="setRating(1)">★</span>
+                <span class="star" onclick="setRating(2)">★</span>
+                <span class="star" onclick="setRating(3)">★</span>
+                <span class="star" onclick="setRating(4)">★</span>
+                <span class="star" onclick="setRating(5)">★</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Personal Note</label>
+              <input type="text" class="form-input" id="f-note" placeholder="One line about this case...">
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="submitCase()" id="submit-case-btn">
+            Log Case & Get AI Report →
+          </button>
+
+          <!-- AI REPORT -->
+          <div class="ai-report" id="ai-report">
+            <div class="ai-report-header">
+              <div class="ai-report-title">Case Intelligence Report</div>
+              <div class="verified-badge">✓ Verified</div>
+            </div>
+
+            <div class="complexity-display">
+              <div>
+                <div style="font-size: 0.75rem; color: var(--gray); margin-bottom: 4px;">Complexity Score</div>
+                <div class="complexity-number" id="report-score">—<span>/10</span></div>
+              </div>
+              <div class="complexity-bar" style="flex:1">
+                <div class="complexity-fill" id="report-bar" style="width:0%"></div>
+              </div>
+            </div>
+
+            <div id="report-insights"></div>
+
+            <div class="metrics-mini" id="report-metrics"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASES VIEW -->
+      <div class="view" id="view-cases">
+        <div class="page-header">
+          <div class="page-title">My Cases</div>
+          <div class="page-sub">Your complete clinical record</div>
+        </div>
+        <div class="card">
+          <div id="all-cases-list">
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <div class="empty-title">No cases yet</div>
+              <div class="empty-sub">Start logging cases to build your clinical record.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROGRESS VIEW -->
+      <div class="view" id="view-progress">
+        <div class="page-header">
+          <div class="page-title">Progress</div>
+          <div class="page-sub">Your clinical growth over time</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label">Endo Cases</div>
+            <div class="stat-card-value" id="prog-endo">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Restorative</div>
+            <div class="stat-card-value" id="prog-resto">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Surgery</div>
+            <div class="stat-card-value" id="prog-surg">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Avg Score</div>
+            <div class="stat-card-value" id="prog-avg">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Level Progress</div>
+          <div style="display:flex; align-items:center; gap:16px; margin-bottom:12px;">
+            <div style="font-family:'Instrument Serif',serif; font-size:2.5rem; color:var(--teal)" id="prog-level-display">1</div>
+            <div>
+              <div style="font-size:0.9rem; color:var(--white); font-weight:500" id="prog-level-name-display">Intern</div>
+              <div style="font-size:0.8rem; color:var(--gray)" id="prog-level-next">Log 25 cases to reach Level 2</div>
+            </div>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="prog-level-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="card" id="progress-insights-card">
+          <div class="card-title">Portfolio Insights</div>
+          <div id="progress-insights-list">
+            <div class="empty-state" style="padding:30px">
+              <div class="empty-sub">Log more cases to unlock personalized insights.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BADGES VIEW -->
+      <div class="view" id="view-badges">
+        <div class="page-header">
+          <div class="page-title">Achievements</div>
+          <div class="page-sub">Milestones that mark your clinical journey</div>
+        </div>
+        <div class="card">
+          <div class="badge-grid" id="badge-grid"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───
+const SUPABASE_URL = 'https://latbebqtayfvgzgebxam.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_IdTc1xIm34-sfTebJBt4Sg_XX_6U11x';
+const ANTHROPIC_KEY = ''; // Will be added via env variable
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ─── STATE ───
+let currentUser = null;
+let currentProfile = null;
+let allCases = [];
+let selectedSpecialty = 'endo';
+let selectedRating = 0;
+
+// ─── INIT ───
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    await loadProfile();
+    showApp();
+  } else {
+    showAuth();
+  }
+  hideLoading();
+}
+
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+
+function showAuth() {
+  document.getElementById('auth-screen').classList.add('active');
+  document.getElementById('app-screen').classList.remove('active');
+}
+
+async function showApp() {
+  document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('app-screen').classList.add('active');
+  await loadCases();
+  updateDashboard();
+  renderBadges();
+  updateProgress();
+}
+
+// ─── AUTH ───
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { showAuthError('Please fill in all fields.'); return; }
+
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    showAuthError(error.message);
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+  } else {
+    currentUser = data.user;
+    await loadProfile();
+    showApp();
+  }
+}
+
+async function handleSignup() {
+  const first = document.getElementById('signup-first').value;
+  const last = document.getElementById('signup-last').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const role = document.getElementById('signup-role').value;
+
+  if (!first || !email || !password || !role) { showAuthError('Please fill in all fields.'); return; }
+  if (password.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
+
+  const btn = document.getElementById('signup-btn');
+  btn.textContent = 'Creating account...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { first_name: first, last_name: last, role } }
+  });
+
+  if (error) {
+    showAuthError(error.message);
+    btn.textContent = 'Create Account — Free';
+    btn.disabled = false;
+  } else {
+    currentUser = data.user;
+    await createProfile(first, last, role);
+    showApp();
+    showToast('Welcome to Provify! 🎉 Start logging your first case.');
+  }
+}
+
+async function createProfile(first, last, role) {
+  await sb.from('profiles').upsert({
+    id: currentUser.id,
+    first_name: first,
+    last_name: last,
+    role,
+    created_at: new Date().toISOString()
+  });
+  currentProfile = { first_name: first, last_name: last, role };
+}
+
+async function loadProfile() {
+  const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  currentProfile = data;
+  if (data) {
+    document.getElementById('user-display-name').textContent = `Dr. ${data.first_name || 'User'}`;
+    document.getElementById('greeting-name').textContent = data.first_name || 'Doctor';
+    document.getElementById('user-avatar').textContent = (data.first_name?.[0] || 'D') + (data.last_name?.[0] || 'R');
+  }
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  currentProfile = null;
+  allCases = [];
+  showAuth();
+}
+
+// ─── NAVIGATION ───
+function showView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.getElementById('nav-' + view).classList.add('active');
+
+  if (view === 'cases') renderAllCases();
+  if (view === 'progress') updateProgress();
+  if (view === 'badges') renderBadges();
+}
+
+// ─── CASES ───
+async function loadCases() {
+  if (!currentUser) return;
+  const { data } = await sb.from('cases').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  allCases = data || [];
+}
+
+function selectSpecialty(spec, btn) {
+  selectedSpecialty = spec;
+  document.querySelectorAll('.specialty-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('endo-fields').style.display = spec === 'endo' ? 'block' : 'none';
+  document.getElementById('restorative-fields').style.display = spec === 'restorative' ? 'block' : 'none';
+  document.getElementById('surgery-fields').style.display = spec === 'surgery' ? 'block' : 'none';
+}
+
+function setRating(n) {
+  selectedRating = n;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
+}
+
+// Show tips on select change
+document.addEventListener('change', function(e) {
+  const tips = {
+    'f-curvature': 'tip-curvature',
+    'f-wl': 'tip-wl',
+    'f-irrigation': 'tip-irrigation',
+    'f-obturation': 'tip-obturation',
+    'f-calcification': 'tip-calcification',
+    'f-separated': 'tip-separated',
+    'f-postop': 'tip-postop',
+  };
+  if (tips[e.target.id] && e.target.value) {
+    document.getElementById(tips[e.target.id]).style.display = 'block';
+  }
+});
+
+function calculateComplexity() {
+  let score = 1;
+  const spec = selectedSpecialty;
+
+  if (spec === 'endo') {
+    if (document.getElementById('f-case-type').value === 'Retreatment') score += 2;
+    const curv = document.getElementById('f-curvature').value;
+    if (curv === 'Severe') score += 2;
+    else if (curv === 'Moderate') score += 1;
+    if (document.getElementById('f-calcification').value === 'Yes') score += 2;
+    if (document.getElementById('f-separated').value === 'Yes') score += 1;
+    const canals = parseInt(document.getElementById('f-canals').value) || 0;
+    if (canals >= 4) score += 1;
+    if (canals >= 5) score += 1;
+    const apical = parseInt(document.getElementById('f-apical').value) || 0;
+    if (apical >= 40) score += 0.5;
+    const pulp = document.getElementById('f-pulp').value;
+    if (pulp === 'Pulp Necrosis') score += 0.5;
+    const perio = document.getElementById('f-periapical').value;
+    if (perio.includes('Abscess')) score += 0.5;
+  } else if (spec === 'restorative') {
+    const surfaces = document.getElementById('f-surfaces').value;
+    if (surfaces === '2 Surfaces') score += 1;
+    else if (surfaces === '3 Surfaces') score += 2;
+    else if (surfaces === '4+ Surfaces') score += 3;
+    if (document.getElementById('f-isolation').value === 'Cotton Roll') score += 0.5;
+  } else if (spec === 'surgery') {
+    const proc = document.getElementById('f-procedure').value;
+    if (proc === 'Surgical Extraction') score += 2;
+    if (proc === 'Impacted Wisdom Tooth') score += 2;
+    if (proc === 'Surgical Endodontics') score += 2;
+    const imp = document.getElementById('f-impaction').value;
+    if (imp === 'Partial Bony') score += 1;
+    if (imp === 'Full Bony') score += 2;
+  }
+
+  const rating = selectedRating;
+  if (rating >= 4) score += 0.5;
+  if (rating === 5) score += 0.5;
+
+  return Math.min(Math.round(score * 10) / 10, 10);
+}
+
+async function submitCase() {
+  const tooth = document.getElementById('f-tooth').value;
+  const age = document.getElementById('f-age').value;
+  const complaint = document.getElementById('f-complaint').value;
+
+  if (!tooth || !age || !complaint) {
+    showToast('Please fill in patient information first.');
+    return;
+  }
+
+  const btn = document.getElementById('submit-case-btn');
+  btn.textContent = 'Saving case...';
+  btn.disabled = true;
+
+  const complexity = calculateComplexity();
+
+  // Build case data
+  const caseData = {
+    user_id: currentUser.id,
+    specialty: selectedSpecialty,
+    tooth_number: tooth,
+    age_range: age,
+    complaint,
+    complexity_score: complexity,
+    difficulty_rating: selectedRating,
+    note: document.getElementById('f-note').value,
+    follow_up: document.getElementById('f-followup').value,
+    post_op: document.getElementById('f-postop').value,
+    created_at: new Date().toISOString(),
+    // Specialty specific
+    ...(selectedSpecialty === 'endo' ? {
+      pulp_diagnosis: document.getElementById('f-pulp').value,
+      periapical_diagnosis: document.getElementById('f-periapical').value,
+      case_type: document.getElementById('f-case-type').value,
+      canals: document.getElementById('f-canals').value,
+      curvature: document.getElementById('f-curvature').value,
+      working_length: document.getElementById('f-wl').value,
+      apical_size: document.getElementById('f-apical').value,
+      irrigation: document.getElementById('f-irrigation').value,
+      obturation: document.getElementById('f-obturation').value,
+      calcification: document.getElementById('f-calcification').value,
+      separated: document.getElementById('f-separated').value,
+    } : {}),
+    ...(selectedSpecialty === 'restorative' ? {
+      cavity_class: document.getElementById('f-cavity-class').value,
+      surfaces: document.getElementById('f-surfaces').value,
+      material: document.getElementById('f-material').value,
+      isolation: document.getElementById('f-isolation').value,
+    } : {}),
+    ...(selectedSpecialty === 'surgery' ? {
+      procedure: document.getElementById('f-procedure').value,
+      impaction: document.getElementById('f-impaction').value,
+      anaesthesia: document.getElementById('f-anaesthesia').value,
+      sutures: document.getElementById('f-sutures').value,
+    } : {}),
+  };
+
+  const { data, error } = await sb.from('cases').insert([caseData]).select();
+
+  if (error) {
+    showToast('Error saving case. Please try again.');
+    btn.textContent = 'Log Case & Get AI Report →';
+    btn.disabled = false;
+    return;
+  }
+
+  allCases.unshift(data[0]);
+  btn.textContent = 'Generating AI Report...';
+
+  // Show AI report
+  await generateAIReport(caseData, complexity);
+
+  btn.textContent = 'Log Case & Get AI Report →';
+  btn.disabled = false;
+
+  updateDashboard();
+  renderBadges();
+  showToast('Case logged! ✓ Check your AI report below.');
+}
+
+async function generateAIReport(caseData, complexity) {
+  const reportEl = document.getElementById('ai-report');
+  const insightsEl = document.getElementById('report-insights');
+  const metricsEl = document.getElementById('report-metrics');
+
+  reportEl.style.display = 'block';
+  insightsEl.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Analyzing your case...</div>`;
+  metricsEl.innerHTML = '';
+
+  document.getElementById('report-score').innerHTML = `${complexity}<span>/10</span>`;
+  document.getElementById('report-bar').style.width = `${complexity * 10}%`;
+
+  // Build prompt
+  const prompt = buildAIPrompt(caseData, complexity);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const result = await response.json();
+    const text = result.content?.[0]?.text || '';
+
+    // Parse JSON response
+    let parsed;
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    } catch {
+      parsed = {
+        strength: 'Good clinical work on this case.',
+        watch: 'Continue documenting cases to track your progress.',
+        tip: 'Keep logging to build your career record.'
+      };
+    }
+
+    insightsEl.innerHTML = `
+      <div class="insight-box insight-strength">
+        <div class="insight-label">✦ Strength</div>
+        ${parsed.strength || 'Good clinical execution on this case.'}
+      </div>
+      <div class="insight-box insight-watch">
+        <div class="insight-label">⚠ Watch Next Time</div>
+        ${parsed.watch || 'Continue refining your technique.'}
+      </div>
+      ${parsed.tip ? `<div class="insight-box insight-strength"><div class="insight-label">💡 Clinical Tip</div>${parsed.tip}</div>` : ''}
+    `;
+
+  } catch (e) {
+    insightsEl.innerHTML = `
+      <div class="insight-box insight-strength">
+        <div class="insight-label">✦ Case Logged</div>
+        Complexity score: ${complexity}/10. Keep logging cases to build your clinical intelligence report history.
+      </div>
+    `;
+  }
+
+  // Metrics
+  const total = allCases.length;
+  const level = getLevel(total);
+  metricsEl.innerHTML = `
+    <div class="metric-mini">
+      <div class="metric-mini-value">${total}</div>
+      <div class="metric-mini-label">Total cases</div>
+    </div>
+    <div class="metric-mini">
+      <div class="metric-mini-value">Lv.${level.level}</div>
+      <div class="metric-mini-label">${level.name}</div>
+    </div>
+    <div class="metric-mini">
+      <div class="metric-mini-value">${complexity}</div>
+      <div class="metric-mini-label">This case score</div>
+    </div>
+  `;
+}
+
+function buildAIPrompt(c, complexity) {
+  const spec = c.specialty;
+  let details = '';
+
+  if (spec === 'endo') {
+    details = `
+Specialty: Endodontics
+Tooth: ${c.tooth_number}, Age range: ${c.age_range}
+Pulp diagnosis: ${c.pulp_diagnosis}, Periapical: ${c.periapical_diagnosis}
+Case type: ${c.case_type}
+Canals: ${c.canals}, Curvature: ${c.curvature}
+Working length: ${c.working_length}mm, Apical size: ${c.apical_size}
+Irrigation: ${c.irrigation}, Obturation: ${c.obturation}
+Calcification: ${c.calcification}, Separated instrument: ${c.separated}
+Post-op: ${c.post_op}, Difficulty rating: ${c.difficulty_rating}/5
+Complexity score calculated: ${complexity}/10`;
+  } else if (spec === 'restorative') {
+    details = `
+Specialty: Restorative Dentistry
+Tooth: ${c.tooth_number}, Class: ${c.cavity_class}
+Surfaces: ${c.surfaces}, Material: ${c.material}
+Isolation: ${c.isolation}, Post-op: ${c.post_op}
+Complexity score: ${complexity}/10`;
+  } else {
+    details = `
+Specialty: Oral Surgery
+Tooth: ${c.tooth_number}, Procedure: ${c.procedure}
+Impaction: ${c.impaction}, Anaesthesia: ${c.anaesthesia}
+Sutures: ${c.sutures}, Post-op: ${c.post_op}
+Complexity score: ${complexity}/10`;
+  }
+
+  return `You are a senior dental specialist reviewing a case logged by a dentist on Provify, a clinical case intelligence platform. 
+
+Case details:
+${details}
+
+Respond ONLY with a JSON object (no markdown, no preamble) with exactly these keys:
+- "strength": One specific sentence praising what went well or acknowledging clinical complexity (be specific to the case data, not generic)
+- "watch": One specific clinical tip or thing to consider next time (based on the actual case data)
+- "tip": One advanced clinical pearl relevant to this specific case
+
+Keep each field to 1-2 sentences max. Be specific, clinical, and genuinely useful. Sound like a senior specialist talking to a junior colleague.`;
+}
+
+// ─── DASHBOARD ───
+function updateDashboard() {
+  const total = allCases.length;
+  document.getElementById('stat-total').textContent = total;
+
+  if (total > 0) {
+    const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
+    document.getElementById('stat-avg').textContent = avg;
+  }
+
+  const level = getLevel(total);
+  document.getElementById('stat-level').textContent = level.level;
+  document.getElementById('stat-level-name').textContent = level.name;
+
+  // Recent cases
+  const recentEl = document.getElementById('recent-cases-list');
+  if (allCases.length === 0) {
+    recentEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🦷</div><div class="empty-title">No cases logged yet</div><div class="empty-sub">Log your first case to see it here.<br>It only takes 3 minutes.</div></div>`;
+  } else {
+    const recent = allCases.slice(0, 5);
+    recentEl.innerHTML = `<div class="cases-list">${recent.map(c => caseItemHTML(c)).join('')}</div>`;
+  }
+
+  // Gap alerts
+  updateGapAlerts();
+}
+
+function caseItemHTML(c) {
+  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+  return `
+    <div class="case-item">
+      <div class="case-specialty-badge">${specLabel}</div>
+      <div class="case-info">
+        <div class="case-tooth">Tooth ${c.tooth_number}</div>
+        <div class="case-date">${date}</div>
+      </div>
+      <div>
+        <div class="case-score">${c.complexity_score || '—'}</div>
+        <div class="case-score-label">score</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAllCases() {
+  const el = document.getElementById('all-cases-list');
+  if (allCases.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No cases yet</div><div class="empty-sub">Start logging cases to build your clinical record.</div></div>`;
+  } else {
+    el.innerHTML = `<div class="cases-list">${allCases.map(c => caseItemHTML(c)).join('')}</div>`;
+  }
+}
+
+// ─── LEVELS ───
+function getLevel(total) {
+  if (total >= 500) return { level: 5, name: 'Master Clinician', next: 500 };
+  if (total >= 250) return { level: 4, name: 'Specialist', next: 500 };
+  if (total >= 100) return { level: 3, name: 'Associate', next: 250 };
+  if (total >= 25) return { level: 2, name: 'Resident', next: 100 };
+  return { level: 1, name: 'Intern', next: 25 };
+}
+
+// ─── PROGRESS ───
+function updateProgress() {
+  const endo = allCases.filter(c => c.specialty === 'endo').length;
+  const resto = allCases.filter(c => c.specialty === 'restorative').length;
+  const surg = allCases.filter(c => c.specialty === 'surgery').length;
+  const total = allCases.length;
+
+  document.getElementById('prog-endo').textContent = endo;
+  document.getElementById('prog-resto').textContent = resto;
+  document.getElementById('prog-surg').textContent = surg;
+
+  if (total > 0) {
+    const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
+    document.getElementById('prog-avg').textContent = avg;
+  }
+
+  const level = getLevel(total);
+  document.getElementById('prog-level-display').textContent = level.level;
+  document.getElementById('prog-level-name-display').textContent = level.name;
+
+  const prev = level.level > 1 ? [0, 25, 100, 250, 500][level.level - 1] : 0;
+  const pct = level.level >= 5 ? 100 : Math.round(((total - prev) / (level.next - prev)) * 100);
+  document.getElementById('prog-level-bar').style.width = `${Math.min(pct, 100)}%`;
+  document.getElementById('prog-level-next').textContent = level.level >= 5 ? 'Maximum level reached!' : `${level.next - total} more cases to Level ${level.level + 1}`;
+
+  // Insights
+  updateProgressInsights(endo, resto, surg, total);
+}
+
+function updateProgressInsights(endo, resto, surg, total) {
+  const el = document.getElementById('progress-insights-list');
+  const insights = [];
+
+  if (total === 0) {
+    el.innerHTML = `<div class="empty-state" style="padding:30px"><div class="empty-sub">Log more cases to unlock personalized insights.</div></div>`;
+    return;
+  }
+
+  if (endo === 0) insights.push('⚡ You have no endodontic cases logged. This is a major gap for most fellowship applications.');
+  if (resto === 0 && total > 5) insights.push('⚡ No restorative cases logged. Add some to show clinical diversity.');
+  if (surg === 0 && total > 5) insights.push('⚡ No surgical cases logged. Consider logging extractions or surgical procedures.');
+  if (total >= 10 && endo > 0) {
+    const endoPct = Math.round((endo / total) * 100);
+    if (endoPct > 80) insights.push(`💡 ${endoPct}% of your cases are endodontic. Consider logging other specialties for a well-rounded portfolio.`);
+  }
+  if (total >= 25) insights.push(`✓ ${total} cases logged — you're building a strong clinical record.`);
+  if (total >= 100) insights.push('🏆 100+ cases! You have a portfolio most applicants can only dream of.');
+
+  if (insights.length === 0) insights.push('✓ Your portfolio is developing well. Keep logging cases consistently.');
+
+  el.innerHTML = insights.map(i => `<div class="gap-alert" style="margin-bottom:8px">${i}</div>`).join('');
+}
+
+function updateGapAlerts() {
+  const total = allCases.length;
+  if (total < 3) return;
+
+  const gaps = [];
+  const endo = allCases.filter(c => c.specialty === 'endo').length;
+  const resto = allCases.filter(c => c.specialty === 'restorative').length;
+  const surg = allCases.filter(c => c.specialty === 'surgery').length;
+
+  if (endo === 0) gaps.push('⚡ No endodontic cases yet — critical for most specialty applications.');
+  if (resto === 0) gaps.push('⚡ Add restorative cases to show clinical diversity.');
+  if (surg === 0) gaps.push('⚡ No surgical cases logged yet.');
+
+  const gapCard = document.getElementById('gap-card');
+  const gapEl = document.getElementById('gap-alerts');
+
+  if (gaps.length > 0) {
+    gapCard.style.display = 'block';
+    gapEl.innerHTML = gaps.map(g => `<div class="gap-alert">${g}</div>`).join('');
+  }
+}
+
+// ─── BADGES ───
+const BADGES = [
+  { id: 'first-case', emoji: '🌟', name: 'First Case', desc: 'Log your very first case', check: (cases) => cases.length >= 1 },
+  { id: '10-cases', emoji: '📋', name: '10 Cases', desc: 'Log 10 cases total', check: (cases) => cases.length >= 10 },
+  { id: '25-cases', emoji: '🎯', name: '25 Cases', desc: 'Log 25 cases total', check: (cases) => cases.length >= 25 },
+  { id: '100-cases', emoji: '💯', name: '100 Cases', desc: 'Log 100 cases total', check: (cases) => cases.length >= 100 },
+  { id: 'endo-pro', emoji: '🦷', name: 'Endo Pro', desc: 'Log 10 endodontic cases', check: (cases) => cases.filter(c => c.specialty === 'endo').length >= 10 },
+  { id: 'well-rounded', emoji: '🌐', name: 'Well Rounded', desc: 'Log cases in all 3 specialties', check: (cases) => ['endo','restorative','surgery'].every(s => cases.some(c => c.specialty === s)) },
+  { id: 'high-complexity', emoji: '🔥', name: 'Complexity King', desc: 'Log a case with score 8+', check: (cases) => cases.some(c => c.complexity_score >= 8) },
+  { id: 'retreatment', emoji: '🔄', name: 'Retreatment Pro', desc: 'Log 5 retreatment cases', check: (cases) => cases.filter(c => c.case_type === 'Retreatment').length >= 5 },
+  { id: 'diverse', emoji: '🎨', name: 'Diverse Clinician', desc: 'Log 5 cases in each specialty', check: (cases) => ['endo','restorative','surgery'].every(s => cases.filter(c => c.specialty === s).length >= 5) },
+  { id: 'portfolio-ready', emoji: '📄', name: 'Portfolio Ready', desc: 'Log 50 cases', check: (cases) => cases.length >= 50 },
+];
+
+function renderBadges() {
+  const grid = document.getElementById('badge-grid');
+  grid.innerHTML = BADGES.map(b => {
+    const earned = b.check(allCases);
+    return `
+      <div class="badge-item ${earned ? 'earned' : 'locked'}">
+        <div class="badge-emoji">${b.emoji}</div>
+        <div class="badge-name">${b.name}</div>
+        <div class="badge-desc">${earned ? '✓ Earned' : b.desc}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 4000);
+}
+
+// ─── START ───
+init();
+</script>
+</body>
+</html>
