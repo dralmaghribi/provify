@@ -1163,7 +1163,21 @@ body {
     </div>
 
     <!-- Fields -->
-    <div style="padding:8px 28px 24px" id="modal-fields"></div>
+    <div style="padding:8px 28px 20px" id="modal-fields"></div>
+
+    <!-- Generate Note -->
+    <div style="padding:0 28px 28px">
+      <button onclick="generateClinicalNote()" id="gen-note-btn" style="width:100%;background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:500;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;">
+        📋 Generate Clinical Note
+      </button>
+      <div id="clinical-note-output" style="display:none;margin-top:12px;background:var(--navy-3);border:1px solid var(--white-faint);border-radius:10px;padding:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:0.65rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:500">Clinical Note — Ready to Copy</div>
+          <button onclick="copyNote()" style="background:var(--teal);color:var(--navy);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:6px;border:none;cursor:pointer;">Copy</button>
+        </div>
+        <div id="clinical-note-text" style="font-size:0.82rem;color:var(--white-dim);line-height:1.7;white-space:pre-wrap;"></div>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -1357,6 +1371,10 @@ body {
             <div class="stat-card-value" id="stat-level">1</div>
             <div class="stat-card-sub" id="stat-level-name">Intern</div>
           </div>
+        </div>
+
+        <!-- XP PROGRESS CARD -->
+        <div class="card" id="xp-progress-card" style="background:linear-gradient(135deg,var(--navy-2) 0%,rgba(124,111,255,0.05) 100%);border-color:var(--teal-mid)">
         </div>
 
         <!-- RECENT CASES -->
@@ -2628,18 +2646,62 @@ function updateDashboard() {
   const total = allCases.length;
   document.getElementById('stat-total').textContent = total;
 
-  // Show welcome card only when 0 cases
+  // Welcome card
   const welcomeCard = document.getElementById('welcome-card');
   if (welcomeCard) welcomeCard.style.display = total === 0 ? 'block' : 'none';
 
-  if (total > 0) {
-    const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
-    document.getElementById('stat-avg').textContent = avg;
-  }
+  const avg = total > 0 ? (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total) : 0;
+  if (total > 0) document.getElementById('stat-avg').textContent = avg.toFixed(1);
 
   const level = getLevel(total);
+  const xp = getXP(total);
+  const rank = getComplexityRank(avg);
+
+  // Update stat cards
   document.getElementById('stat-level').textContent = level.level;
   document.getElementById('stat-level-name').textContent = level.name;
+
+  // Inject XP bar into dashboard
+  const xpCard = document.getElementById('xp-progress-card');
+  if (xpCard) {
+    xpCard.innerHTML = `
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--teal-dim);border:1px solid var(--teal-mid);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0">${level.icon}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
+            <span style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--white);letter-spacing:-0.02em">${level.name}</span>
+            <span style="font-size:0.72rem;color:var(--gray)">Level ${level.level}</span>
+          </div>
+          <div style="font-size:0.75rem;color:var(--gray)">${level.title}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:0.65rem;color:var(--gray);margin-bottom:2px">Complexity Rank</div>
+          <div style="font-size:0.85rem;font-weight:600;color:${rank.color}">${rank.rank}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--gray);margin-bottom:6px">
+          <span>${xp.current} XP</span>
+          <span>${level.level < 10 ? xp.toNext + ' to ' + LEVELS[level.level].name : 'Max Level!'}</span>
+        </div>
+        <div style="height:8px;background:var(--white-faint);border-radius:100px;overflow:hidden;position:relative">
+          <div id="xp-bar-fill" style="height:100%;background:linear-gradient(90deg,var(--teal),#9B91FF);border-radius:100px;width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);position:relative;">
+            <div style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:12px;height:12px;background:white;border-radius:50%;box-shadow:0 0 8px rgba(124,111,255,0.8)"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${allCases.length >= 1 ? `<div style="background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-size:0.62rem;padding:3px 10px;border-radius:100px">🎯 First Case</div>` : ''}
+        ${allCases.length >= 10 ? `<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#F59E0B;font-size:0.62rem;padding:3px 10px;border-radius:100px">🔥 10 Cases</div>` : ''}
+        ${allCases.length >= 25 ? `<div style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.3);color:#A78BFA;font-size:0.62rem;padding:3px 10px;border-radius:100px">⭐ Resident</div>` : ''}
+        ${avg >= 7 ? `<div style="background:rgba(229,228,226,0.1);border:1px solid rgba(229,228,226,0.3);color:#E5E4E2;font-size:0.62rem;padding:3px 10px;border-radius:100px">💎 Platinum Score</div>` : ''}
+      </div>
+    `;
+    setTimeout(() => {
+      const bar = document.getElementById('xp-bar-fill');
+      if (bar) bar.style.width = `${xp.pct}%`;
+    }, 100);
+  }
 
   // Recent cases
   const recentEl = document.getElementById('recent-cases-list');
@@ -2650,7 +2712,6 @@ function updateDashboard() {
     recentEl.innerHTML = `<div class="cases-list">${recent.map(c => caseItemHTML(c)).join('')}</div>`;
   }
 
-  // Gap alerts
   updateGapAlerts();
 }
 
@@ -2678,6 +2739,13 @@ function caseItemHTML(c, showDelete = false) {
 function openCaseDetail(id) {
   const c = allCases.find(x => x.id === id);
   if (!c) return;
+  currentModalCase = c;
+
+  // Reset note output
+  const output = document.getElementById('clinical-note-output');
+  const btn = document.getElementById('gen-note-btn');
+  if (output) output.style.display = 'none';
+  if (btn) { btn.textContent = '📋 Generate Clinical Note'; btn.disabled = false; }
 
   const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -2761,13 +2829,48 @@ function renderAllCases() {
   }
 }
 
-// ─── LEVELS ───
+// ─── LEVELS & XP SYSTEM ───
+const LEVELS = [
+  { level: 1, name: 'Freshman',      title: 'Just getting started',         min: 0,   max: 10,  color: '#9CA3AF', icon: '🩺' },
+  { level: 2, name: 'House Officer', title: 'Building your foundation',      min: 10,  max: 25,  color: '#60A5FA', icon: '🔬' },
+  { level: 3, name: 'Resident',      title: 'Growing in confidence',         min: 25,  max: 50,  color: '#7C6FFF', icon: '⚕️' },
+  { level: 4, name: 'Associate',     title: 'Proving your competence',       min: 50,  max: 100, color: '#A78BFA', icon: '🏥' },
+  { level: 5, name: 'Senior',        title: 'Respected by your peers',       min: 100, max: 200, color: '#F59E0B', icon: '⭐' },
+  { level: 6, name: 'Specialist',    title: 'Mastery in your field',         min: 200, max: 350, color: '#F97316', icon: '🏆' },
+  { level: 7, name: 'Consultant',    title: 'Others seek your guidance',     min: 350, max: 500, color: '#EF4444', icon: '💎' },
+  { level: 8, name: 'Fellow',        title: 'Elite clinical excellence',     min: 500, max: 750, color: '#EC4899', icon: '🌟' },
+  { level: 9, name: 'Attending',     title: 'A name others know',            min: 750, max: 1000,color: '#06B6D4', icon: '👑' },
+  { level: 10, name: 'Master',       title: 'The pinnacle of clinical craft',min: 1000,max: 9999,color: '#7C6FFF', icon: '🔱' },
+];
+
+const COMPLEXITY_RANKS = [
+  { min: 0,   max: 3,   rank: 'Bronze',   color: '#CD7F32', bg: 'rgba(205,127,50,0.1)',  border: 'rgba(205,127,50,0.3)'  },
+  { min: 3,   max: 5,   rank: 'Silver',   color: '#C0C0C0', bg: 'rgba(192,192,192,0.1)', border: 'rgba(192,192,192,0.3)' },
+  { min: 5,   max: 7,   rank: 'Gold',     color: '#FFD700', bg: 'rgba(255,215,0,0.1)',   border: 'rgba(255,215,0,0.3)'   },
+  { min: 7,   max: 9,   rank: 'Platinum', color: '#E5E4E2', bg: 'rgba(229,228,226,0.1)', border: 'rgba(229,228,226,0.3)' },
+  { min: 9,   max: 11,  rank: 'Elite',    color: '#7C6FFF', bg: 'rgba(124,111,255,0.1)', border: 'rgba(124,111,255,0.3)' },
+];
+
 function getLevel(total) {
-  if (total >= 500) return { level: 5, name: 'Master Clinician', next: 500 };
-  if (total >= 250) return { level: 4, name: 'Specialist', next: 500 };
-  if (total >= 100) return { level: 3, name: 'Associate', next: 250 };
-  if (total >= 25) return { level: 2, name: 'Resident', next: 100 };
-  return { level: 1, name: 'Intern', next: 25 };
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (total >= LEVELS[i].min) return LEVELS[i];
+  }
+  return LEVELS[0];
+}
+
+function getComplexityRank(avg) {
+  for (let i = COMPLEXITY_RANKS.length - 1; i >= 0; i--) {
+    if (avg >= COMPLEXITY_RANKS[i].min) return COMPLEXITY_RANKS[i];
+  }
+  return COMPLEXITY_RANKS[0];
+}
+
+function getXP(total) {
+  const level = getLevel(total);
+  const prev = level.min;
+  const next = level.max;
+  const pct = Math.min(Math.round(((total - prev) / (next - prev)) * 100), 100);
+  return { current: total - prev, needed: next - prev, pct, toNext: next - total };
 }
 
 // ─── PROGRESS ───
@@ -2790,10 +2893,9 @@ function updateProgress() {
   document.getElementById('prog-level-display').textContent = level.level;
   document.getElementById('prog-level-name-display').textContent = level.name;
 
-  const prev = level.level > 1 ? [0, 25, 100, 250, 500][level.level - 1] : 0;
-  const pct = level.level >= 5 ? 100 : Math.round(((total - prev) / (level.next - prev)) * 100);
-  document.getElementById('prog-level-bar').style.width = `${Math.min(pct, 100)}%`;
-  document.getElementById('prog-level-next').textContent = level.level >= 5 ? 'Maximum level reached!' : `${level.next - total} more cases to Level ${level.level + 1}`;
+  const xp = getXP(total);
+  document.getElementById('prog-level-bar').style.width = `${xp.pct}%`;
+  document.getElementById('prog-level-next').textContent = level.level >= 10 ? '🔱 Maximum level reached!' : `${xp.toNext} more cases to reach ${LEVELS[level.level].name}`;
 
   // Insights
   updateProgressInsights(endo, resto, surg, total);
@@ -3280,6 +3382,99 @@ async function generatePortfolioPDF() {
 }
 
 
+
+// ─── CLINICAL NOTE GENERATOR ───
+let currentModalCase = null;
+
+async function generateClinicalNote() {
+  if (!currentModalCase) return;
+  const c = currentModalCase;
+  const btn = document.getElementById('gen-note-btn');
+  const output = document.getElementById('clinical-note-output');
+  const noteText = document.getElementById('clinical-note-text');
+
+  btn.textContent = '⏳ Generating note...';
+  btn.disabled = true;
+
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery' }[c.specialty] || c.specialty;
+  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  let clinicalDetails = '';
+  if (c.specialty === 'endo') {
+    clinicalDetails = `
+Pulp Diagnosis: ${c.pulp_diagnosis || 'Not recorded'}
+Periapical Diagnosis: ${c.periapical_diagnosis || 'Not recorded'}
+Case Type: ${c.case_type || 'Not recorded'}
+Number of Canals: ${c.canals || 'Not recorded'}
+Working Length: ${c.working_length || 'Not recorded'}
+Curvature: ${c.curvature || 'Not recorded'}
+Apical Size: ${c.apical_size || 'Not recorded'}
+Irrigation: ${c.irrigation || 'Not recorded'}
+Obturation: ${c.obturation || 'Not recorded'}
+Calcification: ${c.calcification || 'Not recorded'}
+Separated Instrument: ${c.separated || 'No'}`;
+  } else if (c.specialty === 'restorative') {
+    clinicalDetails = `
+Cavity Classification: ${c.cavity_class || 'Not recorded'}
+Number of Surfaces: ${c.surfaces || 'Not recorded'}
+Material: ${c.material || 'Not recorded'}
+Isolation: ${c.isolation || 'Not recorded'}`;
+  } else {
+    clinicalDetails = `
+Procedure: ${c.procedure || 'Not recorded'}
+Impaction Level: ${c.impaction || 'Not recorded'}
+Anaesthesia: ${c.anaesthesia || 'Not recorded'}
+Sutures: ${c.sutures || 'Not recorded'}`;
+  }
+
+  const prompt = `You are a dental clinical documentation assistant. Generate a professional clinical note for a patient record based on the following case data. The note must be formal, medico-legally appropriate, written in third person past tense, and ready to paste into a hospital dental record system.
+
+Case Data:
+Date: ${date}
+Specialty: ${specLabel}
+Tooth: ${c.tooth_number}
+Patient Age Range: ${c.age_range || 'Not recorded'}
+Chief Complaint: ${c.complaint || 'Not recorded'}
+${clinicalDetails}
+Post-operative Symptoms: ${c.post_op || 'None reported'}
+Follow-up: ${c.follow_up || 'Not specified'}
+${c.narrative ? `Additional Notes: ${c.narrative}` : ''}
+
+Generate a complete clinical note in 3-4 paragraphs covering: (1) presenting complaint and examination findings, (2) diagnosis, (3) treatment performed with clinical details, (4) post-operative instructions and follow-up plan. 
+
+Use professional dental terminology. Do not add any preamble or explanation — output the clinical note text only.`;
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 800,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const note = data.content?.[0]?.text || 'Error generating note. Please try again.';
+
+    noteText.textContent = note;
+    output.style.display = 'block';
+    output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  } catch(e) {
+    noteText.textContent = 'Error generating note. Please check your connection and try again.';
+    output.style.display = 'block';
+  }
+
+  btn.textContent = '📋 Regenerate Clinical Note';
+  btn.disabled = false;
+}
+
+function copyNote() {
+  const text = document.getElementById('clinical-note-text').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Clinical note copied ✓'));
+}
 
 // ─── PROFILE SETTINGS ───
 function loadProfileForm() {
