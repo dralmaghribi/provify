@@ -698,17 +698,18 @@ function renderCaseCard(c, index, userId) {
     : ['xr-gen-preop', 'xr-gen-postop', 'cp-preop', 'cp-postop', 'cp-intraoral'];
 
   const photosHTML = photoTypes.map(type => {
-    const url = getPhotoUrl(userId, c.id, type);
+    const baseUrl = `${SUPABASE_URL}/storage/v1/object/public/case-images/${userId}/${c.id}/${type}`;
+    const label = PHOTO_LABELS[type] || type;
     return `
-      <div class="photo-item">
+      <div class="photo-item" id="photo-${c.id}-${type}">
         <img
-          src="${url}"
-          alt="${PHOTO_LABELS[type] || type}"
-          onclick="openLightbox('${url}', '${PHOTO_LABELS[type] || type}')"
-          onerror="this.parentElement.innerHTML='<div class=\\'photo-empty\\'>📷</div><div class=\\'photo-item-label\\'>${PHOTO_LABELS[type] || type}</div>'"
+          src="${baseUrl}.jpg"
+          alt="${label}"
+          onclick="openLightbox(this.src, '${label}')"
+          onerror="tryNextExt(this, '${baseUrl}', ['jpeg','png','webp','heic','HEIC','JPG','PNG'], '${label}', '${c.id}-${type}')"
           loading="lazy"
         >
-        <div class="photo-item-label">${PHOTO_LABELS[type] || type}</div>
+        <div class="photo-item-label">${label}</div>
       </div>
     `;
   }).join('');
@@ -752,10 +753,17 @@ function renderCaseCard(c, index, userId) {
   `;
 }
 
-function getPhotoUrl(userId, caseId, type) {
-  const extensions = ['jpg', 'jpeg', 'png', 'webp', 'heic'];
-  // Try jpg by default — onerror handles fallback
-  return `${SUPABASE_URL}/storage/v1/object/public/case-images/${userId}/${caseId}/${type}.jpg`;
+function tryNextExt(img, baseUrl, exts, label, slotId) {
+  if (exts.length === 0) {
+    // All extensions failed — show empty placeholder
+    const slot = document.getElementById(`photo-${slotId}`);
+    if (slot) slot.innerHTML = `<div class="photo-empty">📷</div><div class="photo-item-label">${label}</div>`;
+    return;
+  }
+  const next = exts.shift();
+  const newSrc = `${baseUrl}.${next}`;
+  img.onerror = () => tryNextExt(img, baseUrl, exts, label, slotId);
+  img.src = newSrc;
 }
 
 function escapeHTML(str) {
