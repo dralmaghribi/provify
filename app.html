@@ -2831,16 +2831,16 @@ function renderAllCases() {
 
 // ─── LEVELS & XP SYSTEM ───
 const LEVELS = [
-  { level: 1, name: 'Freshman',      title: 'Just getting started',         min: 0,   max: 10,  color: '#9CA3AF', icon: '🩺' },
-  { level: 2, name: 'House Officer', title: 'Building your foundation',      min: 10,  max: 25,  color: '#60A5FA', icon: '🔬' },
-  { level: 3, name: 'Resident',      title: 'Growing in confidence',         min: 25,  max: 50,  color: '#7C6FFF', icon: '⚕️' },
-  { level: 4, name: 'Associate',     title: 'Proving your competence',       min: 50,  max: 100, color: '#A78BFA', icon: '🏥' },
-  { level: 5, name: 'Senior',        title: 'Respected by your peers',       min: 100, max: 200, color: '#F59E0B', icon: '⭐' },
-  { level: 6, name: 'Specialist',    title: 'Mastery in your field',         min: 200, max: 350, color: '#F97316', icon: '🏆' },
-  { level: 7, name: 'Consultant',    title: 'Others seek your guidance',     min: 350, max: 500, color: '#EF4444', icon: '💎' },
-  { level: 8, name: 'Fellow',        title: 'Elite clinical excellence',     min: 500, max: 750, color: '#EC4899', icon: '🌟' },
-  { level: 9, name: 'Attending',     title: 'A name others know',            min: 750, max: 1000,color: '#06B6D4', icon: '👑' },
-  { level: 10, name: 'Master',       title: 'The pinnacle of clinical craft',min: 1000,max: 9999,color: '#7C6FFF', icon: '🔱' },
+  { level: 1,  name: 'Bronze',       title: 'Your journey begins',                 min: 0,    max: 10,   color: '#CD7F32', icon: '🥉' },
+  { level: 2,  name: 'Silver',       title: 'Building momentum',                   min: 10,   max: 25,   color: '#C0C0C0', icon: '🥈' },
+  { level: 3,  name: 'Gold',         title: 'Proving your worth',                  min: 25,   max: 50,   color: '#FFD700', icon: '🥇' },
+  { level: 4,  name: 'Platinum',     title: 'Above the rest',                      min: 50,   max: 100,  color: '#E5E4E2', icon: '💿' },
+  { level: 5,  name: 'Diamond',      title: 'Forged under pressure',               min: 100,  max: 200,  color: '#B9F2FF', icon: '💎' },
+  { level: 6,  name: 'Elite',        title: 'The top tier',                        min: 200,  max: 350,  color: '#7C6FFF', icon: '⚡' },
+  { level: 7,  name: 'Master',       title: 'Few reach this level',                min: 350,  max: 500,  color: '#A78BFA', icon: '🔮' },
+  { level: 8,  name: 'Grand Master', title: 'Exceptional clinical record',         min: 500,  max: 750,  color: '#F59E0B', icon: '👑' },
+  { level: 9,  name: 'Legend',       title: 'Your name speaks for itself',         min: 750,  max: 1000, color: '#EF4444', icon: '🌟' },
+  { level: 10, name: 'Apex',         title: 'The pinnacle. Undeniable.',           min: 1000, max: 9999, color: '#7C6FFF', icon: '🔱' },
 ];
 
 const COMPLEXITY_RANKS = [
@@ -3448,21 +3448,24 @@ Use professional dental terminology. Do not add any preamble or explanation — 
     const response = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 800,
-        messages: [{ role: 'user', content: prompt }]
+      body: JSON.stringify({ 
+        caseData: c, 
+        complexity: c.complexity_score,
+        mode: 'clinical_note',
+        notePrompt: prompt
       })
     });
 
     const data = await response.json();
-    const note = data.content?.[0]?.text || 'Error generating note. Please try again.';
+    // Handle both response formats
+    const note = data.note || data.content?.[0]?.text || data.strength || 'Error generating note. Please try again.';
 
     noteText.textContent = note;
     output.style.display = 'block';
     output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   } catch(e) {
+    console.error('Note error:', e);
     noteText.textContent = 'Error generating note. Please check your connection and try again.';
     output.style.display = 'block';
   }
