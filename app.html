@@ -3633,7 +3633,18 @@ async function runGrowthEngine() {
   const earlyAvg = allCases.slice(-Math.min(5, total)).reduce((s, c) => s + (c.complexity_score || 0), 0) / Math.min(5, total);
   const trend = recentAvg > earlyAvg ? 'increasing' : recentAvg < earlyAvg ? 'decreasing' : 'stable';
 
+  const role = currentProfile?.role || 'intern';
+  const isSpecialist = ['specialist', 'consultant', 'senior'].includes(role);
+  const dominantSpecialty = endo.length >= resto.length && endo.length >= surg.length ? 'endodontics' :
+                            resto.length >= surg.length ? 'restorative dentistry' : 'oral surgery';
+
+  const scopeInstruction = isSpecialist
+    ? `This dentist is a specialist/consultant. Analyze ONLY within their primary specialty (${dominantSpecialty}). Do NOT mention or suggest other specialties as blind spots — specialists are expected to focus on one area. Blind spots should be about complexity, case types, or techniques within their specialty only.`
+    : `This dentist is a generalist/intern/resident in training. They are expected to develop across all specialties. Analyze their overall clinical breadth and suggest areas to develop.`;
+
   const prompt = `You are a senior dental educator analyzing a dentist's clinical case history on Provify. Provide a personal clinical development report.
+
+IMPORTANT SCOPE: ${scopeInstruction}
 
 CASE HISTORY:
 Total cases: ${total}
@@ -3651,9 +3662,9 @@ ${surgDetails || 'None logged'}
 
 Respond ONLY with a JSON object (no markdown) with exactly these keys:
 - "strength": 2 sentences about their strongest clinical area based on the data
-- "blindspot": 2 sentences about what they're avoiding or underexposed to — be specific and honest
+- "blindspot": 2 sentences about what they are underexposed to or should develop — respecting their role scope
 - "trajectory": 1 sentence about their complexity trend — are they growing, plateauing, or playing it safe
-- "next30": An array of exactly 3 strings, each a specific case type they should actively seek in the next 30 days (e.g. "A retreatment case on a lower molar", "A Class IV composite on an anterior tooth")
+- "next30": An array of exactly 3 strings, each a specific case type they should actively seek in the next 30 days
 - "verdict": One powerful sentence summarizing where they stand as a clinician right now`;
 
   try {
