@@ -513,21 +513,38 @@ body {
 }
 
 .specialty-btn {
-  padding: 16px;
-  border-radius: 14px;
+  padding: 20px 12px;
+  border-radius: 16px;
   border: 1px solid var(--white-faint);
-  background: var(--navy);
+  background: var(--navy-2);
   color: var(--gray);
   font-family: 'Inter', sans-serif;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: -0.01em;
 }
 
-.specialty-btn:hover { border-color: var(--teal-mid); color: var(--white); }
-.specialty-btn.active { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
-.specialty-btn .spec-icon { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+.specialty-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--teal), #9B91FF);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.specialty-btn:hover { border-color: var(--teal-mid); color: var(--white); background: var(--navy-3); transform: translateY(-1px); }
+.specialty-btn:hover::after { opacity: 0.6; }
+.specialty-btn.active { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,111,255,0.1); }
+.specialty-btn.active::after { opacity: 1; }
+.specialty-btn .spec-icon { display: flex; align-items:center; justify-content:center; margin: 0 auto 10px; width:40px; height:40px; border-radius:10px; background:var(--white-faint); transition: all 0.25s; }
+.specialty-btn.active .spec-icon { background: rgba(124,111,255,0.15); }
 
 .star-rating {
   display: flex;
@@ -965,6 +982,26 @@ body {
 
 .tooth-btn:hover { border-color: var(--teal-mid); color: var(--white); }
 .tooth-btn.selected { border-color: var(--teal); background: var(--teal-dim); color: var(--teal); }
+
+/* TEMPLATE CARDS */
+.template-card {
+  background: var(--navy-2);
+  border: 1px solid var(--white-faint);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'Inter', sans-serif;
+}
+.template-card:hover { border-color: var(--teal-mid); background: var(--navy-3); transform: translateY(-2px); }
+.template-icon { width: 34px; height: 34px; background: var(--teal-dim); border: 1px solid var(--teal-mid); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.template-icon svg { width: 16px; height: 16px; stroke: var(--teal); }
+.template-label { font-size: 0.875rem; color: var(--white); font-weight: 500; letter-spacing: -0.01em; }
+.template-sub { font-size: 0.7rem; color: var(--gray); line-height: 1.4; }
 
 /* PHOTO SLOTS */
 .xray-grid {
@@ -1411,10 +1448,6 @@ body {
                 <div id="timer-display" style="font-family:monospace; font-size:1rem; color:var(--white); min-width:52px">00:00</div>
                 <button onclick="toggleTimer()" id="timer-btn" style="background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s;">▶ Start</button>
               </div>
-              <!-- VOICE -->
-              <button onclick="startVoiceLogging()" id="voice-btn" style="background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; padding:10px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px;">
-                🎙 Voice Log
-              </button>
             </div>
           </div>
         </div>
@@ -1471,17 +1504,80 @@ body {
 
         <div class="log-form">
 
+          <!-- QUICK TEMPLATES -->
+          <div style="margin-bottom:20px;">
+            <div class="form-section-title" style="margin-bottom:12px">Quick Start — Pick a Template</div>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;" id="template-grid">
+              <button class="template-card" onclick="applyTemplate('rct')">
+                <div class="template-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 2.5 1.5 4.5 3 6l1 5h6l1-5c1.5-1.5 3-3.5 3-6 0-4-3-7-7-7z"/><path d="M9 15h6"/></svg>
+                </div>
+                <div class="template-label">Routine RCT</div>
+                <div class="template-sub">Primary · NaOCl+EDTA · Warm Vertical</div>
+              </button>
+              <button class="template-card" onclick="applyTemplate('retreatment')">
+                <div class="template-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-5.5"/></svg>
+                </div>
+                <div class="template-label">Retreatment</div>
+                <div class="template-sub">Retreatment · NaOCl+EDTA+CHX</div>
+              </button>
+              <button class="template-card" onclick="applyTemplate('composite')">
+                <div class="template-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                </div>
+                <div class="template-label">Composite</div>
+                <div class="template-sub">Restorative · Composite · Rubber Dam</div>
+              </button>
+              <button class="template-card" onclick="applyTemplate('extraction')">
+                <div class="template-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M8 8c0-2.2 1.8-4 4-4s4 1.8 4 4c0 1.5-.8 2.8-2 3.5V22"/><path d="M9.5 8.5c0 1.4 1.1 2.5 2.5 2.5"/></svg>
+                </div>
+                <div class="template-label">Extraction</div>
+                <div class="template-sub">Surgery · Simple · Local Anaesthesia</div>
+              </button>
+            </div>
+            <div style="text-align:center; margin-top:10px;">
+              <button onclick="document.getElementById('template-grid').style.display='none'; this.parentElement.style.display='none';" style="background:none; border:none; color:var(--gray); font-size:0.8rem; cursor:pointer; font-family:'Inter',sans-serif;">or start from scratch →</button>
+            </div>
+          </div>
+
           <!-- SPECIALTY SELECTOR -->
-          <div class="form-section-title">Select Specialty</div>
+          <div class="form-section-title">Specialty</div>
           <div class="specialty-selector">
             <button class="specialty-btn active" onclick="selectSpecialty('endo', this)">
-              <span class="spec-icon">🦷</span>Endodontics
+              <span class="spec-icon">
+                <!-- Tooth with root canal lines -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <path d="M8 2c-1.5 0-3 1.5-3 3.5 0 1.5.5 2.5 1 3.5L7 14h2l.5-3h1L11 14h2l1-5c.5-1 1-2 1-3.5C15 3.5 13.5 2 12 2c-1 0-1.8.5-2 1C9.8 2.5 9 2 8 2z"/>
+                  <line x1="10" y1="6" x2="10" y2="12" stroke-width="1"/>
+                  <line x1="12" y1="6" x2="12" y2="12" stroke-width="1"/>
+                </svg>
+              </span>
+              Endodontics
             </button>
             <button class="specialty-btn" onclick="selectSpecialty('restorative', this)">
-              <span class="spec-icon">✨</span>Restorative
+              <span class="spec-icon">
+                <!-- Tooth with filling shape -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <path d="M7 3h10c.5 0 1 .5 1 1v2c0 4-2 7-3 9v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4C8 13 6 10 6 6V4c0-.5.5-1 1-1z"/>
+                  <path d="M9 8h6" stroke-width="1.2"/>
+                  <path d="M9 11h4" stroke-width="1.2"/>
+                </svg>
+              </span>
+              Restorative
             </button>
             <button class="specialty-btn" onclick="selectSpecialty('surgery', this)">
-              <span class="spec-icon">🔧</span>Oral Surgery
+              <span class="spec-icon">
+                <!-- Scalpel / surgical blade -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <path d="M20 4L8 16"/>
+                  <path d="M20 4l-3 1-5 11-2 1 1-2 5-11 1-3 3 3z"/>
+                  <path d="M4 20l4-4"/>
+                  <circle cx="5.5" cy="18.5" r="1.5"/>
+                </svg>
+              </span>
+              Oral Surgery
             </button>
           </div>
 
@@ -2329,6 +2425,10 @@ function resetForm() {
   document.querySelectorAll('.photo-slot-preview').forEach(p => p.style.display = 'block');
   document.querySelectorAll('.photo-slot-img').forEach(img => { img.src=''; img.style.display='none'; });
   resetTimer();
+  // Reset template grid
+  const templateSection = document.getElementById('template-grid');
+  if (templateSection) templateSection.parentElement.style.display = 'block';
+  if (templateSection) templateSection.style.display = 'grid';
 }
 
 function hideLoading() {
@@ -3669,6 +3769,74 @@ function copyNote() {
   const el = document.getElementById('clinical-note-text');
   const text = el.innerText || el.textContent;
   navigator.clipboard.writeText(text).then(() => showToast('Clinical note copied ✓'));
+}
+
+// ─── CASE TEMPLATES ───
+function applyTemplate(type) {
+  // Hide template grid
+  const grid = document.getElementById('template-grid');
+  if (grid) grid.parentElement.style.display = 'none';
+
+  const templates = {
+    rct: {
+      specialty: 'endo',
+      complaint: 'Pain',
+      case_type: 'Primary Treatment',
+      irrigation: 'NaOCl + EDTA',
+      obturation: 'Warm Vertical',
+      calcification: 'No',
+      separated: 'No',
+    },
+    retreatment: {
+      specialty: 'endo',
+      complaint: 'Pain',
+      case_type: 'Retreatment',
+      pulp_diagnosis: 'Previously Treated',
+      irrigation: 'NaOCl + EDTA + CHX',
+      obturation: 'Warm Vertical',
+    },
+    composite: {
+      specialty: 'restorative',
+      complaint: 'Routine',
+      material: 'Composite',
+      isolation: 'Rubber Dam',
+    },
+    extraction: {
+      specialty: 'surgery',
+      complaint: 'Pain',
+      procedure: 'Simple Extraction',
+      impaction: 'N/A',
+      anaesthesia: 'Local — Infiltration',
+      sutures: 'No',
+    },
+  };
+
+  const t = templates[type];
+  if (!t) return;
+
+  // Set specialty
+  if (t.specialty) {
+    const btn = document.querySelector(`.specialty-btn[onclick*="${t.specialty}"]`);
+    if (btn) selectSpecialty(t.specialty, btn);
+  }
+
+  // Fill fields with small delay so specialty switch renders first
+  setTimeout(() => {
+    if (t.complaint) setSelect('f-complaint', t.complaint);
+    if (t.case_type) setSelect('f-case-type', t.case_type);
+    if (t.pulp_diagnosis) setSelect('f-pulp', t.pulp_diagnosis);
+    if (t.irrigation) setSelect('f-irrigation', t.irrigation);
+    if (t.obturation) setSelect('f-obturation', t.obturation);
+    if (t.calcification) setSelect('f-calcification', t.calcification);
+    if (t.separated) setSelect('f-separated', t.separated);
+    if (t.material) setSelect('f-material', t.material);
+    if (t.isolation) setSelect('f-isolation', t.isolation);
+    if (t.procedure) setSelect('f-procedure', t.procedure);
+    if (t.impaction) setSelect('f-impaction', t.impaction);
+    if (t.anaesthesia) setSelect('f-anaesthesia', t.anaesthesia);
+    if (t.sutures) setSelect('f-sutures', t.sutures);
+    showToast('Template applied ✓ Fill in the remaining details');
+  }, 200);
 }
 
 // ─── CASE TIMER ───
