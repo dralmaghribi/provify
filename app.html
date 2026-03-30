@@ -1590,6 +1590,13 @@ body {
                 <div class="template-label">Extraction</div>
                 <div class="template-sub">Surgery · Simple · Local Anaesthesia</div>
               </button>
+              <button class="template-card" onclick="applyTemplate('ssc')">
+                <div class="template-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-1a6 6 0 0 1 12 0v1"/><path d="M9 13l-2 4h10l-2-4"/></svg>
+                </div>
+                <div class="template-label">Paeds SSC</div>
+                <div class="template-sub">Paediatric · Pulpotomy + Crown</div>
+              </button>
             </div>
             <div style="text-align:center; margin-top:10px;">
               <button onclick="document.getElementById('template-grid').style.display='none'; this.parentElement.style.display='none';" style="background:none; border:none; color:var(--gray); font-size:0.8rem; cursor:pointer; font-family:'Inter',sans-serif;">or start from scratch →</button>
@@ -1598,10 +1605,9 @@ body {
 
           <!-- SPECIALTY SELECTOR -->
           <div class="form-section-title">Specialty</div>
-          <div class="specialty-selector">
+          <div class="specialty-selector" style="grid-template-columns:repeat(2,1fr);">
             <button class="specialty-btn active" onclick="selectSpecialty('endo', this)">
               <span class="spec-icon">
-                <!-- Tooth with root canal lines -->
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
                   <path d="M8 2c-1.5 0-3 1.5-3 3.5 0 1.5.5 2.5 1 3.5L7 14h2l.5-3h1L11 14h2l1-5c.5-1 1-2 1-3.5C15 3.5 13.5 2 12 2c-1 0-1.8.5-2 1C9.8 2.5 9 2 8 2z"/>
                   <line x1="10" y1="6" x2="10" y2="12" stroke-width="1"/>
@@ -1612,7 +1618,6 @@ body {
             </button>
             <button class="specialty-btn" onclick="selectSpecialty('restorative', this)">
               <span class="spec-icon">
-                <!-- Tooth with filling shape -->
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
                   <path d="M7 3h10c.5 0 1 .5 1 1v2c0 4-2 7-3 9v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4C8 13 6 10 6 6V4c0-.5.5-1 1-1z"/>
                   <path d="M9 8h6" stroke-width="1.2"/>
@@ -1623,7 +1628,6 @@ body {
             </button>
             <button class="specialty-btn" onclick="selectSpecialty('surgery', this)">
               <span class="spec-icon">
-                <!-- Scalpel / surgical blade -->
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
                   <path d="M20 4L8 16"/>
                   <path d="M20 4l-3 1-5 11-2 1 1-2 5-11 1-3 3 3z"/>
@@ -1632,6 +1636,17 @@ body {
                 </svg>
               </span>
               Oral Surgery
+            </button>
+            <button class="specialty-btn" onclick="selectSpecialty('paeds', this)">
+              <span class="spec-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <circle cx="12" cy="7" r="3"/>
+                  <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+                  <path d="M9 14s-2 1-2 3"/>
+                  <path d="M15 14s2 1 2 3"/>
+                </svg>
+              </span>
+              Paediatric
             </button>
           </div>
 
@@ -1898,6 +1913,105 @@ body {
             </div>
           </div>
 
+          <!-- PAEDIATRIC FIELDS -->
+          <div id="paeds-fields" style="display:none">
+            <div class="form-section">
+              <div class="form-section-title">Tooth Type</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Dentition</label>
+                  <select class="form-select" id="f-dentition">
+                    <option value="">Select dentition</option>
+                    <option>Primary</option>
+                    <option>Mixed</option>
+                    <option>Permanent (young patient)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Behaviour Management</label>
+                  <select class="form-select" id="f-behaviour">
+                    <option value="">Select technique</option>
+                    <option>Tell-Show-Do</option>
+                    <option>Positive Reinforcement</option>
+                    <option>Distraction</option>
+                    <option>Nitrous Oxide Sedation</option>
+                    <option>IV Sedation</option>
+                    <option>General Anaesthesia</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Treatment Details</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Procedure</label>
+                  <select class="form-select" id="f-paeds-procedure">
+                    <option value="">Select procedure</option>
+                    <option>Pulpotomy</option>
+                    <option>Pulpectomy</option>
+                    <option>Indirect Pulp Cap</option>
+                    <option>Direct Pulp Cap</option>
+                    <option>Composite Restoration</option>
+                    <option>Stainless Steel Crown</option>
+                    <option>Strip Crown</option>
+                    <option>Glass Ionomer Restoration</option>
+                    <option>Extraction</option>
+                    <option>Fissure Sealant</option>
+                    <option>Fluoride Application</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Restoration Material</label>
+                  <select class="form-select" id="f-paeds-material">
+                    <option value="">Select material</option>
+                    <option>Stainless Steel Crown</option>
+                    <option>Composite</option>
+                    <option>GIC</option>
+                    <option>Strip Crown (composite)</option>
+                    <option>Amalgam</option>
+                    <option>N/A</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Pulp Status</label>
+                  <select class="form-select" id="f-paeds-pulp">
+                    <option value="">Select</option>
+                    <option>Vital — No symptoms</option>
+                    <option>Vital — Reversible pulpitis</option>
+                    <option>Non-vital</option>
+                    <option>Pulp exposure — carious</option>
+                    <option>Pulp exposure — mechanical</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Space Maintainer</label>
+                  <select class="form-select" id="f-space-maintainer">
+                    <option value="">Select</option>
+                    <option>Not required</option>
+                    <option>Band and Loop placed</option>
+                    <option>Distal shoe placed</option>
+                    <option>Nance appliance</option>
+                    <option>Required — referred</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Child Cooperation Level</label>
+                <select class="form-select" id="f-cooperation">
+                  <option value="">Select</option>
+                  <option>Definitely positive</option>
+                  <option>Positive</option>
+                  <option>Negative</option>
+                  <option>Definitely negative</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <!-- X-RAYS -->
           <div class="form-section">
             <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
@@ -2081,6 +2195,7 @@ body {
             <button onclick="setCasesFilter('endo',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Endo</button>
             <button onclick="setCasesFilter('restorative',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Restorative</button>
             <button onclick="setCasesFilter('surgery',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Surgery</button>
+            <button onclick="setCasesFilter('paeds',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Paeds</button>
           </div>
           <select id="cases-sort" onchange="filterCases()" style="background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.8rem;padding:8px 12px;border-radius:10px;outline:none;cursor:pointer;">
             <option value="newest">Newest First</option>
@@ -2102,7 +2217,7 @@ body {
           <div class="page-sub">Your personal clinical development report</div>
         </div>
 
-        <div class="stats-grid">
+        <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);">
           <div class="stat-card">
             <div class="stat-card-label">Endo Cases</div>
             <div class="stat-card-value" id="prog-endo">0</div>
@@ -2114,6 +2229,10 @@ body {
           <div class="stat-card">
             <div class="stat-card-label">Surgery</div>
             <div class="stat-card-value" id="prog-surg">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Paediatric</div>
+            <div class="stat-card-value" id="prog-paeds">0</div>
           </div>
           <div class="stat-card">
             <div class="stat-card-label">Avg Score</div>
@@ -2461,14 +2580,14 @@ async function uploadAllPhotos(caseId) {
 }
 
 function updateXraySection(specialty) {
-  const endoXrays = document.getElementById('xray-endo');
+  const endoXrays    = document.getElementById('xray-endo');
   const generalXrays = document.getElementById('xray-general');
   if (!endoXrays || !generalXrays) return;
   if (specialty === 'endo') {
-    endoXrays.style.display = 'block';
+    endoXrays.style.display    = 'block';
     generalXrays.style.display = 'none';
   } else {
-    endoXrays.style.display = 'none';
+    endoXrays.style.display    = 'none';
     generalXrays.style.display = 'block';
   }
 }
@@ -2638,9 +2757,10 @@ function selectSpecialty(spec, btn) {
   selectedSpecialty = spec;
   document.querySelectorAll('.specialty-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('endo-fields').style.display = spec === 'endo' ? 'block' : 'none';
+  document.getElementById('endo-fields').style.display        = spec === 'endo'        ? 'block' : 'none';
   document.getElementById('restorative-fields').style.display = spec === 'restorative' ? 'block' : 'none';
-  document.getElementById('surgery-fields').style.display = spec === 'surgery' ? 'block' : 'none';
+  document.getElementById('surgery-fields').style.display     = spec === 'surgery'     ? 'block' : 'none';
+  document.getElementById('paeds-fields').style.display       = spec === 'paeds'       ? 'block' : 'none';
   updateXraySection(spec);
 }
 
@@ -2701,6 +2821,20 @@ function calculateComplexity() {
     const imp = document.getElementById('f-impaction').value;
     if (imp === 'Partial Bony') score += 1;
     if (imp === 'Full Bony') score += 2;
+  } else if (spec === 'paeds') {
+    const proc = document.getElementById('f-paeds-procedure').value;
+    if (proc === 'Pulpotomy') score += 1.5;
+    if (proc === 'Pulpectomy') score += 2.5;
+    if (proc === 'Stainless Steel Crown') score += 1;
+    const behaviour = document.getElementById('f-behaviour').value;
+    if (behaviour === 'Nitrous Oxide Sedation') score += 1;
+    if (behaviour === 'General Anaesthesia') score += 2;
+    const coop = document.getElementById('f-cooperation').value;
+    if (coop === 'Negative') score += 1;
+    if (coop === 'Definitely negative') score += 2;
+    const pulp = document.getElementById('f-paeds-pulp').value;
+    if (pulp === 'Non-vital') score += 1;
+    if (pulp === 'Pulp exposure — carious') score += 1;
   }
 
   const rating = selectedRating;
@@ -2767,6 +2901,15 @@ async function submitCase() {
       impaction: document.getElementById('f-impaction').value,
       anaesthesia: document.getElementById('f-anaesthesia').value,
       sutures: document.getElementById('f-sutures').value,
+    } : {}),
+    ...(selectedSpecialty === 'paeds' ? {
+      procedure:        document.getElementById('f-paeds-procedure').value,
+      material:         document.getElementById('f-paeds-material').value,
+      pulp_diagnosis:   document.getElementById('f-paeds-pulp').value,
+      isolation:        document.getElementById('f-behaviour').value,
+      cavity_class:     document.getElementById('f-dentition').value,
+      surfaces:         document.getElementById('f-cooperation').value,
+      impaction:        document.getElementById('f-space-maintainer').value,
     } : {}),
   };
 
@@ -2892,9 +3035,18 @@ Tooth: ${c.tooth_number}, Class: ${c.cavity_class}
 Surfaces: ${c.surfaces}, Material: ${c.material}
 Isolation: ${c.isolation}, Post-op: ${c.post_op}
 Complexity score: ${complexity}/10`;
-  } else {
+  } else if (spec === 'paeds') {
     details = `
-Specialty: Oral Surgery
+Specialty: Paediatric Dentistry
+Tooth: ${c.tooth_number}, Dentition: ${c.cavity_class}
+Procedure: ${c.procedure}, Material: ${c.material}
+Pulp status: ${c.pulp_diagnosis}
+Behaviour management: ${c.isolation}
+Child cooperation: ${c.surfaces}
+Space maintainer: ${c.impaction}
+Post-op: ${c.post_op}
+Complexity score: ${complexity}/10`;
+  } else {
 Tooth: ${c.tooth_number}, Procedure: ${c.procedure}
 Impaction: ${c.impaction}, Anaesthesia: ${c.anaesthesia}
 Sutures: ${c.sutures}, Post-op: ${c.post_op}
@@ -2994,7 +3146,7 @@ function updateDashboard() {
 
 function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
   return `
     <div class="case-item" id="case-row-${c.id}" onclick="openCaseDetail('${c.id}')" style="cursor:pointer">
       <div class="case-specialty-badge">${specLabel}</div>
@@ -3024,7 +3176,7 @@ function openCaseDetail(id) {
   if (output) output.style.display = 'none';
   if (btn) { btn.textContent = '📋 Generate Clinical Note'; btn.disabled = false; }
 
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const fields = [];
@@ -3056,6 +3208,14 @@ function openCaseDetail(id) {
     if (c.impaction) fields.push(['Impaction', c.impaction]);
     if (c.anaesthesia) fields.push(['Anaesthesia', c.anaesthesia]);
     if (c.sutures) fields.push(['Sutures', c.sutures]);
+  } else if (c.specialty === 'paeds') {
+    if (c.cavity_class) fields.push(['Dentition', c.cavity_class]);
+    if (c.procedure) fields.push(['Procedure', c.procedure]);
+    if (c.material) fields.push(['Material', c.material]);
+    if (c.pulp_diagnosis) fields.push(['Pulp Status', c.pulp_diagnosis]);
+    if (c.isolation) fields.push(['Behaviour Management', c.isolation]);
+    if (c.surfaces) fields.push(['Child Cooperation', c.surfaces]);
+    if (c.impaction) fields.push(['Space Maintainer', c.impaction]);
   }
 
   if (c.post_op) fields.push(['Post-op Symptoms', c.post_op]);
@@ -3146,14 +3306,16 @@ function getXP(total) {
 
 // ─── PROGRESS ───
 function updateProgress() {
-  const endo = allCases.filter(c => c.specialty === 'endo').length;
+  const endo  = allCases.filter(c => c.specialty === 'endo').length;
   const resto = allCases.filter(c => c.specialty === 'restorative').length;
-  const surg = allCases.filter(c => c.specialty === 'surgery').length;
+  const surg  = allCases.filter(c => c.specialty === 'surgery').length;
+  const paeds = allCases.filter(c => c.specialty === 'paeds').length;
   const total = allCases.length;
 
-  document.getElementById('prog-endo').textContent = endo;
+  document.getElementById('prog-endo').textContent  = endo;
   document.getElementById('prog-resto').textContent = resto;
-  document.getElementById('prog-surg').textContent = surg;
+  document.getElementById('prog-surg').textContent  = surg;
+  document.getElementById('prog-paeds').textContent = paeds;
 
   if (total > 0) {
     const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
@@ -3161,18 +3323,19 @@ function updateProgress() {
   }
 
   const level = getLevel(total);
-  document.getElementById('prog-level-display').textContent = level.level;
+  document.getElementById('prog-level-display').textContent     = level.level;
   document.getElementById('prog-level-name-display').textContent = level.name;
 
   const xp = getXP(total);
   document.getElementById('prog-level-bar').style.width = `${xp.pct}%`;
-  document.getElementById('prog-level-next').textContent = level.level >= 10 ? '🔱 Maximum level reached!' : `${xp.toNext} more cases to reach ${LEVELS[level.level].name}`;
+  document.getElementById('prog-level-next').textContent = level.level >= 10
+    ? '🔱 Maximum level reached!'
+    : `${xp.toNext} more cases to reach ${LEVELS[level.level].name}`;
 
-  // Insights
-  updateProgressInsights(endo, resto, surg, total);
+  updateProgressInsights(endo, resto, surg, paeds, total);
 }
 
-function updateProgressInsights(endo, resto, surg, total) {
+function updateProgressInsights(endo, resto, surg, paeds, total) {
   const el = document.getElementById('progress-insights-list');
   const insights = [];
 
@@ -3188,6 +3351,7 @@ function updateProgressInsights(endo, resto, surg, total) {
     const endoPct = Math.round((endo / total) * 100);
     if (endoPct > 80) insights.push(`💡 ${endoPct}% of your cases are endodontic. Consider logging other specialties for a well-rounded portfolio.`);
   }
+  if (paeds > 0) insights.push(`🧒 ${paeds} paediatric case${paeds > 1 ? 's' : ''} logged — great for showing clinical range across age groups.`);
   if (total >= 25) insights.push(`✓ ${total} cases logged — you're building a strong clinical record.`);
   if (total >= 100) insights.push('🏆 100+ cases! You have a portfolio most applicants can only dream of.');
 
@@ -3210,7 +3374,7 @@ async function loadBestWork() {
   if (top.length === 0) { card.style.display = 'none'; return; }
   card.style.display = 'block';
 
-  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery' };
+  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric' };
   const photoTypes = {
     endo:        ['xr-postop','xr-obturation','xr-preop','xr-mc','xr-wl','cp-postop','cp-preop'],
     restorative: ['xr-gen-postop','xr-gen-preop','cp-postop','cp-preop','cp-intraoral'],
@@ -3328,35 +3492,40 @@ function updateGapAlerts() {
   if (total < 3) return;
 
   const gaps = [];
-  const endo = allCases.filter(c => c.specialty === 'endo').length;
+  const endo  = allCases.filter(c => c.specialty === 'endo').length;
   const resto = allCases.filter(c => c.specialty === 'restorative').length;
-  const surg = allCases.filter(c => c.specialty === 'surgery').length;
+  const surg  = allCases.filter(c => c.specialty === 'surgery').length;
+  const paeds = allCases.filter(c => c.specialty === 'paeds').length;
 
-  if (endo === 0) gaps.push('⚡ No endodontic cases yet — critical for most specialty applications.');
+  if (endo === 0)  gaps.push('⚡ No endodontic cases yet — critical for most specialty applications.');
   if (resto === 0) gaps.push('⚡ Add restorative cases to show clinical diversity.');
-  if (surg === 0) gaps.push('⚡ No surgical cases logged yet.');
+  if (surg === 0)  gaps.push('⚡ No surgical cases logged yet.');
+  if (paeds > 0 && paeds < 3) gaps.push('🧒 You have paediatric cases — log a few more to build a solid paeds portfolio.');
 
   const gapCard = document.getElementById('gap-card');
-  const gapEl = document.getElementById('gap-alerts');
+  const gapEl   = document.getElementById('gap-alerts');
 
   if (gaps.length > 0) {
     gapCard.style.display = 'block';
     gapEl.innerHTML = gaps.map(g => `<div class="gap-alert">${g}</div>`).join('');
+  } else {
+    gapCard.style.display = 'none';
   }
 }
 
 // ─── BADGES ───
 const BADGES = [
-  { id: 'first-case', emoji: '🌟', name: 'First Case', desc: 'Log your very first case', check: (cases) => cases.length >= 1 },
-  { id: '10-cases', emoji: '📋', name: '10 Cases', desc: 'Log 10 cases total', check: (cases) => cases.length >= 10 },
-  { id: '25-cases', emoji: '🎯', name: '25 Cases', desc: 'Log 25 cases total', check: (cases) => cases.length >= 25 },
-  { id: '100-cases', emoji: '💯', name: '100 Cases', desc: 'Log 100 cases total', check: (cases) => cases.length >= 100 },
-  { id: 'endo-pro', emoji: '🦷', name: 'Endo Pro', desc: 'Log 10 endodontic cases', check: (cases) => cases.filter(c => c.specialty === 'endo').length >= 10 },
-  { id: 'well-rounded', emoji: '🌐', name: 'Well Rounded', desc: 'Log cases in all 3 specialties', check: (cases) => ['endo','restorative','surgery'].every(s => cases.some(c => c.specialty === s)) },
-  { id: 'high-complexity', emoji: '🔥', name: 'Complexity King', desc: 'Log a case with score 8+', check: (cases) => cases.some(c => c.complexity_score >= 8) },
-  { id: 'retreatment', emoji: '🔄', name: 'Retreatment Pro', desc: 'Log 5 retreatment cases', check: (cases) => cases.filter(c => c.case_type === 'Retreatment').length >= 5 },
-  { id: 'diverse', emoji: '🎨', name: 'Diverse Clinician', desc: 'Log 5 cases in each specialty', check: (cases) => ['endo','restorative','surgery'].every(s => cases.filter(c => c.specialty === s).length >= 5) },
-  { id: 'portfolio-ready', emoji: '📄', name: 'Portfolio Ready', desc: 'Log 50 cases', check: (cases) => cases.length >= 50 },
+  { id: 'first-case',    emoji: '🌟', name: 'First Case',       desc: 'Log your very first case',           check: (cases) => cases.length >= 1 },
+  { id: '10-cases',      emoji: '📋', name: '10 Cases',         desc: 'Log 10 cases total',                 check: (cases) => cases.length >= 10 },
+  { id: '25-cases',      emoji: '🎯', name: '25 Cases',         desc: 'Log 25 cases total',                 check: (cases) => cases.length >= 25 },
+  { id: '100-cases',     emoji: '💯', name: '100 Cases',        desc: 'Log 100 cases total',                check: (cases) => cases.length >= 100 },
+  { id: 'endo-pro',      emoji: '🦷', name: 'Endo Pro',         desc: 'Log 10 endodontic cases',            check: (cases) => cases.filter(c => c.specialty === 'endo').length >= 10 },
+  { id: 'well-rounded',  emoji: '🌐', name: 'Well Rounded',     desc: 'Log cases in all 3 core specialties',check: (cases) => ['endo','restorative','surgery'].every(s => cases.some(c => c.specialty === s)) },
+  { id: 'high-complexity',emoji: '🔥',name: 'Complexity King',  desc: 'Log a case with score 8+',           check: (cases) => cases.some(c => c.complexity_score >= 8) },
+  { id: 'retreatment',   emoji: '🔄', name: 'Retreatment Pro',  desc: 'Log 5 retreatment cases',            check: (cases) => cases.filter(c => c.case_type === 'Retreatment').length >= 5 },
+  { id: 'diverse',       emoji: '🎨', name: 'Diverse Clinician',desc: 'Log 5 cases in each core specialty', check: (cases) => ['endo','restorative','surgery'].every(s => cases.filter(c => c.specialty === s).length >= 5) },
+  { id: 'portfolio-ready',emoji:'📄', name: 'Portfolio Ready',  desc: 'Log 50 cases',                       check: (cases) => cases.length >= 50 },
+  { id: 'paeds-pro',     emoji: '🧒', name: 'Paeds Pro',        desc: 'Log 5 paediatric cases',             check: (cases) => cases.filter(c => c.specialty === 'paeds').length >= 5 },
 ];
 
 function renderBadges() {
@@ -3395,7 +3564,7 @@ function renderPortfolioCases() {
 
   el.innerHTML = allCases.map(c => {
     const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
     const isSelected = selectedCaseIds.has(c.id);
     return `
       <div class="portfolio-case-item ${isSelected ? 'selected' : ''}" onclick="toggleCaseSelection('${c.id}', this)">
@@ -3592,7 +3761,7 @@ async function generatePortfolioPDF() {
       doc.addPage();
       addPageBg();
 
-      const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+      const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
       const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
       // Case header
@@ -3806,7 +3975,7 @@ async function autoGenerateClinicalNote(c) {
   noteSection.style.display = 'block';
   noteText.innerHTML = '<div style="color:var(--gray);font-size:0.85rem">Generating your clinical note...</div>';
 
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery', paeds: 'Paediatric Dentistry' }[c.specialty] || c.specialty;
   const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   let clinicalDetails = '';
@@ -3814,6 +3983,8 @@ async function autoGenerateClinicalNote(c) {
     clinicalDetails = `Pulp Diagnosis: ${c.pulp_diagnosis || 'Not recorded'}\nPeriapical Diagnosis: ${c.periapical_diagnosis || 'Not recorded'}\nCase Type: ${c.case_type || 'Not recorded'}\nNumber of Canals: ${c.canals || 'Not recorded'}\nWorking Length: ${c.working_length || 'Not recorded'}\nCurvature: ${c.curvature || 'Not recorded'}\nApical Size: ${c.apical_size || 'Not recorded'}\nIrrigation: ${c.irrigation || 'Not recorded'}\nObturation: ${c.obturation || 'Not recorded'}\nCalcification: ${c.calcification || 'Not recorded'}\nSeparated Instrument: ${c.separated || 'No'}`;
   } else if (c.specialty === 'restorative') {
     clinicalDetails = `Cavity Classification: ${c.cavity_class || 'Not recorded'}\nNumber of Surfaces: ${c.surfaces || 'Not recorded'}\nMaterial: ${c.material || 'Not recorded'}\nIsolation: ${c.isolation || 'Not recorded'}`;
+  } else if (c.specialty === 'paeds') {
+    clinicalDetails = `Dentition: ${c.cavity_class || 'Not recorded'}\nProcedure: ${c.procedure || 'Not recorded'}\nMaterial: ${c.material || 'Not recorded'}\nPulp Status: ${c.pulp_diagnosis || 'Not recorded'}\nBehaviour Management: ${c.isolation || 'Not recorded'}\nChild Cooperation: ${c.surfaces || 'Not recorded'}\nSpace Maintainer: ${c.impaction || 'Not required'}`;
   } else {
     clinicalDetails = `Procedure: ${c.procedure || 'Not recorded'}\nImpaction Level: ${c.impaction || 'Not recorded'}\nAnaesthesia: ${c.anaesthesia || 'Not recorded'}\nSutures: ${c.sutures || 'Not recorded'}`;
   }
@@ -3875,7 +4046,7 @@ async function generateClinicalNote() {
   btn.textContent = '⏳ Generating note...';
   btn.disabled = true;
 
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery', paeds: 'Paediatric Dentistry' }[c.specialty] || c.specialty;
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   let clinicalDetails = '';
@@ -3898,6 +4069,15 @@ Cavity Classification: ${c.cavity_class || 'Not recorded'}
 Number of Surfaces: ${c.surfaces || 'Not recorded'}
 Material: ${c.material || 'Not recorded'}
 Isolation: ${c.isolation || 'Not recorded'}`;
+  } else if (c.specialty === 'paeds') {
+    clinicalDetails = `
+Dentition: ${c.cavity_class || 'Not recorded'}
+Procedure: ${c.procedure || 'Not recorded'}
+Material: ${c.material || 'Not recorded'}
+Pulp Status: ${c.pulp_diagnosis || 'Not recorded'}
+Behaviour Management: ${c.isolation || 'Not recorded'}
+Child Cooperation: ${c.surfaces || 'Not recorded'}
+Space Maintainer: ${c.impaction || 'Not required'}`;
   } else {
     clinicalDetails = `
 Procedure: ${c.procedure || 'Not recorded'}
@@ -4002,6 +4182,16 @@ function applyTemplate(type) {
       anaesthesia: 'Local — Infiltration',
       sutures: 'No',
     },
+    ssc: {
+      specialty: 'paeds',
+      complaint: 'Pain',
+      paeds_procedure: 'Pulpotomy',
+      paeds_material: 'Stainless Steel Crown',
+      paeds_pulp: 'Pulp exposure — carious',
+      behaviour: 'Tell-Show-Do',
+      dentition: 'Primary',
+      space_maintainer: 'Not required',
+    },
   };
 
   const t = templates[type];
@@ -4028,6 +4218,13 @@ function applyTemplate(type) {
     if (t.impaction) setSelect('f-impaction', t.impaction);
     if (t.anaesthesia) setSelect('f-anaesthesia', t.anaesthesia);
     if (t.sutures) setSelect('f-sutures', t.sutures);
+    // Paeds fields
+    if (t.paeds_procedure)   setSelect('f-paeds-procedure', t.paeds_procedure);
+    if (t.paeds_material)    setSelect('f-paeds-material', t.paeds_material);
+    if (t.paeds_pulp)        setSelect('f-paeds-pulp', t.paeds_pulp);
+    if (t.behaviour)         setSelect('f-behaviour', t.behaviour);
+    if (t.dentition)         setSelect('f-dentition', t.dentition);
+    if (t.space_maintainer)  setSelect('f-space-maintainer', t.space_maintainer);
     showToast('Template applied ✓ Fill in the remaining details');
   }, 200);
 }
@@ -4198,7 +4395,7 @@ function openSimulation() {
   if (!c) return;
   currentSimCase = c;
 
-  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric' }[c.specialty] || c.specialty;
   document.getElementById('sim-modal-title').textContent = `Tooth ${c.tooth_number} — Push Harder`;
   document.getElementById('sim-modal-sub').textContent = `${specLabel} · AI scenario based on your case`;
 
@@ -4224,7 +4421,7 @@ function closeSimModal() {
 
 async function generateSimScenario(c) {
   let baseInfo = '';
-  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry' }[c.specialty] || c.specialty;
   if (c.specialty === 'endo') {
     baseInfo = `Tooth ${c.tooth_number}, ${c.pulp_diagnosis||'pulp pathology'}, ${c.periapical_diagnosis||''}, ${c.case_type||'primary treatment'}, ${c.canals||'?'} canals, ${c.curvature||''} curvature, apical size ${c.apical_size||'?'}, irrigation: ${c.irrigation||'?'}, obturation: ${c.obturation||'?'}`;
   } else if (c.specialty === 'restorative') {
@@ -4240,7 +4437,7 @@ Generate a HARDER, more complex scenario — same specialty, but with added comp
 Respond ONLY with a JSON object (no markdown) with exactly these keys:
 - "scenario": 3-4 vivid sentences. Present tense. Include patient age, relevant medical/dental history, specific clinical findings, and a complexity twist.
 - "key_challenge": One sentence naming the single biggest clinical challenge.
-- "must_address": Array of exactly 4 strings — critical decision points the dentist MUST address.`;
+- "must_address": Array of exactly 4 strings — each a SHORT punchy phrase (max 8 words), naming one critical decision point. No full sentences. Think OSCE mark-scheme bullet points.`;
 
   try {
     const response = await fetch('/api/analyze', {
@@ -4483,25 +4680,29 @@ async function runGrowthEngine() {
   output.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Analyzing your clinical history...</div>`;
 
   const total = allCases.length;
-  const endo = allCases.filter(c => c.specialty === 'endo');
+  const endo  = allCases.filter(c => c.specialty === 'endo');
   const resto = allCases.filter(c => c.specialty === 'restorative');
-  const surg = allCases.filter(c => c.specialty === 'surgery');
+  const surg  = allCases.filter(c => c.specialty === 'surgery');
+  const paeds = allCases.filter(c => c.specialty === 'paeds');
   const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
 
   // Build case history summary
-  const endoDetails = endo.map(c => `Tooth ${c.tooth_number}: ${c.pulp_diagnosis || ''}, ${c.case_type || ''}, score ${c.complexity_score}`).join('\n');
+  const endoDetails  = endo.map(c => `Tooth ${c.tooth_number}: ${c.pulp_diagnosis || ''}, ${c.case_type || ''}, score ${c.complexity_score}`).join('\n');
   const restoDetails = resto.map(c => `Tooth ${c.tooth_number}: ${c.cavity_class || ''}, ${c.material || ''}, score ${c.complexity_score}`).join('\n');
-  const surgDetails = surg.map(c => `Tooth ${c.tooth_number}: ${c.procedure || ''}, score ${c.complexity_score}`).join('\n');
+  const surgDetails  = surg.map(c => `Tooth ${c.tooth_number}: ${c.procedure || ''}, score ${c.complexity_score}`).join('\n');
+  const paedsDetails = paeds.map(c => `Tooth ${c.tooth_number}: ${c.procedure || ''}, ${c.material || ''}, score ${c.complexity_score}`).join('\n');
 
   // Complexity trend
   const recentAvg = allCases.slice(0, Math.min(5, total)).reduce((s, c) => s + (c.complexity_score || 0), 0) / Math.min(5, total);
-  const earlyAvg = allCases.slice(-Math.min(5, total)).reduce((s, c) => s + (c.complexity_score || 0), 0) / Math.min(5, total);
+  const earlyAvg  = allCases.slice(-Math.min(5, total)).reduce((s, c) => s + (c.complexity_score || 0), 0) / Math.min(5, total);
   const trend = recentAvg > earlyAvg ? 'increasing' : recentAvg < earlyAvg ? 'decreasing' : 'stable';
 
   const role = currentProfile?.role || 'intern';
   const isSpecialist = ['specialist', 'consultant', 'senior'].includes(role);
-  const dominantSpecialty = endo.length >= resto.length && endo.length >= surg.length ? 'endodontics' :
-                            resto.length >= surg.length ? 'restorative dentistry' : 'oral surgery';
+  const allLengths = [endo.length, resto.length, surg.length, paeds.length];
+  const dominantSpecialty = allLengths[0] >= Math.max(...allLengths) ? 'endodontics' :
+                            allLengths[1] >= Math.max(...allLengths) ? 'restorative dentistry' :
+                            allLengths[2] >= Math.max(...allLengths) ? 'oral surgery' : 'paediatric dentistry';
 
   const scopeInstruction = isSpecialist
     ? `This dentist is a specialist/consultant. Analyze ONLY within their primary specialty (${dominantSpecialty}). Do NOT mention or suggest other specialties as blind spots — specialists are expected to focus on one area. Blind spots should be about complexity, case types, or techniques within their specialty only.`
@@ -4524,6 +4725,9 @@ ${restoDetails || 'None logged'}
 
 Surgical cases (${surg.length}):
 ${surgDetails || 'None logged'}
+
+Paediatric cases (${paeds.length}):
+${paedsDetails || 'None logged'}
 
 Respond ONLY with a JSON object (no markdown) with exactly these keys:
 - "strength": 2 sentences about their strongest clinical area based on the data
