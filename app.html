@@ -1250,6 +1250,54 @@ body {
         </div>
         <div id="clinical-note-text" style="font-size:0.82rem;color:var(--white-dim);line-height:1.7;white-space:pre-wrap;"></div>
       </div>
+
+      <!-- SIMULATION BUTTON -->
+      <button onclick="openSimulation()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(155,145,255,0.06));border:1px solid rgba(124,111,255,0.3);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:500;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--white)'">
+        <span>⚡</span> Simulate a Harder Version — Test Your Reasoning
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── CASE SIMULATION MODAL ─── -->
+<div id="sim-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:600;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeSimModal()">
+  <div style="background:var(--navy-2);border:1px solid rgba(124,111,255,0.3);border-radius:20px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;">
+
+    <!-- Header -->
+    <div style="padding:24px 28px 16px;border-bottom:1px solid rgba(124,111,255,0.15);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:var(--navy-2);z-index:10;">
+      <div>
+        <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:5px;">⚡ Case Simulation Mode</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white);letter-spacing:-0.02em;line-height:1.2" id="sim-modal-title">What Would You Do?</div>
+        <div style="font-size:0.78rem;color:var(--gray);margin-top:4px" id="sim-modal-sub">Based on your logged case — pushed harder</div>
+      </div>
+      <button onclick="closeSimModal()" style="background:none;border:none;color:var(--gray);font-size:1.5rem;cursor:pointer;padding:4px;line-height:1;transition:color 0.2s;flex-shrink:0;" onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--gray)'">×</button>
+    </div>
+
+    <!-- Scenario -->
+    <div id="sim-scenario-box" style="margin:20px 24px 0;background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.22);border-radius:14px;padding:20px;">
+      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px;">📋 The Scenario</div>
+      <div id="sim-scenario-text" style="font-size:0.92rem;color:var(--white);line-height:1.75;"></div>
+    </div>
+
+    <!-- Answer -->
+    <div style="padding:20px 24px 0;">
+      <div style="font-size:0.72rem;color:var(--white-dim);font-weight:500;margin-bottom:8px;">Your Treatment Plan — Think before you write:</div>
+      <textarea id="sim-answer" placeholder="Walk through your full decision — diagnosis, management approach, technique, risks you'd anticipate, alternatives you'd consider..." style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:14px 16px;border-radius:12px;outline:none;resize:vertical;min-height:130px;line-height:1.7;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'"></textarea>
+      <button onclick="submitSimAnswer()" id="sim-submit-btn" style="width:100%;margin-top:10px;background:var(--teal);color:var(--navy);font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:600;padding:13px;border-radius:10px;border:none;cursor:pointer;transition:all 0.2s;">Submit My Answer — Get Graded →</button>
+    </div>
+
+    <!-- Feedback -->
+    <div id="sim-feedback-box" style="display:none;padding:20px 24px 28px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--white-faint);">
+        <div id="sim-grade-badge" style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;"></div>
+        <div>
+          <div style="font-size:0.62rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">Clinical Grade</div>
+          <div id="sim-grade-label" style="font-size:1.05rem;color:var(--white);font-weight:600;"></div>
+        </div>
+      </div>
+      <div id="sim-feedback-sections" style="display:flex;flex-direction:column;gap:12px;"></div>
+      <button onclick="loadNewSimulation()" style="width:100%;margin-top:16px;background:var(--white-faint);border:1px solid var(--white-faint);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:500;padding:11px;border-radius:10px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--white-dim)'">⚡ Generate Another Scenario</button>
     </div>
 
   </div>
@@ -1485,6 +1533,9 @@ body {
           <div class="card-title">⚡ Portfolio Insights</div>
           <div id="gap-alerts"></div>
         </div>
+
+        <!-- STREAK URGENCY -->
+        <div id="streak-card" style="display:none;margin-bottom:20px;"></div>
       </div>
 
       <!-- LOG CASE VIEW -->
@@ -1502,56 +1553,6 @@ body {
                 <button onclick="toggleTimer()" id="timer-btn" style="background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s;">▶ Start</button>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- VOICE Q&A MODAL -->
-        <div id="voice-modal" style="display:none; background:var(--navy-2); border:1px solid var(--teal-mid); border-radius:20px; padding:28px; margin-bottom:20px; position:relative;">
-          <button onclick="closeVoiceModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.4rem; line-height:1;">×</button>
-
-          <!-- HEADER -->
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-            <div style="width:40px; height:40px; background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">🎙</div>
-            <div>
-              <div style="font-size:1rem; color:var(--white); font-weight:500">Voice Logging</div>
-              <div style="font-size:0.78rem; color:var(--gray)">Answer one question at a time — speak clearly after the beep</div>
-            </div>
-          </div>
-
-          <!-- CURRENT QUESTION DISPLAY -->
-          <div id="vq-question-box" style="background:linear-gradient(135deg, rgba(124,111,255,0.1), rgba(124,111,255,0.04)); border:1px solid var(--teal-mid); border-radius:14px; padding:20px; margin-bottom:16px; min-height:80px; display:flex; align-items:center; justify-content:center; text-align:center;">
-            <div>
-              <div id="vq-question-label" style="font-size:0.65rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-weight:500">Press Start to begin</div>
-              <div id="vq-question-text" style="font-family:'Instrument Serif',serif; font-size:1.5rem; color:var(--white); letter-spacing:-0.02em;">Ready when you are</div>
-              <div id="vq-question-options" style="font-size:0.75rem; color:var(--gray); margin-top:8px; line-height:1.6;"></div>
-            </div>
-          </div>
-
-          <!-- ANSWER DISPLAY -->
-          <div id="vq-answer-box" style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px; margin-bottom:16px; min-height:52px; display:flex; align-items:center; gap:12px;">
-            <div id="vq-mic-indicator" style="width:10px; height:10px; border-radius:50%; background:var(--gray); flex-shrink:0; transition:all 0.3s;"></div>
-            <div id="vq-answer-text" style="font-size:0.9rem; color:var(--gray); font-style:italic;">Your answer will appear here...</div>
-          </div>
-
-          <!-- PROGRESS -->
-          <div style="margin-bottom:16px;">
-            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gray); margin-bottom:6px;">
-              <span id="vq-progress-label">Question 0 of 0</span>
-              <span id="vq-filled-count">0 fields filled</span>
-            </div>
-            <div style="height:4px; background:var(--white-faint); border-radius:100px; overflow:hidden;">
-              <div id="vq-progress-bar" style="height:100%; background:linear-gradient(90deg, var(--teal), #9B91FF); border-radius:100px; width:0%; transition:width 0.4s ease;"></div>
-            </div>
-          </div>
-
-          <!-- FILLED FIELDS PREVIEW -->
-          <div id="vq-filled-preview" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; min-height:28px;"></div>
-
-          <!-- CONTROLS -->
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button onclick="startVoiceQA()" id="vq-start-btn" style="flex:1; background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; padding:12px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">▶ Start Voice Logging</button>
-            <button onclick="skipVoiceQuestion()" id="vq-skip-btn" style="display:none; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--gray); font-family:'Inter',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">Skip →</button>
-            <button onclick="endVoiceQA()" id="vq-done-btn" style="display:none; background:none; border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">Done ✓</button>
           </div>
         </div>
 
@@ -2069,14 +2070,28 @@ body {
           <div class="page-title">My Cases</div>
           <div class="page-sub">Your complete clinical record</div>
         </div>
-        <div class="card">
-          <div id="all-cases-list">
-            <div class="empty-state">
-              <div class="empty-icon">📋</div>
-              <div class="empty-title">No cases yet</div>
-              <div class="empty-sub">Start logging cases to build your clinical record.</div>
-            </div>
+
+        <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <div style="flex:1;min-width:180px;position:relative;">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:0.9rem;pointer-events:none;">🔍</span>
+            <input type="text" id="cases-search" placeholder="Search tooth, diagnosis, date..." oninput="filterCases()" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:9px 12px 9px 34px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
           </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="setCasesFilter('all',this)" class="cases-filter-btn" style="background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">All</button>
+            <button onclick="setCasesFilter('endo',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Endo</button>
+            <button onclick="setCasesFilter('restorative',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Restorative</button>
+            <button onclick="setCasesFilter('surgery',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Surgery</button>
+          </div>
+          <select id="cases-sort" onchange="filterCases()" style="background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.8rem;padding:8px 12px;border-radius:10px;outline:none;cursor:pointer;">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Score</option>
+            <option value="lowest">Lowest Score</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <div id="all-cases-list"></div>
         </div>
       </div>
 
@@ -2918,6 +2933,7 @@ function updateDashboard() {
   // Update stat cards
   document.getElementById('stat-level').textContent = level.level;
   document.getElementById('stat-level-name').textContent = level.name;
+  document.getElementById('stat-streak').textContent = calculateStreak();
 
   // Inject XP bar into dashboard
   const xpCard = document.getElementById('xp-progress-card');
@@ -2973,6 +2989,7 @@ function updateDashboard() {
   updateGapAlerts();
   loadBestWork();
   loadDashboardReviews();
+  updateStreakCard();
 }
 
 function caseItemHTML(c, showDelete = false) {
@@ -3080,14 +3097,8 @@ async function deleteCase(id) {
   showToast('Case deleted.');
 }
 
-function renderAllCases() {
-  const el = document.getElementById('all-cases-list');
-  if (allCases.length === 0) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No cases yet</div><div class="empty-sub">Start logging cases to build your clinical record.</div></div>`;
-  } else {
-    el.innerHTML = `<div class="cases-list">${allCases.map(c => caseItemHTML(c, true)).join('')}</div>`;
-  }
-}
+// renderAllCases — handled by filterCases()
+function renderAllCases() { filterCases(); }
 
 // ─── LEVELS & XP SYSTEM ───
 const LEVELS = [
@@ -3185,7 +3196,7 @@ function updateProgressInsights(endo, resto, surg, total) {
   el.innerHTML = insights.map(i => `<div class="gap-alert" style="margin-bottom:8px">${i}</div>`).join('');
 }
 
-// ─── BEST WORK ───
+// ─── BEST WORK (smart photo detection) ───
 async function loadBestWork() {
   const card = document.getElementById('best-work-card');
   const list = document.getElementById('best-work-list');
@@ -3200,19 +3211,21 @@ async function loadBestWork() {
   card.style.display = 'block';
 
   const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery' };
+  const photoTypes = {
+    endo:        ['xr-postop','xr-obturation','xr-preop','xr-mc','xr-wl','cp-postop','cp-preop'],
+    restorative: ['xr-gen-postop','xr-gen-preop','cp-postop','cp-preop','cp-intraoral'],
+    surgery:     ['xr-gen-postop','xr-gen-preop','cp-postop','cp-preop','cp-intraoral'],
+  };
 
+  // Render cards immediately with tooth-number placeholder
   list.innerHTML = top.map(c => {
     const rank = getComplexityRank(c.complexity_score || 0);
     const spec = specLabels[c.specialty] || c.specialty;
     const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-    const photoBase = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${currentUser.id}/${c.id}`;
-    const photoUrl = c.specialty === 'endo' ? `${photoBase}/xr-postop.jpg` : `${photoBase}/xr-gen-postop.jpg`;
-
     return `
-      <div onclick="openCaseDetail('${c.id}')" style="flex-shrink:0;width:200px;background:var(--navy-3);border:1px solid var(--white-faint);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal-mid)'" onmouseout="this.style.borderColor='var(--white-faint)'">
-        <div style="width:200px;height:130px;background:linear-gradient(135deg,var(--navy-2),rgba(124,111,255,0.08));position:relative;overflow:hidden;">
-          <img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;" onload="this.style.opacity=1" onerror="this.style.display='none'">
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+      <div onclick="openCaseDetail('${c.id}')" id="bw-card-${c.id}" style="flex-shrink:0;width:200px;background:var(--navy-3);border:1px solid var(--white-faint);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal-mid)'" onmouseout="this.style.borderColor='var(--white-faint)'">
+        <div style="width:200px;height:130px;background:linear-gradient(135deg,var(--navy-2),rgba(124,111,255,0.08));position:relative;overflow:hidden;" id="bw-photo-${c.id}">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
             <div style="font-family:'Instrument Serif',serif;font-size:3.5rem;color:rgba(124,111,255,0.12);line-height:1">${c.tooth_number}</div>
           </div>
           <div style="position:absolute;top:8px;right:8px;background:rgba(9,9,11,0.85);border:1px solid ${rank.border};border-radius:8px;padding:3px 8px;font-size:0.7rem;font-weight:700;color:${rank.color}">${c.complexity_score}/10</div>
@@ -3222,9 +3235,42 @@ async function loadBestWork() {
           <div style="font-size:0.92rem;color:var(--white);font-weight:500;margin-bottom:3px">Tooth ${c.tooth_number}</div>
           <div style="font-size:0.7rem;color:var(--gray)">${date} · <span style="color:${rank.color}">${rank.rank}</span></div>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
+
+  // Async photo injection — try each type until one loads
+  for (const c of top) {
+    const types = photoTypes[c.specialty] || photoTypes.surgery;
+    const base = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${currentUser.id}/${c.id}`;
+    const container = document.getElementById(`bw-photo-${c.id}`);
+    if (!container) continue;
+    for (const type of types) {
+      const found = await tryLoadBestWorkPhoto(`${base}/${type}`, container);
+      if (found) break;
+    }
+  }
+}
+
+function tryLoadBestWorkPhoto(baseUrl, container) {
+  return new Promise((resolve) => {
+    const exts = ['jpg','jpeg','png','webp'];
+    let i = 0;
+    function tryNext() {
+      if (i >= exts.length) { resolve(false); return; }
+      const img = new Image();
+      img.onload = () => {
+        const el = document.createElement('img');
+        el.src = `${baseUrl}.${exts[i]}`;
+        el.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.4s;';
+        container.appendChild(el);
+        setTimeout(() => { el.style.opacity = '1'; }, 30);
+        resolve(true);
+      };
+      img.onerror = () => { i++; tryNext(); };
+      img.src = `${baseUrl}.${exts[i]}`;
+    }
+    tryNext();
+  });
 }
 
 // ─── DASHBOARD REVIEWS ───
@@ -4024,280 +4070,295 @@ function resetTimer() {
   if (btn) { btn.textContent = '▶ Start'; btn.style.background = 'var(--teal-dim)'; btn.style.borderColor = 'var(--teal-mid)'; btn.style.color = 'var(--teal)'; }
 }
 
-// ─── VOICE LOGGING ───
-// ─── VOICE Q&A ENGINE ───
-let vqRecognition = null;
-let vqActive = false;
-let vqCurrentIndex = 0;
-let vqFilledFields = {};
-let vqQuestions = [];
+// ─── STREAK ───
+function calculateStreak() {
+  if (allCases.length === 0) return 0;
+  const DAY = 86400000;
+  const days = [...new Set(allCases.map(c => {
+    const d = new Date(c.created_at);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }))].sort((a, b) => b - a);
 
-const VQ_QUESTIONS_ENDO = [
-  { id: 'specialty',            q: 'Which specialty?',           hint: 'Say: Endo, Restorative, or Surgery',              map: {'endo':'endo','endodontics':'endo','root canal':'endo','restorative':'restorative','filling':'restorative','surgery':'surgery','extraction':'surgery'} },
-  { id: 'tooth_number',         q: 'Which tooth number?',        hint: 'Say the number as words, e.g. thirty six',        map: null },
-  { id: 'age_range',            q: 'Patient age range?',         hint: 'Say: twenty to thirty, thirty to forty, etc.',    map: {'ten':'10-20','twenty':'20-30','thirty':'30-40','forty':'40-50','fifty':'50+'} },
-  { id: 'complaint',            q: 'Chief complaint?',           hint: 'Say: Pain, Swelling, Sensitivity, or Routine',    map: {'pain':'Pain','swelling':'Swelling','sensitive':'Sensitivity','sensitivity':'Sensitivity','routine':'Routine','trauma':'Trauma'} },
-  { id: 'pulp_diagnosis',       q: 'Pulp diagnosis?',            hint: 'Say: Irreversible, Reversible, or Necrosis',      map: {'irreversible':'Irreversible Pulpitis','reversible':'Reversible Pulpitis','necrosis':'Pulp Necrosis','necrotic':'Pulp Necrosis','previously treated':'Previously Treated'} },
-  { id: 'periapical_diagnosis', q: 'Periapical diagnosis?',      hint: 'Say: Symptomatic, Asymptomatic, or Abscess',      map: {'symptomatic':'Symptomatic Apical Periodontitis','asymptomatic':'Asymptomatic Apical Periodontitis','abscess':'Acute Apical Abscess','normal':'Normal'} },
-  { id: 'case_type',            q: 'Case type?',                 hint: 'Say: Primary, Retreatment, or Apexification',     map: {'primary':'Primary Treatment','first':'Primary Treatment','retreatment':'Retreatment','apexification':'Apexification','pulpotomy':'Pulpotomy'} },
-  { id: 'canals',               q: 'Number of canals?',          hint: 'Say: one, two, three, or four',                   map: {'one':'1','two':'2','three':'3','four':'4','five':'5','1':'1','2':'2','3':'3','4':'4'} },
-  { id: 'curvature',            q: 'Canal curvature?',           hint: 'Say: Straight, Slight, Moderate, or Severe',      map: {'straight':'Straight','slight':'Slight','moderate':'Moderate','severe':'Severe','curved':'Moderate'} },
-  { id: 'irrigation',           q: 'Irrigation solution?',       hint: 'Say: NaOCl only, NaOCl EDTA, or with CHX',       map: {'naocl only':'NaOCl only','only':'NaOCl only','edta':'NaOCl + EDTA','naocl edta':'NaOCl + EDTA','chx':'NaOCl + EDTA + CHX'} },
-  { id: 'obturation',           q: 'Obturation technique?',      hint: 'Say: Cold lateral, Warm vertical, or Single cone',map: {'cold':'Cold Lateral','cold lateral':'Cold Lateral','warm':'Warm Vertical','warm vertical':'Warm Vertical','single':'Single Cone','single cone':'Single Cone'} },
-  { id: 'post_op',              q: 'Post-op symptoms?',          hint: 'Say: None, Mild pain, or Swelling',               map: {'none':'None','no pain':'None','mild':'Mild Pain','mild pain':'Mild Pain','swelling':'Swelling'} },
-];
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (today.getTime() - days[0] > DAY) return 0; // last case not today or yesterday
 
-const VQ_QUESTIONS_RESTO = [
-  { id: 'specialty',    q: 'Which specialty?',        hint: 'Say: Endo, Restorative, or Surgery',           map: {'endo':'endo','restorative':'restorative','filling':'restorative','surgery':'surgery'} },
-  { id: 'tooth_number', q: 'Which tooth number?',     hint: 'Say the number as words',                      map: null },
-  { id: 'age_range',    q: 'Patient age range?',      hint: 'Say: twenty to thirty, thirty to forty',       map: {'twenty':'20-30','thirty':'30-40','forty':'40-50','fifty':'50+'} },
-  { id: 'complaint',    q: 'Chief complaint?',        hint: 'Say: Pain, Sensitivity, or Routine',           map: {'pain':'Pain','sensitive':'Sensitivity','sensitivity':'Sensitivity','routine':'Routine'} },
-  { id: 'cavity_class', q: 'Cavity class?',           hint: 'Say: Class one, two, three, four, or five',   map: {'one':'Class I','class one':'Class I','two':'Class II','class two':'Class II','three':'Class III','class three':'Class III','four':'Class IV','five':'Class V'} },
-  { id: 'surfaces',     q: 'Number of surfaces?',     hint: 'Say: one, two, three, or four plus',           map: {'one':'1 Surface','two':'2 Surfaces','three':'3 Surfaces','four':'4+ Surfaces'} },
-  { id: 'material',     q: 'Material used?',          hint: 'Say: Composite, Amalgam, Ceramic, or GIC',    map: {'composite':'Composite','amalgam':'Amalgam','ceramic':'Ceramic / Porcelain','porcelain':'Ceramic / Porcelain','gic':'GIC','glass ionomer':'GIC'} },
-  { id: 'isolation',    q: 'Isolation method?',       hint: 'Say: Rubber dam or Cotton roll',               map: {'rubber dam':'Rubber Dam','rubber':'Rubber Dam','dam':'Rubber Dam','cotton':'Cotton Roll','cotton roll':'Cotton Roll'} },
-  { id: 'post_op',      q: 'Post-op symptoms?',       hint: 'Say: None, Mild pain, or Sensitivity',        map: {'none':'None','mild':'Mild Pain','sensitive':'Sensitivity'} },
-];
-
-const VQ_QUESTIONS_SURGERY = [
-  { id: 'specialty',   q: 'Which specialty?',      hint: 'Say: Endo, Restorative, or Surgery',          map: {'endo':'endo','restorative':'restorative','surgery':'surgery','extraction':'surgery'} },
-  { id: 'tooth_number',q: 'Which tooth number?',   hint: 'Say the number as words',                     map: null },
-  { id: 'age_range',   q: 'Patient age range?',    hint: 'Say: twenty to thirty, thirty to forty',      map: {'twenty':'20-30','thirty':'30-40','forty':'40-50','fifty':'50+'} },
-  { id: 'complaint',   q: 'Chief complaint?',      hint: 'Say: Pain, Swelling, or Routine',             map: {'pain':'Pain','swelling':'Swelling','routine':'Routine','trauma':'Trauma'} },
-  { id: 'procedure',   q: 'Procedure type?',       hint: 'Say: Simple, Surgical, or Impacted wisdom',  map: {'simple':'Simple Extraction','surgical':'Surgical Extraction','impacted':'Impacted Wisdom Tooth','wisdom':'Impacted Wisdom Tooth'} },
-  { id: 'impaction',   q: 'Impaction level?',      hint: 'Say: Not applicable, Soft tissue, Partial, or Full bony', map: {'not applicable':'N/A','na':'N/A','none':'N/A','soft':'Soft Tissue','soft tissue':'Soft Tissue','partial':'Partial Bony','full':'Full Bony','full bony':'Full Bony'} },
-  { id: 'anaesthesia', q: 'Anaesthesia type?',     hint: 'Say: Infiltration, Block, Both, or General', map: {'infiltration':'Local — Infiltration','block':'Local — Block','both':'Local — Both','general':'General'} },
-  { id: 'sutures',     q: 'Sutures placed?',       hint: 'Say: No, Resorbable, or Non-resorbable',     map: {'no':'No','none':'No','resorbable':'Yes — Resorbable','non resorbable':'Yes — Non-resorbable','non-resorbable':'Yes — Non-resorbable'} },
-  { id: 'post_op',     q: 'Post-op symptoms?',     hint: 'Say: None, Mild pain, or Swelling',          map: {'none':'None','mild':'Mild Pain','swelling':'Swelling'} },
-];
-
-function startVoiceLogging() {
-  document.getElementById('voice-modal').style.display = 'block';
-  vqFilledFields = {};
-  vqCurrentIndex = 0;
-  vqActive = false;
-  vqQuestions = VQ_QUESTIONS_ENDO;
-  document.getElementById('vq-start-btn').style.display = 'block';
-  document.getElementById('vq-skip-btn').style.display = 'none';
-  document.getElementById('vq-done-btn').style.display = 'none';
-  document.getElementById('vq-filled-preview').innerHTML = '';
-  document.getElementById('vq-answer-text').textContent = 'Your answer will appear here...';
-  document.getElementById('vq-answer-text').style.color = 'var(--gray)';
-  document.getElementById('vq-mic-indicator').style.background = 'var(--gray)';
-  document.getElementById('vq-progress-bar').style.width = '0%';
-  document.getElementById('vq-progress-label').textContent = 'Ready';
-  document.getElementById('vq-filled-count').textContent = '0 fields filled';
-  document.getElementById('vq-question-label').textContent = 'Press Start to begin';
-  document.getElementById('vq-question-text').textContent = 'Ready when you are';
-  document.getElementById('vq-question-options').textContent = '';
+  let streak = 1;
+  for (let i = 1; i < days.length; i++) {
+    if (days[i-1] - days[i] === DAY) streak++;
+    else break;
+  }
+  return streak;
 }
 
-function closeVoiceModal() {
-  document.getElementById('voice-modal').style.display = 'none';
-  vqActive = false;
-  if (vqRecognition) { try { vqRecognition.stop(); vqRecognition.abort(); } catch(e){} vqRecognition = null; }
+function updateStreakCard() {
+  const card = document.getElementById('streak-card');
+  if (!card || allCases.length === 0) return;
+
+  const streak = calculateStreak();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const lastDate = new Date(allCases[0].created_at); lastDate.setHours(0,0,0,0);
+  const loggedToday = lastDate.getTime() === today.getTime();
+
+  if (streak >= 2 && !loggedToday) {
+    card.style.display = 'block';
+    card.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(239,68,68,0.03));border:1px solid rgba(239,68,68,0.25);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="font-size:1.8rem;flex-shrink:0;">🔥</div>
+        <div style="flex:1;min-width:140px;">
+          <div style="font-size:0.68rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;margin-bottom:3px;">Streak at Risk</div>
+          <div style="font-size:0.95rem;color:var(--white);font-weight:500;">${streak}-day streak — log today to keep it alive</div>
+          <div style="font-size:0.75rem;color:var(--gray);margin-top:2px;">Don't break it. You're on a roll.</div>
+        </div>
+        <button onclick="showView('log')" style="background:#EF4444;color:white;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;padding:9px 16px;border-radius:10px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;">Log Now →</button>
+      </div>`;
+  } else if (streak >= 3 && loggedToday) {
+    card.style.display = 'block';
+    card.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(245,158,11,0.07),rgba(245,158,11,0.02));border:1px solid rgba(245,158,11,0.2);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:1.6rem;">🔥</div>
+        <div>
+          <div style="font-size:0.68rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;margin-bottom:2px;">Active Streak</div>
+          <div style="font-size:0.9rem;color:var(--white);font-weight:500;">${streak} days in a row — consistency is everything.</div>
+        </div>
+      </div>`;
+  } else {
+    card.style.display = 'none';
+  }
 }
 
-function speak(text) {
-  return new Promise((resolve) => {
-    if (!window.speechSynthesis) { resolve(); return; }
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.9; u.pitch = 1; u.volume = 1;
-    u.onend = resolve; u.onerror = resolve;
-    window.speechSynthesis.speak(u);
+// ─── CASES FILTER & SEARCH ───
+let casesFilterSpecialty = 'all';
+
+function setCasesFilter(specialty, btn) {
+  casesFilterSpecialty = specialty;
+  document.querySelectorAll('.cases-filter-btn').forEach(b => {
+    b.style.background = 'var(--white-faint)';
+    b.style.borderColor = 'var(--white-faint)';
+    b.style.color = 'var(--gray)';
   });
+  btn.style.background = 'var(--teal-dim)';
+  btn.style.borderColor = 'var(--teal-mid)';
+  btn.style.color = 'var(--teal)';
+  filterCases();
 }
 
-function playBeep() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.15);
-  } catch(e) {}
-}
+function filterCases() {
+  const query  = (document.getElementById('cases-search')?.value || '').toLowerCase().trim();
+  const sort   = document.getElementById('cases-sort')?.value || 'newest';
+  const el     = document.getElementById('all-cases-list');
+  if (!el) return;
 
-async function startVoiceQA() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    showToast('Voice logging requires Chrome or Safari browser.');
+  let list = [...allCases];
+
+  if (casesFilterSpecialty !== 'all')
+    list = list.filter(c => c.specialty === casesFilterSpecialty);
+
+  if (query) {
+    list = list.filter(c =>
+      String(c.tooth_number).includes(query) ||
+      (c.specialty       || '').toLowerCase().includes(query) ||
+      (c.pulp_diagnosis  || '').toLowerCase().includes(query) ||
+      (c.procedure       || '').toLowerCase().includes(query) ||
+      (c.material        || '').toLowerCase().includes(query) ||
+      (c.narrative       || '').toLowerCase().includes(query) ||
+      (c.complaint       || '').toLowerCase().includes(query) ||
+      new Date(c.created_at).toLocaleDateString('en-GB').includes(query)
+    );
+  }
+
+  if      (sort === 'oldest')  list.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  else if (sort === 'highest') list.sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0));
+  else if (sort === 'lowest')  list.sort((a,b) => (a.complexity_score||0) - (b.complexity_score||0));
+  else                         list.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+  if (list.length === 0) {
+    el.innerHTML = allCases.length === 0
+      ? `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No cases yet</div><div class="empty-sub">Start logging cases to build your clinical record.</div></div>`
+      : `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No cases found</div><div class="empty-sub">Try a different search or filter.</div></div>`;
     return;
   }
-  vqActive = true;
-  vqCurrentIndex = 0;
-  document.getElementById('vq-start-btn').style.display = 'none';
-  document.getElementById('vq-skip-btn').style.display = 'block';
-  document.getElementById('vq-done-btn').style.display = 'block';
-  await askNextQuestion();
+
+  const countEl = document.createElement('div');
+  countEl.style.cssText = 'font-size:0.72rem;color:var(--gray);margin-bottom:12px;padding:0 2px;';
+  countEl.textContent = `${list.length} case${list.length !== 1 ? 's' : ''}`;
+  el.innerHTML = '';
+  el.appendChild(countEl);
+  const caseList = document.createElement('div');
+  caseList.className = 'cases-list';
+  caseList.innerHTML = list.map(c => caseItemHTML(c, true)).join('');
+  el.appendChild(caseList);
 }
 
-async function askNextQuestion() {
-  if (!vqActive || vqCurrentIndex >= vqQuestions.length) { endVoiceQA(); return; }
-  const q = vqQuestions[vqCurrentIndex];
-  const total = vqQuestions.length;
-  document.getElementById('vq-question-label').textContent = `Question ${vqCurrentIndex + 1} of ${total}`;
-  document.getElementById('vq-question-text').textContent = q.q;
-  document.getElementById('vq-question-options').textContent = q.hint;
-  document.getElementById('vq-progress-bar').style.width = `${(vqCurrentIndex / total) * 100}%`;
-  document.getElementById('vq-progress-label').textContent = `Question ${vqCurrentIndex + 1} of ${total}`;
-  document.getElementById('vq-answer-text').textContent = 'Listening...';
-  document.getElementById('vq-answer-text').style.color = 'var(--gray)';
-  document.getElementById('vq-mic-indicator').style.background = 'var(--gray)';
-  await speak(q.q);
-  await new Promise(r => setTimeout(r, 250));
-  playBeep();
-  listenForAnswer(q);
+// ─── CASE SIMULATION ENGINE ───
+let currentSimCase = null;
+let currentSimScenario = null;
+
+function openSimulation() {
+  const c = currentModalCase;
+  if (!c) return;
+  currentSimCase = c;
+
+  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery' }[c.specialty] || c.specialty;
+  document.getElementById('sim-modal-title').textContent = `Tooth ${c.tooth_number} — Push Harder`;
+  document.getElementById('sim-modal-sub').textContent = `${specLabel} · AI scenario based on your case`;
+
+  // Reset UI
+  document.getElementById('sim-scenario-text').innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Building your scenario...</div>`;
+  document.getElementById('sim-answer').value = '';
+  document.getElementById('sim-submit-btn').style.display = 'block';
+  document.getElementById('sim-submit-btn').textContent = 'Submit My Answer — Get Graded →';
+  document.getElementById('sim-submit-btn').disabled = false;
+  document.getElementById('sim-feedback-box').style.display = 'none';
+
+  const modal = document.getElementById('sim-modal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  generateSimScenario(c);
 }
 
-function listenForAnswer(q) {
-  if (!vqActive) return;
-  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-  vqRecognition = new SpeechRec();
-  vqRecognition.continuous = false;
-  vqRecognition.interimResults = true;
-  vqRecognition.lang = 'en-US';
-  vqRecognition.maxAlternatives = 3;
-
-  document.getElementById('vq-mic-indicator').style.background = '#EF4444';
-  document.getElementById('vq-mic-indicator').style.boxShadow = '0 0 8px rgba(239,68,68,0.5)';
-
-  let finalAnswer = '';
-
-  vqRecognition.onresult = (e) => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) finalAnswer += t + ' ';
-      else interim += t;
-    }
-    document.getElementById('vq-answer-text').textContent = (finalAnswer + interim).trim();
-    document.getElementById('vq-answer-text').style.color = 'var(--white)';
-  };
-
-  vqRecognition.onend = async () => {
-    if (!vqActive) return;
-    document.getElementById('vq-mic-indicator').style.background = 'var(--teal)';
-    document.getElementById('vq-mic-indicator').style.boxShadow = 'none';
-    const answer = finalAnswer.trim().toLowerCase() || document.getElementById('vq-answer-text').textContent.toLowerCase().trim();
-    if (answer && answer !== 'listening...') await processVoiceAnswer(q, answer);
-    vqCurrentIndex++;
-    await new Promise(r => setTimeout(r, 500));
-    await askNextQuestion();
-  };
-
-  vqRecognition.onerror = async (e) => {
-    if (!vqActive) return;
-    document.getElementById('vq-mic-indicator').style.background = 'var(--gray)';
-    document.getElementById('vq-mic-indicator').style.boxShadow = 'none';
-    vqCurrentIndex++;
-    await new Promise(r => setTimeout(r, 300));
-    await askNextQuestion();
-  };
-
-  vqRecognition.start();
+function closeSimModal() {
+  document.getElementById('sim-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
-async function processVoiceAnswer(q, answer) {
-  let matched = null;
-
-  // Tooth number special handling
-  if (q.id === 'tooth_number') {
-    const num = wordToNum(answer);
-    if (num >= 11 && num <= 48) {
-      selectTooth(num);
-      vqFilledFields[q.id] = num;
-      addVQBadge('Tooth ' + num);
-      return;
-    }
-    // Try extracting digits directly
-    const digits = answer.replace(/[^0-9]/g, '');
-    if (digits.length === 2) {
-      const n = parseInt(digits);
-      if (n >= 11 && n <= 48) {
-        selectTooth(n);
-        vqFilledFields[q.id] = n;
-        addVQBadge('Tooth ' + n);
-        return;
-      }
-    }
+async function generateSimScenario(c) {
+  let baseInfo = '';
+  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery' }[c.specialty] || c.specialty;
+  if (c.specialty === 'endo') {
+    baseInfo = `Tooth ${c.tooth_number}, ${c.pulp_diagnosis||'pulp pathology'}, ${c.periapical_diagnosis||''}, ${c.case_type||'primary treatment'}, ${c.canals||'?'} canals, ${c.curvature||''} curvature, apical size ${c.apical_size||'?'}, irrigation: ${c.irrigation||'?'}, obturation: ${c.obturation||'?'}`;
+  } else if (c.specialty === 'restorative') {
+    baseInfo = `Tooth ${c.tooth_number}, ${c.cavity_class||''}, ${c.surfaces||''}, ${c.material||''} restoration, isolation: ${c.isolation||'?'}`;
+  } else {
+    baseInfo = `Tooth ${c.tooth_number}, ${c.procedure||'extraction'}, impaction: ${c.impaction||'N/A'}, anaesthesia: ${c.anaesthesia||'?'}`;
   }
 
-  // Specialty special handling
-  if (q.id === 'specialty') {
-    const specMap = {'endo':'endo','endodontics':'endo','root canal':'endo','rct':'endo','restorative':'restorative','filling':'restorative','composite':'restorative','restoration':'restorative','surgery':'surgery','surgical':'surgery','extraction':'surgery','oral surgery':'surgery'};
-    for (const [k, v] of Object.entries(specMap)) {
-      if (answer.includes(k)) {
-        const btn = document.querySelector(`.specialty-btn[onclick*="${v}"]`);
-        if (btn) selectSpecialty(v, btn);
-        vqFilledFields[q.id] = v;
-        addVQBadge(v.charAt(0).toUpperCase() + v.slice(1));
-        if (v === 'restorative') vqQuestions = VQ_QUESTIONS_RESTO;
-        else if (v === 'surgery') vqQuestions = VQ_QUESTIONS_SURGERY;
-        else vqQuestions = VQ_QUESTIONS_ENDO;
-        return;
-      }
-    }
-  }
+  const prompt = `You are a senior dental examiner creating a clinical OSCE-style simulation for a dentist who just treated: ${baseInfo} (${specLabel}).
 
-  // Map matching
-  if (q.map) {
-    if (q.map[answer]) { matched = q.map[answer]; }
-    else {
-      for (const [k, v] of Object.entries(q.map)) {
-        if (answer.includes(k) || k.includes(answer)) { matched = v; break; }
-      }
-    }
-  }
+Generate a HARDER, more complex scenario — same specialty, but with added complications, unusual anatomy, patient risk factors, or emergency elements that make it genuinely challenging.
 
-  if (matched) {
-    vqFilledFields[q.id] = matched;
-    const fieldId = { 'pulp_diagnosis':'f-pulp', 'periapical_diagnosis':'f-periapical', 'case_type':'f-case-type', 'cavity_class':'f-cavity-class', 'post_op':'f-postop', 'age_range':'f-age', 'complaint':'f-complaint', 'canals':'f-canals', 'curvature':'f-curvature', 'irrigation':'f-irrigation', 'obturation':'f-obturation', 'surfaces':'f-surfaces', 'material':'f-material', 'isolation':'f-isolation', 'procedure':'f-procedure', 'impaction':'f-impaction', 'anaesthesia':'f-anaesthesia', 'sutures':'f-sutures' }[q.id] || ('f-' + q.id);
-    setSelect(fieldId, matched);
-    if (q.id === 'canals') updateCanalFields();
-    addVQBadge(matched.length > 14 ? matched.substring(0,11)+'...' : matched);
-    document.getElementById('vq-filled-count').textContent = `${Object.keys(vqFilledFields).length} fields filled`;
+Respond ONLY with a JSON object (no markdown) with exactly these keys:
+- "scenario": 3-4 vivid sentences. Present tense. Include patient age, relevant medical/dental history, specific clinical findings, and a complexity twist.
+- "key_challenge": One sentence naming the single biggest clinical challenge.
+- "must_address": Array of exactly 4 strings — critical decision points the dentist MUST address.`;
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'clinical_note', notePrompt: prompt, caseData: c, complexity: c.complexity_score })
+    });
+    const data = await response.json();
+    const result = JSON.parse((data.note||'{}').replace(/```json|```/g,'').trim());
+    currentSimScenario = result;
+
+    document.getElementById('sim-scenario-text').innerHTML = `
+      <div style="font-size:0.93rem;color:var(--white);line-height:1.8;margin-bottom:16px;">${result.scenario||'—'}</div>
+      <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+        <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:5px;">⚠ Key Challenge</div>
+        <div style="font-size:0.85rem;color:var(--white);line-height:1.6;">${result.key_challenge||'—'}</div>
+      </div>
+      <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Your answer must address all of these:</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${(result.must_address||[]).map((item,i) => `
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div style="width:20px;height:20px;background:var(--teal-dim);border:1px solid var(--teal-mid);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.62rem;color:var(--teal);font-weight:700;flex-shrink:0;margin-top:2px;">${i+1}</div>
+            <div style="font-size:0.82rem;color:var(--white-dim);line-height:1.55;">${item}</div>
+          </div>`).join('')}
+      </div>`;
+  } catch(e) {
+    document.getElementById('sim-scenario-text').innerHTML = `<div style="color:var(--gray);text-align:center;padding:20px;">Error generating scenario. Please try again.</div>`;
   }
 }
 
-function wordToNum(text) {
-  const map = {'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'eleven':11,'twelve':12,'thirteen':13,'fourteen':14,'fifteen':15,'sixteen':16,'seventeen':17,'eighteen':18,'nineteen':19,'twenty':20,'thirty':30,'forty':40,'fifty':50};
-  const direct = parseInt(text.replace(/[^0-9]/g,''));
-  if (!isNaN(direct) && direct > 0) return direct;
-  let total = 0;
-  text.split(/[\s-]+/).forEach(w => { if (map[w] !== undefined) total += map[w]; });
-  return total;
+async function submitSimAnswer() {
+  const answer = document.getElementById('sim-answer').value.trim();
+  if (answer.length < 20) { showToast('Write a proper answer first.'); return; }
+
+  const btn = document.getElementById('sim-submit-btn');
+  btn.textContent = '⏳ Grading your answer...';
+  btn.disabled = true;
+
+  const c = currentSimCase;
+  const s = currentSimScenario;
+
+  const prompt = `You are a strict but fair senior dental examiner grading an OSCE response.
+
+SCENARIO: ${s?.scenario||''}
+KEY CHALLENGE: ${s?.key_challenge||''}
+MUST ADDRESS: ${(s?.must_address||[]).join(' | ')}
+
+CANDIDATE ANSWER: "${answer}"
+
+Respond ONLY with JSON (no markdown):
+- "grade": one of "Distinction", "Pass", "Borderline", "Fail"
+- "score": number 0-100
+- "verdict": one powerful sentence — how a senior specialist would sum this up to a junior
+- "strengths": 2 specific sentences on what they got RIGHT from their actual answer
+- "missed": 2 specific sentences on the most critical things MISSED or wrong
+- "pearl": one advanced clinical insight only a specialist would know — memorable and specific`;
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'clinical_note', notePrompt: prompt, caseData: c, complexity: c?.complexity_score })
+    });
+    const data = await response.json();
+    const result = JSON.parse((data.note||'{}').replace(/```json|```/g,'').trim());
+
+    const gColors = { Distinction:'#7C6FFF', Pass:'#22C55E', Borderline:'#F59E0B', Fail:'#EF4444' };
+    const gBg     = { Distinction:'rgba(124,111,255,0.14)', Pass:'rgba(34,197,94,0.12)', Borderline:'rgba(245,158,11,0.12)', Fail:'rgba(239,68,68,0.12)' };
+    const gEmoji  = { Distinction:'🏆', Pass:'✓', Borderline:'⚠', Fail:'✗' };
+    const g = result.grade || 'Pass';
+    const col = gColors[g] || '#7C6FFF';
+
+    const badge = document.getElementById('sim-grade-badge');
+    badge.style.cssText = `width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;background:${gBg[g]||gBg.Pass};border:1px solid ${col}40;`;
+    badge.textContent = gEmoji[g] || '✓';
+
+    const gradeLabel = document.getElementById('sim-grade-label');
+    gradeLabel.textContent = `${g} — ${result.score||'—'}/100`;
+    gradeLabel.style.color = col;
+
+    document.getElementById('sim-feedback-sections').innerHTML = `
+      <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:12px;padding:16px;">
+        <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Examiner Verdict</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1rem;color:var(--white);font-style:italic;line-height:1.6;">"${result.verdict||'—'}"</div>
+      </div>
+      <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:14px;">
+        <div style="font-size:0.6rem;color:#22C55E;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">✦ What You Got Right</div>
+        <div style="font-size:0.875rem;color:var(--white);line-height:1.65;">${result.strengths||'—'}</div>
+      </div>
+      <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:14px;">
+        <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">⚠ What You Missed</div>
+        <div style="font-size:0.875rem;color:var(--white);line-height:1.65;">${result.missed||'—'}</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(124,111,255,0.09),rgba(155,145,255,0.04));border:1px solid rgba(124,111,255,0.2);border-radius:12px;padding:14px;">
+        <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">💎 Specialist Pearl</div>
+        <div style="font-size:0.875rem;color:var(--white);line-height:1.65;">${result.pearl||'—'}</div>
+      </div>`;
+
+    document.getElementById('sim-feedback-box').style.display = 'block';
+    document.getElementById('sim-submit-btn').style.display = 'none';
+    document.getElementById('sim-feedback-box').scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  } catch(e) {
+    showToast('Error grading answer. Please try again.');
+    btn.textContent = 'Submit My Answer — Get Graded →';
+    btn.disabled = false;
+  }
 }
 
-function addVQBadge(label) {
-  const p = document.getElementById('vq-filled-preview');
-  const b = document.createElement('div');
-  b.style.cssText = 'background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-size:0.68rem;padding:3px 10px;border-radius:100px;';
-  b.textContent = '✓ ' + label;
-  p.appendChild(b);
-}
-
-async function skipVoiceQuestion() {
-  if (vqRecognition) { try { vqRecognition.abort(); } catch(e){} }
-  vqCurrentIndex++;
-  await new Promise(r => setTimeout(r, 200));
-  await askNextQuestion();
-}
-
-function endVoiceQA() {
-  vqActive = false;
-  if (vqRecognition) { try { vqRecognition.stop(); } catch(e){} }
-  speak('Done. Form filled.');
-  document.getElementById('vq-question-text').textContent = '✓ All done!';
-  document.getElementById('vq-question-label').textContent = `${Object.keys(vqFilledFields).length} fields filled successfully`;
-  document.getElementById('vq-progress-bar').style.width = '100%';
-  document.getElementById('vq-skip-btn').style.display = 'none';
-  document.getElementById('vq-done-btn').textContent = 'Close ×';
-  document.getElementById('vq-done-btn').onclick = closeVoiceModal;
-  setTimeout(() => closeVoiceModal(), 2500);
+async function loadNewSimulation() {
+  document.getElementById('sim-answer').value = '';
+  document.getElementById('sim-feedback-box').style.display = 'none';
+  document.getElementById('sim-submit-btn').style.display = 'block';
+  document.getElementById('sim-submit-btn').textContent = 'Submit My Answer — Get Graded →';
+  document.getElementById('sim-submit-btn').disabled = false;
+  document.getElementById('sim-scenario-text').innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Generating new scenario...</div>`;
+  if (currentSimCase) await generateSimScenario(currentSimCase);
+  document.getElementById('sim-scenario-box').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 // ─── REVIEWS ───
@@ -4602,7 +4663,10 @@ function viewMyPortfolio() {
 
 // Close modal on Escape
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeCaseDetail();
+  if (e.key === 'Escape') {
+    closeCaseDetail();
+    closeSimModal();
+  }
 });
 
 // ─── START ───
