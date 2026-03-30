@@ -4194,116 +4194,178 @@ async function generateInstagramCard(caseId) {
   const c = allCases.find(x => x.id === caseId);
   if (!c) return;
 
+  showToast('⏳ Building card...');
+
   const canvas = document.createElement('canvas');
   canvas.width = 1080;
   canvas.height = 1080;
   const ctx = canvas.getContext('2d');
 
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Oral Surgery' }[c.specialty] || c.specialty;
   const name = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Dr.';
   const rank = getComplexityRank(c.complexity_score || 0);
+  const username = currentProfile?.username;
+  const url = username ? `provify.app/portfolio.html?u=${username}` : 'provify.app';
 
-  // Background
-  const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
-  gradient.addColorStop(0, '#09090B');
-  gradient.addColorStop(1, '#13101F');
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, 1080, 1080);
+  // Try to load the best available photo
+  const photoTypes = c.specialty === 'endo'
+    ? ['xr-postop', 'xr-preop', 'xr-obturation', 'cp-preop', 'cp-postop']
+    : ['xr-gen-postop', 'xr-gen-preop', 'cp-preop', 'cp-postop'];
 
-  // Violet accent bar left
-  ctx.fillStyle = '#7C6FFF';
-  ctx.fillRect(0, 0, 8, 1080);
+  let photo = null;
+  for (const type of photoTypes) {
+    const base = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${currentUser.id}/${c.id}/${type}`;
+    for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {
+      const img = await loadImage(`${base}.${ext}`);
+      if (img) { photo = img; break; }
+    }
+    if (photo) break;
+  }
 
-  // Top glow
-  const glow = ctx.createRadialGradient(540, 0, 0, 540, 0, 600);
-  glow.addColorStop(0, 'rgba(124,111,255,0.12)');
-  glow.addColorStop(1, 'transparent');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, 1080, 1080);
+  if (photo) {
+    // ── PHOTO CARD — photo fills most of the canvas ──
 
-  // Provify logo top right
-  ctx.fillStyle = 'rgba(250,250,250,0.4)';
-  ctx.font = '500 32px Inter, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText('Provify.', 1040, 64);
+    // Draw photo as background — cover fit
+    const scale = Math.max(1080 / photo.width, 1080 / photo.height);
+    const pw = photo.width * scale;
+    const ph = photo.height * scale;
+    const px = (1080 - pw) / 2;
+    const py = (1080 - ph) / 2;
+    ctx.drawImage(photo, px, py, pw, ph);
 
-  // Specialty tag
-  ctx.fillStyle = 'rgba(124,111,255,0.15)';
-  roundRect(ctx, 60, 120, specLabel.length * 18 + 40, 48, 24);
+    // Dark gradient overlay — bottom 45%
+    const grad = ctx.createLinearGradient(0, 500, 0, 1080);
+    grad.addColorStop(0, 'transparent');
+    grad.addColorStop(0.4, 'rgba(9,9,11,0.85)');
+    grad.addColorStop(1, 'rgba(9,9,11,0.97)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    // Top subtle gradient
+    const topGrad = ctx.createLinearGradient(0, 0, 0, 180);
+    topGrad.addColorStop(0, 'rgba(9,9,11,0.7)');
+    topGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = topGrad;
+    ctx.fillRect(0, 0, 1080, 180);
+
+  } else {
+    // ── NO PHOTO — elegant dark card ──
+    const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
+    bg.addColorStop(0, '#09090B');
+    bg.addColorStop(1, '#13101F');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= 1080; x += 90) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1080); ctx.stroke(); }
+    for (let y = 0; y <= 1080; y += 90) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1080, y); ctx.stroke(); }
+
+    // Center glow
+    const glow = ctx.createRadialGradient(540, 400, 0, 540, 400, 600);
+    glow.addColorStop(0, 'rgba(124,111,255,0.12)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    // Big tooth number centered
+    ctx.fillStyle = 'rgba(124,111,255,0.06)';
+    ctx.font = 'bold 400px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(c.tooth_number || '—', 540, 580);
+  }
+
+  // ── TOP BAR — Provify logo + specialty ──
+  // Provify wordmark
+  ctx.fillStyle = 'rgba(250,250,250,0.9)';
+  ctx.font = '500 34px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('Provify.', 52, 64);
+
+  // Specialty pill top right
+  const specW = specLabel.length * 17 + 40;
+  ctx.fillStyle = 'rgba(124,111,255,0.3)';
+  roundRect(ctx, 1080 - specW - 40, 34, specW, 42, 21);
   ctx.fill();
-  ctx.fillStyle = '#9B91FF';
-  ctx.font = '600 24px Inter, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText(specLabel.toUpperCase(), 80, 152);
+  ctx.fillStyle = '#C4BCFF';
+  ctx.font = '600 22px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(specLabel.toUpperCase(), 1040, 62);
 
-  // Tooth number — big
+  // ── BOTTOM INFO ──
+  const bY = 760; // where bottom section starts
+
+  // Tooth + score row
   ctx.fillStyle = '#FAFAFA';
-  ctx.font = '300 160px "Georgia", serif';
+  ctx.font = '300 88px Georgia, serif';
   ctx.textAlign = 'left';
-  ctx.fillText(`Tooth ${c.tooth_number}`, 60, 360);
+  ctx.fillText(`Tooth ${c.tooth_number}`, 52, bY + 90);
 
   // Complexity score
   ctx.fillStyle = '#7C6FFF';
-  ctx.font = '700 96px "Georgia", serif';
-  ctx.fillText(`${c.complexity_score || '—'}`, 60, 500);
-  ctx.fillStyle = 'rgba(250,250,250,0.4)';
-  ctx.font = '300 40px Inter, sans-serif';
-  ctx.fillText('/10 complexity', 60 + (c.complexity_score?.toString().length || 1) * 56 + 10, 500);
+  ctx.font = '700 56px Georgia, serif';
+  ctx.fillText(`${c.complexity_score || '—'}`, 52, bY + 168);
+  ctx.fillStyle = 'rgba(250,250,250,0.45)';
+  ctx.font = '300 32px Inter, sans-serif';
+  ctx.fillText('/10  ·  ' + rank.rank, 52 + (String(c.complexity_score || '—').length * 38), bY + 168);
 
-  // Rank badge
-  ctx.fillStyle = rank.bg || 'rgba(124,111,255,0.1)';
-  roundRect(ctx, 60, 540, 200, 56, 28);
-  ctx.fill();
-  ctx.fillStyle = rank.color || '#7C6FFF';
-  ctx.font = '700 28px Inter, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(rank.rank, 160, 575);
-
-  // Narrative
+  // Narrative — max 2 lines
   if (c.narrative) {
-    ctx.fillStyle = 'rgba(250,250,250,0.6)';
-    ctx.font = 'italic 300 32px "Georgia", serif';
+    ctx.fillStyle = 'rgba(250,250,250,0.55)';
+    ctx.font = 'italic 300 28px Georgia, serif';
     ctx.textAlign = 'left';
-    const words = c.narrative.split(' ');
-    let line = '"';
-    let y = 680;
+    const words = ('"' + c.narrative + '"').split(' ');
+    let line = '';
+    let lineY = bY + 230;
+    let lineCount = 0;
     for (const word of words) {
       const test = line + word + ' ';
-      if (ctx.measureText(test).width > 960 || y > 820) {
-        if (y <= 820) { ctx.fillText(line, 60, y); y += 44; line = word + ' '; }
-        else break;
+      if (ctx.measureText(test).width > 976 && line) {
+        if (lineCount < 2) { ctx.fillText(line.trim(), 52, lineY); lineY += 42; lineCount++; }
+        line = word + ' ';
+        if (lineCount >= 2) break;
       } else { line = test; }
     }
-    if (y <= 820) ctx.fillText(line.trim() + '"', 60, y);
+    if (lineCount < 2 && line.trim()) ctx.fillText(line.trim(), 52, lineY);
   }
 
-  // Bottom bar
-  ctx.fillStyle = 'rgba(124,111,255,0.15)';
-  ctx.fillRect(0, 940, 1080, 140);
-  ctx.fillStyle = '#7C6FFF';
-  ctx.fillRect(0, 940, 1080, 2);
+  // ── FOOTER ──
+  // Separator line
+  ctx.strokeStyle = 'rgba(124,111,255,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(52, 1014); ctx.lineTo(1028, 1014); ctx.stroke();
 
-  // Doctor name
-  ctx.fillStyle = '#FAFAFA';
-  ctx.font = '500 36px Inter, sans-serif';
+  // Doctor name left
+  ctx.fillStyle = 'rgba(250,250,250,0.85)';
+  ctx.font = '500 30px Inter, sans-serif';
   ctx.textAlign = 'left';
-  ctx.fillText(name, 60, 1010);
+  ctx.fillText(name, 52, 1054);
 
-  // Portfolio URL
-  const username = currentProfile?.username;
-  const url = username ? `provify.app/portfolio.html?u=${username}` : 'provify.app';
-  ctx.fillStyle = 'rgba(250,250,250,0.4)';
-  ctx.font = '300 28px Inter, sans-serif';
-  ctx.fillText(url, 60, 1050);
+  // URL right
+  ctx.fillStyle = 'rgba(250,250,250,0.35)';
+  ctx.font = '300 24px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(url, 1028, 1054);
 
   // Download
   const link = document.createElement('a');
-  link.download = `Provify_Case_${c.tooth_number}_${specLabel}.png`;
+  link.download = `Provify_${name.replace(/\s+/g,'_')}_Tooth${c.tooth_number}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
   showToast('✓ Instagram card downloaded!');
 }
 
+function loadImage(url) {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => resolve(null), 3000);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { clearTimeout(timeout); resolve(img); };
+    img.onerror = () => { clearTimeout(timeout); resolve(null); };
+    img.src = url;
+  });
+}
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
