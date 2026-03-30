@@ -660,9 +660,18 @@ async function loadPortfolio() {
     `;
   } else {
     container.innerHTML = sorted.map((c, i) => renderCaseCard(c, i, resolvedUserId)).join('');
+  }
 
+  // Hide loading NOW — don't wait for photos or reviews
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('portfolio-content')?.style && (document.getElementById('portfolio-content').style.display = 'block');
+
+  if (sorted.length > 0) {
     // Load reviews for each case
     sorted.forEach(c => loadCaseReviews(c.id));
+
+    // Load photos async — non-blocking, shows up as they arrive
+    sorted.forEach(c => loadCasePhotos(c.id, c.specialty, resolvedUserId));
   }
 
   // Load average patient rating
@@ -683,9 +692,9 @@ async function loadPortfolio() {
 }
 
 function renderCaseCard(c, index, userId) {
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  const delay = index * 0.1;
+  const delay = index * 0.08;
 
   // Build detail items
   const details = [];
@@ -707,31 +716,15 @@ function renderCaseCard(c, index, userId) {
   } else if (c.specialty === 'surgery') {
     if (c.procedure) details.push(['Procedure', c.procedure]);
     if (c.impaction && c.impaction !== 'N/A') details.push(['Impaction', c.impaction]);
+  } else if (c.specialty === 'paeds') {
+    if (c.cavity_class) details.push(['Dentition', c.cavity_class]);
+    if (c.procedure) details.push(['Procedure', c.procedure]);
+    if (c.material) details.push(['Material', c.material]);
+    if (c.pulp_diagnosis) details.push(['Pulp Status', c.pulp_diagnosis]);
+    if (c.isolation) details.push(['Behaviour Mgmt', c.isolation]);
   }
 
   if (c.post_op && c.post_op !== 'None') details.push(['Post-op', c.post_op]);
-
-  // Photo slots for this case
-  const photoTypes = c.specialty === 'endo'
-    ? ['xr-preop', 'xr-wl', 'xr-mc', 'xr-obturation', 'xr-postop', 'cp-preop', 'cp-postop', 'cp-intraoral']
-    : ['xr-gen-preop', 'xr-gen-postop', 'cp-preop', 'cp-postop', 'cp-intraoral'];
-
-  const photosHTML = photoTypes.map(type => {
-    const baseUrl = `${SUPABASE_URL}/storage/v1/object/public/case-images/${userId}/${c.id}/${type}`;
-    const label = PHOTO_LABELS[type] || type;
-    return `
-      <div class="photo-item" id="photo-${c.id}-${type}">
-        <img
-          src="${baseUrl}.jpg"
-          alt="${label}"
-          onclick="openLightbox(this.src, '${label}')"
-          onerror="tryNextExt(this, '${baseUrl}', ['jpeg','png','webp','heic','HEIC','JPG','PNG'], '${label}', '${c.id}-${type}')"
-          loading="lazy"
-        >
-        <div class="photo-item-label">${label}</div>
-      </div>
-    `;
-  }).join('');
 
   const detailsHTML = details.map(([label, value]) => `
     <div class="detail-item">
@@ -760,9 +753,9 @@ function renderCaseCard(c, index, userId) {
       </div>
       ` : ''}
 
-      <div class="case-photos" id="photos-section-${c.id}">
+      <div class="case-photos" id="photos-section-${c.id}" style="display:none;">
         <div class="photos-label">Radiographs & Clinical Photos</div>
-        <div class="photos-grid">${photosHTML}</div>
+        <div class="photos-grid" id="photos-grid-${c.id}"></div>
       </div>
 
       ${details.length > 0 ? `
@@ -816,17 +809,47 @@ async function loadCaseReviews(caseId) {
   `;
 }
 
-function tryNextExt(img, baseUrl, exts, label, slotId) {
-  if (exts.length === 0) {
-    // All extensions failed — hide the slot entirely
-    const slot = document.getElementById(`photo-${slotId}`);
-    if (slot) slot.style.display = 'none';
-    return;
+// Smart async photo loader — probes quietly, only injects photos that exist
+function probeImage(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const timeout = setTimeout(() => { img.src = ''; resolve(null); }, 3000);
+    img.onload  = () => { clearTimeout(timeout); resolve(url); };
+    img.onerror = () => { clearTimeout(timeout); resolve(null); };
+    img.src = url;
+  });
+}
+
+async function loadCasePhotos(caseId, specialty, userId) {
+  const photoTypes = specialty === 'endo'
+    ? ['xr-preop','xr-wl','xr-mc','xr-obturation','xr-postop','cp-preop','cp-postop','cp-intraoral']
+    : ['xr-gen-preop','xr-gen-postop','cp-preop','cp-postop','cp-intraoral'];
+
+  const found = [];
+
+  // Try each type — stop at first working extension
+  for (const type of photoTypes) {
+    const base = `${SUPABASE_URL}/storage/v1/object/public/case-images/${userId}/${caseId}/${type}`;
+    for (const ext of ['jpg','jpeg','png','webp']) {
+      const url = await probeImage(`${base}.${ext}`);
+      if (url) { found.push({ url, label: PHOTO_LABELS[type] || type }); break; }
+    }
   }
-  const next = exts.shift();
-  const newSrc = `${baseUrl}.${next}`;
-  img.onerror = () => tryNextExt(img, baseUrl, exts, label, slotId);
-  img.src = newSrc;
+
+  if (found.length === 0) return;
+
+  const section = document.getElementById(`photos-section-${caseId}`);
+  const grid    = document.getElementById(`photos-grid-${caseId}`);
+  if (!section || !grid) return;
+
+  grid.innerHTML = found.map(p => `
+    <div class="photo-item">
+      <img src="${p.url}" alt="${p.label}" onclick="openLightbox('${p.url}', '${p.label}')" loading="lazy">
+      <div class="photo-item-label">${p.label}</div>
+    </div>
+  `).join('');
+
+  section.style.display = 'block';
 }
 
 function escapeHTML(str) {
