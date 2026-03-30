@@ -4333,16 +4333,9 @@ async function showPatientReviewQR() {
   if (section.style.display === 'block') { section.style.display = 'none'; return; }
   section.style.display = 'block';
 
-  // Generate unique token and store it
+  // Generate unique token — no pre-insert needed
   const token = crypto.randomUUID();
   currentReviewLink = `https://provify.app/review.html?token=${token}&case=${c.id}`;
-
-  // Pre-create the review record with null rating (pending)
-  await sb.from('reviews').insert({
-    case_id: c.id,
-    reviewer_type: 'patient',
-    token: token,
-  });
 
   // Generate QR code
   const qrDiv = document.getElementById('qr-canvas');
@@ -4357,7 +4350,7 @@ async function showPatientReviewQR() {
       correctLevel: QRCode.CorrectLevel.H
     });
   } else {
-    qrDiv.innerHTML = `<div style="padding:16px;font-size:0.8rem;color:var(--g)">QR library loading... use copy link instead.</div>`;
+    qrDiv.innerHTML = `<div style="padding:16px;font-size:0.8rem;color:var(--g)">Use copy link below.</div>`;
   }
 
   document.getElementById('qr-link').textContent = currentReviewLink;
