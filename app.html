@@ -1266,7 +1266,7 @@ body {
         <span class="nav-icon">📋</span> My Cases
       </button>
       <button class="nav-item" onclick="showView('progress')" id="nav-progress">
-        <span class="nav-icon">📈</span> Progress
+        <span class="nav-icon">📈</span> Growth
       </button>
       <button class="nav-item" onclick="showView('badges')" id="nav-badges">
         <span class="nav-icon">🏆</span> Achievements
@@ -1868,8 +1868,8 @@ body {
       <!-- PROGRESS VIEW -->
       <div class="view" id="view-progress">
         <div class="page-header">
-          <div class="page-title">Progress</div>
-          <div class="page-sub">Your clinical growth over time</div>
+          <div class="page-title">Clinical Growth Engine</div>
+          <div class="page-sub">Your personal clinical development report</div>
         </div>
 
         <div class="stats-grid">
@@ -1891,13 +1891,14 @@ body {
           </div>
         </div>
 
+        <!-- LEVEL CARD -->
         <div class="card">
-          <div class="card-title">Level Progress</div>
-          <div style="display:flex; align-items:center; gap:16px; margin-bottom:12px;">
-            <div style="font-family:'Instrument Serif',serif; font-size:2.5rem; color:var(--teal)" id="prog-level-display">1</div>
-            <div>
-              <div style="font-size:0.9rem; color:var(--white); font-weight:500" id="prog-level-name-display">Intern</div>
-              <div style="font-size:0.8rem; color:var(--gray)" id="prog-level-next">Log 25 cases to reach Level 2</div>
+          <div class="card-title">Rank Progress</div>
+          <div style="display:flex; align-items:center; gap:16px; margin-bottom:14px;">
+            <div style="font-family:'Instrument Serif',serif; font-size:2.5rem; color:var(--teal); line-height:1" id="prog-level-display">1</div>
+            <div style="flex:1">
+              <div style="font-size:1rem; color:var(--white); font-weight:500; margin-bottom:2px" id="prog-level-name-display">Bronze</div>
+              <div style="font-size:0.8rem; color:var(--gray)" id="prog-level-next">Log 10 cases to reach Silver</div>
             </div>
           </div>
           <div class="progress-bar-track">
@@ -1905,6 +1906,26 @@ body {
           </div>
         </div>
 
+        <!-- CLINICAL GROWTH ENGINE -->
+        <div class="card" id="growth-engine-card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div class="card-title" style="margin-bottom:4px">Clinical Growth Analysis</div>
+              <div style="font-size:0.8rem; color:var(--gray)">AI analysis of your complete case history</div>
+            </div>
+            <button onclick="runGrowthEngine()" id="growth-engine-btn" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; padding:10px 20px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s; white-space:nowrap;">
+              ⚡ Analyze My Growth
+            </button>
+          </div>
+          <div id="growth-engine-output">
+            <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:20px; text-align:center;">
+              <div style="font-size:1.4rem; margin-bottom:8px">🧠</div>
+              <div style="font-size:0.85rem; color:var(--gray); line-height:1.6">Log at least 5 cases then click Analyze My Growth to get your personal clinical development report — strengths, blind spots, and your next 30 days.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PORTFOLIO INSIGHTS -->
         <div class="card" id="progress-insights-card">
           <div class="card-title">Portfolio Insights</div>
           <div id="progress-insights-list">
@@ -3581,6 +3602,116 @@ function copyNote() {
   const el = document.getElementById('clinical-note-text');
   const text = el.innerText || el.textContent;
   navigator.clipboard.writeText(text).then(() => showToast('Clinical note copied ✓'));
+}
+
+// ─── CLINICAL GROWTH ENGINE ───
+async function runGrowthEngine() {
+  if (allCases.length < 5) {
+    showToast('Log at least 5 cases to unlock the Growth Engine.');
+    return;
+  }
+
+  const btn = document.getElementById('growth-engine-btn');
+  const output = document.getElementById('growth-engine-output');
+  btn.textContent = '⏳ Analyzing...';
+  btn.disabled = true;
+  output.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Analyzing your clinical history...</div>`;
+
+  const total = allCases.length;
+  const endo = allCases.filter(c => c.specialty === 'endo');
+  const resto = allCases.filter(c => c.specialty === 'restorative');
+  const surg = allCases.filter(c => c.specialty === 'surgery');
+  const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
+
+  // Build case history summary
+  const endoDetails = endo.map(c => `Tooth ${c.tooth_number}: ${c.pulp_diagnosis || ''}, ${c.case_type || ''}, score ${c.complexity_score}`).join('\n');
+  const restoDetails = resto.map(c => `Tooth ${c.tooth_number}: ${c.cavity_class || ''}, ${c.material || ''}, score ${c.complexity_score}`).join('\n');
+  const surgDetails = surg.map(c => `Tooth ${c.tooth_number}: ${c.procedure || ''}, score ${c.complexity_score}`).join('\n');
+
+  // Complexity trend
+  const recentAvg = allCases.slice(0, Math.min(5, total)).reduce((s, c) => s + (c.complexity_score || 0), 0) / Math.min(5, total);
+  const earlyAvg = allCases.slice(-Math.min(5, total)).reduce((s, c) => s + (c.complexity_score || 0), 0) / Math.min(5, total);
+  const trend = recentAvg > earlyAvg ? 'increasing' : recentAvg < earlyAvg ? 'decreasing' : 'stable';
+
+  const prompt = `You are a senior dental educator analyzing a dentist's clinical case history on Provify. Provide a personal clinical development report.
+
+CASE HISTORY:
+Total cases: ${total}
+Average complexity: ${avg}/10
+Complexity trend (recent vs early): ${trend}
+
+Endodontic cases (${endo.length}):
+${endoDetails || 'None logged'}
+
+Restorative cases (${resto.length}):
+${restoDetails || 'None logged'}
+
+Surgical cases (${surg.length}):
+${surgDetails || 'None logged'}
+
+Respond ONLY with a JSON object (no markdown) with exactly these keys:
+- "strength": 2 sentences about their strongest clinical area based on the data
+- "blindspot": 2 sentences about what they're avoiding or underexposed to — be specific and honest
+- "trajectory": 1 sentence about their complexity trend — are they growing, plateauing, or playing it safe
+- "next30": An array of exactly 3 strings, each a specific case type they should actively seek in the next 30 days (e.g. "A retreatment case on a lower molar", "A Class IV composite on an anterior tooth")
+- "verdict": One powerful sentence summarizing where they stand as a clinician right now`;
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'clinical_note', notePrompt: prompt, caseData: {}, complexity: 0 })
+    });
+
+    const data = await response.json();
+    const raw = data.note || '{}';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    output.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+
+        <div style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:12px;padding:16px">
+          <div style="font-size:0.65rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:8px">✦ Your Strength</div>
+          <div style="font-size:0.9rem;color:var(--white);line-height:1.65">${result.strength || '—'}</div>
+        </div>
+
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px">
+          <div style="font-size:0.65rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:8px">⚠ Blind Spot</div>
+          <div style="font-size:0.9rem;color:var(--white);line-height:1.65">${result.blindspot || '—'}</div>
+        </div>
+
+        <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:16px">
+          <div style="font-size:0.65rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:8px">📈 Your Trajectory</div>
+          <div style="font-size:0.9rem;color:var(--white);line-height:1.65">${result.trajectory || '—'}</div>
+        </div>
+
+        <div style="background:var(--navy-3);border:1px solid var(--white-faint);border-radius:12px;padding:16px">
+          <div style="font-size:0.65rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:12px">🎯 Your Next 30 Days — Seek These Cases</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${(result.next30 || []).map((item, i) => `
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="width:22px;height:22px;background:var(--teal-dim);border:1px solid var(--teal-mid);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--teal);font-weight:600;flex-shrink:0;margin-top:1px">${i+1}</div>
+                <div style="font-size:0.875rem;color:var(--white-dim);line-height:1.5">${item}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(124,111,255,0.1),rgba(255,107,138,0.06));border:1px solid rgba(124,111,255,0.25);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Clinical Verdict</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:var(--white);font-style:italic;line-height:1.5">"${result.verdict || '—'}"</div>
+        </div>
+
+      </div>
+    `;
+
+  } catch(e) {
+    output.innerHTML = `<div style="color:var(--gray);text-align:center;padding:20px">Error generating analysis. Please try again.</div>`;
+  }
+
+  btn.textContent = '⚡ Re-analyze';
+  btn.disabled = false;
 }
 
 // ─── PROFILE SETTINGS ───
