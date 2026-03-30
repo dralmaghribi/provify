@@ -3101,30 +3101,32 @@ async function generatePortfolioPDF() {
     const margin = 18;
     const contentW = pageW - margin * 2;
 
-    // Helper: fetch image as base64 using Image + Canvas (bypasses CORS)
+    // Helper: fetch image as base64 using Image + Canvas with timeout
     async function fetchImageBase64(url) {
       return new Promise((resolve) => {
+        const timeout = setTimeout(() => resolve(null), 3000); // 3 second timeout
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
+          clearTimeout(timeout);
           try {
             const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth || img.width;
-            canvas.height = img.naturalHeight || img.height;
+            canvas.width = img.naturalWidth || 200;
+            canvas.height = img.naturalHeight || 200;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/jpeg', 0.85));
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
           } catch { resolve(null); }
         };
-        img.onerror = () => resolve(null);
-        img.src = url + '?t=' + Date.now(); // cache bust
+        img.onerror = () => { clearTimeout(timeout); resolve(null); };
+        img.src = url;
       });
     }
 
-    // Helper: try multiple extensions for a photo
+    // Helper: try jpg then png only — fast
     async function fetchPhoto(userId, caseId, type) {
       const base = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${userId}/${caseId}/${type}`;
-      for (const ext of ['jpg', 'jpeg', 'png', 'webp', 'heic', 'HEIC', 'JPG', 'PNG']) {
+      for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {
         const b64 = await fetchImageBase64(`${base}.${ext}`);
         if (b64) return b64;
       }
@@ -3202,9 +3204,9 @@ async function generatePortfolioPDF() {
       };
 
       const photos = {};
-      for (const type of photoTypes) {
+      await Promise.all(photoTypes.map(async (type) => {
         photos[type] = await fetchPhoto(currentUser.id, c.id, type);
-      }
+      }));
 
       doc.addPage();
       addPageBg();
