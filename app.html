@@ -3389,40 +3389,55 @@ async function generatePortfolioPDF() {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
     const selectedCases = allCases.filter(c => selectedCaseIds.has(c.id));
-    const name = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Dr.';
-    const role = currentProfile?.role || 'Dentist';
-    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    const total = selectedCases.length;
-    const avgScore = total > 0 ? (selectedCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1) : '—';
+    const name     = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Dr.';
+    const roleRaw  = currentProfile?.role || 'intern';
+    const roleMap  = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
+    const roleLabel = roleMap[roleRaw] || roleRaw.charAt(0).toUpperCase() + roleRaw.slice(1);
+    const bio      = currentProfile?.bio || '';
+    const today    = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const total    = selectedCases.length;
+    const avgScore = total > 0 ? (selectedCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '—';
 
-    // Colors — violet identity
-    const BG     = [9, 9, 11];
-    const BG2    = [15, 15, 18];
-    const VIOLET = [124, 111, 255];
-    const WHITE  = [250, 250, 250];
-    const GRAY   = [107, 114, 128];
-    const DARK   = [20, 20, 24];
+    // ── PALETTE — professional white paper ──
+    const WHITE   = [255, 255, 255];
+    const OFF_W   = [249, 249, 251];
+    const BLACK   = [15,  15,  20];
+    const DARK    = [40,  40,  50];
+    const MID     = [90,  90, 105];
+    const LIGHT   = [160,160,175];
+    const RULE    = [220,220,228];
+    const VIOLET  = [100, 88, 220];
+    const VIO_LT  = [230,226,255];
+    const VIO_BG  = [245,244,255];
+    const ENDO_C  = [100, 88, 220];
+    const RESTO_C = [180,120,  0];
+    const SURG_C  = [190, 50, 50];
+    const PAEDS_C = [30, 150, 100];
+
+    const specColor = { endo: ENDO_C, restorative: RESTO_C, surgery: SURG_C, paeds: PAEDS_C };
+    const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry' };
 
     const pageW = 210;
     const pageH = 297;
-    const margin = 18;
-    const contentW = pageW - margin * 2;
+    const ML = 20; // margin left
+    const MR = 20; // margin right
+    const cW = pageW - ML - MR; // content width = 170mm
 
-    // Helper: fetch image as base64 using Image + Canvas with timeout
+    // ── HELPERS ──
     async function fetchImageBase64(url) {
       return new Promise((resolve) => {
-        const timeout = setTimeout(() => resolve(null), 3000); // 3 second timeout
+        const timeout = setTimeout(() => resolve(null), 4000);
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
           clearTimeout(timeout);
           try {
             const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth || 200;
-            canvas.height = img.naturalHeight || 200;
+            canvas.width  = img.naturalWidth  || 400;
+            canvas.height = img.naturalHeight || 400;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/jpeg', 0.8));
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
           } catch { resolve(null); }
         };
         img.onerror = () => { clearTimeout(timeout); resolve(null); };
@@ -3430,289 +3445,549 @@ async function generatePortfolioPDF() {
       });
     }
 
-    // Helper: try jpg then png only — fast
-    async function fetchPhoto(userId, caseId, type) {
-      const base = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${userId}/${caseId}/${type}`;
-      for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {
+    async function fetchPhoto(caseId, type) {
+      const base = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${currentUser.id}/${caseId}/${type}`;
+      for (const ext of ['jpg','jpeg','png','webp']) {
         const b64 = await fetchImageBase64(`${base}.${ext}`);
         if (b64) return b64;
       }
       return null;
     }
 
-    // Helper: add page background
-    function addPageBg() {
-      doc.setFillColor(...BG);
-      doc.rect(0, 0, pageW, pageH, 'F');
-      doc.setFillColor(...VIOLET);
-      doc.rect(0, 0, 5, pageH, 'F');
+    function rule(y, alpha = RULE) {
+      doc.setDrawColor(...alpha);
+      doc.setLineWidth(0.2);
+      doc.line(ML, y, pageW - MR, y);
     }
 
-    // ─── COVER PAGE ───
-    addPageBg();
-
-    doc.setTextColor(...WHITE);
-    doc.setFontSize(38);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Clinical', margin + 4, 88);
-    doc.text('Portfolio', margin + 4, 108);
-
-    doc.setFillColor(...VIOLET);
-    doc.rect(margin + 4, 113, 70, 1.5, 'F');
-
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...WHITE);
-    doc.text(name, margin + 4, 128);
-    doc.setFontSize(11);
-    doc.setTextColor(...GRAY);
-    doc.text(role.charAt(0).toUpperCase() + role.slice(1), margin + 4, 137);
-    doc.text(`Generated: ${today}`, margin + 4, 146);
-
-    // Stats
-    const stats = [
-      { v: total.toString(), l: 'Cases' },
-      { v: `${avgScore}/10`, l: 'Avg Score' },
-      { v: [...new Set(selectedCases.map(c => c.specialty))].length.toString(), l: 'Specialties' },
-    ];
-    stats.forEach((s, i) => {
-      const x = margin + 4 + i * 58;
-      doc.setFillColor(...DARK);
-      doc.roundedRect(x, 158, 52, 28, 3, 3, 'F');
-      doc.setTextColor(...VIOLET);
-      doc.setFontSize(20);
+    function pageHeader(pageNum) {
+      // Top rule
+      doc.setFillColor(...VIOLET);
+      doc.rect(0, 0, pageW, 1.5, 'F');
+      // Header bar
+      doc.setFillColor(...WHITE);
+      doc.setDrawColor(...RULE);
+      doc.setLineWidth(0.2);
+      // Provify wordmark
       doc.setFont('helvetica', 'bold');
-      doc.text(s.v, x + 6, 173);
-      doc.setTextColor(...GRAY);
-      doc.setFontSize(8);
+      doc.setFontSize(9);
+      doc.setTextColor(...VIOLET);
+      doc.text('PROVIFY', ML, 11);
       doc.setFont('helvetica', 'normal');
-      doc.text(s.l, x + 6, 181);
+      doc.setFontSize(8);
+      doc.setTextColor(...LIGHT);
+      doc.text('Clinical Case Portfolio', ML + 20, 11);
+      // Right: name + page
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...LIGHT);
+      doc.text(`${name}  ·  Page ${pageNum}`, pageW - MR, 11, { align: 'right' });
+      // Separator
+      doc.setDrawColor(...RULE);
+      doc.setLineWidth(0.3);
+      doc.line(ML, 14, pageW - MR, 14);
+    }
+
+    function pageFooter() {
+      doc.setDrawColor(...RULE);
+      doc.setLineWidth(0.2);
+      doc.line(ML, pageH - 12, pageW - MR, pageH - 12);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(...LIGHT);
+      doc.text('Generated by Provify — provify.app — Clinical case intelligence for dental professionals', ML, pageH - 7);
+      doc.text(today, pageW - MR, pageH - 7, { align: 'right' });
+    }
+
+    function sectionLabel(text, y, color = VIOLET) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...color);
+      doc.text(text.toUpperCase(), ML, y);
+    }
+
+    function fieldRow(label, value, y, isShaded = false) {
+      if (isShaded) {
+        doc.setFillColor(...OFF_W);
+        doc.rect(ML, y - 3, cW, 7, 'F');
+      }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...LIGHT);
+      doc.text(label, ML + 2, y + 1);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...DARK);
+      const val = (value || '—').toString();
+      doc.text(val.length > 60 ? val.substring(0,57)+'...' : val, ML + 48, y + 1);
+      return y + 7;
+    }
+
+    // ══════════════════════════════════════
+    // ── COVER PAGE ──
+    // ══════════════════════════════════════
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, pageW, pageH, 'F');
+
+    // Left violet accent strip
+    doc.setFillColor(...VIOLET);
+    doc.rect(0, 0, 6, pageH, 'F');
+
+    // Top section — large name block
+    doc.setFillColor(...VIO_BG);
+    doc.rect(6, 0, pageW - 6, 90, 'F');
+
+    // Provify logo area
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...VIOLET);
+    doc.text('PROVIFY', 22, 22);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...MID);
+    doc.text('Clinical Case Intelligence Platform', 22, 29);
+
+    // Separator in header area
+    doc.setDrawColor(...VIO_LT);
+    doc.setLineWidth(0.3);
+    doc.line(22, 33, pageW - 20, 33);
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(28);
+    doc.setTextColor(...BLACK);
+    doc.text('Clinical Case', 22, 52);
+    doc.text('Portfolio', 22, 65);
+
+    // Violet underline
+    doc.setFillColor(...VIOLET);
+    doc.rect(22, 69, 50, 1.5, 'F');
+
+    // Name & role
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(...BLACK);
+    doc.text(name, 22, 82);
+
+    // White content area
+    doc.setFillColor(...WHITE);
+    doc.rect(6, 90, pageW - 6, pageH - 90, 'F');
+
+    // Role + bio
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...MID);
+    doc.text(roleLabel, 22, 102);
+
+    if (bio) {
+      doc.setFontSize(9);
+      doc.setTextColor(...MID);
+      const bioLines = doc.splitTextToSize(bio, cW - 10);
+      doc.text(bioLines.slice(0,3), 22, 112);
+    }
+
+    // Divider
+    doc.setDrawColor(...RULE);
+    doc.setLineWidth(0.5);
+    doc.line(22, 130, pageW - 20, 130);
+
+    // Stats block — 4 cards
+    const endoCnt  = selectedCases.filter(c => c.specialty === 'endo').length;
+    const restoCnt = selectedCases.filter(c => c.specialty === 'restorative').length;
+    const surgCnt  = selectedCases.filter(c => c.specialty === 'surgery').length;
+    const paedsCnt = selectedCases.filter(c => c.specialty === 'paeds').length;
+    const highComp = selectedCases.filter(c => (c.complexity_score||0) >= 7).length;
+
+    const stats = [
+      { value: total.toString(),     label: 'Total Cases',       color: VIOLET },
+      { value: `${avgScore}/10`,     label: 'Avg Complexity',    color: VIOLET },
+      { value: highComp.toString(),  label: 'High Complexity',   color: SURG_C },
+      { value: [...new Set(selectedCases.map(c=>c.specialty))].length.toString(), label: 'Specialties', color: PAEDS_C },
+    ];
+
+    const cardW = (cW - 9) / 4;
+    stats.forEach((s, i) => {
+      const x = ML + i * (cardW + 3);
+      doc.setFillColor(...OFF_W);
+      doc.setDrawColor(...RULE);
+      doc.setLineWidth(0.2);
+      doc.roundedRect(x, 138, cardW, 24, 2, 2, 'FD');
+      // Top colored rule on each card
+      doc.setFillColor(...s.color);
+      doc.rect(x, 138, cardW, 1.5, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(...s.color);
+      doc.text(s.value, x + cardW/2, 151, { align:'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MID);
+      doc.text(s.label.toUpperCase(), x + cardW/2, 157, { align:'center' });
     });
 
-    doc.setTextColor(...GRAY);
-    doc.setFontSize(8);
-    doc.text('Powered by Provify — provify.app', margin + 4, 278);
+    // Specialty breakdown
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(...LIGHT);
+    doc.text('SPECIALTY BREAKDOWN', ML, 176);
 
-    // ─── CASE PAGES ───
+    const specs = [
+      { label:'Endodontics',          count: endoCnt,  color: ENDO_C },
+      { label:'Restorative',          count: restoCnt, color: RESTO_C },
+      { label:'Oral Surgery',         count: surgCnt,  color: SURG_C },
+      { label:'Paediatric Dentistry', count: paedsCnt, color: PAEDS_C },
+    ].filter(s => s.count > 0);
+
+    let sy = 180;
+    specs.forEach(s => {
+      const pct = total > 0 ? s.count / total : 0;
+      const barW = (cW - 30) * pct;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(...DARK);
+      doc.text(s.label, ML, sy + 3.5);
+      doc.setFillColor(...RULE);
+      doc.rect(ML + 42, sy, cW - 55, 5, 'F');
+      doc.setFillColor(...s.color);
+      if (barW > 0) doc.rect(ML + 42, sy, barW, 5, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...s.color);
+      doc.text(`${s.count}`, pageW - MR, sy + 3.5, { align:'right' });
+      sy += 10;
+    });
+
+    // Date generated
+    doc.setDrawColor(...RULE);
+    doc.setLineWidth(0.2);
+    doc.line(ML, pageH - 22, pageW - MR, pageH - 22);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...LIGHT);
+    doc.text(`Portfolio generated: ${today}`, ML, pageH - 15);
+    doc.text(`Verified by Provify — provify.app`, pageW - MR, pageH - 15, { align:'right' });
+    doc.setFontSize(7);
+    doc.text('This document was generated by the Provify clinical case intelligence platform and reflects logged case data submitted by the clinician.', ML, pageH - 9, { maxWidth: cW });
+
+    // ══════════════════════════════════════
+    // ── CASE PAGES ──
+    // ══════════════════════════════════════
     for (let i = 0; i < selectedCases.length; i++) {
       const c = selectedCases[i];
-      btn.textContent = `⏳ Fetching photos ${i + 1}/${selectedCases.length}...`;
+      btn.textContent = `⏳ Building case ${i + 1} of ${selectedCases.length}...`;
 
-      // Fetch all photos for this case
       const photoTypes = c.specialty === 'endo'
-        ? ['xr-preop', 'xr-wl', 'xr-mc', 'xr-obturation', 'xr-postop', 'cp-preop', 'cp-postop', 'cp-intraoral']
-        : ['xr-gen-preop', 'xr-gen-postop', 'cp-preop', 'cp-postop', 'cp-intraoral'];
+        ? ['xr-preop','xr-wl','xr-mc','xr-obturation','xr-postop','cp-preop','cp-postop','cp-intraoral']
+        : c.specialty === 'paeds'
+        ? ['xr-gen-preop','xr-gen-postop','cp-preop','cp-postop','cp-intraoral']
+        : ['xr-gen-preop','xr-gen-postop','cp-preop','cp-postop','cp-intraoral'];
 
       const photoLabels = {
-        'xr-preop': 'Pre-op X-Ray', 'xr-wl': 'Working Length', 'xr-mc': 'Master Cone',
-        'xr-obturation': 'Final Obturation', 'xr-postop': 'Post-op X-Ray',
-        'xr-gen-preop': 'Pre-op X-Ray', 'xr-gen-postop': 'Post-op X-Ray',
-        'cp-preop': 'Clinical Pre-op', 'cp-postop': 'Clinical Post-op', 'cp-intraoral': 'Intraoral'
+        'xr-preop':'Pre-op Radiograph', 'xr-wl':'Working Length', 'xr-mc':'Master Cone',
+        'xr-obturation':'Final Obturation', 'xr-postop':'Post-op Radiograph',
+        'xr-gen-preop':'Pre-op Radiograph', 'xr-gen-postop':'Post-op Radiograph',
+        'cp-preop':'Clinical — Pre-op', 'cp-postop':'Clinical — Post-op', 'cp-intraoral':'Intraoral View',
       };
 
       const photos = {};
       await Promise.all(photoTypes.map(async (type) => {
-        photos[type] = await fetchPhoto(currentUser.id, c.id, type);
+        photos[type] = await fetchPhoto(c.id, type);
       }));
 
       doc.addPage();
-      addPageBg();
+      doc.setFillColor(...WHITE);
+      doc.rect(0, 0, pageW, pageH, 'F');
 
-      const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
-      const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      pageHeader(i + 2);
+      pageFooter();
 
-      // Case header
-      doc.setFillColor(...DARK);
-      doc.rect(margin - 2, 10, contentW + 4, 26, 'F');
-      doc.setTextColor(...VIOLET);
+      // Case title bar
+      const sc = specColor[c.specialty] || VIOLET;
+      const sl = specLabel[c.specialty] || c.specialty;
+      const caseDate = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+      doc.setFillColor(...sc.map(v => Math.min(255, v + 200 > 255 ? v : v + 200))); // very light tint
+      doc.setFillColor(sc[0], sc[1], sc[2], 0.08); // won't work in jsPDF — use manual light version
+      // Use OFF_W as base tint with colored left border
+      doc.setFillColor(...OFF_W);
+      doc.rect(ML, 18, cW, 16, 'F');
+      // Colored left accent
+      doc.setFillColor(...sc);
+      doc.rect(ML, 18, 2.5, 16, 'F');
+
+      doc.setFont('helvetica', 'bold');
       doc.setFontSize(7);
+      doc.setTextColor(...sc);
+      doc.text(`CASE ${i+1}  ·  ${sl.toUpperCase()}`, ML + 6, 24);
       doc.setFont('helvetica', 'bold');
-      doc.text(`CASE ${i + 1} — ${specLabel.toUpperCase()}`, margin + 2, 20);
-      doc.setTextColor(...WHITE);
-      doc.setFontSize(16);
-      doc.text(`Tooth ${c.tooth_number}`, margin + 2, 30);
-      doc.setTextColor(...GRAY);
-      doc.setFontSize(8);
+      doc.setFontSize(13);
+      doc.setTextColor(...BLACK);
+      doc.text(`Tooth ${c.tooth_number}`, ML + 6, 31);
+
+      // Date + score on right
       doc.setFont('helvetica', 'normal');
-      doc.text(date, pageW - margin - 2, 20, { align: 'right' });
+      doc.setFontSize(7.5);
+      doc.setTextColor(...LIGHT);
+      doc.text(caseDate, pageW - MR, 24, { align:'right' });
 
-      // Score badge
-      doc.setFillColor(...VIOLET);
-      doc.roundedRect(pageW - margin - 26, 23, 24, 10, 2, 2, 'F');
-      doc.setTextColor(...BG);
-      doc.setFontSize(9);
+      // Complexity score badge
+      const score = c.complexity_score || 0;
+      doc.setFillColor(...sc);
+      doc.roundedRect(pageW - MR - 22, 26, 22, 8, 2, 2, 'F');
       doc.setFont('helvetica', 'bold');
-      doc.text(`${c.complexity_score || '—'}/10`, pageW - margin - 20, 30);
+      doc.setFontSize(9);
+      doc.setTextColor(...WHITE);
+      doc.text(`${score}/10`, pageW - MR - 11, 31.5, { align:'center' });
 
-      let y = 44;
+      let y = 40;
 
-      // Narrative
+      // ── Narrative ──
       if (c.narrative) {
-        doc.setFillColor(20, 18, 40);
-        const lines = doc.splitTextToSize(c.narrative, contentW - 10);
-        const h = lines.length * 5 + 10;
-        doc.rect(margin - 2, y - 2, contentW + 4, h, 'F');
+        doc.setFillColor(...VIO_BG);
+        const narLines = doc.splitTextToSize(`"${c.narrative}"`, cW - 8);
+        const narH = narLines.length * 5 + 8;
+        doc.rect(ML, y, cW, narH, 'F');
         doc.setFillColor(...VIOLET);
-        doc.rect(margin - 2, y - 2, 2.5, h, 'F');
-        doc.setTextColor(...WHITE);
-        doc.setFontSize(8.5);
+        doc.rect(ML, y, 2, narH, 'F');
         doc.setFont('helvetica', 'italic');
-        doc.text(lines, margin + 4, y + 4);
-        y += h + 6;
+        doc.setFontSize(8.5);
+        doc.setTextColor(...DARK);
+        doc.text(narLines, ML + 5, y + 6);
+        y += narH + 6;
       }
 
-      // Clinical details — two columns
-      const fields = [];
-      if (c.complaint) fields.push(['Chief Complaint', c.complaint]);
-      if (c.age_range) fields.push(['Age Range', c.age_range]);
+      // ── Clinical Details ──
+      sectionLabel('Clinical Details', y + 4);
+      y += 8;
+
+      const fields = [
+        ['Patient Age', c.age_range],
+        ['Chief Complaint', c.complaint],
+      ];
+
       if (c.specialty === 'endo') {
-        if (c.pulp_diagnosis) fields.push(['Pulp Dx', c.pulp_diagnosis]);
-        if (c.periapical_diagnosis) fields.push(['Periapical Dx', c.periapical_diagnosis]);
-        if (c.case_type) fields.push(['Case Type', c.case_type]);
-        if (c.canals) fields.push(['Canals', c.canals]);
-        if (c.working_length) fields.push(['Working Length', c.working_length]);
-        if (c.curvature) fields.push(['Curvature', c.curvature]);
-        if (c.obturation) fields.push(['Obturation', c.obturation]);
+        if (c.pulp_diagnosis)       fields.push(['Pulp Diagnosis', c.pulp_diagnosis]);
+        if (c.periapical_diagnosis) fields.push(['Periapical Diagnosis', c.periapical_diagnosis]);
+        if (c.case_type)            fields.push(['Case Type', c.case_type]);
+        if (c.canals)               fields.push(['Number of Canals', c.canals]);
+        if (c.working_length)       fields.push(['Working Length', c.working_length]);
+        if (c.curvature)            fields.push(['Canal Curvature', c.curvature]);
+        if (c.apical_size)          fields.push(['Apical Size', `ISO ${c.apical_size}`]);
+        if (c.irrigation)           fields.push(['Irrigation', c.irrigation]);
+        if (c.obturation)           fields.push(['Obturation', c.obturation]);
+        if (c.calcification && c.calcification !== 'No') fields.push(['Calcification', c.calcification]);
+        if (c.separated === 'Yes')  fields.push(['Separated Instrument', 'Yes — documented']);
       } else if (c.specialty === 'restorative') {
-        if (c.cavity_class) fields.push(['Class', c.cavity_class]);
-        if (c.surfaces) fields.push(['Surfaces', c.surfaces]);
-        if (c.material) fields.push(['Material', c.material]);
-      } else {
-        if (c.procedure) fields.push(['Procedure', c.procedure]);
-        if (c.anaesthesia) fields.push(['Anaesthesia', c.anaesthesia]);
-      }
-      if (c.post_op) fields.push(['Post-op', c.post_op]);
-
-      if (fields.length > 0) {
-        doc.setFillColor(...DARK);
-        const colW = (contentW - 4) / 2;
-        const rows = Math.ceil(fields.length / 2);
-        doc.rect(margin - 2, y - 2, contentW + 4, rows * 8 + 4, 'F');
-
-        fields.forEach(([label, value], fi) => {
-          const col = fi % 2;
-          const row = Math.floor(fi / 2);
-          const fx = margin + col * (colW + 4);
-          const fy = y + row * 8;
-          doc.setTextColor(...GRAY);
-          doc.setFontSize(6.5);
-          doc.setFont('helvetica', 'normal');
-          doc.text(label, fx, fy + 2);
-          doc.setTextColor(...WHITE);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(7.5);
-          const val = (value || '').toString();
-          doc.text(val.length > 28 ? val.substring(0, 25) + '...' : val, fx, fy + 7);
-        });
-
-        y += rows * 8 + 8;
+        if (c.cavity_class)  fields.push(['Cavity Classification', c.cavity_class]);
+        if (c.surfaces)      fields.push(['Surfaces Involved', c.surfaces]);
+        if (c.material)      fields.push(['Restorative Material', c.material]);
+        if (c.isolation)     fields.push(['Isolation', c.isolation]);
+      } else if (c.specialty === 'surgery') {
+        if (c.procedure)    fields.push(['Procedure', c.procedure]);
+        if (c.impaction)    fields.push(['Impaction Level', c.impaction]);
+        if (c.anaesthesia)  fields.push(['Anaesthesia', c.anaesthesia]);
+        if (c.sutures)      fields.push(['Sutures', c.sutures]);
+      } else if (c.specialty === 'paeds') {
+        if (c.cavity_class) fields.push(['Dentition', c.cavity_class]);
+        if (c.procedure)    fields.push(['Procedure', c.procedure]);
+        if (c.material)     fields.push(['Material', c.material]);
+        if (c.pulp_diagnosis) fields.push(['Pulp Status', c.pulp_diagnosis]);
+        if (c.isolation)    fields.push(['Behaviour Management', c.isolation]);
+        if (c.surfaces)     fields.push(['Child Cooperation', c.surfaces]);
+        if (c.impaction)    fields.push(['Space Maintainer', c.impaction]);
       }
 
-      // Complexity bar
-      if (y < 240) {
-        doc.setFillColor(...DARK);
-        doc.rect(margin - 2, y, contentW + 4, 9, 'F');
-        doc.setTextColor(...GRAY);
-        doc.setFontSize(6.5);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Complexity', margin, y + 6);
-        doc.setFillColor(30, 28, 50);
-        doc.rect(margin + 22, y + 2.5, contentW - 36, 4, 'F');
-        const score = c.complexity_score || 0;
-        doc.setFillColor(...VIOLET);
-        doc.rect(margin + 22, y + 2.5, ((score / 10) * (contentW - 36)), 4, 'F');
-        doc.setTextColor(...VIOLET);
-        doc.setFontSize(8);
+      if (c.post_op) fields.push(['Post-operative', c.post_op]);
+      if (c.follow_up && c.follow_up !== 'No') fields.push(['Follow-up', c.follow_up]);
+
+      fields.forEach(([label, value], fi) => {
+        if (y > pageH - 40) return;
+        y = fieldRow(label, value, y, fi % 2 === 0);
+      });
+
+      y += 4;
+
+      // ── Complexity bar ──
+      if (y < pageH - 50) {
+        sectionLabel('Complexity Assessment', y + 4, MID);
+        y += 9;
+        doc.setFillColor(...RULE);
+        doc.rect(ML, y, cW, 6, 'F');
+        doc.setFillColor(...sc);
+        doc.rect(ML, y, cW * (score / 10), 6, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.text(`${score}/10`, pageW - margin, y + 6, { align: 'right' });
+        doc.setFontSize(8);
+        doc.setTextColor(...sc);
+        doc.text(`${score}/10`, pageW - MR, y + 4.5, { align:'right' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(...LIGHT);
+        doc.text('0', ML, y + 9);
+        doc.text('10', pageW - MR - 2, y + 9);
+        y += 16;
+      }
+
+      // ── Personal note ──
+      if (c.note && y < pageH - 30) {
+        doc.setFillColor(...OFF_W);
+        doc.setDrawColor(...RULE);
+        doc.setLineWidth(0.2);
+        doc.rect(ML, y, cW, 10, 'FD');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(...LIGHT);
+        doc.text('CLINICIAN NOTE', ML + 3, y + 4);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(...DARK);
+        const noteStr = c.note.length > 80 ? c.note.substring(0,77)+'...' : c.note;
+        doc.text(noteStr, ML + 3, y + 8.5);
         y += 14;
       }
 
-      // ─── REAL PHOTOS ───
-      const availablePhotos = photoTypes.filter(t => photos[t]);
-      if (availablePhotos.length > 0 && y < 245) {
-        doc.setTextColor(...VIOLET);
-        doc.setFontSize(7);
-        doc.setFont('helvetica', 'bold');
-        doc.text('RADIOGRAPHS & CLINICAL PHOTOS', margin, y);
-        y += 5;
+      // ── Photos ──
+      const availPhotos = photoTypes.filter(t => photos[t]);
+      if (availPhotos.length > 0 && y < pageH - 55) {
+        y += 2;
+        sectionLabel('Radiographs & Clinical Photography', y + 4, MID);
+        y += 9;
 
-        const remaining = pageH - y - 10;
-        const photoH = Math.min(45, remaining);
-        const photoW = Math.min(45, (contentW - (availablePhotos.length - 1) * 3) / availablePhotos.length);
+        const maxPhotos = Math.min(availPhotos.length, 4);
+        const gap = 3;
+        const photoW = (cW - gap * (maxPhotos - 1)) / maxPhotos;
+        const photoH = Math.min(50, (pageH - y - 16));
 
-        for (let pi = 0; pi < availablePhotos.length; pi++) {
-          const type = availablePhotos[pi];
-          const b64 = photos[type];
-          const px = margin + pi * (photoW + 3);
+        for (let pi = 0; pi < maxPhotos; pi++) {
+          if (y + photoH > pageH - 14) break;
+          const type = availPhotos[pi];
+          const b64  = photos[type];
+          const px   = ML + pi * (photoW + gap);
 
-          if (y + photoH > pageH - 8) break;
+          doc.setFillColor(...OFF_W);
+          doc.setDrawColor(...RULE);
+          doc.setLineWidth(0.2);
+          doc.rect(px, y, photoW, photoH + 7, 'FD');
 
           try {
-            const format = b64.includes('data:image/png') ? 'PNG' : 'JPEG';
-            doc.addImage(b64, format, px, y, photoW, photoH);
+            const fmt = b64.includes('data:image/png') ? 'PNG' : 'JPEG';
+            doc.addImage(b64, fmt, px, y, photoW, photoH);
           } catch {
-            doc.setFillColor(...DARK);
-            doc.rect(px, y, photoW, photoH, 'F');
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(6);
+            doc.setTextColor(...LIGHT);
+            doc.text('Image unavailable', px + photoW/2, y + photoH/2, { align:'center' });
           }
 
-          // Label
-          doc.setFillColor(0, 0, 0, 0.5);
-          doc.rect(px, y + photoH - 6, photoW, 6, 'F');
+          // Photo label bar
+          doc.setFillColor(...BLACK);
+          doc.rect(px, y + photoH, photoW, 7, 'F');
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(5.5);
           doc.setTextColor(...WHITE);
-          doc.setFontSize(5);
-          doc.setFont('helvetica', 'normal');
-          const lbl = photoLabels[type] || type;
-          doc.text(lbl.toUpperCase(), px + 2, y + photoH - 2);
+          doc.text((photoLabels[type]||type).toUpperCase(), px + photoW/2, y + photoH + 4.5, { align:'center' });
         }
-      } else if (availablePhotos.length === 0 && y < 260) {
-        doc.setFillColor(...DARK);
-        doc.rect(margin - 2, y, contentW + 4, 12, 'F');
-        doc.setTextColor(...GRAY);
-        doc.setFontSize(7);
+      } else if (availPhotos.length === 0 && y < pageH - 40) {
+        doc.setFillColor(...OFF_W);
+        doc.setDrawColor(...RULE);
+        doc.setLineWidth(0.2);
+        doc.rect(ML, y, cW, 12, 'FD');
         doc.setFont('helvetica', 'italic');
-        doc.text('No photos uploaded for this case', margin + contentW / 2, y + 8, { align: 'center' });
+        doc.setFontSize(7.5);
+        doc.setTextColor(...LIGHT);
+        doc.text('No radiographs or clinical photographs uploaded for this case.', ML + cW/2, y + 8, { align:'center' });
       }
     }
 
-    // ─── SUMMARY PAGE ───
+    // ══════════════════════════════════════
+    // ── SUMMARY PAGE ──
+    // ══════════════════════════════════════
     doc.addPage();
-    addPageBg();
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, pageW, pageH, 'F');
 
-    doc.setTextColor(...WHITE);
-    doc.setFontSize(22);
+    pageHeader(selectedCases.length + 2);
+    pageFooter();
+
+    // Title
     doc.setFont('helvetica', 'bold');
-    doc.text('Portfolio Summary', margin + 4, 30);
+    doc.setFontSize(16);
+    doc.setTextColor(...BLACK);
+    doc.text('Portfolio Summary', ML, 28);
     doc.setFillColor(...VIOLET);
-    doc.rect(margin + 4, 34, 70, 1, 'F');
+    doc.rect(ML, 31, 40, 1.5, 'F');
 
-    const summaryData = [
-      ['Total Cases', total],
-      ['High Complexity Cases (7+)', selectedCases.filter(c => c.complexity_score >= 7).length],
-      ['Average Complexity Score', `${avgScore}/10`],
+    // Summary table
+    const summaryRows = [
+      ['Total Cases Submitted', total.toString()],
+      ['Endodontic Cases', endoCnt.toString()],
+      ['Restorative Cases', restoCnt.toString()],
+      ['Oral Surgery Cases', surgCnt.toString()],
+      ...(paedsCnt > 0 ? [['Paediatric Cases', paedsCnt.toString()]] : []),
+      ['High Complexity Cases (≥7.0)', highComp.toString()],
+      ['Average Complexity Score', `${avgScore} / 10`],
+      ['Date Generated', today],
     ];
 
-    let ys = 48;
-    summaryData.forEach(([label, value], i) => {
-      doc.setFillColor(i % 2 === 0 ? 20 : 15, i % 2 === 0 ? 20 : 15, i % 2 === 0 ? 24 : 18);
-      doc.rect(margin - 2, ys - 3, contentW + 4, 11, 'F');
-      doc.setTextColor(...GRAY);
-      doc.setFontSize(9);
+    let sy = 38;
+    summaryRows.forEach(([label, value], i) => {
+      doc.setFillColor(i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 254 : 251);
+      doc.rect(ML, sy, cW, 8, 'F');
       doc.setFont('helvetica', 'normal');
-      doc.text(label, margin + 2, ys + 4);
-      doc.setTextColor(...VIOLET);
+      doc.setFontSize(8.5);
+      doc.setTextColor(...MID);
+      doc.text(label, ML + 3, sy + 5.5);
       doc.setFont('helvetica', 'bold');
-      doc.text(value.toString(), pageW - margin - 2, ys + 4, { align: 'right' });
-      ys += 13;
+      doc.setTextColor(...DARK);
+      doc.text(value, pageW - MR - 3, sy + 5.5, { align:'right' });
+      doc.setDrawColor(...RULE);
+      doc.setLineWidth(0.15);
+      doc.line(ML, sy + 8, pageW - MR, sy + 8);
+      sy += 8;
     });
 
-    doc.setTextColor(...GRAY);
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Generated by Provify for ${name} on ${today}.`, margin + 4, 272);
-    doc.text('provify.app — Clinical case intelligence for dental professionals.', margin + 4, 279);
+    // Declaration block
+    sy += 10;
+    doc.setFillColor(...VIO_BG);
+    doc.setDrawColor(...VIO_LT);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(ML, sy, cW, 38, 3, 3, 'FD');
+    doc.setFillColor(...VIOLET);
+    doc.rect(ML, sy, 2.5, 38, 'F');
 
-    const filename = `${name.replace(/\s+/g, '_')}_Portfolio_${new Date().getFullYear()}.pdf`;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...VIOLET);
+    doc.text('CLINICIAN DECLARATION', ML + 6, sy + 8);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...DARK);
+    const decl = `I, ${name}, confirm that all cases documented in this portfolio were performed under appropriate supervision and documented accurately to the best of my knowledge. This portfolio has been generated through Provify, a clinical case intelligence platform, and reflects my clinical activity and professional development.`;
+    const declLines = doc.splitTextToSize(decl, cW - 10);
+    doc.text(declLines, ML + 6, sy + 16);
+
+    // Signature line
+    sy += 44;
+    doc.setDrawColor(...DARK);
+    doc.setLineWidth(0.3);
+    doc.line(ML, sy + 15, ML + 70, sy + 15);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(...LIGHT);
+    doc.text('Signature', ML, sy + 19);
+    doc.line(ML + 85, sy + 15, ML + 140, sy + 15);
+    doc.text('Date', ML + 85, sy + 19);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...DARK);
+    doc.text(name, ML, sy + 10);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...MID);
+    doc.text(roleLabel, ML, sy + 5);
+
+    // Save
+    const filename = `${name.replace(/\s+/g,'_')}_Clinical_Portfolio_${new Date().getFullYear()}.pdf`;
     doc.save(filename);
     showToast('✓ Portfolio PDF downloaded!');
 
@@ -3723,7 +3998,8 @@ async function generatePortfolioPDF() {
 
   btn.textContent = '📄 Generate PDF';
   btn.disabled = false;
-}// ─── AUTO CLINICAL NOTE (runs after every case submission) ───
+}
+// ─── AUTO CLINICAL NOTE (runs after every case submission) ───
 async function autoGenerateClinicalNote(c) {
   const noteSection = document.getElementById('auto-note-section');
   const noteText = document.getElementById('auto-note-text');
