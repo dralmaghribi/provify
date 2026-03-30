@@ -664,7 +664,7 @@ async function loadPortfolio() {
 
   // Hide loading NOW — don't wait for photos or reviews
   document.getElementById('loading').style.display = 'none';
-  document.getElementById('portfolio-content')?.style && (document.getElementById('portfolio-content').style.display = 'block');
+  document.getElementById('portfolio').style.display = 'block';
 
   if (sorted.length > 0) {
     // Load reviews for each case
