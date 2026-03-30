@@ -213,52 +213,53 @@ const RATING_LABELS = ['','😞 Poor','😐 Fair','🙂 Good','😊 Very good','
 async function init() {
   const params = new URLSearchParams(window.location.search);
   reviewToken = params.get('token');
+  const caseId = params.get('case');
 
-  if (!reviewToken) { showError(); return; }
+  if (!reviewToken || !caseId) { showError(); return; }
 
-  // Verify token exists and hasn't been used
-  const { data: review, error } = await sb
-    .from('reviews')
-    .select('id, case_id')
-    .eq('token', reviewToken)
-    .eq('reviewer_type', 'patient')
-    .is('rating', null)
-    .single();
+  // Just load the case directly — no pre-created record needed
+  try {
+    const { data: c, error } = await sb
+      .from('cases')
+      .select('specialty, tooth_number, created_at, user_id')
+      .eq('id', caseId)
+      .single();
 
-  if (error || !review) { showError(); return; }
+    if (error || !c) { showError(); return; }
 
-  // Load case data
-  const { data: c } = await sb
-    .from('cases')
-    .select('*, profiles(*)')
-    .eq('id', review.case_id)
-    .single();
+    // Load profile separately
+    const { data: profile } = await sb
+      .from('profiles')
+      .select('first_name, last_name, role')
+      .eq('id', c.user_id)
+      .single();
 
-  if (!c) { showError(); return; }
+    caseData = { ...c, id: caseId };
+    profileData = profile;
 
-  caseData = c;
-  profileData = c.profiles;
+    const first = profile?.first_name || 'Dr';
+    const last = profile?.last_name || '';
+    const fullName = `Dr. ${first} ${last}`.trim();
+    const initials = (first[0] || 'D') + (last[0] || 'R');
+    const roleMap = { student:'Dental Student', intern:'Dental Intern', resident:'Resident', general:'General Dentist', specialist:'Specialist', consultant:'Consultant' };
+    const role = roleMap[profile?.role] || 'Dentist';
+    const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery' }[c.specialty] || c.specialty;
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
 
-  // Populate UI
-  const first = profileData?.first_name || 'Dr';
-  const last = profileData?.last_name || '';
-  const fullName = `Dr. ${first} ${last}`.trim();
-  const initials = (first[0] || 'D') + (last[0] || 'R');
-  const roleMap = { student:'Dental Student', intern:'Dental Intern', resident:'Resident', general:'General Dentist', specialist:'Specialist', consultant:'Consultant' };
-  const role = roleMap[profileData?.role] || 'Dentist';
-  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery' }[c.specialty] || c.specialty;
-  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    document.getElementById('doctor-avatar').textContent = initials;
+    document.getElementById('doctor-name').textContent = fullName;
+    document.getElementById('doctor-role').textContent = role;
+    document.getElementById('case-info').textContent = `${specLabel} · Tooth ${c.tooth_number} · ${date}`;
+    document.getElementById('doctor-first').textContent = first;
+    document.getElementById('success-doctor-name').textContent = first;
+    document.title = `Review ${fullName} — Provify`;
 
-  document.getElementById('doctor-avatar').textContent = initials;
-  document.getElementById('doctor-name').textContent = fullName;
-  document.getElementById('doctor-role').textContent = role;
-  document.getElementById('case-info').textContent = `${specLabel} · Tooth ${c.tooth_number} · ${date}`;
-  document.getElementById('doctor-first').textContent = first;
-  document.getElementById('success-doctor-name').textContent = first;
-  document.title = `Review ${fullName} — Provify`;
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('main-form').style.display = 'block';
 
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('main-form').style.display = 'block';
+  } catch(e) {
+    showError();
+  }
 }
 
 function setRating(n) {
@@ -300,16 +301,14 @@ async function submitReview() {
 
   const reviewerName = document.getElementById('reviewer-name').value.trim() || 'Anonymous Patient';
 
-  // Update the review record
-  const { error } = await sb
-    .from('reviews')
-    .update({
-      rating: selectedRating,
-      comment: comment || null,
-      reviewer_name: reviewerName,
-      reviewer_type: 'patient',
-    })
-    .eq('token', reviewToken);
+  const { error } = await sb.from('reviews').insert({
+    case_id: caseData.id,
+    reviewer_type: 'patient',
+    token: reviewToken,
+    rating: selectedRating,
+    comment: comment || null,
+    reviewer_name: reviewerName,
+  });
 
   if (error) {
     errEl.textContent = 'Error submitting review. Please try again.';
