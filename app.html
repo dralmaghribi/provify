@@ -1147,7 +1147,8 @@ body {
         <div style="font-family:'Instrument Serif',serif; font-size:1.4rem; color:var(--white); letter-spacing:-0.02em" id="modal-title">Case Detail</div>
         <div style="font-size:0.8rem; color:var(--gray); margin-top:4px" id="modal-date"></div>
       </div>
-      <div style="display:flex; align-items:center; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button onclick="generateInstagramCard(currentModalCase?.id)" style="background:linear-gradient(135deg,#833AB4,#FD1D1D,#F77737); color:white; font-family:'Inter',sans-serif; font-size:0.75rem; font-weight:600; padding:7px 14px; border-radius:8px; border:none; cursor:pointer;">📸 Share</button>
         <div style="text-align:center; background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:10px; padding:8px 14px;">
           <div style="font-family:'Instrument Serif',serif; font-size:1.6rem; color:var(--teal); line-height:1" id="modal-score">—</div>
           <div style="font-size:0.6rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.08em">score</div>
@@ -1399,8 +1400,38 @@ body {
       <!-- LOG CASE VIEW -->
       <div class="view" id="view-log">
         <div class="page-header">
-          <div class="page-title">Log a Case</div>
-          <div class="page-sub">Takes about 3 minutes — your AI report is instant</div>
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div class="page-title">Log a Case</div>
+              <div class="page-sub">Takes about 3 minutes — your AI report is instant</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <!-- TIMER -->
+              <div style="background:var(--navy-2); border:1px solid var(--white-faint); border-radius:10px; padding:8px 14px; display:flex; align-items:center; gap:10px;">
+                <div id="timer-display" style="font-family:monospace; font-size:1rem; color:var(--white); min-width:52px">00:00</div>
+                <button onclick="toggleTimer()" id="timer-btn" style="background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s;">▶ Start</button>
+              </div>
+              <!-- VOICE -->
+              <button onclick="startVoiceLogging()" id="voice-btn" style="background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; padding:10px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px;">
+                🎙 Voice Log
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VOICE LOGGING MODAL -->
+        <div id="voice-modal" style="display:none; background:var(--navy-2); border:1px solid var(--teal-mid); border-radius:16px; padding:24px; margin-bottom:20px; position:relative;">
+          <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:12px">🎙 Voice Logging</div>
+          <div style="font-size:0.85rem; color:var(--gray); margin-bottom:16px; line-height:1.6">Speak your case naturally. For example: <em style="color:var(--white-dim)">"Tooth 36, patient complained of pain, diagnosis irreversible pulpitis with symptomatic apical periodontitis, primary treatment, 3 canals MB ML and distal, working length 21mm, NaOCl and EDTA, warm vertical condensation"</em></div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button onclick="recordVoice()" id="record-btn" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; padding:12px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
+              🔴 Start Recording
+            </button>
+            <div id="voice-status" style="font-size:0.82rem; color:var(--gray)">Press to start</div>
+          </div>
+          <div id="voice-transcript" style="display:none; margin-top:14px; background:var(--navy-3); border:1px solid var(--white-faint); border-radius:10px; padding:14px; font-size:0.85rem; color:var(--white-dim); line-height:1.6;"></div>
+          <div id="voice-filling" style="display:none; margin-top:10px; font-size:0.82rem; color:var(--teal);">⏳ Filling form from your voice...</div>
+          <button onclick="closeVoiceModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.2rem;">×</button>
         </div>
 
         <div class="log-form">
@@ -2262,6 +2293,7 @@ function resetForm() {
   document.querySelectorAll('.photo-slot').forEach(s => s.classList.remove('has-photo'));
   document.querySelectorAll('.photo-slot-preview').forEach(p => p.style.display = 'block');
   document.querySelectorAll('.photo-slot-img').forEach(img => { img.src=''; img.style.display='none'; });
+  resetTimer();
 }
 
 function hideLoading() {
@@ -3602,6 +3634,327 @@ function copyNote() {
   const el = document.getElementById('clinical-note-text');
   const text = el.innerText || el.textContent;
   navigator.clipboard.writeText(text).then(() => showToast('Clinical note copied ✓'));
+}
+
+// ─── CASE TIMER ───
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+
+function toggleTimer() {
+  const btn = document.getElementById('timer-btn');
+  const display = document.getElementById('timer-display');
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    btn.textContent = '▶ Resume';
+    btn.style.background = 'var(--teal-dim)';
+  } else {
+    timerRunning = true;
+    btn.textContent = '⏸ Pause';
+    btn.style.background = 'rgba(239,68,68,0.15)';
+    btn.style.borderColor = 'rgba(239,68,68,0.3)';
+    btn.style.color = '#EF4444';
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const s = String(timerSeconds % 60).padStart(2, '0');
+      display.textContent = `${m}:${s}`;
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  const display = document.getElementById('timer-display');
+  const btn = document.getElementById('timer-btn');
+  if (display) display.textContent = '00:00';
+  if (btn) { btn.textContent = '▶ Start'; btn.style.background = 'var(--teal-dim)'; btn.style.borderColor = 'var(--teal-mid)'; btn.style.color = 'var(--teal)'; }
+}
+
+// ─── VOICE LOGGING ───
+let recognition = null;
+let isRecording = false;
+
+function startVoiceLogging() {
+  document.getElementById('voice-modal').style.display = 'block';
+}
+
+function closeVoiceModal() {
+  document.getElementById('voice-modal').style.display = 'none';
+  if (recognition) { recognition.stop(); isRecording = false; }
+}
+
+function recordVoice() {
+  const btn = document.getElementById('record-btn');
+  const status = document.getElementById('voice-status');
+  const transcript = document.getElementById('voice-transcript');
+  const filling = document.getElementById('voice-filling');
+
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showToast('Voice logging requires Chrome or Safari browser.');
+    return;
+  }
+
+  if (isRecording) {
+    recognition.stop();
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    isRecording = true;
+    btn.textContent = '⏹ Stop Recording';
+    btn.style.background = '#EF4444';
+    btn.style.color = 'white';
+    status.textContent = '🔴 Recording... speak your case';
+    transcript.style.display = 'none';
+  };
+
+  recognition.onresult = (e) => {
+    const text = Array.from(e.results).map(r => r[0].transcript).join('');
+    transcript.style.display = 'block';
+    transcript.textContent = text;
+  };
+
+  recognition.onend = async () => {
+    isRecording = false;
+    btn.textContent = '🔴 Start Recording';
+    btn.style.background = 'var(--teal)';
+    btn.style.color = 'var(--navy)';
+    status.textContent = 'Processing...';
+
+    const text = transcript.textContent;
+    if (!text.trim()) { status.textContent = 'No speech detected. Try again.'; return; }
+
+    filling.style.display = 'block';
+    await fillFormFromVoice(text);
+    filling.style.display = 'none';
+    status.textContent = '✓ Form filled from voice!';
+    setTimeout(() => closeVoiceModal(), 1500);
+  };
+
+  recognition.onerror = (e) => {
+    isRecording = false;
+    status.textContent = `Error: ${e.error}. Try again.`;
+    btn.textContent = '🔴 Start Recording';
+    btn.style.background = 'var(--teal)';
+    btn.style.color = 'var(--navy)';
+  };
+
+  recognition.start();
+}
+
+async function fillFormFromVoice(text) {
+  const prompt = `You are a dental form assistant. Parse this spoken case description and extract structured data.
+
+Spoken text: "${text}"
+
+Respond ONLY with a JSON object with these fields (use null if not mentioned):
+{
+  "specialty": "endo" or "restorative" or "surgery" or null,
+  "tooth_number": number or null,
+  "age_range": "10-20" or "20-30" or "30-40" or "40-50" or "50+" or null,
+  "complaint": "Pain" or "Swelling" or "Sensitivity" or "Routine" or "Trauma" or "Other" or null,
+  "pulp_diagnosis": exact AAE term or null,
+  "periapical_diagnosis": exact AAE term or null,
+  "case_type": "Primary Treatment" or "Retreatment" or "Apexification" or "Pulpotomy" or null,
+  "canals": number as string or null,
+  "curvature": "Straight" or "Slight" or "Moderate" or "Severe" or null,
+  "irrigation": "NaOCl only" or "NaOCl + EDTA" or "NaOCl + EDTA + CHX" or null,
+  "obturation": "Cold Lateral" or "Warm Vertical" or "Single Cone" or null,
+  "cavity_class": "Class I" through "Class V" or null,
+  "material": "Composite" or "Amalgam" or "Ceramic / Porcelain" or "GIC" or null,
+  "procedure": "Simple Extraction" or "Surgical Extraction" or "Impacted Wisdom Tooth" or null,
+  "narrative": a clean written version of what was said, suitable for a clinical note or null
+}`;
+
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'clinical_note', notePrompt: prompt, caseData: {}, complexity: 0 })
+    });
+    const data = await response.json();
+    const raw = (data.note || '{}').replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(raw);
+
+    // Fill form fields
+    if (parsed.specialty) {
+      const btn = document.querySelector(`.specialty-btn[onclick*="${parsed.specialty}"]`);
+      if (btn) selectSpecialty(parsed.specialty, btn);
+    }
+    if (parsed.tooth_number) {
+      selectTooth(parsed.tooth_number);
+    }
+    if (parsed.age_range) setSelect('f-age', parsed.age_range);
+    if (parsed.complaint) setSelect('f-complaint', parsed.complaint);
+    if (parsed.pulp_diagnosis) setSelect('f-pulp', parsed.pulp_diagnosis);
+    if (parsed.periapical_diagnosis) setSelect('f-periapical', parsed.periapical_diagnosis);
+    if (parsed.case_type) setSelect('f-case-type', parsed.case_type);
+    if (parsed.curvature) setSelect('f-curvature', parsed.curvature);
+    if (parsed.irrigation) setSelect('f-irrigation', parsed.irrigation);
+    if (parsed.obturation) setSelect('f-obturation', parsed.obturation);
+    if (parsed.cavity_class) setSelect('f-cavity-class', parsed.cavity_class);
+    if (parsed.material) setSelect('f-material', parsed.material);
+    if (parsed.procedure) setSelect('f-procedure', parsed.procedure);
+    if (parsed.narrative) {
+      const narrativeEl = document.getElementById('f-narrative');
+      if (narrativeEl) narrativeEl.value = parsed.narrative;
+    }
+    if (parsed.canals) {
+      setSelect('f-canals', parsed.canals);
+      updateCanalFields();
+    }
+
+  } catch(e) {
+    console.error('Voice fill error:', e);
+    showToast('Could not parse voice. Please fill manually.');
+  }
+}
+
+function setSelect(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const options = Array.from(el.options);
+  const match = options.find(o => o.value.toLowerCase().includes(value.toString().toLowerCase()) || value.toString().toLowerCase().includes(o.value.toLowerCase()));
+  if (match) el.value = match.value;
+}
+
+// ─── INSTAGRAM CASE CARD ───
+async function generateInstagramCard(caseId) {
+  const c = allCases.find(x => x.id === caseId);
+  if (!c) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1080;
+  const ctx = canvas.getContext('2d');
+
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery' }[c.specialty] || c.specialty;
+  const name = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Dr.';
+  const rank = getComplexityRank(c.complexity_score || 0);
+
+  // Background
+  const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
+  gradient.addColorStop(0, '#09090B');
+  gradient.addColorStop(1, '#13101F');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  // Violet accent bar left
+  ctx.fillStyle = '#7C6FFF';
+  ctx.fillRect(0, 0, 8, 1080);
+
+  // Top glow
+  const glow = ctx.createRadialGradient(540, 0, 0, 540, 0, 600);
+  glow.addColorStop(0, 'rgba(124,111,255,0.12)');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  // Provify logo top right
+  ctx.fillStyle = 'rgba(250,250,250,0.4)';
+  ctx.font = '500 32px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('Provify.', 1040, 64);
+
+  // Specialty tag
+  ctx.fillStyle = 'rgba(124,111,255,0.15)';
+  roundRect(ctx, 60, 120, specLabel.length * 18 + 40, 48, 24);
+  ctx.fill();
+  ctx.fillStyle = '#9B91FF';
+  ctx.font = '600 24px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(specLabel.toUpperCase(), 80, 152);
+
+  // Tooth number — big
+  ctx.fillStyle = '#FAFAFA';
+  ctx.font = '300 160px "Georgia", serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(`Tooth ${c.tooth_number}`, 60, 360);
+
+  // Complexity score
+  ctx.fillStyle = '#7C6FFF';
+  ctx.font = '700 96px "Georgia", serif';
+  ctx.fillText(`${c.complexity_score || '—'}`, 60, 500);
+  ctx.fillStyle = 'rgba(250,250,250,0.4)';
+  ctx.font = '300 40px Inter, sans-serif';
+  ctx.fillText('/10 complexity', 60 + (c.complexity_score?.toString().length || 1) * 56 + 10, 500);
+
+  // Rank badge
+  ctx.fillStyle = rank.bg || 'rgba(124,111,255,0.1)';
+  roundRect(ctx, 60, 540, 200, 56, 28);
+  ctx.fill();
+  ctx.fillStyle = rank.color || '#7C6FFF';
+  ctx.font = '700 28px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(rank.rank, 160, 575);
+
+  // Narrative
+  if (c.narrative) {
+    ctx.fillStyle = 'rgba(250,250,250,0.6)';
+    ctx.font = 'italic 300 32px "Georgia", serif';
+    ctx.textAlign = 'left';
+    const words = c.narrative.split(' ');
+    let line = '"';
+    let y = 680;
+    for (const word of words) {
+      const test = line + word + ' ';
+      if (ctx.measureText(test).width > 960 || y > 820) {
+        if (y <= 820) { ctx.fillText(line, 60, y); y += 44; line = word + ' '; }
+        else break;
+      } else { line = test; }
+    }
+    if (y <= 820) ctx.fillText(line.trim() + '"', 60, y);
+  }
+
+  // Bottom bar
+  ctx.fillStyle = 'rgba(124,111,255,0.15)';
+  ctx.fillRect(0, 940, 1080, 140);
+  ctx.fillStyle = '#7C6FFF';
+  ctx.fillRect(0, 940, 1080, 2);
+
+  // Doctor name
+  ctx.fillStyle = '#FAFAFA';
+  ctx.font = '500 36px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(name, 60, 1010);
+
+  // Portfolio URL
+  const username = currentProfile?.username;
+  const url = username ? `provify.app/portfolio.html?u=${username}` : 'provify.app';
+  ctx.fillStyle = 'rgba(250,250,250,0.4)';
+  ctx.font = '300 28px Inter, sans-serif';
+  ctx.fillText(url, 60, 1050);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = `Provify_Case_${c.tooth_number}_${specLabel}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('✓ Instagram card downloaded!');
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 // ─── CLINICAL GROWTH ENGINE ───
