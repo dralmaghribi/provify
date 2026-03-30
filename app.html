@@ -1421,15 +1421,28 @@ body {
 
         <!-- VOICE LOGGING MODAL -->
         <div id="voice-modal" style="display:none; background:var(--navy-2); border:1px solid var(--teal-mid); border-radius:16px; padding:24px; margin-bottom:20px; position:relative;">
-          <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:12px">🎙 Voice Logging</div>
-          <div style="font-size:0.85rem; color:var(--gray); margin-bottom:16px; line-height:1.6">Speak your case naturally. For example: <em style="color:var(--white-dim)">"Tooth 36, patient complained of pain, diagnosis irreversible pulpitis with symptomatic apical periodontitis, primary treatment, 3 canals MB ML and distal, working length 21mm, NaOCl and EDTA, warm vertical condensation"</em></div>
+          <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:16px">🎙 Voice Logging</div>
+
+          <!-- GUIDE -->
+          <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; font-weight:500">📋 Say it exactly like this:</div>
+            <div style="font-size:0.83rem; color:var(--white); line-height:2; font-family:monospace;">
+              "Tooth <span style="color:var(--teal)">thirty six</span> ... <span style="color:var(--teal)">endo</span> ... pain ... <span style="color:var(--teal)">irreversible pulpitis</span> ... <span style="color:var(--teal)">symptomatic apical periodontitis</span> ... <span style="color:var(--teal)">primary treatment</span> ... <span style="color:var(--teal)">three</span> canals ... <span style="color:var(--teal)">moderate</span> curvature ... working length <span style="color:var(--teal)">twenty one</span> millimeters ... <span style="color:var(--teal)">NaOCl and EDTA</span> ... <span style="color:var(--teal)">warm vertical</span>"
+            </div>
+            <div style="margin-top:10px; font-size:0.75rem; color:var(--gray)">💡 Speak slowly and clearly. Say numbers as words — "thirty six" not "36". Pause briefly between items.</div>
+          </div>
+
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <button onclick="recordVoice()" id="record-btn" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; padding:12px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
               🔴 Start Recording
             </button>
+            <button onclick="stopAndProcess()" id="stop-btn" style="display:none; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#EF4444; font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; padding:12px 24px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+              ⏹ Done — Fill Form
+            </button>
             <div id="voice-status" style="font-size:0.82rem; color:var(--gray)">Press to start</div>
           </div>
-          <div id="voice-transcript" style="display:none; margin-top:14px; background:var(--navy-3); border:1px solid var(--white-faint); border-radius:10px; padding:14px; font-size:0.85rem; color:var(--white-dim); line-height:1.6;"></div>
+
+          <div id="voice-transcript" style="display:none; margin-top:14px; background:var(--navy-3); border:1px solid var(--white-faint); border-radius:10px; padding:14px; font-size:0.85rem; color:var(--white-dim); line-height:1.6; min-height:60px;"></div>
           <div id="voice-filling" style="display:none; margin-top:10px; font-size:0.82rem; color:var(--teal);">⏳ Filling form from your voice...</div>
           <button onclick="closeVoiceModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.2rem;">×</button>
         </div>
@@ -3677,6 +3690,7 @@ function resetTimer() {
 // ─── VOICE LOGGING ───
 let recognition = null;
 let isRecording = false;
+let fullTranscript = '';
 
 function startVoiceLogging() {
   document.getElementById('voice-modal').style.display = 'block';
@@ -3684,96 +3698,116 @@ function startVoiceLogging() {
 
 function closeVoiceModal() {
   document.getElementById('voice-modal').style.display = 'none';
-  if (recognition) { recognition.stop(); isRecording = false; }
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
+  isRecording = false;
+  fullTranscript = '';
 }
 
 function recordVoice() {
   const btn = document.getElementById('record-btn');
+  const stopBtn = document.getElementById('stop-btn');
   const status = document.getElementById('voice-status');
   const transcript = document.getElementById('voice-transcript');
-  const filling = document.getElementById('voice-filling');
 
   if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
     showToast('Voice logging requires Chrome or Safari browser.');
     return;
   }
 
-  if (isRecording) {
-    recognition.stop();
-    return;
-  }
+  if (isRecording) return;
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
+  recognition.maxAlternatives = 1;
+  fullTranscript = '';
 
   recognition.onstart = () => {
     isRecording = true;
-    btn.textContent = '⏹ Stop Recording';
-    btn.style.background = '#EF4444';
-    btn.style.color = 'white';
-    status.textContent = '🔴 Recording... speak your case';
-    transcript.style.display = 'none';
+    btn.style.display = 'none';
+    stopBtn.style.display = 'flex';
+    status.textContent = '🔴 Recording... speak your case, then press Done';
+    transcript.style.display = 'block';
+    transcript.textContent = '';
   };
 
   recognition.onresult = (e) => {
-    const text = Array.from(e.results).map(r => r[0].transcript).join('');
-    transcript.style.display = 'block';
-    transcript.textContent = text;
-  };
-
-  recognition.onend = async () => {
-    isRecording = false;
-    btn.textContent = '🔴 Start Recording';
-    btn.style.background = 'var(--teal)';
-    btn.style.color = 'var(--navy)';
-    status.textContent = 'Processing...';
-
-    const text = transcript.textContent;
-    if (!text.trim()) { status.textContent = 'No speech detected. Try again.'; return; }
-
-    filling.style.display = 'block';
-    await fillFormFromVoice(text);
-    filling.style.display = 'none';
-    status.textContent = '✓ Form filled from voice!';
-    setTimeout(() => closeVoiceModal(), 1500);
+    let interim = '';
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) final += t + ' ';
+      else interim += t;
+    }
+    fullTranscript += final;
+    transcript.textContent = fullTranscript + interim;
   };
 
   recognition.onerror = (e) => {
-    isRecording = false;
+    if (e.error === 'no-speech') { recognition.stop(); recognition.start(); return; }
     status.textContent = `Error: ${e.error}. Try again.`;
-    btn.textContent = '🔴 Start Recording';
-    btn.style.background = 'var(--teal)';
-    btn.style.color = 'var(--navy)';
+    isRecording = false;
+    btn.style.display = 'flex';
+    stopBtn.style.display = 'none';
+  };
+
+  recognition.onend = () => {
+    // Auto-restart if still recording (handles browser timeout)
+    if (isRecording) {
+      try { recognition.start(); } catch(e) {}
+    }
   };
 
   recognition.start();
 }
 
+async function stopAndProcess() {
+  const stopBtn = document.getElementById('stop-btn');
+  const btn = document.getElementById('record-btn');
+  const status = document.getElementById('voice-status');
+  const filling = document.getElementById('voice-filling');
+
+  isRecording = false;
+  try { recognition.stop(); } catch(e) {}
+
+  stopBtn.style.display = 'none';
+  btn.style.display = 'flex';
+
+  const text = fullTranscript.trim();
+  if (!text) { status.textContent = 'No speech detected. Try again.'; return; }
+
+  status.textContent = 'Processing...';
+  filling.style.display = 'block';
+  await fillFormFromVoice(text);
+  filling.style.display = 'none';
+  status.textContent = '✓ Form filled! Check and adjust if needed.';
+  setTimeout(() => closeVoiceModal(), 2000);
+}
+
 async function fillFormFromVoice(text) {
-  const prompt = `You are a dental form assistant. Parse this spoken case description and extract structured data.
+  const prompt = `You are a dental form assistant. Parse this spoken case description and extract structured data. Numbers may be spoken as words (e.g. "thirty six" = 36, "twenty one" = 21, "three" = 3).
 
 Spoken text: "${text}"
 
 Respond ONLY with a JSON object with these fields (use null if not mentioned):
 {
   "specialty": "endo" or "restorative" or "surgery" or null,
-  "tooth_number": number or null,
+  "tooth_number": number (convert word numbers to digits) or null,
   "age_range": "10-20" or "20-30" or "30-40" or "40-50" or "50+" or null,
   "complaint": "Pain" or "Swelling" or "Sensitivity" or "Routine" or "Trauma" or "Other" or null,
-  "pulp_diagnosis": exact AAE term or null,
-  "periapical_diagnosis": exact AAE term or null,
+  "pulp_diagnosis": "Normal" or "Reversible Pulpitis" or "Irreversible Pulpitis" or "Pulp Necrosis" or "Previously Treated" or null,
+  "periapical_diagnosis": "Normal" or "Symptomatic Apical Periodontitis" or "Asymptomatic Apical Periodontitis" or "Acute Apical Abscess" or "Chronic Apical Abscess" or null,
   "case_type": "Primary Treatment" or "Retreatment" or "Apexification" or "Pulpotomy" or null,
-  "canals": number as string or null,
+  "canals": number as string (convert word to digit: "three"="3") or null,
   "curvature": "Straight" or "Slight" or "Moderate" or "Severe" or null,
   "irrigation": "NaOCl only" or "NaOCl + EDTA" or "NaOCl + EDTA + CHX" or null,
   "obturation": "Cold Lateral" or "Warm Vertical" or "Single Cone" or null,
-  "cavity_class": "Class I" through "Class V" or null,
+  "cavity_class": "Class I" or "Class II" or "Class III" or "Class IV" or "Class V" or null,
   "material": "Composite" or "Amalgam" or "Ceramic / Porcelain" or "GIC" or null,
   "procedure": "Simple Extraction" or "Surgical Extraction" or "Impacted Wisdom Tooth" or null,
-  "narrative": a clean written version of what was said, suitable for a clinical note or null
+  "narrative": a clean professional written summary of what was said or null
 }`;
 
   try {
