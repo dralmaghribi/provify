@@ -527,6 +527,10 @@ nav {
         <span>⭐</span>
         <span>Avg complexity <strong id="p-avg">—</strong>/10</span>
       </div>
+      <div class="portfolio-meta-item" id="p-rating-wrap" style="display:none">
+        <span>🌟</span>
+        <span><strong id="p-rating">—</strong> patient rating</span>
+      </div>
       <a href="https://provify.app/app.html" class="powered-badge" target="_blank">
         Powered by Provify
       </a>
@@ -656,11 +660,26 @@ async function loadPortfolio() {
     `;
   } else {
     container.innerHTML = sorted.map((c, i) => renderCaseCard(c, i, resolvedUserId)).join('');
+
+    // Load reviews for each case
+    sorted.forEach(c => loadCaseReviews(c.id));
   }
 
-  // Show portfolio
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('portfolio').style.display = 'block';
+  // Load average patient rating
+  const { data: allReviews } = await sb
+    .from('reviews')
+    .select('rating, reviewer_type')
+    .in('case_id', cases.map(c => c.id))
+    .not('rating', 'is', null);
+
+  if (allReviews && allReviews.length > 0) {
+    const patientReviews = allReviews.filter(r => r.reviewer_type === 'patient');
+    if (patientReviews.length > 0) {
+      const avgRating = (patientReviews.reduce((s, r) => s + r.rating, 0) / patientReviews.length).toFixed(1);
+      document.getElementById('p-rating').textContent = `${avgRating}/5 (${patientReviews.length})`;
+      document.getElementById('p-rating-wrap').style.display = 'flex';
+    }
+  }
 }
 
 function renderCaseCard(c, index, userId) {
@@ -749,6 +768,50 @@ function renderCaseCard(c, index, userId) {
       ${details.length > 0 ? `
       <div class="case-details">${detailsHTML}</div>
       ` : ''}
+
+      <div class="case-reviews" id="reviews-${c.id}">
+        <!-- Reviews load here -->
+      </div>
+    </div>
+  `;
+}
+
+async function loadCaseReviews(caseId) {
+  const { data: reviews } = await sb
+    .from('reviews')
+    .select('*')
+    .eq('case_id', caseId)
+    .not('rating', 'is', null)
+    .order('created_at', { ascending: false });
+
+  if (!reviews || reviews.length === 0) return;
+
+  const el = document.getElementById(`reviews-${caseId}`);
+  if (!el) return;
+
+  const stars = (n) => '★'.repeat(n) + '☆'.repeat(5-n);
+
+  el.innerHTML = `
+    <div style="padding:20px 24px; border-top:1px solid var(--white-faint);">
+      <div style="font-size:0.65rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; font-weight:500">Reviews</div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        ${reviews.map(r => `
+          <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:${r.reviewer_type === 'peer' ? 'rgba(124,111,255,0.2)' : 'rgba(245,158,11,0.15)'};display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;color:${r.reviewer_type === 'peer' ? 'var(--teal)' : '#F59E0B'};">${r.reviewer_type === 'peer' ? '👨‍⚕️' : '👤'}</div>
+                <div>
+                  <div style="font-size:0.8rem;color:var(--white);font-weight:500">${r.reviewer_name || 'Anonymous'}</div>
+                  ${r.reviewer_role ? `<div style="font-size:0.68rem;color:var(--gray)">${r.reviewer_role}</div>` : `<div style="font-size:0.68rem;color:var(--gray)">Patient</div>`}
+                </div>
+              </div>
+              <div style="font-size:0.9rem;color:#F59E0B;letter-spacing:2px">${stars(r.rating)}</div>
+            </div>
+            ${r.comment ? `<div style="font-size:0.82rem;color:var(--white-dim);line-height:1.6">${r.comment}</div>` : ''}
+            ${r.reviewer_type === 'peer' ? `<div style="margin-top:6px;display:inline-block;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);color:var(--teal);font-size:0.62rem;padding:2px 8px;border-radius:100px;font-weight:500">✓ Peer Verified</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }

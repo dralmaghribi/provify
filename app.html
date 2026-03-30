@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
   --navy: #09090B;
@@ -1205,6 +1206,41 @@ body {
 
     <!-- Generate Note -->
     <div style="padding:0 28px 28px">
+      <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+        <button onclick="showPatientReviewQR()" style="flex:1; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); color:#F59E0B; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; padding:10px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+          ⭐ Patient Review QR
+        </button>
+        <button onclick="showPeerReviewForm()" style="flex:1; background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; padding:10px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+          👨‍⚕️ Peer Review
+        </button>
+      </div>
+
+      <!-- QR CODE SECTION -->
+      <div id="patient-qr-section" style="display:none; background:var(--navy-3); border:1px solid rgba(245,158,11,0.2); border-radius:12px; padding:20px; margin-bottom:12px; text-align:center;">
+        <div style="font-size:0.7rem; color:#F59E0B; text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:4px">Patient Review QR Code</div>
+        <div style="font-size:0.78rem; color:var(--g); margin-bottom:16px">Show this to your patient — they scan and leave a review</div>
+        <div id="qr-canvas" style="display:flex; justify-content:center; margin-bottom:14px;"></div>
+        <div id="qr-link" style="font-size:0.72rem; color:var(--g); word-break:break-all; margin-bottom:12px;"></div>
+        <div style="display:flex; gap:8px; justify-content:center;">
+          <button onclick="copyReviewLink()" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; padding:8px 16px; border-radius:8px; border:none; cursor:pointer;">Copy Link</button>
+          <button onclick="downloadQR()" style="background:none; border:1px solid var(--wf2); color:var(--g2); font-family:'Inter',sans-serif; font-size:0.8rem; padding:8px 16px; border-radius:8px; cursor:pointer;">Download QR</button>
+        </div>
+      </div>
+
+      <!-- PEER REVIEW FORM -->
+      <div id="peer-review-section" style="display:none; background:var(--navy-3); border:1px solid var(--teal-mid); border-radius:12px; padding:20px; margin-bottom:12px;">
+        <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:12px">Leave a Peer Review</div>
+        <div style="display:flex; gap:6px; margin-bottom:12px;" id="peer-stars">
+          <button onclick="setPeerRating(1)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(2)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(3)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(4)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(5)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
+        </div>
+        <textarea id="peer-comment" placeholder="Share your clinical perspective on this case..." style="width:100%;background:var(--navy-2);border:1px solid var(--wf2);color:var(--w);font-family:'Inter',sans-serif;font-size:0.85rem;padding:10px 12px;border-radius:8px;outline:none;resize:vertical;min-height:80px;margin-bottom:10px;line-height:1.6;"></textarea>
+        <button onclick="submitPeerReview()" id="peer-submit-btn" style="width:100%;background:var(--teal);color:var(--navy);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;padding:10px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;">Submit Peer Review</button>
+      </div>
+
       <button onclick="generateClinicalNote()" id="gen-note-btn" style="width:100%;background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:500;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;">
         📋 Generate Clinical Note
       </button>
@@ -4280,6 +4316,121 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
+}
+
+// ─── REVIEWS ───
+let currentReviewLink = '';
+let peerRating = 0;
+
+async function showPatientReviewQR() {
+  const c = currentModalCase;
+  if (!c) return;
+
+  const section = document.getElementById('patient-qr-section');
+  const peerSection = document.getElementById('peer-review-section');
+  peerSection.style.display = 'none';
+
+  if (section.style.display === 'block') { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  // Generate unique token
+  const token = crypto.randomUUID();
+  currentReviewLink = `https://provify.app/review.html?token=${token}`;
+
+  // Create review record with token (no rating yet = pending)
+  const { error } = await sb.from('reviews').insert({
+    case_id: c.id,
+    reviewer_type: 'patient',
+    token: token,
+  });
+
+  if (error && !error.message.includes('duplicate')) {
+    // Token might already exist — use existing link
+  }
+
+  // Generate QR code
+  const qrDiv = document.getElementById('qr-canvas');
+  qrDiv.innerHTML = '';
+  new QRCode(qrDiv, {
+    text: currentReviewLink,
+    width: 180,
+    height: 180,
+    colorDark: '#FAFAFA',
+    colorLight: '#09090B',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  document.getElementById('qr-link').textContent = currentReviewLink;
+}
+
+function copyReviewLink() {
+  navigator.clipboard.writeText(currentReviewLink).then(() => showToast('Review link copied ✓'));
+}
+
+function downloadQR() {
+  const canvas = document.querySelector('#qr-canvas canvas');
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = `review_qr_tooth_${currentModalCase?.tooth_number}.png`;
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+function showPeerReviewForm() {
+  const section = document.getElementById('peer-review-section');
+  const qrSection = document.getElementById('patient-qr-section');
+  qrSection.style.display = 'none';
+  section.style.display = section.style.display === 'block' ? 'none' : 'block';
+}
+
+function setPeerRating(n) {
+  peerRating = n;
+  document.querySelectorAll('.peer-star').forEach((btn, i) => {
+    btn.style.background = i < n ? 'rgba(245,158,11,0.15)' : 'var(--navy-2)';
+    btn.style.borderColor = i < n ? 'rgba(245,158,11,0.4)' : 'var(--wf2)';
+  });
+}
+
+async function submitPeerReview() {
+  if (!currentUser) { showToast('You must be logged in to leave a peer review.'); return; }
+  if (peerRating === 0) { showToast('Please select a rating.'); return; }
+
+  const c = currentModalCase;
+  if (!c) return;
+
+  // Can't review your own case
+  if (c.user_id === currentUser.id) { showToast("You can't review your own case."); return; }
+
+  const btn = document.getElementById('peer-submit-btn');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+
+  const comment = document.getElementById('peer-comment').value.trim();
+  const level = getLevel(allCases.length);
+
+  const { error } = await sb.from('reviews').insert({
+    case_id: c.id,
+    reviewer_type: 'peer',
+    reviewer_provify_id: currentUser.id,
+    reviewer_name: currentProfile ? `Dr. ${currentProfile.first_name} ${currentProfile.last_name}`.trim() : 'A Provify Dentist',
+    reviewer_role: `${level.name} · ${allCases.length} cases`,
+    rating: peerRating,
+    comment: comment || null,
+    token: crypto.randomUUID(),
+  });
+
+  if (error) {
+    showToast('Error submitting review.');
+  } else {
+    showToast('Peer review submitted ✓');
+    document.getElementById('peer-review-section').style.display = 'none';
+    document.getElementById('peer-comment').value = '';
+    peerRating = 0;
+    setPeerRating(0);
+  }
+
+  btn.textContent = 'Submit Peer Review';
+  btn.disabled = false;
 }
 
 // ─── CLINICAL GROWTH ENGINE ───

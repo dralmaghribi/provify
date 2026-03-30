@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave a Review — Provify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#09090B;--bg-2:#0F0F12;--bg-3:#141418;
+  --v:#7C6FFF;--v2:#9B91FF;--vd:rgba(124,111,255,0.08);--vm:rgba(124,111,255,0.2);
+  --w:#FAFAFA;--wd:rgba(250,250,250,0.65);--wf:rgba(250,250,250,0.06);--wf2:rgba(250,250,250,0.09);
+  --g:#6B7280;--g2:#9CA3AF;
+  --amber:#F59E0B;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--w);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+
+.container{width:100%;max-width:480px;}
+
+/* LOGO */
+.logo{font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--w);letter-spacing:-0.03em;text-align:center;margin-bottom:32px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.logo-dot{width:8px;height:8px;background:var(--v);border-radius:50%;}
+
+/* DOCTOR CARD */
+.doctor-card{background:var(--bg-2);border:1px solid var(--wf2);border-radius:20px;padding:24px;margin-bottom:24px;text-align:center;position:relative;overflow:hidden;}
+.doctor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--vm),transparent);}
+.doctor-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--v2));display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--w);margin:0 auto 12px;letter-spacing:-0.02em;}
+.doctor-name{font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--w);letter-spacing:-0.02em;margin-bottom:4px;}
+.doctor-role{font-size:0.82rem;color:var(--v2);margin-bottom:8px;}
+.case-info{font-size:0.78rem;color:var(--g);background:var(--bg-3);border:1px solid var(--wf);border-radius:8px;padding:6px 12px;display:inline-block;}
+
+/* FORM */
+.review-form{background:var(--bg-2);border:1px solid var(--wf2);border-radius:20px;padding:28px;}
+.form-title{font-family:'Instrument Serif',serif;font-size:1.2rem;color:var(--w);letter-spacing:-0.02em;margin-bottom:6px;}
+.form-sub{font-size:0.82rem;color:var(--g);margin-bottom:24px;line-height:1.6;}
+
+/* STAR RATING */
+.star-section{margin-bottom:24px;}
+.star-label{font-size:0.72rem;color:var(--g2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;font-weight:500;}
+.stars{display:flex;gap:8px;justify-content:center;}
+.star-btn{width:52px;height:52px;border-radius:14px;border:1px solid var(--wf2);background:var(--bg-3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.6rem;transition:all 0.2s;}
+.star-btn:hover,.star-btn.active{border-color:var(--amber);background:rgba(245,158,11,0.1);transform:scale(1.1);}
+.star-btn.active{box-shadow:0 0 16px rgba(245,158,11,0.2);}
+
+/* ASPECTS */
+.aspects-section{margin-bottom:24px;}
+.aspects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.aspect-btn{background:var(--bg-3);border:1px solid var(--wf);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;transition:all 0.2s;}
+.aspect-btn:hover{border-color:var(--vm);}
+.aspect-btn.selected{border-color:var(--v);background:var(--vd);}
+.aspect-label{font-size:0.8rem;color:var(--w);font-weight:500;margin-bottom:2px;}
+.aspect-sub{font-size:0.7rem;color:var(--g);}
+
+/* INPUTS */
+.input-group{margin-bottom:16px;}
+.input-label{font-size:0.75rem;color:var(--g2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;font-weight:500;display:block;}
+.text-input{width:100%;background:var(--bg-3);border:1px solid var(--wf2);color:var(--w);font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:300;padding:12px 16px;border-radius:12px;outline:none;transition:border-color 0.2s;}
+.text-input:focus{border-color:var(--vm);}
+.text-input::placeholder{color:var(--g);}
+textarea.text-input{resize:vertical;min-height:100px;line-height:1.6;}
+
+/* SUBMIT */
+.submit-btn{width:100%;background:var(--v);color:var(--w);font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;padding:16px;border-radius:14px;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;margin-top:8px;}
+.submit-btn:hover{background:var(--v2);box-shadow:0 8px 24px rgba(124,111,255,0.3);transform:translateY(-1px);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+/* SUCCESS */
+.success-screen{display:none;text-align:center;padding:40px 20px;}
+.success-icon{font-size:3rem;margin-bottom:16px;}
+.success-title{font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--w);letter-spacing:-0.03em;margin-bottom:12px;}
+.success-sub{font-size:0.9rem;color:var(--g);line-height:1.7;margin-bottom:24px;}
+.success-link{color:var(--v2);text-decoration:none;font-size:0.85rem;}
+
+/* ERROR */
+.error-screen{display:none;text-align:center;padding:60px 20px;}
+
+/* LOADING */
+.loading-screen{text-align:center;padding:60px 20px;}
+.spinner{width:32px;height:32px;border:2px solid var(--wf2);border-top-color:var(--v);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.powered{text-align:center;margin-top:24px;font-size:0.75rem;color:var(--g);}
+.powered a{color:var(--g);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo"><div class="logo-dot"></div>Provify</div>
+
+  <!-- LOADING -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="spinner"></div>
+    <div style="font-size:0.9rem;color:var(--g)">Loading...</div>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error-screen" class="error-screen" style="display:none">
+    <div style="font-size:3rem;margin-bottom:16px">😕</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--w);margin-bottom:12px">Invalid review link</div>
+    <div style="font-size:0.85rem;color:var(--g)">This review link has expired or already been used.</div>
+  </div>
+
+  <!-- MAIN FORM -->
+  <div id="main-form" style="display:none">
+
+    <!-- DOCTOR CARD -->
+    <div class="doctor-card">
+      <div class="doctor-avatar" id="doctor-avatar">DR</div>
+      <div class="doctor-name" id="doctor-name">Dr. Name</div>
+      <div class="doctor-role" id="doctor-role">Dentist</div>
+      <div class="case-info" id="case-info">Case details</div>
+    </div>
+
+    <!-- REVIEW FORM -->
+    <div class="review-form">
+      <div class="form-title">How was your experience?</div>
+      <div class="form-sub">Your honest feedback helps Dr. <span id="doctor-first">Name</span> grow as a clinician and helps other patients make informed decisions.</div>
+
+      <!-- STARS -->
+      <div class="star-section">
+        <div class="star-label">Overall Rating</div>
+        <div class="stars" id="star-row">
+          <button class="star-btn" onclick="setRating(1)" data-r="1">⭐</button>
+          <button class="star-btn" onclick="setRating(2)" data-r="2">⭐</button>
+          <button class="star-btn" onclick="setRating(3)" data-r="3">⭐</button>
+          <button class="star-btn" onclick="setRating(4)" data-r="4">⭐</button>
+          <button class="star-btn" onclick="setRating(5)" data-r="5">⭐</button>
+        </div>
+        <div id="rating-label" style="text-align:center;font-size:0.8rem;color:var(--g);margin-top:10px">Tap to rate</div>
+      </div>
+
+      <!-- ASPECTS -->
+      <div class="aspects-section">
+        <div class="star-label">What stood out? <span style="color:var(--g);text-transform:none;letter-spacing:0">(optional)</span></div>
+        <div class="aspects-grid">
+          <button class="aspect-btn" onclick="toggleAspect(this,'gentle')">
+            <div class="aspect-label">🤝 Gentle & careful</div>
+            <div class="aspect-sub">Made me feel comfortable</div>
+          </button>
+          <button class="aspect-btn" onclick="toggleAspect(this,'explained')">
+            <div class="aspect-label">💬 Explained clearly</div>
+            <div class="aspect-sub">Kept me informed</div>
+          </button>
+          <button class="aspect-btn" onclick="toggleAspect(this,'professional')">
+            <div class="aspect-label">⭐ Very professional</div>
+            <div class="aspect-sub">Confident and skilled</div>
+          </button>
+          <button class="aspect-btn" onclick="toggleAspect(this,'painless')">
+            <div class="aspect-label">😌 Painless procedure</div>
+            <div class="aspect-sub">Minimal discomfort</div>
+          </button>
+          <button class="aspect-btn" onclick="toggleAspect(this,'efficient')">
+            <div class="aspect-label">⚡ Efficient</div>
+            <div class="aspect-sub">Respected my time</div>
+          </button>
+          <button class="aspect-btn" onclick="toggleAspect(this,'caring')">
+            <div class="aspect-label">❤️ Caring attitude</div>
+            <div class="aspect-sub">Genuinely attentive</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- COMMENT -->
+      <div class="input-group">
+        <label class="input-label">Your comment <span style="color:var(--g);text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="text-input" id="review-comment" placeholder="Tell others about your experience with this doctor..."></textarea>
+      </div>
+
+      <!-- NAME -->
+      <div class="input-group">
+        <label class="input-label">Your first name <span style="color:var(--g);text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input type="text" class="text-input" id="reviewer-name" placeholder="e.g. Sarah">
+      </div>
+
+      <div id="submit-error" style="color:#EF4444;font-size:0.82rem;margin-bottom:12px;display:none;text-align:center;"></div>
+
+      <button class="submit-btn" onclick="submitReview()" id="submit-btn">Submit Review</button>
+    </div>
+
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="success-screen" class="success-screen">
+    <div class="success-icon">🌟</div>
+    <div class="success-title">Thank you!</div>
+    <div class="success-sub">Your review has been submitted. It will appear on Dr. <span id="success-doctor-name">Name</span>'s portfolio and help them grow as a clinician.</div>
+    <a href="https://provify.app" class="success-link">Learn about Provify →</a>
+  </div>
+
+  <div class="powered"><a href="https://provify.app">Powered by Provify</a></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://latbebqtayfvgzgebxam.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_IdTc1xIm34-sfTebJBt4Sg_XX_6U11x';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let selectedRating = 0;
+let selectedAspects = [];
+let caseData = null;
+let profileData = null;
+let reviewToken = null;
+
+const RATING_LABELS = ['','😞 Poor','😐 Fair','🙂 Good','😊 Very good','🤩 Excellent!'];
+
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  reviewToken = params.get('token');
+
+  if (!reviewToken) { showError(); return; }
+
+  // Verify token exists and hasn't been used
+  const { data: review, error } = await sb
+    .from('reviews')
+    .select('id, case_id')
+    .eq('token', reviewToken)
+    .eq('reviewer_type', 'patient')
+    .is('rating', null)
+    .single();
+
+  if (error || !review) { showError(); return; }
+
+  // Load case data
+  const { data: c } = await sb
+    .from('cases')
+    .select('*, profiles(*)')
+    .eq('id', review.case_id)
+    .single();
+
+  if (!c) { showError(); return; }
+
+  caseData = c;
+  profileData = c.profiles;
+
+  // Populate UI
+  const first = profileData?.first_name || 'Dr';
+  const last = profileData?.last_name || '';
+  const fullName = `Dr. ${first} ${last}`.trim();
+  const initials = (first[0] || 'D') + (last[0] || 'R');
+  const roleMap = { student:'Dental Student', intern:'Dental Intern', resident:'Resident', general:'General Dentist', specialist:'Specialist', consultant:'Consultant' };
+  const role = roleMap[profileData?.role] || 'Dentist';
+  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery' }[c.specialty] || c.specialty;
+  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+
+  document.getElementById('doctor-avatar').textContent = initials;
+  document.getElementById('doctor-name').textContent = fullName;
+  document.getElementById('doctor-role').textContent = role;
+  document.getElementById('case-info').textContent = `${specLabel} · Tooth ${c.tooth_number} · ${date}`;
+  document.getElementById('doctor-first').textContent = first;
+  document.getElementById('success-doctor-name').textContent = first;
+  document.title = `Review ${fullName} — Provify`;
+
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('main-form').style.display = 'block';
+}
+
+function setRating(n) {
+  selectedRating = n;
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i < n);
+  });
+  document.getElementById('rating-label').textContent = RATING_LABELS[n];
+  document.getElementById('rating-label').style.color = n >= 4 ? '#F59E0B' : 'var(--g)';
+}
+
+function toggleAspect(btn, aspect) {
+  btn.classList.toggle('selected');
+  if (selectedAspects.includes(aspect)) {
+    selectedAspects = selectedAspects.filter(a => a !== aspect);
+  } else {
+    selectedAspects.push(aspect);
+  }
+}
+
+async function submitReview() {
+  const errEl = document.getElementById('submit-error');
+  errEl.style.display = 'none';
+
+  if (selectedRating === 0) {
+    errEl.textContent = 'Please select a rating before submitting.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+
+  const comment = [
+    selectedAspects.map(a => ({ gentle:'Gentle & careful', explained:'Explained clearly', professional:'Very professional', painless:'Painless procedure', efficient:'Efficient', caring:'Caring attitude' }[a])).filter(Boolean).join(', '),
+    document.getElementById('review-comment').value.trim()
+  ].filter(Boolean).join('\n\n');
+
+  const reviewerName = document.getElementById('reviewer-name').value.trim() || 'Anonymous Patient';
+
+  // Update the review record
+  const { error } = await sb
+    .from('reviews')
+    .update({
+      rating: selectedRating,
+      comment: comment || null,
+      reviewer_name: reviewerName,
+      reviewer_type: 'patient',
+    })
+    .eq('token', reviewToken);
+
+  if (error) {
+    errEl.textContent = 'Error submitting review. Please try again.';
+    errEl.style.display = 'block';
+    btn.textContent = 'Submit Review';
+    btn.disabled = false;
+    return;
+  }
+
+  document.getElementById('main-form').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+}
+
+function showError() {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('error-screen').style.display = 'block';
+}
+
+init();
+</script>
+</body>
+</html>
