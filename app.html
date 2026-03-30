@@ -3927,55 +3927,55 @@ async function generatePortfolioPDF() {
       ['Date Generated', today],
     ];
 
-    let sy = 38;
+    let sumY = 38;
     summaryRows.forEach(([label, value], i) => {
       doc.setFillColor(i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 254 : 251);
-      doc.rect(ML, sy, cW, 8, 'F');
+      doc.rect(ML, sumY, cW, 8, 'F');
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
       doc.setTextColor(...MID);
-      doc.text(label, ML + 3, sy + 5.5);
+      doc.text(label, ML + 3, sumY + 5.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...DARK);
-      doc.text(value, pageW - MR - 3, sy + 5.5, { align:'right' });
+      doc.text(value, pageW - MR - 3, sumY + 5.5, { align:'right' });
       doc.setDrawColor(...RULE);
       doc.setLineWidth(0.15);
-      doc.line(ML, sy + 8, pageW - MR, sy + 8);
-      sy += 8;
+      doc.line(ML, sumY + 8, pageW - MR, sumY + 8);
+      sumY += 8;
     });
 
     // Declaration block
-    sy += 10;
+    sumY += 10;
     doc.setFillColor(...VIO_BG);
     doc.setDrawColor(...VIO_LT);
     doc.setLineWidth(0.3);
-    doc.roundedRect(ML, sy, cW, 38, 3, 3, 'FD');
+    doc.roundedRect(ML, sumY, cW, 38, 3, 3, 'FD');
     doc.setFillColor(...VIOLET);
-    doc.rect(ML, sy, 2.5, 38, 'F');
+    doc.rect(ML, sumY, 2.5, 38, 'F');
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...VIOLET);
-    doc.text('CLINICIAN DECLARATION', ML + 6, sy + 8);
+    doc.text('CLINICIAN DECLARATION', ML + 6, sumY + 8);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...DARK);
-    const decl = `I, ${name}, confirm that all cases documented in this portfolio were performed under appropriate supervision and documented accurately to the best of my knowledge. This portfolio has been generated through Provify, a clinical case intelligence platform, and reflects my clinical activity and professional development.`;
+    const decl = `I, ${name}, confirm that all cases documented in this portfolio were personally performed and documented accurately to the best of my knowledge. This portfolio has been generated through Provify, a clinical case intelligence platform, and reflects my clinical activity and professional development.`;
     const declLines = doc.splitTextToSize(decl, cW - 10);
-    doc.text(declLines, ML + 6, sy + 16);
+    doc.text(declLines, ML + 6, sumY + 16);
 
     // Signature line
-    sy += 44;
+    sumY += 44;
     doc.setDrawColor(...DARK);
     doc.setLineWidth(0.3);
-    doc.line(ML, sy + 15, ML + 70, sy + 15);
+    doc.line(ML, sumY + 15, ML + 70, sumY + 15);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(...LIGHT);
-    doc.text('Signature', ML, sy + 19);
-    doc.line(ML + 85, sy + 15, ML + 140, sy + 15);
-    doc.text('Date', ML + 85, sy + 19);
+    doc.text('Signature', ML, sumY + 19);
+    doc.line(ML + 85, sumY + 15, ML + 140, sumY + 15);
+    doc.text('Date', ML + 85, sumY + 19);
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
