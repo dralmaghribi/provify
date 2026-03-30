@@ -816,6 +816,11 @@ body::after {
       <button onclick="openSimulation()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(155,145,255,0.06));border:1px solid rgba(124,111,255,0.3);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:500;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--white)'">
         <span>⚡</span> Simulate a Harder Version — Test Your Reasoning
       </button>
+
+      <!-- VERIFY BUTTON -->
+      <button onclick="openCaseVerification()" style="width:100%;margin-top:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.borderColor='rgba(124,111,255,0.25)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='var(--gray)'">
+        🛡 View Verification Record
+      </button>
     </div>
 
   </div>
@@ -1808,6 +1813,59 @@ body::after {
             </div>
           </div>
 
+          <!-- MEDICO-LEGAL DOCUMENTATION -->
+          <div class="form-section" style="background:linear-gradient(135deg,rgba(124,111,255,0.06),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:20px;">
+            <div class="form-section-title" style="color:var(--teal);border-bottom-color:rgba(124,111,255,0.2);">
+              🛡 Medico-Legal Record
+              <span style="margin-left:auto;font-size:0.65rem;color:var(--gray);text-transform:none;letter-spacing:0;font-weight:400;">Timestamped &amp; verifiable</span>
+            </div>
+            <div style="font-size:0.78rem;color:var(--gray);line-height:1.6;margin-bottom:16px;padding:10px 14px;background:rgba(124,111,255,0.04);border-radius:8px;border-left:3px solid rgba(124,111,255,0.3);">
+              This section creates a contemporaneous clinical record. Every entry is timestamped at the moment of submission and assigned a unique verifiable case ID.
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Informed Consent</label>
+                <select class="form-select" id="f-consent">
+                  <option value="">Select</option>
+                  <option>Verbal consent obtained</option>
+                  <option>Written consent obtained</option>
+                  <option>Consent form signed</option>
+                  <option>Emergency — consent not possible</option>
+                  <option>Guardian consent obtained</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Risks Discussed With Patient</label>
+                <select class="form-select" id="f-risks">
+                  <option value="">Select</option>
+                  <option>Yes — procedure risks discussed</option>
+                  <option>Yes — full risks and alternatives discussed</option>
+                  <option>Patient declined risk discussion</option>
+                  <option>Emergency — not applicable</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Complications <span style="color:var(--gray);font-size:0.7rem">If none, select None</span></label>
+              <select class="form-select" id="f-complications">
+                <option value="">Select</option>
+                <option>None</option>
+                <option>Haemorrhage — controlled</option>
+                <option>Instrument fracture — documented</option>
+                <option>Perforation — managed</option>
+                <option>Nerve paresthesia — noted</option>
+                <option>Oro-antral communication</option>
+                <option>Post-op infection</option>
+                <option>Referred for specialist management</option>
+                <option>Other — see narrative</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clinician Declaration <span style="color:var(--gray);font-size:0.7rem">Optional free text</span></label>
+              <textarea class="form-input" id="f-declaration" rows="2" placeholder="e.g. Patient tolerated procedure well. All findings discussed. Patient advised to return if symptoms worsen..." style="resize:vertical;line-height:1.6;font-size:0.875rem;"></textarea>
+            </div>
+          </div>
+
           <button class="btn btn-primary" onclick="submitCase()" id="submit-case-btn">
             Log Case & Get AI Report →
           </button>
@@ -2328,7 +2386,11 @@ function resetForm() {
   document.getElementById('f-canals').value = '';
   document.getElementById('canal-wl-section').style.display = 'none';
   document.getElementById('canal-wl-fields').innerHTML = '';
-  document.getElementById('f-note').value = '';
+  document.getElementById('f-note').value        = '';
+  document.getElementById('f-consent').value     = '';
+  document.getElementById('f-risks').value       = '';
+  document.getElementById('f-complications').value = '';
+  document.getElementById('f-declaration').value = '';
   const narrativeEl = document.getElementById('f-narrative');
   if (narrativeEl) narrativeEl.value = '';
   selectedRating = 0;
@@ -2616,6 +2678,21 @@ async function submitCase() {
   const canalData = getCanalData();
   const workingLengths = canalData.map(c => `${c.name}: ${c.wl}mm`).join(', ');
 
+  // Build medico-legal record
+  const consent       = document.getElementById('f-consent').value;
+  const risks         = document.getElementById('f-risks').value;
+  const complications = document.getElementById('f-complications').value;
+  const declaration   = document.getElementById('f-declaration').value.trim();
+  const mlParts = [];
+  if (consent)       mlParts.push(`CONSENT: ${consent}`);
+  if (risks)         mlParts.push(`RISKS DISCUSSED: ${risks}`);
+  if (complications) mlParts.push(`COMPLICATIONS: ${complications}`);
+  if (declaration)   mlParts.push(`DECLARATION: ${declaration}`);
+  const mlRecord = mlParts.length > 0 ? mlParts.join(' | ') : '';
+
+  const personalNote = document.getElementById('f-note').value.trim();
+  const combinedNote = [personalNote, mlRecord].filter(Boolean).join(' || ML_RECORD: ');
+
   // Build case data
   const caseData = {
     user_id: currentUser.id,
@@ -2625,7 +2702,7 @@ async function submitCase() {
     complaint,
     complexity_score: complexity,
     difficulty_rating: selectedRating,
-    note: document.getElementById('f-note').value,
+    note: combinedNote || null,
     narrative: document.getElementById('f-narrative').value,
     follow_up: document.getElementById('f-followup').value,
     post_op: document.getElementById('f-postop').value,
@@ -2978,7 +3055,35 @@ function openCaseDetail(id) {
   if (c.post_op) fields.push(['Post-op Symptoms', c.post_op]);
   if (c.follow_up) fields.push(['Follow-up', c.follow_up]);
   if (c.difficulty_rating) fields.push(['Difficulty', '★'.repeat(c.difficulty_rating) + '☆'.repeat(5 - c.difficulty_rating)]);
-  if (c.note) fields.push(['Personal Note', c.note]);
+
+  // Parse medico-legal record
+  let personalNote = c.note || '';
+  let mlHTML = '';
+  if (c.note && c.note.includes('|| ML_RECORD:')) {
+    const parts = c.note.split('|| ML_RECORD:');
+    personalNote = parts[0].trim();
+    const mlRaw = parts[1]?.trim() || '';
+    const mlFields = mlRaw.split(' | ').map(f => {
+      const colonIdx = f.indexOf(':');
+      if (colonIdx === -1) return null;
+      return [f.substring(0, colonIdx).trim(), f.substring(colonIdx + 1).trim()];
+    }).filter(Boolean);
+    if (mlFields.length > 0) {
+      mlHTML = `
+        <div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:12px;">
+          <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+            🛡 Medico-Legal Record
+            <span style="margin-left:auto;font-size:0.6rem;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0;">Timestamped · ${new Date(c.created_at).toLocaleString('en-GB')}</span>
+          </div>
+          ${mlFields.map(([label, value]) => `
+            <div style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;gap:12px;">
+              <div style="font-size:0.72rem;color:var(--gray);min-width:130px;padding-top:1px;">${label}</div>
+              <div style="font-size:0.82rem;color:var(--white);flex:1;">${value}</div>
+            </div>`).join('')}
+        </div>`;
+    }
+  }
+  if (personalNote) fields.push(['Personal Note', personalNote]);
 
   const fieldsHTML = fields.map(([label, value]) => `
     <div style="padding:10px 0; border-bottom:1px solid var(--white-faint); display:flex; gap:16px;">
@@ -2993,7 +3098,7 @@ function openCaseDetail(id) {
   document.getElementById('modal-score').textContent = c.complexity_score || '—';
   document.getElementById('modal-narrative').textContent = c.narrative || '';
   document.getElementById('modal-narrative-section').style.display = c.narrative ? 'block' : 'none';
-  document.getElementById('modal-fields').innerHTML = fieldsHTML;
+  document.getElementById('modal-fields').innerHTML = fieldsHTML + mlHTML;
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -3826,8 +3931,20 @@ async function generatePortfolioPDF() {
         y += 16;
       }
 
-      // ── Personal note ──
-      if (c.note && y < pageH - 30) {
+      // ── Personal note + Medico-Legal Record ──
+      let pdfNote = c.note || '';
+      let mlFields = [];
+      if (c.note && c.note.includes('|| ML_RECORD:')) {
+        const parts = c.note.split('|| ML_RECORD:');
+        pdfNote = parts[0].trim();
+        const mlRaw = parts[1]?.trim() || '';
+        mlFields = mlRaw.split(' | ').map(f => {
+          const idx = f.indexOf(':');
+          return idx !== -1 ? [f.substring(0,idx).trim(), f.substring(idx+1).trim()] : null;
+        }).filter(Boolean);
+      }
+
+      if (pdfNote && y < pageH - 30) {
         doc.setFillColor(...OFF_W);
         doc.setDrawColor(...RULE);
         doc.setLineWidth(0.2);
@@ -3839,9 +3956,41 @@ async function generatePortfolioPDF() {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(...DARK);
-        const noteStr = c.note.length > 80 ? c.note.substring(0,77)+'...' : c.note;
+        const noteStr = pdfNote.length > 100 ? pdfNote.substring(0,97)+'...' : pdfNote;
         doc.text(noteStr, ML + 3, y + 8.5);
         y += 14;
+      }
+
+      // ── Medico-Legal Record ──
+      if (mlFields.length > 0 && y < pageH - 40) {
+        const mlH = mlFields.length * 7 + 14;
+        doc.setFillColor(245, 244, 255);
+        doc.setDrawColor(...VIOLET);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(ML, y, cW, mlH, 2, 2, 'FD');
+        // Left accent
+        doc.setFillColor(...VIOLET);
+        doc.rect(ML, y, 2.5, mlH, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(...VIOLET);
+        doc.text('MEDICO-LEGAL RECORD', ML + 6, y + 6);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(...LIGHT);
+        doc.text(`Timestamped: ${new Date(c.created_at).toLocaleString('en-GB')}  ·  Case ID: ${c.id?.substring(0,8).toUpperCase()}`, pageW - MR - 2, y + 6, { align:'right' });
+        let mly = y + 11;
+        mlFields.forEach(([label, value]) => {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(6.5);
+          doc.setTextColor(...MID);
+          doc.text(label, ML + 6, mly);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(...DARK);
+          doc.text(value.length > 80 ? value.substring(0,77)+'...' : value, ML + 48, mly);
+          mly += 7;
+        });
+        y += mlH + 6;
       }
 
       // ── Photos ──
@@ -4906,6 +5055,12 @@ document.addEventListener('keydown', e => {
     closeQuickLog();
   }
 });
+
+function openCaseVerification() {
+  if (!currentModalCase) return;
+  const url = `https://provify.app/verify.html?id=${currentModalCase.id}`;
+  window.open(url, '_blank');
+}
 
 // ─── QUICK LOG ───
 let qlSpecialty = 'endo';
