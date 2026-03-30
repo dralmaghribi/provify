@@ -1419,32 +1419,54 @@ body {
           </div>
         </div>
 
-        <!-- VOICE LOGGING MODAL -->
-        <div id="voice-modal" style="display:none; background:var(--navy-2); border:1px solid var(--teal-mid); border-radius:16px; padding:24px; margin-bottom:20px; position:relative;">
-          <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:16px">🎙 Voice Logging</div>
+        <!-- VOICE Q&A MODAL -->
+        <div id="voice-modal" style="display:none; background:var(--navy-2); border:1px solid var(--teal-mid); border-radius:20px; padding:28px; margin-bottom:20px; position:relative;">
+          <button onclick="closeVoiceModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.4rem; line-height:1;">×</button>
 
-          <!-- GUIDE -->
-          <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:16px; margin-bottom:16px;">
-            <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; font-weight:500">📋 Say it exactly like this:</div>
-            <div style="font-size:0.83rem; color:var(--white); line-height:2; font-family:monospace;">
-              "Tooth <span style="color:var(--teal)">thirty six</span> ... <span style="color:var(--teal)">endo</span> ... pain ... <span style="color:var(--teal)">irreversible pulpitis</span> ... <span style="color:var(--teal)">symptomatic apical periodontitis</span> ... <span style="color:var(--teal)">primary treatment</span> ... <span style="color:var(--teal)">three</span> canals ... <span style="color:var(--teal)">moderate</span> curvature ... working length <span style="color:var(--teal)">twenty one</span> millimeters ... <span style="color:var(--teal)">NaOCl and EDTA</span> ... <span style="color:var(--teal)">warm vertical</span>"
+          <!-- HEADER -->
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+            <div style="width:40px; height:40px; background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">🎙</div>
+            <div>
+              <div style="font-size:1rem; color:var(--white); font-weight:500">Voice Logging</div>
+              <div style="font-size:0.78rem; color:var(--gray)">Answer one question at a time — speak clearly after the beep</div>
             </div>
-            <div style="margin-top:10px; font-size:0.75rem; color:var(--gray)">💡 Speak slowly and clearly. Say numbers as words — "thirty six" not "36". Pause briefly between items.</div>
           </div>
 
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <button onclick="recordVoice()" id="record-btn" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; padding:12px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
-              🔴 Start Recording
-            </button>
-            <button onclick="stopAndProcess()" id="stop-btn" style="display:none; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#EF4444; font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; padding:12px 24px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
-              ⏹ Done — Fill Form
-            </button>
-            <div id="voice-status" style="font-size:0.82rem; color:var(--gray)">Press to start</div>
+          <!-- CURRENT QUESTION DISPLAY -->
+          <div id="vq-question-box" style="background:linear-gradient(135deg, rgba(124,111,255,0.1), rgba(124,111,255,0.04)); border:1px solid var(--teal-mid); border-radius:14px; padding:20px; margin-bottom:16px; min-height:80px; display:flex; align-items:center; justify-content:center; text-align:center;">
+            <div>
+              <div id="vq-question-label" style="font-size:0.65rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; font-weight:500">Press Start to begin</div>
+              <div id="vq-question-text" style="font-family:'Instrument Serif',serif; font-size:1.5rem; color:var(--white); letter-spacing:-0.02em;">Ready when you are</div>
+              <div id="vq-question-options" style="font-size:0.75rem; color:var(--gray); margin-top:8px; line-height:1.6;"></div>
+            </div>
           </div>
 
-          <div id="voice-transcript" style="display:none; margin-top:14px; background:var(--navy-3); border:1px solid var(--white-faint); border-radius:10px; padding:14px; font-size:0.85rem; color:var(--white-dim); line-height:1.6; min-height:60px;"></div>
-          <div id="voice-filling" style="display:none; margin-top:10px; font-size:0.82rem; color:var(--teal);">⏳ Filling form from your voice...</div>
-          <button onclick="closeVoiceModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--gray); cursor:pointer; font-size:1.2rem;">×</button>
+          <!-- ANSWER DISPLAY -->
+          <div id="vq-answer-box" style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px; margin-bottom:16px; min-height:52px; display:flex; align-items:center; gap:12px;">
+            <div id="vq-mic-indicator" style="width:10px; height:10px; border-radius:50%; background:var(--gray); flex-shrink:0; transition:all 0.3s;"></div>
+            <div id="vq-answer-text" style="font-size:0.9rem; color:var(--gray); font-style:italic;">Your answer will appear here...</div>
+          </div>
+
+          <!-- PROGRESS -->
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--gray); margin-bottom:6px;">
+              <span id="vq-progress-label">Question 0 of 0</span>
+              <span id="vq-filled-count">0 fields filled</span>
+            </div>
+            <div style="height:4px; background:var(--white-faint); border-radius:100px; overflow:hidden;">
+              <div id="vq-progress-bar" style="height:100%; background:linear-gradient(90deg, var(--teal), #9B91FF); border-radius:100px; width:0%; transition:width 0.4s ease;"></div>
+            </div>
+          </div>
+
+          <!-- FILLED FIELDS PREVIEW -->
+          <div id="vq-filled-preview" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; min-height:28px;"></div>
+
+          <!-- CONTROLS -->
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button onclick="startVoiceQA()" id="vq-start-btn" style="flex:1; background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; padding:12px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">▶ Start Voice Logging</button>
+            <button onclick="skipVoiceQuestion()" id="vq-skip-btn" style="display:none; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--gray); font-family:'Inter',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">Skip →</button>
+            <button onclick="endVoiceQA()" id="vq-done-btn" style="display:none; background:none; border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">Done ✓</button>
+          </div>
         </div>
 
         <div class="log-form">
@@ -3688,178 +3710,279 @@ function resetTimer() {
 }
 
 // ─── VOICE LOGGING ───
-let recognition = null;
-let isRecording = false;
-let fullTranscript = '';
+// ─── VOICE Q&A ENGINE ───
+let vqRecognition = null;
+let vqActive = false;
+let vqCurrentIndex = 0;
+let vqFilledFields = {};
+let vqQuestions = [];
+
+const VQ_QUESTIONS_ENDO = [
+  { id: 'specialty',            q: 'Which specialty?',           hint: 'Say: Endo, Restorative, or Surgery',              map: {'endo':'endo','endodontics':'endo','root canal':'endo','restorative':'restorative','filling':'restorative','surgery':'surgery','extraction':'surgery'} },
+  { id: 'tooth_number',         q: 'Which tooth number?',        hint: 'Say the number as words, e.g. thirty six',        map: null },
+  { id: 'age_range',            q: 'Patient age range?',         hint: 'Say: twenty to thirty, thirty to forty, etc.',    map: {'ten':'10-20','twenty':'20-30','thirty':'30-40','forty':'40-50','fifty':'50+'} },
+  { id: 'complaint',            q: 'Chief complaint?',           hint: 'Say: Pain, Swelling, Sensitivity, or Routine',    map: {'pain':'Pain','swelling':'Swelling','sensitive':'Sensitivity','sensitivity':'Sensitivity','routine':'Routine','trauma':'Trauma'} },
+  { id: 'pulp_diagnosis',       q: 'Pulp diagnosis?',            hint: 'Say: Irreversible, Reversible, or Necrosis',      map: {'irreversible':'Irreversible Pulpitis','reversible':'Reversible Pulpitis','necrosis':'Pulp Necrosis','necrotic':'Pulp Necrosis','previously treated':'Previously Treated'} },
+  { id: 'periapical_diagnosis', q: 'Periapical diagnosis?',      hint: 'Say: Symptomatic, Asymptomatic, or Abscess',      map: {'symptomatic':'Symptomatic Apical Periodontitis','asymptomatic':'Asymptomatic Apical Periodontitis','abscess':'Acute Apical Abscess','normal':'Normal'} },
+  { id: 'case_type',            q: 'Case type?',                 hint: 'Say: Primary, Retreatment, or Apexification',     map: {'primary':'Primary Treatment','first':'Primary Treatment','retreatment':'Retreatment','apexification':'Apexification','pulpotomy':'Pulpotomy'} },
+  { id: 'canals',               q: 'Number of canals?',          hint: 'Say: one, two, three, or four',                   map: {'one':'1','two':'2','three':'3','four':'4','five':'5','1':'1','2':'2','3':'3','4':'4'} },
+  { id: 'curvature',            q: 'Canal curvature?',           hint: 'Say: Straight, Slight, Moderate, or Severe',      map: {'straight':'Straight','slight':'Slight','moderate':'Moderate','severe':'Severe','curved':'Moderate'} },
+  { id: 'irrigation',           q: 'Irrigation solution?',       hint: 'Say: NaOCl only, NaOCl EDTA, or with CHX',       map: {'naocl only':'NaOCl only','only':'NaOCl only','edta':'NaOCl + EDTA','naocl edta':'NaOCl + EDTA','chx':'NaOCl + EDTA + CHX'} },
+  { id: 'obturation',           q: 'Obturation technique?',      hint: 'Say: Cold lateral, Warm vertical, or Single cone',map: {'cold':'Cold Lateral','cold lateral':'Cold Lateral','warm':'Warm Vertical','warm vertical':'Warm Vertical','single':'Single Cone','single cone':'Single Cone'} },
+  { id: 'post_op',              q: 'Post-op symptoms?',          hint: 'Say: None, Mild pain, or Swelling',               map: {'none':'None','no pain':'None','mild':'Mild Pain','mild pain':'Mild Pain','swelling':'Swelling'} },
+];
+
+const VQ_QUESTIONS_RESTO = [
+  { id: 'specialty',    q: 'Which specialty?',        hint: 'Say: Endo, Restorative, or Surgery',           map: {'endo':'endo','restorative':'restorative','filling':'restorative','surgery':'surgery'} },
+  { id: 'tooth_number', q: 'Which tooth number?',     hint: 'Say the number as words',                      map: null },
+  { id: 'age_range',    q: 'Patient age range?',      hint: 'Say: twenty to thirty, thirty to forty',       map: {'twenty':'20-30','thirty':'30-40','forty':'40-50','fifty':'50+'} },
+  { id: 'complaint',    q: 'Chief complaint?',        hint: 'Say: Pain, Sensitivity, or Routine',           map: {'pain':'Pain','sensitive':'Sensitivity','sensitivity':'Sensitivity','routine':'Routine'} },
+  { id: 'cavity_class', q: 'Cavity class?',           hint: 'Say: Class one, two, three, four, or five',   map: {'one':'Class I','class one':'Class I','two':'Class II','class two':'Class II','three':'Class III','class three':'Class III','four':'Class IV','five':'Class V'} },
+  { id: 'surfaces',     q: 'Number of surfaces?',     hint: 'Say: one, two, three, or four plus',           map: {'one':'1 Surface','two':'2 Surfaces','three':'3 Surfaces','four':'4+ Surfaces'} },
+  { id: 'material',     q: 'Material used?',          hint: 'Say: Composite, Amalgam, Ceramic, or GIC',    map: {'composite':'Composite','amalgam':'Amalgam','ceramic':'Ceramic / Porcelain','porcelain':'Ceramic / Porcelain','gic':'GIC','glass ionomer':'GIC'} },
+  { id: 'isolation',    q: 'Isolation method?',       hint: 'Say: Rubber dam or Cotton roll',               map: {'rubber dam':'Rubber Dam','rubber':'Rubber Dam','dam':'Rubber Dam','cotton':'Cotton Roll','cotton roll':'Cotton Roll'} },
+  { id: 'post_op',      q: 'Post-op symptoms?',       hint: 'Say: None, Mild pain, or Sensitivity',        map: {'none':'None','mild':'Mild Pain','sensitive':'Sensitivity'} },
+];
+
+const VQ_QUESTIONS_SURGERY = [
+  { id: 'specialty',   q: 'Which specialty?',      hint: 'Say: Endo, Restorative, or Surgery',          map: {'endo':'endo','restorative':'restorative','surgery':'surgery','extraction':'surgery'} },
+  { id: 'tooth_number',q: 'Which tooth number?',   hint: 'Say the number as words',                     map: null },
+  { id: 'age_range',   q: 'Patient age range?',    hint: 'Say: twenty to thirty, thirty to forty',      map: {'twenty':'20-30','thirty':'30-40','forty':'40-50','fifty':'50+'} },
+  { id: 'complaint',   q: 'Chief complaint?',      hint: 'Say: Pain, Swelling, or Routine',             map: {'pain':'Pain','swelling':'Swelling','routine':'Routine','trauma':'Trauma'} },
+  { id: 'procedure',   q: 'Procedure type?',       hint: 'Say: Simple, Surgical, or Impacted wisdom',  map: {'simple':'Simple Extraction','surgical':'Surgical Extraction','impacted':'Impacted Wisdom Tooth','wisdom':'Impacted Wisdom Tooth'} },
+  { id: 'impaction',   q: 'Impaction level?',      hint: 'Say: Not applicable, Soft tissue, Partial, or Full bony', map: {'not applicable':'N/A','na':'N/A','none':'N/A','soft':'Soft Tissue','soft tissue':'Soft Tissue','partial':'Partial Bony','full':'Full Bony','full bony':'Full Bony'} },
+  { id: 'anaesthesia', q: 'Anaesthesia type?',     hint: 'Say: Infiltration, Block, Both, or General', map: {'infiltration':'Local — Infiltration','block':'Local — Block','both':'Local — Both','general':'General'} },
+  { id: 'sutures',     q: 'Sutures placed?',       hint: 'Say: No, Resorbable, or Non-resorbable',     map: {'no':'No','none':'No','resorbable':'Yes — Resorbable','non resorbable':'Yes — Non-resorbable','non-resorbable':'Yes — Non-resorbable'} },
+  { id: 'post_op',     q: 'Post-op symptoms?',     hint: 'Say: None, Mild pain, or Swelling',          map: {'none':'None','mild':'Mild Pain','swelling':'Swelling'} },
+];
 
 function startVoiceLogging() {
   document.getElementById('voice-modal').style.display = 'block';
+  vqFilledFields = {};
+  vqCurrentIndex = 0;
+  vqActive = false;
+  vqQuestions = VQ_QUESTIONS_ENDO;
+  document.getElementById('vq-start-btn').style.display = 'block';
+  document.getElementById('vq-skip-btn').style.display = 'none';
+  document.getElementById('vq-done-btn').style.display = 'none';
+  document.getElementById('vq-filled-preview').innerHTML = '';
+  document.getElementById('vq-answer-text').textContent = 'Your answer will appear here...';
+  document.getElementById('vq-answer-text').style.color = 'var(--gray)';
+  document.getElementById('vq-mic-indicator').style.background = 'var(--gray)';
+  document.getElementById('vq-progress-bar').style.width = '0%';
+  document.getElementById('vq-progress-label').textContent = 'Ready';
+  document.getElementById('vq-filled-count').textContent = '0 fields filled';
+  document.getElementById('vq-question-label').textContent = 'Press Start to begin';
+  document.getElementById('vq-question-text').textContent = 'Ready when you are';
+  document.getElementById('vq-question-options').textContent = '';
 }
 
 function closeVoiceModal() {
   document.getElementById('voice-modal').style.display = 'none';
-  if (recognition) { try { recognition.stop(); } catch(e) {} }
-  isRecording = false;
-  fullTranscript = '';
+  vqActive = false;
+  if (vqRecognition) { try { vqRecognition.stop(); vqRecognition.abort(); } catch(e){} vqRecognition = null; }
 }
 
-function recordVoice() {
-  const btn = document.getElementById('record-btn');
-  const stopBtn = document.getElementById('stop-btn');
-  const status = document.getElementById('voice-status');
-  const transcript = document.getElementById('voice-transcript');
+function speak(text) {
+  return new Promise((resolve) => {
+    if (!window.speechSynthesis) { resolve(); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.9; u.pitch = 1; u.volume = 1;
+    u.onend = resolve; u.onerror = resolve;
+    window.speechSynthesis.speak(u);
+  });
+}
 
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.15);
+  } catch(e) {}
+}
+
+async function startVoiceQA() {
   if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
     showToast('Voice logging requires Chrome or Safari browser.');
     return;
   }
+  vqActive = true;
+  vqCurrentIndex = 0;
+  document.getElementById('vq-start-btn').style.display = 'none';
+  document.getElementById('vq-skip-btn').style.display = 'block';
+  document.getElementById('vq-done-btn').style.display = 'block';
+  await askNextQuestion();
+}
 
-  if (isRecording) return;
+async function askNextQuestion() {
+  if (!vqActive || vqCurrentIndex >= vqQuestions.length) { endVoiceQA(); return; }
+  const q = vqQuestions[vqCurrentIndex];
+  const total = vqQuestions.length;
+  document.getElementById('vq-question-label').textContent = `Question ${vqCurrentIndex + 1} of ${total}`;
+  document.getElementById('vq-question-text').textContent = q.q;
+  document.getElementById('vq-question-options').textContent = q.hint;
+  document.getElementById('vq-progress-bar').style.width = `${(vqCurrentIndex / total) * 100}%`;
+  document.getElementById('vq-progress-label').textContent = `Question ${vqCurrentIndex + 1} of ${total}`;
+  document.getElementById('vq-answer-text').textContent = 'Listening...';
+  document.getElementById('vq-answer-text').style.color = 'var(--gray)';
+  document.getElementById('vq-mic-indicator').style.background = 'var(--gray)';
+  await speak(q.q);
+  await new Promise(r => setTimeout(r, 250));
+  playBeep();
+  listenForAnswer(q);
+}
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = 'en-US';
-  recognition.maxAlternatives = 1;
-  fullTranscript = '';
+function listenForAnswer(q) {
+  if (!vqActive) return;
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  vqRecognition = new SpeechRec();
+  vqRecognition.continuous = false;
+  vqRecognition.interimResults = true;
+  vqRecognition.lang = 'en-US';
+  vqRecognition.maxAlternatives = 3;
 
-  recognition.onstart = () => {
-    isRecording = true;
-    btn.style.display = 'none';
-    stopBtn.style.display = 'flex';
-    status.textContent = '🔴 Recording... speak your case, then press Done';
-    transcript.style.display = 'block';
-    transcript.textContent = '';
-  };
+  document.getElementById('vq-mic-indicator').style.background = '#EF4444';
+  document.getElementById('vq-mic-indicator').style.boxShadow = '0 0 8px rgba(239,68,68,0.5)';
 
-  recognition.onresult = (e) => {
+  let finalAnswer = '';
+
+  vqRecognition.onresult = (e) => {
     let interim = '';
-    let final = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) final += t + ' ';
+      if (e.results[i].isFinal) finalAnswer += t + ' ';
       else interim += t;
     }
-    fullTranscript += final;
-    transcript.textContent = fullTranscript + interim;
+    document.getElementById('vq-answer-text').textContent = (finalAnswer + interim).trim();
+    document.getElementById('vq-answer-text').style.color = 'var(--white)';
   };
 
-  recognition.onerror = (e) => {
-    if (e.error === 'no-speech') { recognition.stop(); recognition.start(); return; }
-    status.textContent = `Error: ${e.error}. Try again.`;
-    isRecording = false;
-    btn.style.display = 'flex';
-    stopBtn.style.display = 'none';
+  vqRecognition.onend = async () => {
+    if (!vqActive) return;
+    document.getElementById('vq-mic-indicator').style.background = 'var(--teal)';
+    document.getElementById('vq-mic-indicator').style.boxShadow = 'none';
+    const answer = finalAnswer.trim().toLowerCase() || document.getElementById('vq-answer-text').textContent.toLowerCase().trim();
+    if (answer && answer !== 'listening...') await processVoiceAnswer(q, answer);
+    vqCurrentIndex++;
+    await new Promise(r => setTimeout(r, 500));
+    await askNextQuestion();
   };
 
-  recognition.onend = () => {
-    // Auto-restart if still recording (handles browser timeout)
-    if (isRecording) {
-      try { recognition.start(); } catch(e) {}
-    }
+  vqRecognition.onerror = async (e) => {
+    if (!vqActive) return;
+    document.getElementById('vq-mic-indicator').style.background = 'var(--gray)';
+    document.getElementById('vq-mic-indicator').style.boxShadow = 'none';
+    vqCurrentIndex++;
+    await new Promise(r => setTimeout(r, 300));
+    await askNextQuestion();
   };
 
-  recognition.start();
+  vqRecognition.start();
 }
 
-async function stopAndProcess() {
-  const stopBtn = document.getElementById('stop-btn');
-  const btn = document.getElementById('record-btn');
-  const status = document.getElementById('voice-status');
-  const filling = document.getElementById('voice-filling');
+async function processVoiceAnswer(q, answer) {
+  let matched = null;
 
-  isRecording = false;
-  try { recognition.stop(); } catch(e) {}
-
-  stopBtn.style.display = 'none';
-  btn.style.display = 'flex';
-
-  const text = fullTranscript.trim();
-  if (!text) { status.textContent = 'No speech detected. Try again.'; return; }
-
-  status.textContent = 'Processing...';
-  filling.style.display = 'block';
-  await fillFormFromVoice(text);
-  filling.style.display = 'none';
-  status.textContent = '✓ Form filled! Check and adjust if needed.';
-  setTimeout(() => closeVoiceModal(), 2000);
-}
-
-async function fillFormFromVoice(text) {
-  const prompt = `You are a dental form assistant. Parse this spoken case description and extract structured data. Numbers may be spoken as words (e.g. "thirty six" = 36, "twenty one" = 21, "three" = 3).
-
-Spoken text: "${text}"
-
-Respond ONLY with a JSON object with these fields (use null if not mentioned):
-{
-  "specialty": "endo" or "restorative" or "surgery" or null,
-  "tooth_number": number (convert word numbers to digits) or null,
-  "age_range": "10-20" or "20-30" or "30-40" or "40-50" or "50+" or null,
-  "complaint": "Pain" or "Swelling" or "Sensitivity" or "Routine" or "Trauma" or "Other" or null,
-  "pulp_diagnosis": "Normal" or "Reversible Pulpitis" or "Irreversible Pulpitis" or "Pulp Necrosis" or "Previously Treated" or null,
-  "periapical_diagnosis": "Normal" or "Symptomatic Apical Periodontitis" or "Asymptomatic Apical Periodontitis" or "Acute Apical Abscess" or "Chronic Apical Abscess" or null,
-  "case_type": "Primary Treatment" or "Retreatment" or "Apexification" or "Pulpotomy" or null,
-  "canals": number as string (convert word to digit: "three"="3") or null,
-  "curvature": "Straight" or "Slight" or "Moderate" or "Severe" or null,
-  "irrigation": "NaOCl only" or "NaOCl + EDTA" or "NaOCl + EDTA + CHX" or null,
-  "obturation": "Cold Lateral" or "Warm Vertical" or "Single Cone" or null,
-  "cavity_class": "Class I" or "Class II" or "Class III" or "Class IV" or "Class V" or null,
-  "material": "Composite" or "Amalgam" or "Ceramic / Porcelain" or "GIC" or null,
-  "procedure": "Simple Extraction" or "Surgical Extraction" or "Impacted Wisdom Tooth" or null,
-  "narrative": a clean professional written summary of what was said or null
-}`;
-
-  try {
-    const response = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode: 'clinical_note', notePrompt: prompt, caseData: {}, complexity: 0 })
-    });
-    const data = await response.json();
-    const raw = (data.note || '{}').replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(raw);
-
-    // Fill form fields
-    if (parsed.specialty) {
-      const btn = document.querySelector(`.specialty-btn[onclick*="${parsed.specialty}"]`);
-      if (btn) selectSpecialty(parsed.specialty, btn);
+  // Tooth number special handling
+  if (q.id === 'tooth_number') {
+    const num = wordToNum(answer);
+    if (num >= 11 && num <= 48) {
+      selectTooth(num);
+      vqFilledFields[q.id] = num;
+      addVQBadge('Tooth ' + num);
+      return;
     }
-    if (parsed.tooth_number) {
-      selectTooth(parsed.tooth_number);
+    // Try extracting digits directly
+    const digits = answer.replace(/[^0-9]/g, '');
+    if (digits.length === 2) {
+      const n = parseInt(digits);
+      if (n >= 11 && n <= 48) {
+        selectTooth(n);
+        vqFilledFields[q.id] = n;
+        addVQBadge('Tooth ' + n);
+        return;
+      }
     }
-    if (parsed.age_range) setSelect('f-age', parsed.age_range);
-    if (parsed.complaint) setSelect('f-complaint', parsed.complaint);
-    if (parsed.pulp_diagnosis) setSelect('f-pulp', parsed.pulp_diagnosis);
-    if (parsed.periapical_diagnosis) setSelect('f-periapical', parsed.periapical_diagnosis);
-    if (parsed.case_type) setSelect('f-case-type', parsed.case_type);
-    if (parsed.curvature) setSelect('f-curvature', parsed.curvature);
-    if (parsed.irrigation) setSelect('f-irrigation', parsed.irrigation);
-    if (parsed.obturation) setSelect('f-obturation', parsed.obturation);
-    if (parsed.cavity_class) setSelect('f-cavity-class', parsed.cavity_class);
-    if (parsed.material) setSelect('f-material', parsed.material);
-    if (parsed.procedure) setSelect('f-procedure', parsed.procedure);
-    if (parsed.narrative) {
-      const narrativeEl = document.getElementById('f-narrative');
-      if (narrativeEl) narrativeEl.value = parsed.narrative;
-    }
-    if (parsed.canals) {
-      setSelect('f-canals', parsed.canals);
-      updateCanalFields();
-    }
+  }
 
-  } catch(e) {
-    console.error('Voice fill error:', e);
-    showToast('Could not parse voice. Please fill manually.');
+  // Specialty special handling
+  if (q.id === 'specialty') {
+    const specMap = {'endo':'endo','endodontics':'endo','root canal':'endo','rct':'endo','restorative':'restorative','filling':'restorative','composite':'restorative','restoration':'restorative','surgery':'surgery','surgical':'surgery','extraction':'surgery','oral surgery':'surgery'};
+    for (const [k, v] of Object.entries(specMap)) {
+      if (answer.includes(k)) {
+        const btn = document.querySelector(`.specialty-btn[onclick*="${v}"]`);
+        if (btn) selectSpecialty(v, btn);
+        vqFilledFields[q.id] = v;
+        addVQBadge(v.charAt(0).toUpperCase() + v.slice(1));
+        if (v === 'restorative') vqQuestions = VQ_QUESTIONS_RESTO;
+        else if (v === 'surgery') vqQuestions = VQ_QUESTIONS_SURGERY;
+        else vqQuestions = VQ_QUESTIONS_ENDO;
+        return;
+      }
+    }
+  }
+
+  // Map matching
+  if (q.map) {
+    if (q.map[answer]) { matched = q.map[answer]; }
+    else {
+      for (const [k, v] of Object.entries(q.map)) {
+        if (answer.includes(k) || k.includes(answer)) { matched = v; break; }
+      }
+    }
+  }
+
+  if (matched) {
+    vqFilledFields[q.id] = matched;
+    const fieldId = { 'pulp_diagnosis':'f-pulp', 'periapical_diagnosis':'f-periapical', 'case_type':'f-case-type', 'cavity_class':'f-cavity-class', 'post_op':'f-postop', 'age_range':'f-age', 'complaint':'f-complaint', 'canals':'f-canals', 'curvature':'f-curvature', 'irrigation':'f-irrigation', 'obturation':'f-obturation', 'surfaces':'f-surfaces', 'material':'f-material', 'isolation':'f-isolation', 'procedure':'f-procedure', 'impaction':'f-impaction', 'anaesthesia':'f-anaesthesia', 'sutures':'f-sutures' }[q.id] || ('f-' + q.id);
+    setSelect(fieldId, matched);
+    if (q.id === 'canals') updateCanalFields();
+    addVQBadge(matched.length > 14 ? matched.substring(0,11)+'...' : matched);
+    document.getElementById('vq-filled-count').textContent = `${Object.keys(vqFilledFields).length} fields filled`;
   }
 }
 
-function setSelect(id, value) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const options = Array.from(el.options);
-  const match = options.find(o => o.value.toLowerCase().includes(value.toString().toLowerCase()) || value.toString().toLowerCase().includes(o.value.toLowerCase()));
-  if (match) el.value = match.value;
+function wordToNum(text) {
+  const map = {'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'eleven':11,'twelve':12,'thirteen':13,'fourteen':14,'fifteen':15,'sixteen':16,'seventeen':17,'eighteen':18,'nineteen':19,'twenty':20,'thirty':30,'forty':40,'fifty':50};
+  const direct = parseInt(text.replace(/[^0-9]/g,''));
+  if (!isNaN(direct) && direct > 0) return direct;
+  let total = 0;
+  text.split(/[\s-]+/).forEach(w => { if (map[w] !== undefined) total += map[w]; });
+  return total;
+}
+
+function addVQBadge(label) {
+  const p = document.getElementById('vq-filled-preview');
+  const b = document.createElement('div');
+  b.style.cssText = 'background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-size:0.68rem;padding:3px 10px;border-radius:100px;';
+  b.textContent = '✓ ' + label;
+  p.appendChild(b);
+}
+
+async function skipVoiceQuestion() {
+  if (vqRecognition) { try { vqRecognition.abort(); } catch(e){} }
+  vqCurrentIndex++;
+  await new Promise(r => setTimeout(r, 200));
+  await askNextQuestion();
+}
+
+function endVoiceQA() {
+  vqActive = false;
+  if (vqRecognition) { try { vqRecognition.stop(); } catch(e){} }
+  speak('Done. Form filled.');
+  document.getElementById('vq-question-text').textContent = '✓ All done!';
+  document.getElementById('vq-question-label').textContent = `${Object.keys(vqFilledFields).length} fields filled successfully`;
+  document.getElementById('vq-progress-bar').style.width = '100%';
+  document.getElementById('vq-skip-btn').style.display = 'none';
+  document.getElementById('vq-done-btn').textContent = 'Close ×';
+  document.getElementById('vq-done-btn').onclick = closeVoiceModal;
+  setTimeout(() => closeVoiceModal(), 2500);
 }
 
 // ─── INSTAGRAM CASE CARD ───
