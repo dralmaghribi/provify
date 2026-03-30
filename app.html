@@ -1463,6 +1463,24 @@ body {
           </div>
         </div>
 
+        <!-- BEST WORK -->
+        <div class="card" id="best-work-card" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div class="card-title" style="margin:0">⭐ Your Best Work</div>
+            <div style="font-size:0.75rem;color:var(--gray)">Highest complexity cases</div>
+          </div>
+          <div id="best-work-list" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="card" id="dashboard-reviews-card" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div class="card-title" style="margin:0">🌟 Your Reviews</div>
+            <div id="dashboard-avg-rating" style="font-size:0.85rem;color:var(--amber, #F59E0B);font-weight:600"></div>
+          </div>
+          <div id="dashboard-reviews-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
         <!-- GAP ALERT -->
         <div class="card" id="gap-card" style="display:none">
           <div class="card-title">⚡ Portfolio Insights</div>
@@ -2954,6 +2972,8 @@ function updateDashboard() {
   }
 
   updateGapAlerts();
+  loadBestWork();
+  loadDashboardReviews();
 }
 
 function caseItemHTML(c, showDelete = false) {
@@ -3164,6 +3184,98 @@ function updateProgressInsights(endo, resto, surg, total) {
   if (insights.length === 0) insights.push('✓ Your portfolio is developing well. Keep logging cases consistently.');
 
   el.innerHTML = insights.map(i => `<div class="gap-alert" style="margin-bottom:8px">${i}</div>`).join('');
+}
+
+// ─── BEST WORK ───
+async function loadBestWork() {
+  const card = document.getElementById('best-work-card');
+  const list = document.getElementById('best-work-list');
+  if (!card || !list) return;
+
+  const top = [...allCases]
+    .filter(c => c.complexity_score > 0)
+    .sort((a, b) => (b.complexity_score || 0) - (a.complexity_score || 0))
+    .slice(0, 3);
+
+  if (top.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery' };
+
+  list.innerHTML = top.map(c => {
+    const rank = getComplexityRank(c.complexity_score || 0);
+    const spec = specLabels[c.specialty] || c.specialty;
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    const photoBase = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${currentUser.id}/${c.id}`;
+    const photoUrl = c.specialty === 'endo' ? `${photoBase}/xr-postop.jpg` : `${photoBase}/xr-gen-postop.jpg`;
+
+    return `
+      <div onclick="openCaseDetail('${c.id}')" style="flex-shrink:0;width:200px;background:var(--navy-3);border:1px solid var(--white-faint);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal-mid)'" onmouseout="this.style.borderColor='var(--white-faint)'">
+        <div style="width:200px;height:130px;background:linear-gradient(135deg,var(--navy-2),rgba(124,111,255,0.08));position:relative;overflow:hidden;">
+          <img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;" onload="this.style.opacity=1" onerror="this.style.display='none'">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+            <div style="font-family:'Instrument Serif',serif;font-size:3.5rem;color:rgba(124,111,255,0.12);line-height:1">${c.tooth_number}</div>
+          </div>
+          <div style="position:absolute;top:8px;right:8px;background:rgba(9,9,11,0.85);border:1px solid ${rank.border};border-radius:8px;padding:3px 8px;font-size:0.7rem;font-weight:700;color:${rank.color}">${c.complexity_score}/10</div>
+        </div>
+        <div style="padding:12px;">
+          <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">${spec}</div>
+          <div style="font-size:0.92rem;color:var(--white);font-weight:500;margin-bottom:3px">Tooth ${c.tooth_number}</div>
+          <div style="font-size:0.7rem;color:var(--gray)">${date} · <span style="color:${rank.color}">${rank.rank}</span></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── DASHBOARD REVIEWS ───
+async function loadDashboardReviews() {
+  const card = document.getElementById('dashboard-reviews-card');
+  const list = document.getElementById('dashboard-reviews-list');
+  const avgEl = document.getElementById('dashboard-avg-rating');
+  if (!card || !list || !currentUser) return;
+
+  const caseIds = allCases.map(c => c.id);
+  if (caseIds.length === 0) { card.style.display = 'none'; return; }
+
+  const { data: reviews } = await sb
+    .from('reviews')
+    .select('*')
+    .in('case_id', caseIds)
+    .not('rating', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  if (!reviews || reviews.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+  avgEl.textContent = `★ ${avg}/5`;
+
+  const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+
+  list.innerHTML = reviews.map(r => {
+    const isPatient = r.reviewer_type === 'patient';
+    const caseInfo = allCases.find(c => c.id === r.case_id);
+    return `
+      <div style="background:var(--navy-3);border:1px solid var(--white-faint);border-radius:12px;padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${r.comment ? '8px' : '0'}">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:${isPatient ? 'rgba(245,158,11,0.12)' : 'rgba(124,111,255,0.12)'};display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0">${isPatient ? '👤' : '👨‍⚕️'}</div>
+            <div>
+              <div style="font-size:0.82rem;color:var(--white);font-weight:500">${r.reviewer_name || 'Anonymous'}</div>
+              <div style="font-size:0.68rem;color:var(--gray)">${isPatient ? 'Patient' : (r.reviewer_role || 'Peer Review')}${caseInfo ? ' · Tooth ' + caseInfo.tooth_number : ''}</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:0.85rem;color:#F59E0B">${stars(r.rating)}</div>
+            ${!isPatient ? `<div style="font-size:0.6rem;color:var(--teal);margin-top:2px">✓ Peer Verified</div>` : ''}
+          </div>
+        </div>
+        ${r.comment ? `<div style="font-size:0.82rem;color:var(--white-dim);line-height:1.6;padding-left:42px">${r.comment}</div>` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 function updateGapAlerts() {
