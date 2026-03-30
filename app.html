@@ -1655,12 +1655,16 @@ body {
             <div class="form-section-title">Patient Information</div>
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Age Range</label>
-                <select class="form-select" id="f-age">
+                <label class="form-label" id="age-label">Age Range</label>
+                <!-- Adult age dropdown — shown for endo/resto/surgery -->
+                <select class="form-select" id="f-age-select">
                   <option value="">Select age range</option>
                   <option>10-20</option><option>20-30</option><option>30-40</option>
                   <option>40-50</option><option>50+</option>
                 </select>
+                <!-- Paeds age text input — shown for paeds -->
+                <input type="text" class="form-input" id="f-age-text" placeholder="e.g. 4 years, 7 years" style="display:none;">
+                <input type="hidden" id="f-age">
               </div>
               <div class="form-group">
                 <label class="form-label">Chief Complaint</label>
@@ -1673,6 +1677,9 @@ body {
             </div>
             <div class="form-group">
               <label class="form-label">Select Tooth</label>
+              <div id="chart-mode-badge" style="display:none;margin-bottom:8px;background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:8px;padding:6px 12px;font-size:0.72rem;color:var(--teal);display:inline-flex;align-items:center;gap:6px;">
+                🧒 Showing primary dentition (FDI 51–85)
+              </div>
               <div class="tooth-chart">
                 <div class="arch-label">Upper Arch</div>
                 <div class="arch-container" id="upper-arch"></div>
@@ -2412,11 +2419,24 @@ let allPhotoFiles = {};
 const UPPER_TEETH = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
 const LOWER_TEETH = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
 
+// Primary dentition — FDI notation (20 teeth)
+// Upper right 55-51, Upper left 61-65, Lower left 71-75, Lower right 85-81
+const PRIMARY_UPPER = [55,54,53,52,51,61,62,63,64,65];
+const PRIMARY_LOWER = [85,84,83,82,81,71,72,73,74,75];
+
 const TOOTH_TYPE = {
   18:'M',17:'M',16:'M',15:'P',14:'P',13:'C',12:'I',11:'I',
   21:'I',22:'I',23:'C',24:'P',25:'P',26:'M',27:'M',28:'M',
   48:'M',47:'M',46:'M',45:'P',44:'P',43:'C',42:'I',41:'I',
   31:'I',32:'I',33:'C',34:'P',35:'P',36:'M',37:'M',38:'M',
+};
+
+// Primary tooth types — no premolars, molars where premolars would be
+const PRIMARY_TOOTH_TYPE = {
+  55:'M',54:'M',53:'C',52:'I',51:'I',
+  61:'I',62:'I',63:'C',64:'M',65:'M',
+  85:'M',84:'M',83:'C',82:'I',81:'I',
+  71:'I',72:'I',73:'C',74:'M',75:'M',
 };
 
 const TOOTH_CANAL_MAP = {
@@ -2430,11 +2450,32 @@ const TOOTH_CANAL_MAP = {
   46:['MB','ML','D'],47:['MB','ML','D'],48:['MB','D'],
 };
 
+// Primary tooth canal defaults
+const PRIMARY_CANAL_MAP = {
+  51:['B'],52:['B'],53:['B'],61:['B'],62:['B'],63:['B'],
+  81:['B'],82:['B'],83:['B'],71:['B'],72:['B'],73:['B'],
+  54:['MB','DB','P'],55:['MB','DB','P'],
+  64:['MB','DB','P'],65:['MB','DB','P'],
+  74:['MB','ML','D'],75:['MB','ML','D'],
+  84:['MB','ML','D'],85:['MB','ML','D'],
+};
+
+const PRIMARY_TOOTH_NAMES = {
+  55:'UR Second Primary Molar', 54:'UR First Primary Molar', 53:'UR Primary Canine', 52:'UR Lateral Incisor', 51:'UR Central Incisor',
+  61:'UL Central Incisor', 62:'UL Lateral Incisor', 63:'UL Primary Canine', 64:'UL First Primary Molar', 65:'UL Second Primary Molar',
+  85:'LR Second Primary Molar', 84:'LR First Primary Molar', 83:'LR Primary Canine', 82:'LR Lateral Incisor', 81:'LR Central Incisor',
+  71:'LL Central Incisor', 72:'LL Lateral Incisor', 73:'LL Primary Canine', 74:'LL First Primary Molar', 75:'LL Second Primary Molar',
+};
+
 const ALL_CANAL_OPTIONS = ['MB','MB2','DB','DL','ML','MM','MD','Distal','Buccal','Lingual','Palatal'];
 
 // ─── INIT ───
 async function init() {
   buildToothChart();
+  // Sync adult age select to hidden field
+  const ageSelect = document.getElementById('f-age-select');
+  const ageHidden = document.getElementById('f-age');
+  if (ageSelect) ageSelect.onchange = () => { ageHidden.value = ageSelect.value; };
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     currentUser = session.user;
@@ -2447,21 +2488,30 @@ async function init() {
 }
 
 // ─── TOOTH CHART ───
+let isPrimaryChart = false;
+
+function getToothType(num) {
+  return isPrimaryChart ? (PRIMARY_TOOTH_TYPE[num] || 'I') : (TOOTH_TYPE[num] || 'I');
+}
+
 function getToothSVG(num, arch) {
-  const type = TOOTH_TYPE[num];
+  const type = getToothType(num);
   const isUpper = arch === 'upper';
   const fill = '#141418';
   const stroke = '#F4F7F930';
   const cusp = '#F4F7F940';
+  // Primary teeth get softer, rounder, more bulbous shapes
+  const isPrimary = isPrimaryChart;
 
   if (type === 'M') {
-    return `<svg width="22" height="26" viewBox="0 0 22 26" fill="none">
-      <rect x="1" y="${isUpper?5:1}" width="20" height="19" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
-      <rect x="3" y="${isUpper?8:4}" width="5" height="5" rx="1.5" fill="${cusp}"/>
-      <rect x="14" y="${isUpper?8:4}" width="5" height="5" rx="1.5" fill="${cusp}"/>
-      <rect x="3" y="${isUpper?15:11}" width="5" height="5" rx="1.5" fill="${cusp}"/>
-      <rect x="14" y="${isUpper?15:11}" width="5" height="5" rx="1.5" fill="${cusp}"/>
-      ${isUpper?`<path d="M6 5 Q11 1 16 5" stroke="${stroke}" stroke-width="1" fill="none"/>`:`<path d="M6 24 Q11 26 16 24" stroke="${stroke}" stroke-width="1" fill="none"/>`}
+    // Primary molars — rounder and wider
+    return `<svg width="${isPrimary?24:22}" height="26" viewBox="0 0 ${isPrimary?24:22} 26" fill="none">
+      <rect x="1" y="${isUpper?5:1}" width="${isPrimary?22:20}" height="${isPrimary?20:19}" rx="${isPrimary?6:4}" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
+      <rect x="3" y="${isUpper?8:4}" width="5" height="5" rx="${isPrimary?2.5:1.5}" fill="${cusp}"/>
+      <rect x="${isPrimary?16:14}" y="${isUpper?8:4}" width="5" height="5" rx="${isPrimary?2.5:1.5}" fill="${cusp}"/>
+      <rect x="3" y="${isUpper?15:11}" width="5" height="5" rx="${isPrimary?2.5:1.5}" fill="${cusp}"/>
+      <rect x="${isPrimary?16:14}" y="${isUpper?15:11}" width="5" height="5" rx="${isPrimary?2.5:1.5}" fill="${cusp}"/>
+      ${isUpper?`<path d="M6 5 Q${isPrimary?12:11} 1 ${isPrimary?18:16} 5" stroke="${stroke}" stroke-width="1" fill="none"/>`:`<path d="M6 24 Q${isPrimary?12:11} 26 ${isPrimary?18:16} 24" stroke="${stroke}" stroke-width="1" fill="none"/>`}
     </svg>`;
   } else if (type === 'P') {
     return `<svg width="17" height="26" viewBox="0 0 17 26" fill="none">
@@ -2471,36 +2521,48 @@ function getToothSVG(num, arch) {
       ${isUpper?`<path d="M4 6 Q8.5 2 13 6" stroke="${stroke}" stroke-width="1" fill="none"/>`:`<path d="M4 24 Q8.5 26 13 24" stroke="${stroke}" stroke-width="1" fill="none"/>`}
     </svg>`;
   } else if (type === 'C') {
-    return `<svg width="14" height="26" viewBox="0 0 14 26" fill="none">
-      <path d="${isUpper?'M7 1 L13 9 L13 22 Q13 25 10 25 L4 25 Q1 25 1 22 L1 9 Z':'M7 25 L13 17 L13 4 Q13 1 10 1 L4 1 Q1 1 1 4 L1 17 Z'}" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
+    // Primary canines — more rounded tip
+    return `<svg width="${isPrimary?16:14}" height="26" viewBox="0 0 ${isPrimary?16:14} 26" fill="none">
+      <path d="${isUpper?`M${isPrimary?8:7} 1 L${isPrimary?15:13} 10 L${isPrimary?15:13} 22 Q${isPrimary?15:13} 25 ${isPrimary?12:10} 25 L${isPrimary?4:4} 25 Q1 25 1 22 L1 10 Z`:`M${isPrimary?8:7} 25 L${isPrimary?15:13} 16 L${isPrimary?15:13} 4 Q${isPrimary?15:13} 1 ${isPrimary?12:10} 1 L4 1 Q1 1 1 4 L1 16 Z`}" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
     </svg>`;
   } else {
-    return `<svg width="13" height="26" viewBox="0 0 13 26" fill="none">
-      <rect x="1" y="${isUpper?7:1}" width="11" height="17" rx="3" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
-      ${isUpper?`<rect x="2" y="2" width="9" height="6" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`:`<rect x="2" y="18" width="9" height="6" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`}
+    // Incisors — primary ones slightly wider
+    return `<svg width="${isPrimary?15:13}" height="26" viewBox="0 0 ${isPrimary?15:13} 26" fill="none">
+      <rect x="1" y="${isUpper?7:1}" width="${isPrimary?13:11}" height="17" rx="3" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
+      ${isUpper?`<rect x="2" y="2" width="${isPrimary?11:9}" height="6" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`:`<rect x="2" y="18" width="${isPrimary?11:9}" height="6" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`}
     </svg>`;
   }
 }
 
-function buildToothChart() {
+function buildToothChart(primary = false) {
+  isPrimaryChart = primary;
   const upper = document.getElementById('upper-arch');
   const lower = document.getElementById('lower-arch');
   if (!upper || !lower) return;
-  upper.innerHTML = UPPER_TEETH.map(t => `
+
+  const upperTeeth = primary ? PRIMARY_UPPER : UPPER_TEETH;
+  const lowerTeeth = primary ? PRIMARY_LOWER : LOWER_TEETH;
+
+  upper.innerHTML = upperTeeth.map(t => `
     <button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}" title="Tooth ${t}">
       ${getToothSVG(t,'upper')}
       <span class="tooth-num">${t}</span>
     </button>`).join('');
-  lower.innerHTML = LOWER_TEETH.map(t => `
+  lower.innerHTML = lowerTeeth.map(t => `
     <button class="tooth-btn" onclick="selectTooth(${t})" id="tooth-${t}" title="Tooth ${t}">
       ${getToothSVG(t,'lower')}
       <span class="tooth-num">${t}</span>
     </button>`).join('');
+
+  // Show/hide the paeds badge
+  const badge = document.getElementById('chart-mode-badge');
+  if (badge) badge.style.display = primary ? 'inline-flex' : 'none';
 }
 
 function getToothName(num) {
+  if (isPrimaryChart && PRIMARY_TOOTH_NAMES[num]) return PRIMARY_TOOTH_NAMES[num];
   const names = { M:'Molar', P:'Premolar', C:'Canine', I:'Incisor' };
-  return names[TOOTH_TYPE[num]] || '';
+  return names[getToothType(num)] || '';
 }
 
 function selectTooth(num) {
@@ -2519,7 +2581,8 @@ function updateCanalFields() {
   const fieldsDiv = document.getElementById('canal-wl-fields');
   if (canals === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  const suggested = selectedToothNum ? (TOOTH_CANAL_MAP[selectedToothNum] || []) : [];
+  const canalMap = isPrimaryChart ? PRIMARY_CANAL_MAP : TOOTH_CANAL_MAP;
+  const suggested = selectedToothNum ? (canalMap[selectedToothNum] || []) : [];
   let html = '';
   for (let i = 0; i < canals; i++) {
     const defaultName = suggested[i] || ALL_CANAL_OPTIONS[i] || `Canal ${i+1}`;
@@ -2597,7 +2660,9 @@ function resetForm() {
   selectedToothNum = null;
   document.getElementById('f-tooth').value = '';
   document.getElementById('selected-tooth-display').style.display = 'none';
-  document.getElementById('f-age').value = '';
+  document.getElementById('f-age-select').value = '';
+  document.getElementById('f-age-text').value   = '';
+  document.getElementById('f-age').value         = '';
   document.getElementById('f-complaint').value = '';
   document.getElementById('f-canals').value = '';
   document.getElementById('canal-wl-section').style.display = 'none';
@@ -2762,6 +2827,34 @@ function selectSpecialty(spec, btn) {
   document.getElementById('surgery-fields').style.display     = spec === 'surgery'     ? 'block' : 'none';
   document.getElementById('paeds-fields').style.display       = spec === 'paeds'       ? 'block' : 'none';
   updateXraySection(spec);
+
+  // Switch age field
+  const ageSelect = document.getElementById('f-age-select');
+  const ageText   = document.getElementById('f-age-text');
+  const ageHidden = document.getElementById('f-age');
+  const ageLabel  = document.getElementById('age-label');
+  if (spec === 'paeds') {
+    ageSelect.style.display = 'none';
+    ageText.style.display   = 'block';
+    ageLabel.textContent    = 'Patient Age';
+    ageText.oninput = () => { ageHidden.value = ageText.value; };
+  } else {
+    ageSelect.style.display = 'block';
+    ageText.style.display   = 'none';
+    ageLabel.textContent    = 'Age Range';
+    ageSelect.onchange = () => { ageHidden.value = ageSelect.value; };
+    // Sync on switch back
+    ageHidden.value = ageSelect.value;
+  }
+
+  // Switch tooth chart — paeds uses primary, everything else uses adult
+  const isPaeds = spec === 'paeds';
+  buildToothChart(isPaeds);
+
+  // Reset tooth selection when switching
+  selectedToothNum = null;
+  document.getElementById('f-tooth').value = '';
+  document.getElementById('selected-tooth-display').style.display = 'none';
 }
 
 function setRating(n) {
