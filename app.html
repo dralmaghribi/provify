@@ -747,11 +747,32 @@ body::after {
         <div style="font-size:0.8rem; color:var(--gray); margin-top:4px" id="modal-date"></div>
       </div>
       <div style="display:flex; align-items:center; gap:10px;">
+        <button onclick="toggleCaseEdit()" id="edit-case-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='var(--gray)'">
+          ✏️ Edit
+        </button>
         <div style="text-align:center; background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:10px; padding:8px 14px;">
           <div style="font-family:'Instrument Serif',serif; font-size:1.6rem; color:var(--teal); line-height:1" id="modal-score">—</div>
           <div style="font-size:0.6rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.08em">score</div>
         </div>
         <button onclick="closeCaseDetail()" style="background:none; border:none; color:var(--gray); font-size:1.5rem; cursor:pointer; padding:4px; line-height:1; transition:color 0.2s" onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--gray)'">×</button>
+      </div>
+    </div>
+
+    <!-- EDIT MODE PANEL -->
+    <div id="case-edit-panel" style="display:none;padding:20px 28px;border-bottom:1px solid rgba(124,111,255,0.15);background:linear-gradient(135deg,rgba(124,111,255,0.05),rgba(124,111,255,0.02));">
+      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:14px;">✏️ Edit Case</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="edit-fields-grid"></div>
+      <div style="margin-top:12px;">
+        <label style="font-size:0.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:6px;">Case Narrative</label>
+        <textarea id="edit-narrative" rows="3" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:10px 14px;border-radius:10px;outline:none;resize:vertical;line-height:1.6;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'"></textarea>
+      </div>
+      <div style="margin-top:10px;">
+        <label style="font-size:0.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:6px;">Personal Note</label>
+        <input type="text" id="edit-note" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:10px 14px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="saveCaseEdit()" id="save-edit-btn" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:600;padding:11px;border-radius:10px;border:none;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(124,111,255,0.3);">Save Changes</button>
+        <button onclick="toggleCaseEdit()" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.875rem;padding:11px 20px;border-radius:10px;cursor:pointer;transition:all 0.2s;">Cancel</button>
       </div>
     </div>
 
@@ -3106,6 +3127,121 @@ function openCaseDetail(id) {
 function closeCaseDetail() {
   document.getElementById('case-detail-modal').style.display = 'none';
   document.body.style.overflow = '';
+  // Reset edit mode
+  const panel = document.getElementById('case-edit-panel');
+  if (panel) panel.style.display = 'none';
+  const btn = document.getElementById('edit-case-btn');
+  if (btn) btn.textContent = '✏️ Edit';
+}
+
+function toggleCaseEdit() {
+  const panel = document.getElementById('case-edit-panel');
+  const btn = document.getElementById('edit-case-btn');
+  const c = currentModalCase;
+  if (!c) return;
+
+  if (panel.style.display === 'none' || panel.style.display === '') {
+    // Build edit fields based on specialty
+    const grid = document.getElementById('edit-fields-grid');
+    const editField = (label, key, type = 'text', options = []) => {
+      const val = c[key] || '';
+      if (type === 'select') {
+        const opts = options.map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('');
+        return `<div>
+          <label style="font-size:0.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:5px;">${label}</label>
+          <select data-key="${key}" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:9px 12px;border-radius:10px;outline:none;cursor:pointer;appearance:none;">
+            <option value="">—</option>${opts}
+          </select>
+        </div>`;
+      }
+      return `<div>
+        <label style="font-size:0.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:5px;">${label}</label>
+        <input type="${type}" data-key="${key}" value="${val}" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:9px 12px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
+      </div>`;
+    };
+
+    let fieldsHTML = editField('Age Range / Age', 'age_range');
+    fieldsHTML += editField('Chief Complaint', 'complaint', 'select', ['Pain','Swelling','Sensitivity','Routine','Trauma','Other']);
+    fieldsHTML += editField('Post-op Symptoms', 'post_op', 'select', ['None','Mild Pain','Moderate Pain','Swelling','Other']);
+    fieldsHTML += editField('Follow-up', 'follow_up', 'select', ['No','Yes — 1 week','Yes — 1 month','Yes — 6 months']);
+
+    if (c.specialty === 'endo') {
+      fieldsHTML += editField('Pulp Diagnosis', 'pulp_diagnosis', 'select', ['Normal','Reversible Pulpitis','Irreversible Pulpitis','Pulp Necrosis','Previously Treated','Previously Initiated']);
+      fieldsHTML += editField('Periapical Diagnosis', 'periapical_diagnosis', 'select', ['Normal','Symptomatic Apical Periodontitis','Asymptomatic Apical Periodontitis','Acute Apical Abscess','Chronic Apical Abscess']);
+      fieldsHTML += editField('Obturation', 'obturation', 'select', ['Cold Lateral','Warm Vertical','Single Cone','Other']);
+      fieldsHTML += editField('Irrigation', 'irrigation', 'select', ['NaOCl only','NaOCl + EDTA','NaOCl + EDTA + CHX','Other']);
+    } else if (c.specialty === 'restorative') {
+      fieldsHTML += editField('Material', 'material', 'select', ['Composite','Amalgam','Ceramic / Porcelain','GIC','Other']);
+      fieldsHTML += editField('Isolation', 'isolation', 'select', ['Rubber Dam','Cotton Roll','Other']);
+    } else if (c.specialty === 'surgery') {
+      fieldsHTML += editField('Procedure', 'procedure', 'select', ['Simple Extraction','Surgical Extraction','Impacted Wisdom Tooth','Biopsy','Surgical Endodontics','Other']);
+      fieldsHTML += editField('Anaesthesia', 'anaesthesia', 'select', ['Local — Infiltration','Local — Block','Local — Both','General']);
+    }
+
+    grid.innerHTML = fieldsHTML;
+    document.getElementById('edit-narrative').value = c.narrative || '';
+
+    // Extract personal note from combined note
+    let personalNote = c.note || '';
+    if (c.note && c.note.includes('|| ML_RECORD:')) {
+      personalNote = c.note.split('|| ML_RECORD:')[0].trim();
+    }
+    document.getElementById('edit-note').value = personalNote;
+
+    panel.style.display = 'block';
+    btn.textContent = '✕ Cancel Edit';
+    btn.onmouseover = null; btn.onmouseout = null;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    panel.style.display = 'none';
+    btn.textContent = '✏️ Edit';
+  }
+}
+
+async function saveCaseEdit() {
+  const c = currentModalCase;
+  if (!c) return;
+
+  const btn = document.getElementById('save-edit-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+
+  // Collect all edited fields
+  const updates = {};
+  document.querySelectorAll('#edit-fields-grid [data-key]').forEach(el => {
+    if (el.value !== undefined) updates[el.dataset.key] = el.value || null;
+  });
+
+  // Narrative
+  const newNarrative = document.getElementById('edit-narrative').value.trim();
+  updates.narrative = newNarrative || null;
+
+  // Personal note — preserve ML_RECORD if it exists
+  const newNote = document.getElementById('edit-note').value.trim();
+  let mlPart = '';
+  if (c.note && c.note.includes('|| ML_RECORD:')) {
+    mlPart = c.note.split('|| ML_RECORD:')[1] || '';
+  }
+  updates.note = mlPart ? `${newNote} || ML_RECORD: ${mlPart}`.trim() : (newNote || null);
+
+  const { error } = await sb.from('cases').update(updates).eq('id', c.id).eq('user_id', currentUser.id);
+
+  if (error) {
+    showToast('Error saving. Please try again.');
+    btn.textContent = 'Save Changes'; btn.disabled = false;
+    return;
+  }
+
+  // Update local state
+  Object.assign(c, updates);
+  const idx = allCases.findIndex(x => x.id === c.id);
+  if (idx !== -1) allCases[idx] = { ...allCases[idx], ...updates };
+
+  // Refresh modal view
+  document.getElementById('case-edit-panel').style.display = 'none';
+  document.getElementById('edit-case-btn').textContent = '✏️ Edit';
+  openCaseDetail(c.id);
+  updateDashboard();
+  showToast('Case updated ✓');
 }
 
 async function deleteCase(id) {
@@ -4533,16 +4669,26 @@ function filterCases() {
     list = list.filter(c => c.specialty === casesFilterSpecialty);
 
   if (query) {
-    list = list.filter(c =>
-      String(c.tooth_number).includes(query) ||
-      (c.specialty       || '').toLowerCase().includes(query) ||
-      (c.pulp_diagnosis  || '').toLowerCase().includes(query) ||
-      (c.procedure       || '').toLowerCase().includes(query) ||
-      (c.material        || '').toLowerCase().includes(query) ||
-      (c.narrative       || '').toLowerCase().includes(query) ||
-      (c.complaint       || '').toLowerCase().includes(query) ||
-      new Date(c.created_at).toLocaleDateString('en-GB').includes(query)
-    );
+    list = list.filter(c => {
+      // Extract personal note cleanly
+      let noteText = c.note || '';
+      if (noteText.includes('|| ML_RECORD:')) noteText = noteText.split('|| ML_RECORD:')[0];
+      return (
+        String(c.tooth_number).includes(query) ||
+        (c.specialty       || '').toLowerCase().includes(query) ||
+        (c.pulp_diagnosis  || '').toLowerCase().includes(query) ||
+        (c.procedure       || '').toLowerCase().includes(query) ||
+        (c.material        || '').toLowerCase().includes(query) ||
+        (c.narrative       || '').toLowerCase().includes(query) ||
+        (c.complaint       || '').toLowerCase().includes(query) ||
+        noteText.toLowerCase().includes(query) ||
+        (c.periapical_diagnosis || '').toLowerCase().includes(query) ||
+        (c.case_type       || '').toLowerCase().includes(query) ||
+        (c.cavity_class    || '').toLowerCase().includes(query) ||
+        (c.obturation      || '').toLowerCase().includes(query) ||
+        new Date(c.created_at).toLocaleDateString('en-GB').includes(query)
+      );
+    });
   }
 
   if      (sort === 'oldest')  list.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
