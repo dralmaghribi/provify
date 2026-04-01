@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Provify — Clinical Case Intelligence for Dentists</title>
-<meta name="description" content="Log clinical cases, get instant AI feedback, build a portfolio that proves your competence.">
+<title>Provify — Every case documented. Every decision protected.</title>
+<meta name="description" content="The clinical documentation platform for dentists. Every case timestamped, verified, and ready when you need it most.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,50 +13,42 @@
 :root{
   --bg:#09090B;--bg-2:#0F0F12;--bg-3:#141418;--bg-4:#1A1A20;
   --v:#7C6FFF;--v2:#9B91FF;--vd:rgba(124,111,255,0.08);--vm:rgba(124,111,255,0.2);--vg:rgba(124,111,255,0.15);
-  --rose:#FF6B8A;--amber:#FFB347;
+  --rose:#FF6B8A;--amber:#FFB347;--green:#34D399;
   --w:#FAFAFA;--wd:rgba(250,250,250,0.65);--wf:rgba(250,250,250,0.06);--wf2:rgba(250,250,250,0.09);
   --g:#6B7280;--g2:#9CA3AF;
 }
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--w);font-family:"Inter",sans-serif;font-weight:300;overflow-x:hidden;line-height:1.6;}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:998;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(9,9,11,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--wf);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(9,9,11,0.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--wf);}
 .nav-logo{font-family:"Instrument Serif",serif;font-size:1.3rem;color:var(--w);text-decoration:none;letter-spacing:-0.03em;display:flex;align-items:center;gap:8px;}
 .nav-logo-dot{width:8px;height:8px;background:var(--v);border-radius:50%;animation:ldot 3s ease-in-out infinite;flex-shrink:0;}
 @keyframes ldot{0%,100%{opacity:1;box-shadow:0 0 0 0 var(--vg)}50%{opacity:0.6;box-shadow:0 0 0 6px transparent}}
 .nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
-.nav-links a{color:var(--g);text-decoration:none;font-size:0.85rem;font-weight:400;transition:color 0.2s;}
+.nav-links a{color:var(--g);text-decoration:none;font-size:0.85rem;transition:color 0.2s;}
 .nav-links a:hover{color:var(--w);}
 .nav-right{display:flex;align-items:center;gap:12px;}
 .nav-si{color:var(--g2);font-size:0.85rem;text-decoration:none;transition:color 0.2s;}
 .nav-si:hover{color:var(--w);}
-.nav-cta{background:var(--v);color:var(--w);font-family:"Inter",sans-serif;font-size:0.85rem;font-weight:500;padding:8px 20px;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:all 0.2s;letter-spacing:-0.01em;}
+.nav-cta{background:var(--v);color:var(--w);font-family:"Inter",sans-serif;font-size:0.85rem;font-weight:500;padding:8px 20px;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:all 0.2s;}
 .nav-cta:hover{background:var(--v2);box-shadow:0 0 24px var(--vg);}
-
-/* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 6% 60px;position:relative;overflow:hidden;}
 .orb{position:absolute;border-radius:50%;pointer-events:none;}
-.o1{width:800px;height:800px;top:-250px;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(124,111,255,0.1) 0%,transparent 70%);}
-.o2{width:500px;height:500px;bottom:-150px;left:5%;background:radial-gradient(circle,rgba(255,107,138,0.06) 0%,transparent 70%);}
-.o3{width:350px;height:350px;bottom:0;right:5%;background:radial-gradient(circle,rgba(124,111,255,0.05) 0%,transparent 70%);}
+.o1{width:900px;height:900px;top:-300px;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(124,111,255,0.1) 0%,transparent 70%);}
+.o2{width:400px;height:400px;bottom:-100px;left:5%;background:radial-gradient(circle,rgba(255,107,138,0.05) 0%,transparent 70%);}
+.o3{width:300px;height:300px;bottom:0;right:5%;background:radial-gradient(circle,rgba(124,111,255,0.05) 0%,transparent 70%);}
 .grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--wf) 1px,transparent 1px),linear-gradient(90deg,var(--wf) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,black 0%,transparent 100%);}
-
 .eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--vd);border:1px solid var(--vm);color:var(--v2);font-size:0.72rem;font-weight:500;padding:5px 14px;border-radius:100px;margin-bottom:32px;letter-spacing:0.05em;text-transform:uppercase;animation:fu 0.6s ease both;}
 .ep{width:5px;height:5px;background:var(--v);border-radius:50%;animation:ep2 2s ease-in-out infinite;}
 @keyframes ep2{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(0.7);opacity:0.5}}
-
 h1{font-family:"Instrument Serif",serif;font-size:clamp(3.2rem,9vw,7.5rem);line-height:1.0;letter-spacing:-0.05em;color:var(--w);margin-bottom:24px;max-width:1000px;animation:fu 0.7s 0.1s ease both;}
 .hl{background:linear-gradient(135deg,var(--v) 0%,var(--rose) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:italic;}
-
-.hero-sub{font-size:1.1rem;color:var(--g2);max-width:520px;line-height:1.75;margin-bottom:40px;font-weight:300;animation:fu 0.7s 0.2s ease both;}
+.hero-sub{font-size:1.15rem;color:var(--g2);max-width:540px;line-height:1.8;margin-bottom:40px;font-weight:300;animation:fu 0.7s 0.2s ease both;}
 .hero-btns{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;animation:fu 0.7s 0.3s ease both;}
-.btn-main{background:var(--v);color:var(--w);font-family:"Inter",sans-serif;font-size:1rem;font-weight:500;padding:14px 32px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:all 0.25s;letter-spacing:-0.01em;display:inline-flex;align-items:center;gap:8px;position:relative;overflow:hidden;}
+.btn-main{background:var(--v);color:var(--w);font-family:"Inter",sans-serif;font-size:1rem;font-weight:500;padding:14px 32px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:all 0.25s;letter-spacing:-0.01em;display:inline-flex;align-items:center;gap:8px;}
 .btn-main:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(124,111,255,0.35);background:var(--v2);}
 .btn-sec{color:var(--g2);font-family:"Inter",sans-serif;font-size:0.95rem;background:none;border:1px solid var(--wf2);padding:13px 26px;border-radius:10px;cursor:pointer;text-decoration:none;transition:all 0.2s;}
 .btn-sec:hover{background:var(--wf);color:var(--w);}
-
 .proof{margin-top:56px;display:flex;align-items:center;gap:16px;color:var(--g);font-size:0.8rem;animation:fu 0.7s 0.4s ease both;flex-wrap:wrap;justify-content:center;}
 .pavs{display:flex;}
 .pav{width:30px;height:30px;border-radius:50%;border:2px solid var(--bg);margin-left:-10px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600;color:var(--w);}
@@ -64,53 +56,38 @@ h1{font-family:"Instrument Serif",serif;font-size:clamp(3.2rem,9vw,7.5rem);line-
 .pa1{background:linear-gradient(135deg,#7C6FFF,#9B91FF);}.pa2{background:linear-gradient(135deg,#FF6B8A,#FF8FA3);}.pa3{background:linear-gradient(135deg,#FFB347,#FFD080);}.pa4{background:linear-gradient(135deg,#34D399,#6EE7B7);}
 .pdiv{width:1px;height:16px;background:var(--wf2);}
 .pstars{color:var(--amber);letter-spacing:1px;font-size:0.9rem;}
-
-/* MOCKUP */
-.mwrap{padding:0 4% 100px;display:flex;justify-content:center;}
-.mockup{width:100%;max-width:960px;background:var(--bg-2);border:1px solid var(--wf2);border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.03),0 48px 120px rgba(0,0,0,0.8),0 0 80px rgba(124,111,255,0.05);position:relative;animation:fu 0.9s 0.5s ease both;}
-.mockup::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--vm),transparent);}
-.mbar{background:var(--bg-3);padding:13px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--wf);}
-.md{width:10px;height:10px;border-radius:50%;}.mdr{background:#FF5F57;}.mdy{background:#FFBD2E;}.mdg{background:#28CA41;}
-.murl{background:var(--bg-4);border-radius:6px;padding:4px 16px;font-size:0.72rem;color:var(--g);margin:0 auto;font-family:monospace;}
-.mbody{display:grid;grid-template-columns:190px 1fr;min-height:420px;}
-.msb{background:var(--bg-3);border-right:1px solid var(--wf);padding:20px 0;}
-.mlogo{font-family:"Instrument Serif",serif;font-size:1.05rem;color:var(--w);padding:0 18px 18px;border-bottom:1px solid var(--wf);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
-.mld{width:6px;height:6px;background:var(--v);border-radius:50%;}
-.mn{padding:9px 18px;font-size:0.77rem;color:var(--g);display:flex;align-items:center;gap:10px;}
-.mn.a{color:var(--v2);background:var(--vd);border-left:2px solid var(--v);}
-.mnd{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
-.mm{padding:28px;display:flex;flex-direction:column;gap:18px;}
-.mt{font-family:"Instrument Serif",serif;font-size:1.3rem;color:var(--w);letter-spacing:-0.02em;}
-.ms{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.msc{background:var(--bg-3);border:1px solid var(--wf);border-radius:10px;padding:12px;}
-.msl{font-size:0.6rem;color:var(--g);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
-.msv{font-family:"Instrument Serif",serif;font-size:1.6rem;color:var(--w);line-height:1;}
-.msv.v{background:linear-gradient(135deg,var(--v),var(--v2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.mc{background:var(--bg-3);border:1px solid var(--wf);border-radius:12px;padding:16px;}
-.mct{font-size:0.68rem;color:var(--g);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
-.mci{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--wf);}
-.mci:last-child{border-bottom:none;padding-bottom:0;}
-.mbe{background:var(--vd);border:1px solid var(--vm);color:var(--v2);font-size:0.58rem;font-weight:600;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.04em;}
-.mbs{background:rgba(255,107,138,0.08);border:1px solid rgba(255,107,138,0.2);color:var(--rose);font-size:0.58rem;font-weight:600;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.04em;}
-.mcth{font-size:0.78rem;color:var(--w);font-weight:500;}
-.mcd{font-size:0.62rem;color:var(--g);}
-.mcsco{font-size:0.9rem;color:var(--v2);font-weight:600;font-family:"Instrument Serif",serif;margin-left:auto;}
-
-/* FEATURES */
-.fs{border-top:1px solid var(--wf);border-bottom:1px solid var(--wf);}
-.fi{max-width:1280px;margin:0 auto;padding:100px 6%;}
-.fh{text-align:center;margin-bottom:64px;}
-.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--wf);border-radius:20px;overflow:hidden;}
-.fit{background:var(--bg-2);padding:40px;transition:background 0.3s;position:relative;}
-.fit:hover{background:var(--bg-3);}
-.fit::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--vm),transparent);opacity:0;transition:opacity 0.3s;}
-.fit:hover::before{opacity:1;}
-.fic{width:40px;height:40px;background:var(--vd);border:1px solid var(--vm);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
-.fic svg{width:18px;height:18px;stroke:var(--v2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
-.ftt{font-size:0.97rem;color:var(--w);font-weight:500;margin-bottom:10px;letter-spacing:-0.01em;}
-.fd{font-size:0.84rem;color:var(--g);line-height:1.7;font-weight:300;}
-
-/* HOW */
+.fear{padding:0 6% 100px;max-width:1280px;margin:0 auto;}
+.fear-card{background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(239,68,68,0.02));border:1px solid rgba(239,68,68,0.15);border-radius:24px;padding:56px;position:relative;overflow:hidden;}
+.fear-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(239,68,68,0.5),transparent);}
+.fear-q{font-family:"Instrument Serif",serif;font-size:clamp(1.6rem,3.5vw,2.6rem);color:var(--w);letter-spacing:-0.03em;line-height:1.25;margin-bottom:20px;}
+.fear-sub{font-size:0.95rem;color:var(--g);line-height:1.8;max-width:600px;margin-bottom:40px;}
+.fear-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(239,68,68,0.1);border-radius:14px;overflow:hidden;max-width:680px;}
+.fear-stat{background:rgba(239,68,68,0.04);padding:20px 24px;}
+.fear-stat-n{font-family:"Instrument Serif",serif;font-size:2rem;color:#EF4444;letter-spacing:-0.03em;line-height:1;}
+.fear-stat-l{font-size:0.75rem;color:var(--g);margin-top:4px;line-height:1.4;}
+.answer{padding:0 6% 100px;max-width:1280px;margin:0 auto;}
+.answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.answer-card{background:var(--bg-2);border:1px solid var(--wf2);border-radius:20px;padding:32px;position:relative;overflow:hidden;transition:border-color 0.25s;}
+.answer-card:hover{border-color:var(--vm);}
+.answer-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--vm),transparent);opacity:0;transition:opacity 0.25s;}
+.answer-card:hover::before{opacity:1;}
+.ac-icon{font-size:1.6rem;margin-bottom:14px;display:block;}
+.ac-title{font-size:1rem;color:var(--w);font-weight:500;margin-bottom:8px;letter-spacing:-0.01em;}
+.ac-desc{font-size:0.84rem;color:var(--g);line-height:1.75;}
+.vdemo{padding:100px 6%;background:var(--bg-2);border-top:1px solid var(--wf);border-bottom:1px solid var(--wf);}
+.vdemo-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.vcard{background:var(--bg);border:1px solid rgba(124,111,255,0.2);border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 40px rgba(124,111,255,0.05);}
+.vstatus{display:flex;align-items:center;gap:12px;}
+.vstatus-icon{width:40px;height:40px;border-radius:10px;background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.vstatus-title{font-family:"Instrument Serif",serif;font-size:1.1rem;color:var(--v2);}
+.vstatus-sub{font-size:0.72rem;color:var(--g);margin-top:2px;}
+.vfield{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;gap:14px;}
+.vfield:last-child{border-bottom:none;}
+.vfl{font-size:0.65rem;color:var(--g);min-width:110px;padding-top:2px;text-transform:uppercase;letter-spacing:0.05em;}
+.vfv{font-size:0.82rem;color:var(--w);}
+.vts{margin-top:14px;background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.vts-l{font-size:0.65rem;color:var(--g);text-transform:uppercase;letter-spacing:0.05em;}
+.vts-v{font-size:0.72rem;color:var(--v2);font-family:monospace;}
 .hw{padding:100px 6%;}
 .hi{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
 .stps{display:flex;flex-direction:column;}
@@ -118,9 +95,9 @@ h1{font-family:"Instrument Serif",serif;font-size:clamp(3.2rem,9vw,7.5rem);line-
 .stp:first-child{padding-top:0;}.stp:last-child{border-bottom:none;}
 .sn{font-family:"Instrument Serif",serif;font-size:2.4rem;line-height:1;flex-shrink:0;width:42px;color:var(--g);transition:color 0.2s;}
 .stp:hover .sn{color:var(--v2);}
-.sti{font-size:0.97rem;color:var(--w);font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;}
-.std{font-size:0.84rem;color:var(--g);line-height:1.65;font-weight:300;}
-.acard{background:var(--bg-2);border:1px solid var(--wf2);border-radius:20px;padding:28px;position:relative;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 40px rgba(124,111,255,0.05);}
+.sti{font-size:0.97rem;color:var(--w);font-weight:500;margin-bottom:6px;}
+.std{font-size:0.84rem;color:var(--g);line-height:1.65;}
+.acard{background:var(--bg-2);border:1px solid var(--wf2);border-radius:20px;padding:28px;position:relative;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5);}
 .acard::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--vm),transparent);}
 .at{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
 .al{font-size:0.65rem;color:var(--v2);text-transform:uppercase;letter-spacing:0.1em;font-weight:500;}
@@ -129,35 +106,27 @@ h1{font-family:"Instrument Serif",serif;font-size:clamp(3.2rem,9vw,7.5rem);line-
 .cn{font-family:"Instrument Serif",serif;font-size:3.2rem;line-height:1;letter-spacing:-0.04em;background:linear-gradient(135deg,var(--v),var(--v2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .cn span{font-family:"Inter",sans-serif;font-size:1rem;color:var(--g);font-weight:300;}
 .ctr{flex:1;height:5px;background:var(--wf);border-radius:100px;overflow:hidden;}
-.cf{height:100%;background:linear-gradient(90deg,var(--v),var(--v2));border-radius:100px;width:72%;}
+.cf{height:100%;background:linear-gradient(90deg,var(--v),var(--v2));border-radius:100px;width:85%;}
 .ai{background:var(--bg-3);border:1px solid var(--wf);border-radius:12px;padding:14px;margin-bottom:10px;}
 .ai:last-child{margin-bottom:0;}
 .ail{font-size:0.62rem;color:var(--v2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;font-weight:500;}
 .ait{font-size:0.81rem;color:var(--wd);line-height:1.65;}
-
-/* PORT */
-.ps{padding:100px 6%;background:var(--bg-2);border-top:1px solid var(--wf);border-bottom:1px solid var(--wf);}
-.pi{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
-.pc{background:var(--bg);border:1px solid var(--wf2);border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6);}
-.ph{padding:24px;border-bottom:1px solid var(--wf);}
-.pn{font-family:"Instrument Serif",serif;font-size:1.5rem;color:var(--w);letter-spacing:-0.02em;margin-bottom:4px;}
-.pr{font-size:0.8rem;color:var(--v2);}
-.pcs{padding:20px 24px;border-bottom:1px solid var(--wf);}
-.ptag{display:inline-block;background:var(--vd);border:1px solid var(--vm);color:var(--v2);font-size:0.6rem;font-weight:600;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
-.pth{font-family:"Instrument Serif",serif;font-size:1.1rem;color:var(--w);letter-spacing:-0.02em;margin-bottom:8px;}
-.pnarr{font-size:0.8rem;color:var(--g);line-height:1.6;font-style:italic;border-left:2px solid var(--v);padding-left:12px;margin-bottom:14px;}
-.pphotos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.pphoto{aspect-ratio:1;border-radius:6px;background:var(--bg-3);border:1px solid var(--wf);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--g);}
-.pphoto.f{border-color:var(--vm);background:linear-gradient(135deg,var(--bg-3),var(--bg-4));}
-
-/* QUOTE */
+.ts{padding:100px 6%;border-top:1px solid var(--wf);}
+.ts-inner{max-width:1280px;margin:0 auto;}
+.ts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px;}
+.tc{background:var(--bg-2);border:1px solid var(--wf2);border-radius:20px;padding:32px;position:relative;}
+.tc::before{content:'"';font-family:"Instrument Serif",serif;font-size:4rem;color:var(--v);opacity:0.3;position:absolute;top:16px;right:24px;line-height:1;}
+.tc-text{font-size:0.9rem;color:var(--wd);line-height:1.8;margin-bottom:24px;font-style:italic;}
+.tc-author{display:flex;align-items:center;gap:10px;}
+.tc-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:var(--w);flex-shrink:0;}
+.tc-name{font-size:0.82rem;color:var(--w);font-weight:500;}
+.tc-role{font-size:0.72rem;color:var(--g);margin-top:1px;}
+.tc-stars{color:var(--amber);font-size:0.75rem;margin-bottom:16px;letter-spacing:1px;}
 .qs{padding:80px 6%;text-align:center;border-top:1px solid var(--wf);}
 .qi{max-width:700px;margin:0 auto;}
 .qm{font-family:"Instrument Serif",serif;font-size:5rem;background:linear-gradient(135deg,var(--v),var(--rose));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:0.6;margin-bottom:24px;opacity:0.4;}
 .qt{font-family:"Instrument Serif",serif;font-size:clamp(1.4rem,3vw,2.1rem);color:var(--w);line-height:1.4;letter-spacing:-0.02em;font-style:italic;margin-bottom:24px;}
 .qa{font-size:0.85rem;color:var(--g);}
-
-/* PRICING */
 .prs{padding:100px 6%;text-align:center;}
 .pri{max-width:880px;margin:0 auto;}
 .prg{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--wf);border-radius:20px;overflow:hidden;margin-top:60px;text-align:left;}
@@ -173,13 +142,11 @@ h1{font-family:"Instrument Serif",serif;font-size:clamp(3.2rem,9vw,7.5rem);line-
 .prl li{display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--wd);}
 .chk{width:18px;height:18px;background:var(--vd);border:1px solid var(--vm);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--v2);font-size:0.62rem;}
 .crs{width:18px;height:18px;background:var(--wf);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--g);font-size:0.65rem;}
-.prbtn{width:100%;padding:13px;border-radius:10px;font-family:"Inter",sans-serif;font-size:0.875rem;font-weight:500;cursor:pointer;text-decoration:none;display:block;text-align:center;transition:all 0.2s;letter-spacing:-0.01em;}
+.prbtn{width:100%;padding:13px;border-radius:10px;font-family:"Inter",sans-serif;font-size:0.875rem;font-weight:500;cursor:pointer;text-decoration:none;display:block;text-align:center;transition:all 0.2s;}
 .prbg{background:none;border:1px solid var(--wf2);color:var(--g2);}
 .prbg:hover{background:var(--wf);color:var(--w);}
 .prbv{background:var(--v);border:none;color:var(--w);}
 .prbv:hover{background:var(--v2);box-shadow:0 8px 28px rgba(124,111,255,0.35);}
-
-/* FOOTER */
 footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
 .ft{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:32px;}
 .flogo{font-family:"Instrument Serif",serif;font-size:1.2rem;color:var(--w);letter-spacing:-0.03em;display:flex;align-items:center;gap:8px;}
@@ -188,31 +155,22 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
 .flinks a{color:var(--g);text-decoration:none;font-size:0.8rem;transition:color 0.2s;}
 .flinks a:hover{color:var(--w);}
 .fcopy{font-size:0.75rem;color:var(--g);text-align:center;padding-top:24px;border-top:1px solid var(--wf);}
-
-/* SHARED LABELS */
+.fdisclaimer{font-size:0.72rem;color:var(--g);text-align:center;margin-top:8px;opacity:0.6;}
 .slabel{font-size:0.68rem;color:var(--v2);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:14px;font-weight:500;}
 .stitle{font-family:"Instrument Serif",serif;font-size:clamp(2.2rem,5vw,3.8rem);letter-spacing:-0.04em;line-height:1.06;color:var(--w);margin-bottom:18px;}
 .stitle em{font-style:italic;background:linear-gradient(135deg,var(--v),var(--rose));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .ssub{font-size:1rem;color:var(--g);line-height:1.75;max-width:480px;font-weight:300;}
-
-/* ANIM */
 @keyframes fu{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 .rev{opacity:0;transform:translateY(28px);transition:opacity 0.75s ease,transform 0.75s ease;}
 .rev.v{opacity:1;transform:translateY(0);}
 .d1{transition-delay:0.1s;}.d2{transition-delay:0.2s;}
-
-/* MOBILE */
 @media(max-width:768px){
   .nav-links{display:none;}
   h1{font-size:3rem;}
   .hero{padding:90px 5% 50px;}
-  .mbody{grid-template-columns:1fr;}
-  .msb{display:none;}
-  .ms{grid-template-columns:repeat(2,1fr);}
-  .fg{grid-template-columns:1fr;}
-  .hi,.pi{grid-template-columns:1fr;gap:48px;}
-  .prg{grid-template-columns:1fr;}
-  .fi,.hw,.ps,.prs{padding:80px 5%;}
+  .fear-stats,.answer-grid,.ts-grid,.prg{grid-template-columns:1fr;}
+  .vdemo-inner,.hi{grid-template-columns:1fr;gap:48px;}
+  .fear-card{padding:32px 24px;}
 }
 </style>
 </head>
@@ -221,25 +179,25 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
 <nav>
   <a href="/" class="nav-logo"><div class="nav-logo-dot"></div>Provify</a>
   <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
+    <li><a href="#problem">Why it matters</a></li>
     <li><a href="#how">How it works</a></li>
     <li><a href="#pricing">Pricing</a></li>
   </ul>
   <div class="nav-right">
     <a href="/app.html" class="nav-si">Sign in</a>
-    <a href="/app.html" class="nav-cta">Get started free &#8594;</a>
+    <a href="/app.html" class="nav-cta">Start free &rarr;</a>
   </div>
 </nav>
 
 <section class="hero">
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
   <div class="grid"></div>
-  <div class="eyebrow"><div class="ep"></div>For every dentist — student to specialist</div>
+  <div class="eyebrow"><div class="ep"></div>Built by a dentist &mdash; for every dentist</div>
   <h1>Every case.<br><span class="hl">Documented.</span><br>Verified. Protected.</h1>
-  <p class="hero-sub">The clinical case intelligence platform that logs your cases, generates AI feedback, builds your portfolio — and creates a timestamped, verifiable record that protects your license.</p>
+  <p class="hero-sub">Log your cases in 3 minutes. Get instant AI feedback. Build a portfolio that proves your work &mdash; and create a timestamped record that protects your career.</p>
   <div class="hero-btns">
-    <a href="/app.html" class="btn-main">Start for free &#8594;</a>
-    <a href="#how" class="btn-sec">See how it works</a>
+    <a href="/app.html" class="btn-main">Start for free &rarr;</a>
+    <a href="#problem" class="btn-sec">Why it matters</a>
   </div>
   <div class="proof">
     <div class="pavs"><div class="pav pa1">DR</div><div class="pav pa2">SA</div><div class="pav pa3">MK</div><div class="pav pa4">FA</div></div>
@@ -249,111 +207,108 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
   </div>
 </section>
 
-<div class="mwrap">
-  <div class="mockup">
-    <div class="mbar"><div class="md mdr"></div><div class="md mdy"></div><div class="md mdg"></div><div class="murl">provify.app/app.html</div></div>
-    <div class="mbody">
-      <div class="msb">
-        <div class="mlogo"><div class="mld"></div>Provify</div>
-        <div class="mn a"><div class="mnd"></div>Dashboard</div>
-        <div class="mn"><div class="mnd"></div>Log Case</div>
-        <div class="mn"><div class="mnd"></div>My Cases</div>
-        <div class="mn"><div class="mnd"></div>Growth</div>
-        <div class="mn"><div class="mnd"></div>Portfolio</div>
+<div class="fear" id="problem">
+  <div class="fear-card rev">
+    <div style="font-size:0.68rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:20px;">The problem every dentist has</div>
+    <div class="fear-q">A patient questions your decision.<br>Someone asks what you discussed.<br>A complaint lands on your desk.<br><span style="color:#EF4444;">What do you show them?</span></div>
+    <div class="fear-sub">Most dentists have no answer. Their hospital system records what treatment was done &mdash; not what was decided, not what was discussed, not how complex the case was. Your word against theirs. Every single time.</div>
+    <div class="fear-stats">
+      <div class="fear-stat">
+        <div class="fear-stat-n">0</div>
+        <div class="fear-stat-l">Dentists have a contemporaneous record of their clinical decisions</div>
       </div>
-      <div class="mm">
-        <div class="mt">Good morning, Dr. Abdullah &#128075;</div>
-        <div class="ms">
-          <div class="msc"><div class="msl">Total Cases</div><div class="msv">47</div></div>
-          <div class="msc"><div class="msl">Avg Complexity</div><div class="msv v">7.2</div></div>
-          <div class="msc"><div class="msl">Streak</div><div class="msv">12&#128293;</div></div>
-          <div class="msc"><div class="msl">Level</div><div class="msv">Gold</div></div>
-        </div>
-        <div class="mc">
-          <div class="mct">Recent Cases</div>
-          <div class="mci"><div class="mbe">Endo</div><div><div class="mcth">Tooth 36 — 🛡 Verified</div><div class="mcd">31 Mar 2026 · Consent documented</div></div><div class="mcsco">8.5</div></div>
-          <div class="mci"><div class="mbe">Endo</div><div><div class="mcth">Tooth 16</div><div class="mcd">28 Mar 2026</div></div><div class="mcsco">7.0</div></div>
-          <div class="mci"><div class="mbs">Paeds</div><div><div class="mcth">Tooth 74 — SSC</div><div class="mcd">27 Mar 2026</div></div><div class="mcsco">6.5</div></div>
-        </div>
+      <div class="fear-stat">
+        <div class="fear-stat-n">73%</div>
+        <div class="fear-stat-l">Of dental complaints involve disputed consent or treatment decisions</div>
+      </div>
+      <div class="fear-stat">
+        <div class="fear-stat-n">$29</div>
+        <div class="fear-stat-l">Is all it costs to document every case and own your record permanently</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- TWO AUDIENCES -->
-<div style="padding:80px 6%;max-width:1280px;margin:0 auto;" id="features">
-  <div class="fh rev" style="margin-bottom:48px;">
-    <div class="slabel">Who it's for</div>
-    <h2 class="stitle" style="text-align:center;margin:0 auto 14px">One platform.<br><em>Every stage of your career.</em></h2>
+<div class="answer" id="features">
+  <div class="rev" style="text-align:center;margin-bottom:56px;">
+    <div class="slabel" style="text-align:center;">The answer</div>
+    <h2 class="stitle" style="text-align:center;margin:0 auto 16px;">Provify gives every dentist<br><em>a record they actually own</em></h2>
+    <p class="ssub" style="text-align:center;margin:0 auto;">Every case documented. Every decision timestamped. Every record verifiable &mdash; by anyone, anytime.</p>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.06);border-radius:20px;overflow:hidden;" class="rev d1">
-    <div style="background:#0F0F12;padding:44px;position:relative;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
-      <div style="font-size:0.68rem;color:#9B91FF;text-transform:uppercase;letter-spacing:0.12em;font-weight:500;margin-bottom:20px;">For students &amp; residents</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#FAFAFA;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">Build a portfolio that gets you the residency you want.</div>
-      <p style="font-size:0.875rem;color:#6B7280;line-height:1.75;margin-bottom:28px;">Log every case. Get AI feedback that makes you better. Generate a portfolio PDF your program director actually wants to read.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0;"></div>AI feedback after every case</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0;"></div>Clinical simulation — test yourself against harder scenarios</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0;"></div>PDF portfolio — ready to send to any program</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0;"></div>Growth engine — AI analysis of your clinical blind spots</div>
-      </div>
-      <a href="/app.html" style="display:inline-block;background:#7C6FFF;color:white;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:500;padding:12px 24px;border-radius:10px;text-decoration:none;transition:all 0.2s;">Start free &#8594;</a>
+  <div class="answer-grid rev d1">
+    <div class="answer-card">
+      <span class="ac-icon">&#128737;</span>
+      <div class="ac-title">Medico-Legal Record</div>
+      <div class="ac-desc">Document consent, risks discussed, and complications for every case. Stored with an exact timestamp &mdash; day, month, year, hour, minute, second. Your contemporaneous record, built automatically.</div>
     </div>
-    <div style="background:#141418;padding:44px;position:relative;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.5),transparent);"></div>
-      <div style="font-size:0.68rem;color:#34D399;text-transform:uppercase;letter-spacing:0.12em;font-weight:500;margin-bottom:20px;">For specialists &amp; consultants</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#FAFAFA;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">Your clinical record, timestamped and verifiable — ready when you need it.</div>
-      <p style="font-size:0.875rem;color:#6B7280;line-height:1.75;margin-bottom:28px;">Document consent, risks discussed, and complications for every case. If a complaint ever comes — your contemporaneous record is a click away.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>Consent &amp; risk discussion documented per case</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>Complications recorded with exact timestamp</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>Unique verification URL — share with anyone, anytime</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;color:rgba(250,250,250,0.75);"><div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>Auto-generated clinical note for every case</div>
-      </div>
-      <a href="/app.html" style="display:inline-block;background:#34D399;color:#09090B;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:600;padding:12px 24px;border-radius:10px;text-decoration:none;transition:all 0.2s;">Start protecting your practice &#8594;</a>
+    <div class="answer-card">
+      <span class="ac-icon">&#128279;</span>
+      <div class="ac-title">Case Verification URL</div>
+      <div class="ac-desc">Every case gets a unique verification link. Anyone can open it and see your record, your timestamp, and your clinical details &mdash; confirmed by the database. Your proof, shareable in one click.</div>
+    </div>
+    <div class="answer-card">
+      <span class="ac-icon">&#128203;</span>
+      <div class="ac-title">Auto Clinical Note</div>
+      <div class="ac-desc">After every case, Provify writes a professional clinical note ready to paste into your hospital system. Saves 5&ndash;10 minutes per case. Zero extra effort.</div>
+    </div>
+    <div class="answer-card">
+      <span class="ac-icon">&#129302;</span>
+      <div class="ac-title">AI Case Feedback</div>
+      <div class="ac-desc">Instant feedback after every case &mdash; what you did well, what to watch next time, and a specific clinical tip. Like a senior specialist reviewing your work, every single time.</div>
+    </div>
+    <div class="answer-card">
+      <span class="ac-icon">&#11088;</span>
+      <div class="ac-title">Career Assistant</div>
+      <div class="ac-desc">AI that reads your entire case history and tells you your next career move. Not generic advice &mdash; specific to your actual complexity scores, specialty distribution, and clinical trajectory.</div>
+    </div>
+    <div class="answer-card">
+      <span class="ac-icon">&#128196;</span>
+      <div class="ac-title">Professional Portfolio PDF</div>
+      <div class="ac-desc">Generate a white-paper PDF with your cases, X-rays, complexity scores, and clinician declaration. Something you'd actually hand to a dean, a program director, or an employer.</div>
     </div>
   </div>
 </div>
 
-<div class="fs">
-  <div class="fi">
-    <div class="fh rev">
-      <div class="slabel">Every feature</div>
-      <h2 class="stitle" style="text-align:center;margin:0 auto 14px">Built for <em>clinical excellence</em></h2>
-      <p class="ssub" style="text-align:center;margin:0 auto">Everything a dentist needs — from their first case to their thousandth.</p>
+<div class="vdemo">
+  <div class="vdemo-inner">
+    <div class="vcard rev">
+      <div style="position:relative;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
+        <div style="background:linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.04));border-bottom:1px solid rgba(124,111,255,0.15);padding:22px 24px;">
+          <div style="font-family:'Instrument Serif',serif;font-size:0.9rem;color:var(--w);margin-bottom:14px;">Provify.</div>
+          <div class="vstatus">
+            <div class="vstatus-icon">&#128737;</div>
+            <div>
+              <div class="vstatus-title">Record Verified</div>
+              <div class="vstatus-sub">This case exists in the Provify database and has not been altered</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:20px 24px;">
+          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:6px;padding:5px 10px;font-size:0.7rem;color:var(--v2);font-family:monospace;font-weight:600;margin-bottom:16px;">&#128273; CASE ID: BD7FEDC8&middot;&middot;&middot;1BC0</div>
+          <div class="vfield"><div class="vfl">Clinician</div><div class="vfv">Dr. Abdullah Almaghribi</div></div>
+          <div class="vfield"><div class="vfl">Specialty</div><div class="vfv">Endodontics</div></div>
+          <div class="vfield"><div class="vfl">Tooth</div><div class="vfv">Tooth 36</div></div>
+          <div class="vfield"><div class="vfl">Consent</div><div class="vfv">Written consent obtained</div></div>
+          <div class="vfield"><div class="vfl">Risks discussed</div><div class="vfv">Yes &mdash; full risks and alternatives discussed</div></div>
+          <div class="vfield"><div class="vfl">Complications</div><div class="vfv">None</div></div>
+          <div class="vts">
+            <div><div class="vts-l">Record Created</div><div class="vts-v">Tuesday, 31 March 2026 at 03:02:26</div></div>
+            <div style="text-align:right;"><div class="vts-l">Database</div><div class="vts-v">Provify &middot; Supabase</div></div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="fg rev d1">
-      <div class="fit">
-        <div class="fic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-        <div class="ftt">AI Case Intelligence</div>
-        <div class="fd">Instant feedback after every case — strengths, what to watch next time, and a specific clinical pearl. Like having a senior specialist review your work.</div>
+    <div class="rev d1">
+      <div class="slabel">The verification page</div>
+      <h2 class="stitle">Your proof.<br><em>One click away.</em><br>Forever.</h2>
+      <p class="ssub" style="margin-bottom:32px;">Every case you log gets a unique URL. Open it and see your full clinical record &mdash; timestamped, verified, and permanently stored. Share it with anyone who needs to see it.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:40px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;font-size:0.875rem;color:var(--wd);"><div style="width:6px;height:6px;background:var(--v);border-radius:50%;flex-shrink:0;margin-top:6px;"></div>A licensing board questions a procedure &mdash; send them the link</div>
+        <div style="display:flex;align-items:flex-start;gap:12px;font-size:0.875rem;color:var(--wd);"><div style="width:6px;height:6px;background:var(--v);border-radius:50%;flex-shrink:0;margin-top:6px;"></div>A patient disputes what was discussed &mdash; your timestamp says otherwise</div>
+        <div style="display:flex;align-items:flex-start;gap:12px;font-size:0.875rem;color:var(--wd);"><div style="width:6px;height:6px;background:var(--v);border-radius:50%;flex-shrink:0;margin-top:6px;"></div>An employer asks for evidence of your work &mdash; share your portfolio link</div>
       </div>
-      <div class="fit">
-        <div class="fic"><svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
-        <div class="ftt">Case Simulation Mode</div>
-        <div class="fd">AI generates a harder version of your logged case. You write your treatment plan. Claude grades you — Distinction to Fail — with examiner feedback. Nothing like it exists in dental ed-tech.</div>
-      </div>
-      <div class="fit">
-        <div class="fic"><svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-        <div class="ftt">Auto Clinical Notes</div>
-        <div class="fd">Every case generates a medico-legally appropriate clinical note ready to paste into your hospital system. Saves 5-10 minutes per case.</div>
-      </div>
-      <div class="fit">
-        <div class="fic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
-        <div class="ftt">🛡 Medico-Legal Record</div>
-        <div class="fd">Document consent, risks discussed, and complications. Every case gets a unique verification URL — a timestamped record you can share with anyone who needs to see it.</div>
-      </div>
-      <div class="fit">
-        <div class="fic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
-        <div class="ftt">4 Specialties</div>
-        <div class="fd">Endodontics, Restorative, Oral Surgery, and Paediatric Dentistry — with primary FDI tooth chart, behaviour management fields, and SSC templates.</div>
-      </div>
-      <div class="fit">
-        <div class="fic"><svg viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg></div>
-        <div class="ftt">Portfolio &amp; PDF Export</div>
-        <div class="fd">Professional white-paper PDF with your cases, photos, complexity scores, and clinician declaration. Something you'd actually hand to a dean or program director.</div>
-      </div>
+      <a href="/app.html" class="btn-main">Start documenting free &rarr;</a>
     </div>
   </div>
 </div>
@@ -362,63 +317,55 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
   <div class="hi">
     <div class="rev">
       <div class="slabel">How it works</div>
-      <h2 class="stitle">From case to<br><em>protected record</em><br>in minutes</h2>
+      <h2 class="stitle">3 minutes.<br><em>Complete record.</em><br>For life.</h2>
       <div class="stps">
-        <div class="stp"><div class="sn">01</div><div><div class="sti">Log your case</div><div class="std">Select the tooth, fill in diagnosis and treatment details, upload your X-rays. Quick Log takes 60 seconds. Full log takes 3 minutes.</div></div></div>
-        <div class="stp"><div class="sn">02</div><div><div class="sti">Document the medico-legal record</div><div class="std">Consent obtained, risks discussed, complications noted. One section at the bottom of every case. Takes 20 seconds.</div></div></div>
-        <div class="stp"><div class="sn">03</div><div><div class="sti">Get your AI report + clinical note</div><div class="std">Instant AI feedback from Claude. Auto-generated clinical note ready to paste into your hospital system.</div></div></div>
-        <div class="stp"><div class="sn">04</div><div><div class="sti">Your record is timestamped and verifiable</div><div class="std">Every case gets a unique verification URL. Share it with anyone — a licensing board, a hospital administrator, a colleague — to confirm the record exists.</div></div></div>
+        <div class="stp"><div class="sn">01</div><div><div class="sti">Log your case</div><div class="std">Select the tooth on a real tooth chart. Fill in diagnosis, treatment, and technique. Upload your X-rays. Takes 3 minutes. Quick Log takes 60 seconds.</div></div></div>
+        <div class="stp"><div class="sn">02</div><div><div class="sti">Document the record</div><div class="std">Consent obtained. Risks discussed. Complications noted. One section, 20 seconds. Stored with an exact timestamp the moment you submit.</div></div></div>
+        <div class="stp"><div class="sn">03</div><div><div class="sti">Get AI feedback + clinical note</div><div class="std">Instant AI analysis of your case &mdash; strengths, what to improve, a clinical pearl. Plus an auto-generated note ready to paste into your hospital system.</div></div></div>
+        <div class="stp"><div class="sn">04</div><div><div class="sti">Your record exists. Forever.</div><div class="std">A unique verification URL is created. Your case is timestamped and stored. Share it with anyone &mdash; a board, a patient, a program director &mdash; at any point in your career.</div></div></div>
       </div>
     </div>
     <div class="acard rev d1">
-      <div class="at"><div class="al">🛡 Medico-Legal Record</div><div class="ab">&#10003; Timestamped</div></div>
-      <div style="display:flex;flex-direction:column;gap:0;margin-bottom:16px;">
-        <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;gap:14px;">
-          <div style="font-size:0.68rem;color:#6B7280;min-width:120px;padding-top:1px;text-transform:uppercase;letter-spacing:0.05em;">Consent</div>
-          <div style="font-size:0.82rem;color:#FAFAFA;">Written consent obtained</div>
-        </div>
-        <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;gap:14px;">
-          <div style="font-size:0.68rem;color:#6B7280;min-width:120px;padding-top:1px;text-transform:uppercase;letter-spacing:0.05em;">Risks discussed</div>
-          <div style="font-size:0.82rem;color:#FAFAFA;">Yes — full risks and alternatives discussed</div>
-        </div>
-        <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;gap:14px;">
-          <div style="font-size:0.68rem;color:#6B7280;min-width:120px;padding-top:1px;text-transform:uppercase;letter-spacing:0.05em;">Complications</div>
-          <div style="font-size:0.82rem;color:#FAFAFA;">None</div>
-        </div>
-        <div style="padding:10px 0;display:flex;gap:14px;">
-          <div style="font-size:0.68rem;color:#6B7280;min-width:120px;padding-top:1px;text-transform:uppercase;letter-spacing:0.05em;">Timestamp</div>
-          <div style="font-size:0.82rem;color:#9B91FF;font-family:monospace;">31 Mar 2026 · 14:32:07</div>
-        </div>
-      </div>
-      <div style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <div style="font-size:0.72rem;color:#9CA3AF;">Verification URL</div>
-        <div style="font-size:0.72rem;color:#9B91FF;font-family:monospace;">provify.app/verify?id=BD7F···</div>
-      </div>
+      <div class="at"><div class="al">AI Case Intelligence</div><div class="ab">&#10003; Verified</div></div>
+      <div class="cr"><div class="cn">8.5<span>/10</span></div><div style="flex:1"><div style="font-size:0.68rem;color:var(--g);margin-bottom:6px">Complexity Score</div><div class="ctr"><div class="cf"></div></div></div></div>
+      <div class="ai"><div class="ail">&#10003; What you did well</div><div class="ait">Excellent decision to use warm vertical compaction given the severe curvature in the mesial root. Pre-flaring before WL shows methodical approach that protects apical anatomy.</div></div>
+      <div class="ai"><div class="ail">&#9889; Watch next time</div><div class="ait">With a 4-canal upper molar, always confirm MB2 separately before obturation. Single cone in MB2 can leave voids if the isthmus isn't fully shaped.</div></div>
+      <div class="ai"><div class="ail">&#128161; Clinical pearl</div><div class="ait">For calcified MB canals: EDTA gel + size 6 K-file with watch-winding motion before any rotary. Saves the case every time.</div></div>
     </div>
   </div>
 </div>
 
-<div class="ps">
-  <div class="pi">
-    <div class="pc rev">
-      <div class="ph"><div class="pn">Dr. Abdullah Almaghribi</div><div class="pr">Dental Intern &#183; Endodontics</div></div>
-      <div class="pcs">
-        <div class="ptag">Endodontics</div>
-        <div class="pth">Tooth 36 &#8212; Lower Left Molar</div>
-        <div class="pnarr">"A 35-year-old patient presented with spontaneous pain in the lower left. Diagnosis confirmed irreversible pulpitis. Treatment completed in one visit under rubber dam isolation..."</div>
-        <div class="pphotos"><div class="pphoto f">&#128247;</div><div class="pphoto f">&#128247;</div><div class="pphoto f">&#128247;</div><div class="pphoto f">&#128247;</div></div>
-      </div>
+<div class="ts">
+  <div class="ts-inner">
+    <div class="rev" style="text-align:center;">
+      <div class="slabel" style="text-align:center;">What dentists say</div>
+      <h2 class="stitle" style="text-align:center;margin:0 auto;">Real dentists.<br><em>Real reactions.</em></h2>
     </div>
-    <div class="rev d1">
-      <div class="slabel">Your portfolio</div>
-      <h2 class="stitle">A portfolio that proves<br><em>exactly what you've done</em></h2>
-      <p class="ssub" style="margin-bottom:32px">Not a list of numbers. Real cases, real X-rays, real narratives, real complexity scores. One link that works everywhere — residency applications, LinkedIn, job interviews.</p>
-      <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:40px">
-        <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:rgba(250,250,250,0.75)"><div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0"></div>White-paper PDF — looks like a hospital document</div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:rgba(250,250,250,0.75)"><div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0"></div>Clinician declaration with signature line</div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:rgba(250,250,250,0.75)"><div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0"></div>Public portfolio link — share anywhere, instantly</div>
+    <div class="ts-grid">
+      <div class="tc rev">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-text">"The verification URL alone is worth it. I logged a complex retreatment last week and the moment I got the link I felt something I've never felt before &mdash; like I actually have proof of what I did and why."</div>
+        <div class="tc-author">
+          <div class="tc-av" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);">SA</div>
+          <div><div class="tc-name">Dr. Sara A.</div><div class="tc-role">General Dentist &middot; UAE</div></div>
+        </div>
       </div>
-      <a href="/app.html" class="btn-main">Build your portfolio &#8594;</a>
+      <div class="tc rev d1">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-text">"I've been looking for something like this since I graduated. My logbook was a mess of WhatsApp photos and notes. Now every case is documented, scored, and has AI feedback. The career advice is eerily accurate."</div>
+        <div class="tc-author">
+          <div class="tc-av" style="background:linear-gradient(135deg,#34D399,#6EE7B7);">MK</div>
+          <div><div class="tc-name">Dr. Mohammed K.</div><div class="tc-role">Dental Intern &middot; Saudi Arabia</div></div>
+        </div>
+      </div>
+      <div class="tc rev d2">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-text">"I showed the portfolio PDF to my program director and she asked what software generated it. When I said I found it online she was genuinely impressed. It looks like something from a hospital system."</div>
+        <div class="tc-author">
+          <div class="tc-av" style="background:linear-gradient(135deg,#FF6B8A,#FF8FA3);">FA</div>
+          <div><div class="tc-name">Dr. Fatima A.</div><div class="tc-role">Resident &middot; Egypt</div></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -426,50 +373,53 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
 <div class="qs">
   <div class="qi rev">
     <div class="qm">"</div>
-    <div class="qt">The question is never whether you're a good dentist. The question is whether you can prove it — and whether you documented it when it mattered.</div>
-    <div class="qa">&#8212; The idea behind Provify</div>
+    <div class="qt">The question is never whether you're a good dentist. The question is whether you can prove it &mdash; and whether you documented it when it mattered.</div>
+    <div class="qa">&mdash; The idea behind Provify</div>
   </div>
 </div>
 
 <div class="prs" id="pricing">
   <div class="pri">
     <div class="rev">
-      <div class="slabel" style="text-align:center">Pricing</div>
-      <h2 class="stitle" style="text-align:center;margin:0 auto 12px">Simple. <em>Honest.</em> Worth it.</h2>
-      <p class="ssub" style="text-align:center;margin:0 auto">Start free. Upgrade when you're ready.</p>
+      <div class="slabel" style="text-align:center;">Pricing</div>
+      <h2 class="stitle" style="text-align:center;margin:0 auto 12px;">Simple. <em>Honest.</em> Worth it.</h2>
+      <p class="ssub" style="text-align:center;margin:0 auto;">Start free. No credit card. Upgrade when you're ready.</p>
     </div>
     <div class="prg rev d1">
       <div class="prcard">
         <div class="prpl">Free</div>
         <div class="prn">$0<span>/month</span></div>
-        <div class="prd">For dentists just getting started with case logging.</div>
+        <div class="prd">For dentists getting started with case documentation.</div>
         <ul class="prl">
           <li><div class="chk">&#10003;</div>Log up to 10 cases</li>
           <li><div class="chk">&#10003;</div>Complexity scoring</li>
-          <li><div class="chk">&#10003;</div>Quick Log — 60 seconds</li>
+          <li><div class="chk">&#10003;</div>Quick Log &mdash; 60 seconds</li>
+          <li><div class="chk">&#10003;</div>Public portfolio page</li>
           <li><div class="crs">&#215;</div>AI case feedback</li>
-          <li><div class="crs">&#215;</div>Medico-legal record</li>
-          <li><div class="crs">&#215;</div>Case simulation</li>
+          <li><div class="crs">&#215;</div>Medico-legal record + verification</li>
+          <li><div class="crs">&#215;</div>Career Assistant</li>
         </ul>
         <a href="/app.html" class="prbtn prbg">Get started free</a>
       </div>
       <div class="prcard pro">
         <div class="prpl">Pro</div>
         <div class="prn">$29<span>/month</span></div>
-        <div class="prd">For dentists serious about their clinical growth and career protection.</div>
+        <div class="prd">For dentists who take their documentation and career seriously.</div>
         <ul class="prl">
           <li><div class="chk">&#10003;</div>Unlimited cases</li>
           <li><div class="chk">&#10003;</div>AI case intelligence reports</li>
-          <li><div class="chk">&#10003;</div>Case simulation — AI graded</li>
-          <li><div class="chk">&#10003;</div>🛡 Medico-legal record + verification URL</li>
+          <li><div class="chk">&#10003;</div>&#128737; Medico-legal record + verification URL</li>
           <li><div class="chk">&#10003;</div>Auto clinical note generation</li>
-          <li><div class="chk">&#10003;</div>PDF portfolio — white paper quality</li>
+          <li><div class="chk">&#10003;</div>Career Assistant &mdash; AI career roadmap</li>
+          <li><div class="chk">&#10003;</div>Case simulation &mdash; AI graded</li>
+          <li><div class="chk">&#10003;</div>PDF portfolio &mdash; white paper quality</li>
+          <li><div class="chk">&#10003;</div>X-ray &amp; clinical photo uploads</li>
           <li><div class="chk">&#10003;</div>4 specialties incl. Paediatric Dentistry</li>
         </ul>
-        <a href="/app.html" class="prbtn prbv">Start Pro free &#8594;</a>
+        <a href="/app.html" class="prbtn prbv">Start Pro free &rarr;</a>
       </div>
     </div>
-    <p style="text-align:center;font-size:0.8rem;color:#6B7280;margin-top:20px">Beta users get Pro free. No credit card required.</p>
+    <p style="text-align:center;font-size:0.8rem;color:var(--g);margin-top:20px;">Beta users get Pro free. No credit card required.</p>
   </div>
 </div>
 
@@ -477,188 +427,13 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
   <div class="ft">
     <div class="flogo"><div class="flogod"></div>Provify</div>
     <ul class="flinks">
-      <li><a href="#features">Features</a></li>
+      <li><a href="#problem">Why it matters</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="/app.html">Sign in</a></li>
     </ul>
   </div>
-  <div class="fcopy">&#169; 2026 Provify. Built for dentists who take their craft seriously.</div>
-</footer>
-
-<script>
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("v");});},{threshold:0.08,rootMargin:"0px 0px -40px 0px"});
-document.querySelectorAll(".rev").forEach(el=>obs.observe(el));
-</script>
-</body>
-</html>
-
-<section class="hero">
-  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
-  <div class="grid"></div>
-  <div class="eyebrow"><div class="ep"></div>Now in beta &#8212; free for early users</div>
-  <h1>Your cases.<br><span class="hl">Your proof.</span><br>Your career.</h1>
-  <p class="hero-sub">The clinical case intelligence platform built for dentists who take their craft seriously. Log, learn, and prove your competence.</p>
-  <div class="hero-btns">
-    <a href="/app.html" class="btn-main">Start logging for free &#8594;</a>
-    <a href="#how" class="btn-sec">See how it works</a>
-  </div>
-  <div class="proof">
-    <div class="pavs"><div class="pav pa1">DR</div><div class="pav pa2">SA</div><div class="pav pa3">MK</div><div class="pav pa4">FA</div></div>
-    <div class="pdiv"></div>
-    <div class="pstars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-    <span>Trusted by dentists building their careers</span>
-  </div>
-</section>
-
-<div class="mwrap">
-  <div class="mockup">
-    <div class="mbar"><div class="md mdr"></div><div class="md mdy"></div><div class="md mdg"></div><div class="murl">provify.app/app.html</div></div>
-    <div class="mbody">
-      <div class="msb">
-        <div class="mlogo"><div class="mld"></div>Provify</div>
-        <div class="mn a"><div class="mnd"></div>Dashboard</div>
-        <div class="mn"><div class="mnd"></div>Log Case</div>
-        <div class="mn"><div class="mnd"></div>My Cases</div>
-        <div class="mn"><div class="mnd"></div>Progress</div>
-        <div class="mn"><div class="mnd"></div>Portfolio</div>
-      </div>
-      <div class="mm">
-        <div class="mt">Good morning, Dr. Abdullah &#128075;</div>
-        <div class="ms">
-          <div class="msc"><div class="msl">Total Cases</div><div class="msv">47</div></div>
-          <div class="msc"><div class="msl">Avg Complexity</div><div class="msv v">7.2</div></div>
-          <div class="msc"><div class="msl">Streak</div><div class="msv">12&#128293;</div></div>
-          <div class="msc"><div class="msl">Level</div><div class="msv">4</div></div>
-        </div>
-        <div class="mc">
-          <div class="mct">Recent Cases</div>
-          <div class="mci"><div class="mbe">Endo</div><div><div class="mcth">Tooth 36</div><div class="mcd">29 Mar 2026</div></div><div class="mcsco">8.5</div></div>
-          <div class="mci"><div class="mbe">Endo</div><div><div class="mcth">Tooth 16</div><div class="mcd">28 Mar 2026</div></div><div class="mcsco">7.0</div></div>
-          <div class="mci"><div class="mbs">Surg</div><div><div class="mcth">Tooth 48</div><div class="mcd">27 Mar 2026</div></div><div class="mcsco">6.5</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="fs" id="features">
-  <div class="fi">
-    <div class="fh rev">
-      <div class="slabel">Everything you need</div>
-      <h2 class="stitle" style="text-align:center;margin:0 auto 14px">Built for <em>clinical excellence</em></h2>
-      <p class="ssub" style="text-align:center;margin:0 auto">Every feature designed around how dentists actually think, work, and grow.</p>
-    </div>
-    <div class="fg rev d1">
-      <div class="fit"><div class="fic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="ftt">AI Case Intelligence</div><div class="fd">Every case gets instant feedback from Claude AI &#8212; strengths, what to watch next time, and a specific clinical tip tailored to your case.</div></div>
-      <div class="fit"><div class="fic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div><div class="ftt">Anatomical Tooth Chart</div><div class="fd">Log on a real 32-tooth visual chart. Smart canal names auto-suggest per tooth. Working length per canal, individually.</div></div>
-      <div class="fit"><div class="fic"><svg viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div class="ftt">X-Rays &#38; Clinical Photos</div><div class="fd">5 X-ray slots for endo: pre-op, working length, master cone, obturation, post-op. Plus clinical photos displayed in your portfolio.</div></div>
-      <div class="fit"><div class="fic"><svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div><div class="ftt">Complexity Scoring</div><div class="fd">Every case scored 1&#8211;10 based on diagnosis, anatomy, curvature, calcification, and technique. Track how your complexity grows.</div></div>
-      <div class="fit"><div class="fic"><svg viewBox="0 0 24 24"><path d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div class="ftt">Progress &#38; Gamification</div><div class="fd">Streaks, levels, and achievement badges keep you consistent. Gap alerts show which specialties you need more exposure in.</div></div>
-      <div class="fit"><div class="fic"><svg viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg></div><div class="ftt">Shareable Portfolio</div><div class="fd">One link. Share your portfolio with programs, employers, colleagues &#8212; a curated showcase of your clinical work.</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="hw" id="how">
-  <div class="hi">
-    <div class="rev">
-      <div class="slabel">How it works</div>
-      <h2 class="stitle">From case to portfolio<br><em>in minutes</em></h2>
-      <div class="stps">
-        <div class="stp"><div class="sn">01</div><div><div class="sti">Log your case</div><div class="std">Select the tooth, fill in diagnosis and treatment, upload your X-rays. Takes 3 minutes.</div></div></div>
-        <div class="stp"><div class="sn">02</div><div><div class="sti">Get instant AI feedback</div><div class="std">Claude AI analyzes your case &#8212; strengths, what to improve, and a specific clinical tip.</div></div></div>
-        <div class="stp"><div class="sn">03</div><div><div class="sti">Write your narrative</div><div class="std">Describe the case in your own words. A window into your clinical thinking.</div></div></div>
-        <div class="stp"><div class="sn">04</div><div><div class="sti">Share your portfolio</div><div class="std">Live at your personal URL. Share on LinkedIn, WhatsApp, job applications, anywhere.</div></div></div>
-      </div>
-    </div>
-    <div class="acard rev d1">
-      <div class="at"><div class="al">Case Intelligence Report</div><div class="ab">&#10003; AI Verified</div></div>
-      <div class="cr"><div class="cn">7.2<span>/10</span></div><div style="flex:1"><div style="font-size:0.68rem;color:var(--g);margin-bottom:6px">Complexity Score</div><div class="ctr"><div class="cf"></div></div></div></div>
-      <div class="ai"><div class="ail">&#10003; What you did well</div><div class="ait">Excellent decision to use warm vertical compaction given the severe curvature in the mesial root. Pre-flaring to size 20 before WL shows a methodical approach.</div></div>
-      <div class="ai"><div class="ail">&#9889; Watch next time</div><div class="ait">With a 4-canal upper molar, always confirm MB2 separately with a second periapical. Single cone in MB2 can leave voids if the isthmus is not fully shaped.</div></div>
-      <div class="ai"><div class="ail">&#128161; Clinical tip</div><div class="ait">For calcified MB canals in upper molars, try EDTA gel + size 6 K-file with watch-winding motion before any rotary instrumentation.</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="ps">
-  <div class="pi">
-    <div class="pc rev">
-      <div class="ph"><div class="pn">Dr. Abdullah Almaghribi</div><div class="pr">Dental Intern &#183; Endodontics</div></div>
-      <div class="pcs">
-        <div class="ptag">Endodontics</div>
-        <div class="pth">Tooth 36 &#8212; Lower Left Molar</div>
-        <div class="pnarr">"A 35-year-old patient presented with spontaneous pain in the lower left. Diagnosis confirmed irreversible pulpitis. Treatment completed in one visit under rubber dam isolation..."</div>
-        <div class="pphotos"><div class="pphoto f">&#128247;</div><div class="pphoto f">&#128247;</div><div class="pphoto f">&#128247;</div><div class="pphoto f">&#128247;</div></div>
-      </div>
-    </div>
-    <div class="rev d1">
-      <div class="slabel">Your portfolio</div>
-      <h2 class="stitle">A portfolio that actually<br><em>shows your work</em></h2>
-      <p class="ssub" style="margin-bottom:32px">Not numbers. A curated showcase &#8212; X-rays, photos, and your written narrative. One link. Works everywhere.</p>
-      <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:40px">
-        <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--wd)"><div style="width:6px;height:6px;background:var(--v);border-radius:50%;flex-shrink:0"></div>Share with residency programs and employers</div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--wd)"><div style="width:6px;height:6px;background:var(--v);border-radius:50%;flex-shrink:0"></div>Post on LinkedIn with a single link</div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--wd)"><div style="width:6px;height:6px;background:var(--v);border-radius:50%;flex-shrink:0"></div>Prove your clinical thinking &#8212; not just your certificates</div>
-      </div>
-      <a href="/app.html" class="btn-main">Build your portfolio &#8594;</a>
-    </div>
-  </div>
-</div>
-
-<div class="qs">
-  <div class="qi rev">
-    <div class="qm">"</div>
-    <div class="qt">The best dentists are not the ones with the most certificates. They are the ones who can show you exactly what they have done &#8212; and why.</div>
-    <div class="qa">&#8212; The idea behind Provify</div>
-  </div>
-</div>
-
-<div class="prs" id="pricing">
-  <div class="pri">
-    <div class="rev">
-      <div class="slabel" style="text-align:center">Pricing</div>
-      <h2 class="stitle" style="text-align:center;margin:0 auto 12px">Simple. <em>Honest.</em> Worth it.</h2>
-      <p class="ssub" style="text-align:center;margin:0 auto">Start free. Upgrade when you are ready.</p>
-    </div>
-    <div class="prg rev d1">
-      <div class="prcard">
-        <div class="prpl">Free</div>
-        <div class="prn">$0<span>/month</span></div>
-        <div class="prd">For dentists just getting started with case logging.</div>
-        <ul class="prl">
-          <li><div class="chk">&#10003;</div>Log up to 10 cases</li>
-          <li><div class="chk">&#10003;</div>Complexity scoring</li>
-          <li><div class="crs">&#215;</div>AI case feedback</li>
-          <li><div class="crs">&#215;</div>Photo &#38; X-ray uploads</li>
-          <li><div class="crs">&#215;</div>Public portfolio</li>
-        </ul>
-        <a href="/app.html" class="prbtn prbg">Get started free</a>
-      </div>
-      <div class="prcard pro">
-        <div class="prpl">Pro</div>
-        <div class="prn">$49<span>/month</span></div>
-        <div class="prd">For dentists serious about their clinical growth and career.</div>
-        <ul class="prl">
-          <li><div class="chk">&#10003;</div>Unlimited cases</li>
-          <li><div class="chk">&#10003;</div>AI case intelligence reports</li>
-          <li><div class="chk">&#10003;</div>Photo &#38; X-ray uploads</li>
-          <li><div class="chk">&#10003;</div>Public shareable portfolio</li>
-          <li><div class="chk">&#10003;</div>PDF export &#38; progress tracking</li>
-        </ul>
-        <a href="/app.html" class="prbtn prbv">Start Pro free &#8594;</a>
-      </div>
-    </div>
-    <p style="text-align:center;font-size:0.8rem;color:var(--g);margin-top:20px">Beta users get Pro free. No credit card required.</p>
-  </div>
-</div>
-
-<footer>
-  <div class="ft">
-    <div class="flogo"><div class="flogod"></div>Provify</div>
-    <ul class="flinks"><li><a href="#features">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="/app.html">Sign in</a></li></ul>
-  </div>
-  <div class="fcopy">&#169; 2026 Provify. Built for dentists who take their craft seriously.</div>
+  <div class="fcopy">&copy; 2026 Provify. Built by a dentist, for dentists who take their craft seriously.</div>
+  <div class="fdisclaimer">Provify is a clinical documentation tool. It does not constitute legal advice or replace formal medico-legal counsel.</div>
 </footer>
 
 <script>
