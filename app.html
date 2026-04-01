@@ -1074,6 +1074,10 @@ body::after {
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
         Portfolio
       </button>
+      <button class="nav-item" onclick="showView('career')" id="nav-career">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+        Career Assistant
+      </button>
       <button class="nav-item" onclick="showView('profile')" id="nav-profile">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
         My Profile
@@ -2075,6 +2079,56 @@ body::after {
         </div>
       </div>
 
+      <!-- CAREER ASSISTANT VIEW -->
+      <div class="view" id="view-career">
+        <div class="page-header">
+          <div class="page-title">Career Assistant</div>
+          <div class="page-sub">Personalized career intelligence — built from your actual case history</div>
+        </div>
+
+        <!-- Memory Card -->
+        <div class="card" style="margin-bottom:20px;border-color:rgba(124,111,255,0.2);background:linear-gradient(135deg,rgba(124,111,255,0.06),rgba(124,111,255,0.02));">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div style="flex:1;">
+              <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:8px;">⭐ Provify Memory</div>
+              <div style="font-size:0.875rem;color:var(--white-dim);line-height:1.7;" id="clinical-profile-display">
+                Provify is building your clinical profile. Log more cases to unlock deeper insights.
+              </div>
+            </div>
+            <button onclick="refreshClinicalProfile()" id="refresh-profile-btn" style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 16px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;">
+              ↻ Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Career Advice -->
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div class="card-title" style="margin-bottom:4px;">Your Career Roadmap</div>
+              <div style="font-size:0.8rem;color:var(--gray);">AI-generated from your clinical data — not generic advice</div>
+            </div>
+            <button onclick="generateCareerAdvice()" id="career-btn" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:600;padding:12px 24px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(124,111,255,0.35);white-space:nowrap;">
+              ⭐ Get My Career Advice
+            </button>
+          </div>
+
+          <div id="career-output" style="display:none;">
+            <div id="career-loading" style="display:none;padding:24px;text-align:center;color:var(--gray);">
+              <div style="width:32px;height:32px;border:2px solid rgba(255,255,255,0.06);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+              Analyzing your clinical history...
+            </div>
+            <div id="career-content" style="display:none;"></div>
+          </div>
+
+          <div id="career-empty" style="text-align:center;padding:40px 20px;color:var(--gray);">
+            <div style="font-size:2.5rem;margin-bottom:16px;opacity:0.5;">⭐</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:var(--white-dim);margin-bottom:8px;">Your career roadmap is waiting</div>
+            <div style="font-size:0.875rem;line-height:1.6;">Log at least 5 cases and click "Get My Career Advice".<br>The more cases you log, the more specific the advice gets.</div>
+          </div>
+        </div>
+      </div>
+
       <!-- PROFILE VIEW -->
       <div class="view" id="view-profile">
         <div class="page-header">
@@ -2553,6 +2607,7 @@ function showView(view) {
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderPortfolioCases();
   if (view === 'profile') loadProfileForm();
+  if (view === 'career') loadClinicalProfileDisplay();
 }
 
 // ─── CASES ───
@@ -2790,6 +2845,10 @@ async function submitCase() {
   // Auto-generate clinical note
   btn.textContent = 'Generating Clinical Note...';
   await autoGenerateClinicalNote(caseData);
+
+  // Update Provify Memory
+  btn.textContent = 'Updating your clinical profile...';
+  await updateClinicalMemory();
 
   btn.textContent = 'Log Case & Get AI Report →';
   btn.disabled = false;
@@ -5305,6 +5364,206 @@ async function submitQuickLog() {
   renderBadges();
   closeQuickLog();
   showToast('✓ Case logged! Open it from My Cases to add full details.');
+}
+
+// ─── PROVIFY MEMORY ───
+async function updateClinicalMemory() {
+  if (!currentUser || allCases.length < 2) return;
+
+  const name = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'the clinician';
+  const role = currentProfile?.role || 'intern';
+  const total = allCases.length;
+  const endoCnt  = allCases.filter(c => c.specialty === 'endo').length;
+  const restoCnt = allCases.filter(c => c.specialty === 'restorative').length;
+  const surgCnt  = allCases.filter(c => c.specialty === 'surgery').length;
+  const paedsCnt = allCases.filter(c => c.specialty === 'paeds').length;
+  const avgScore = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
+  const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
+  const recent5  = allCases.slice(0,5).map(c => `${c.specialty} tooth ${c.tooth_number} (score:${c.complexity_score||'?'})`).join(', ');
+  const existing = currentProfile?.clinical_profile || '';
+
+  const prompt = `You are building a running clinical profile for a dentist using Provify. Update their profile based on their case data.
+
+EXISTING PROFILE:
+${existing || 'None yet — this is their first profile update.'}
+
+CURRENT CASE DATA:
+- Name: ${name}
+- Role: ${role}
+- Total cases logged: ${total}
+- Endodontics: ${endoCnt} | Restorative: ${restoCnt} | Surgery: ${surgCnt} | Paeds: ${paedsCnt}
+- Average complexity score: ${avgScore}/10
+- High complexity cases (7+): ${highComp}
+- Most recent 5 cases: ${recent5}
+
+Write a concise 3-4 sentence clinical profile that:
+1. Describes their clinical identity and specialty preference
+2. Notes their complexity trajectory
+3. Identifies one strength and one area to develop
+4. Is written in third person, professional tone
+
+Be specific to their actual data. Never be generic. Maximum 80 words.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const profile = data.content?.[0]?.text?.trim();
+    if (!profile) return;
+
+    await sb.from('profiles').update({ clinical_profile: profile }).eq('id', currentUser.id);
+    if (currentProfile) currentProfile.clinical_profile = profile;
+
+    const display = document.getElementById('clinical-profile-display');
+    if (display) display.textContent = profile;
+  } catch(e) {
+    console.error('Memory update failed:', e);
+  }
+}
+
+async function refreshClinicalProfile() {
+  const btn = document.getElementById('refresh-profile-btn');
+  btn.textContent = '↻ Updating...'; btn.disabled = true;
+  await updateClinicalMemory();
+  btn.textContent = '↻ Refresh'; btn.disabled = false;
+  showToast('Clinical profile updated ✓');
+}
+
+function loadClinicalProfileDisplay() {
+  const display = document.getElementById('clinical-profile-display');
+  if (!display) return;
+  if (currentProfile?.clinical_profile) {
+    display.textContent = currentProfile.clinical_profile;
+  } else if (allCases.length > 0) {
+    display.textContent = 'Provify is analyzing your cases. Log a new case to generate your clinical profile.';
+  } else {
+    display.textContent = 'Log your first cases to start building your clinical profile.';
+  }
+}
+
+// ─── CAREER ASSISTANT ───
+async function generateCareerAdvice() {
+  if (allCases.length < 3) {
+    showToast('Log at least 3 cases to unlock Career Assistant.');
+    return;
+  }
+
+  const btn = document.getElementById('career-btn');
+  const output = document.getElementById('career-output');
+  const loading = document.getElementById('career-loading');
+  const content = document.getElementById('career-content');
+  const empty = document.getElementById('career-empty');
+
+  btn.textContent = 'Analyzing...'; btn.disabled = true;
+  empty.style.display = 'none';
+  output.style.display = 'block';
+  loading.style.display = 'block';
+  content.style.display = 'none';
+
+  const name = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Doctor';
+  const role = currentProfile?.role || 'intern';
+  const roleLabel = { student:'Dental Student', intern:'Intern/House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' }[role] || role;
+  const total = allCases.length;
+  const endoCnt  = allCases.filter(c => c.specialty === 'endo').length;
+  const restoCnt = allCases.filter(c => c.specialty === 'restorative').length;
+  const surgCnt  = allCases.filter(c => c.specialty === 'surgery').length;
+  const paedsCnt = allCases.filter(c => c.specialty === 'paeds').length;
+  const avgScore = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
+  const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
+  const clinicalProfile = currentProfile?.clinical_profile || 'No profile yet.';
+  const recentNarratives = allCases.slice(0,3).filter(c=>c.narrative).map(c=>c.narrative).join(' | ');
+
+  const prompt = `You are a senior dental career advisor with 20 years of experience mentoring dentists globally. You have access to a dentist's complete clinical data through Provify.
+
+DENTIST PROFILE:
+- Name: ${name}
+- Current role: ${roleLabel}
+- Total logged cases: ${total}
+- Specialty breakdown: Endo ${endoCnt} | Restorative ${restoCnt} | Surgery ${surgCnt} | Paeds ${paedsCnt}
+- Average complexity: ${avgScore}/10
+- High complexity cases (7+): ${highComp}
+- Clinical profile: ${clinicalProfile}
+- Recent case narratives: ${recentNarratives || 'None yet'}
+
+Generate a personalized career roadmap. Structure it exactly as:
+
+WHERE YOU ARE NOW
+[2-3 sentences describing their current clinical stage based on their data]
+
+YOUR CLINICAL IDENTITY
+[2-3 sentences about what kind of dentist they're becoming based on their specialty preference and complexity scores]
+
+YOUR NEXT 90 DAYS
+[3 specific, actionable steps tailored to their data — not generic advice]
+
+YOUR 1-YEAR TARGET
+[Where they should aim to be in 12 months, what qualifications/experience to pursue]
+
+THE HONEST TRUTH
+[One paragraph of direct, mentor-level honesty about what they need to hear — their main gap or risk]
+
+Be specific to their actual numbers. Never give generic advice. Talk directly to them. Maximum 350 words total.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text?.trim();
+    if (!text) throw new Error('No response');
+
+    // Parse sections
+    const sections = [
+      { key: 'WHERE YOU ARE NOW',    icon: '📍', color: 'var(--gray)' },
+      { key: 'YOUR CLINICAL IDENTITY', icon: '⭐', color: 'var(--teal)' },
+      { key: 'YOUR NEXT 90 DAYS',    icon: '🎯', color: '#F59E0B' },
+      { key: 'YOUR 1-YEAR TARGET',   icon: '🏆', color: '#34D399' },
+      { key: 'THE HONEST TRUTH',     icon: '💡', color: '#EF4444' },
+    ];
+
+    let html = '';
+    let remaining = text;
+
+    sections.forEach((s, i) => {
+      const nextKey = sections[i+1]?.key;
+      const start = remaining.indexOf(s.key);
+      if (start === -1) return;
+      const end = nextKey ? remaining.indexOf(nextKey) : remaining.length;
+      const body = remaining.substring(start + s.key.length, end !== -1 ? end : undefined).trim().replace(/^[\s:*-]+/, '');
+
+      html += `
+        <div style="padding:16px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+          <div style="font-size:0.65rem;color:${s.color};text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">${s.icon} ${s.key}</div>
+          <div style="font-size:0.875rem;color:var(--white-dim);line-height:1.75;">${body}</div>
+        </div>`;
+    });
+
+    if (!html) html = `<div style="font-size:0.875rem;color:var(--white-dim);line-height:1.75;white-space:pre-wrap;">${text}</div>`;
+
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = html;
+
+  } catch(e) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = '<div style="color:var(--gray);font-size:0.875rem;">Something went wrong. Please try again.</div>';
+  }
+
+  btn.textContent = '⭐ Get My Career Advice'; btn.disabled = false;
 }
 
 // ─── START ───
