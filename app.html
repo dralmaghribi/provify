@@ -1220,7 +1220,7 @@ body::after {
       <!-- DASHBOARD VIEW -->
       <div class="view active" id="view-dashboard">
         <div class="page-header">
-          <div class="page-title" id="greeting-title">Good morning, <span id="greeting-name">Doctor</span></div>
+          <div class="page-title" id="greeting-title">Good morning, Doctor</div>
           <div class="page-sub" id="greeting-sub">Here's your clinical overview</div>
         </div>
 
@@ -2687,7 +2687,6 @@ async function loadProfile() {
   currentProfile = data;
   if (data) {
     document.getElementById('user-display-name').textContent = `Dr. ${data.first_name || 'User'}`;
-    document.getElementById('greeting-name').textContent = data.first_name || 'Doctor';
     document.getElementById('user-avatar').textContent = (data.first_name?.[0] || 'D') + (data.last_name?.[0] || 'R');
   }
 }
@@ -5355,9 +5354,9 @@ async function saveProfile() {
   } else {
     currentProfile = { ...currentProfile, ...updates };
     document.getElementById('user-display-name').textContent = `Dr. ${updates.first_name}`;
-    document.getElementById('greeting-name').textContent = updates.first_name;
     document.getElementById('user-avatar').textContent = (updates.first_name?.[0] || 'D') + (updates.last_name?.[0] || 'R');
     document.getElementById('profile-username').value = updates.username;
+    updateDashboard();
     updatePortfolioLinkDisplay();
     showToast('Profile saved ✓');
   }
