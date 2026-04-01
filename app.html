@@ -905,6 +905,29 @@ body::after {
   </div>
 </div>
 
+<!-- ─── FIRST CASE CELEBRATION ─── -->
+<div id="celebration-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:700;align-items:center;justify-content:center;padding:20px;" onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';">
+  <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.3);border-radius:28px;width:100%;max-width:440px;padding:48px 40px;text-align:center;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
+    <div style="font-size:3.5rem;margin-bottom:20px;" id="cel-icon">🛡</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:12px;line-height:1.2;">Your first case is<br>documented and protected.</div>
+    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:32px;">It's timestamped. Verified. Yours forever. This is what every case you log from now on becomes.</div>
+    <div style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:14px;padding:16px;margin-bottom:28px;display:flex;align-items:center;gap:12px;text-align:left;">
+      <div style="font-size:1.5rem;flex-shrink:0;">🔗</div>
+      <div>
+        <div style="font-size:0.75rem;color:var(--teal);font-weight:500;margin-bottom:3px;">Verification record created</div>
+        <div style="font-size:0.72rem;color:var(--gray);">Your case has a unique URL — open it from My Cases anytime.</div>
+      </div>
+    </div>
+    <button onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';showView('cases');" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">
+      View My Case →
+    </button>
+    <button onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';" style="background:none;border:none;color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;cursor:pointer;padding:8px;">
+      Continue logging
+    </button>
+  </div>
+</div>
+
 <!-- ─── ONBOARDING MODAL ─── -->
 <div id="onboarding-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:600;align-items:center;justify-content:center;padding:20px;">
   <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.25);border-radius:28px;width:100%;max-width:500px;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);">
@@ -1197,56 +1220,51 @@ body::after {
       <!-- DASHBOARD VIEW -->
       <div class="view active" id="view-dashboard">
         <div class="page-header">
-          <div class="page-title">Good morning, <span id="greeting-name">Doctor</span> 👋</div>
-          <div class="page-sub">Here's your clinical overview</div>
+          <div class="page-title" id="greeting-title">Good morning, <span id="greeting-name">Doctor</span></div>
+          <div class="page-sub" id="greeting-sub">Here's your clinical overview</div>
         </div>
 
-        <!-- WELCOME CARD — shown only when 0 cases -->
-        <div class="card" id="welcome-card" style="display:none; background:linear-gradient(135deg, #0F0F12 0%, #13101F 100%); border-color:var(--teal-mid); margin-bottom:20px;">
+        <!-- EMPTY STATE — shown only when 0 cases -->
+        <div id="welcome-card" style="display:none;margin-bottom:24px;">
+          <!-- Hero empty state -->
+          <div style="background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:24px;padding:48px;text-align:center;position:relative;overflow:hidden;margin-bottom:16px;">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
+            <div style="font-size:3rem;margin-bottom:20px;">🛡</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:12px;line-height:1.2;">Your first case is one click away.</div>
+            <div style="font-size:0.95rem;color:var(--gray);line-height:1.8;max-width:480px;margin:0 auto 32px;">Every case you log becomes a timestamped, verifiable clinical record. Your protection. Your portfolio. Your career intelligence — all from one log.</div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <button onclick="showView('log')" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:0.95rem;padding:14px 32px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                Log My First Case →
+              </button>
+              <button onclick="openQuickLog()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.9rem;padding:14px 24px;border-radius:12px;cursor:pointer;transition:all 0.2s;">
+                Quick Log — 60 seconds
+              </button>
+            </div>
+          </div>
+          <!-- 3 step checklist -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;text-align:center;">
+              <div style="font-size:1.5rem;margin-bottom:10px;">📋</div>
+              <div style="font-size:0.82rem;color:var(--white);font-weight:500;margin-bottom:6px;">Log a case</div>
+              <div style="font-size:0.72rem;color:var(--gray);line-height:1.5;">Tooth chart, diagnosis, treatment. AI feedback instantly.</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;text-align:center;opacity:0.6;">
+              <div style="font-size:1.5rem;margin-bottom:10px;">🛡</div>
+              <div style="font-size:0.82rem;color:var(--white);font-weight:500;margin-bottom:6px;">Document the record</div>
+              <div style="font-size:0.72rem;color:var(--gray);line-height:1.5;">Consent, risks, complications. Timestamped forever.</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;text-align:center;opacity:0.6;">
+              <div style="font-size:1.5rem;margin-bottom:10px;">⭐</div>
+              <div style="font-size:0.82rem;color:var(--white);font-weight:500;margin-bottom:6px;">Build your career</div>
+              <div style="font-size:0.72rem;color:var(--gray);line-height:1.5;">Portfolio, Career Assistant, and more unlock as you log.</div>
+            </div>
+          </div>
+        </div>
           <div style="display:flex; align-items:flex-start; gap:20px; flex-wrap:wrap;">
             <div style="flex:1; min-width:200px;">
               <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px">Welcome to Provify</div>
               <div style="font-family:'Instrument Serif',serif; font-size:1.6rem; color:var(--white); letter-spacing:-0.02em; margin-bottom:12px; line-height:1.2">Your clinical journey starts with one case.</div>
-              <div style="font-size:0.875rem; color:var(--gray); line-height:1.7; margin-bottom:20px;">
-                Log your first case in 3 minutes. Get instant AI feedback on your clinical decisions. Build a portfolio that proves your competence.
-              </div>
-              <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button onclick="showView('log')" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem; padding:12px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
-                  + Log Your First Case →
-                </button>
-                <button onclick="showView('profile')" style="background:none; border:1px solid var(--white-faint); color:var(--gray); font-family:'Inter',sans-serif; font-size:0.85rem; padding:12px 20px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
-                  Set Up Profile
-                </button>
-              </div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:10px; min-width:180px;">
-              <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
-                <span style="font-size:1.2rem">🦷</span>
-                <div>
-                  <div style="font-size:0.8rem; color:var(--white); font-weight:500">Log a case</div>
-                  <div style="font-size:0.7rem; color:var(--gray)">3 minutes</div>
-                </div>
-                <span style="margin-left:auto; color:var(--teal); font-size:0.8rem">①</span>
-              </div>
-              <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px; opacity:0.5;">
-                <span style="font-size:1.2rem">🤖</span>
-                <div>
-                  <div style="font-size:0.8rem; color:var(--white); font-weight:500">Get AI feedback</div>
-                  <div style="font-size:0.7rem; color:var(--gray)">Instant</div>
-                </div>
-                <span style="margin-left:auto; color:var(--gray); font-size:0.8rem">②</span>
-              </div>
-              <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px; opacity:0.5;">
-                <span style="font-size:1.2rem">📄</span>
-                <div>
-                  <div style="font-size:0.8rem; color:var(--white); font-weight:500">Share portfolio</div>
-                  <div style="font-size:0.7rem; color:var(--gray)">One link</div>
-                </div>
-                <span style="margin-left:auto; color:var(--gray); font-size:0.8rem">③</span>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         <div class="stats-grid">
           <div class="stat-card">
@@ -2919,6 +2937,11 @@ async function submitCase() {
   allCases.unshift(data[0]);
   btn.textContent = 'Uploading photos...';
 
+  // First case celebration
+  if (allCases.length === 1) {
+    setTimeout(() => showFirstCaseCelebration(), 500);
+  }
+
   // Upload photos
   if (data[0]?.id) {
     await uploadAllPhotos(data[0].id);
@@ -2952,7 +2975,15 @@ async function generateAIReport(caseData, complexity) {
   const metricsEl = document.getElementById('report-metrics');
 
   reportEl.style.display = 'block';
-  insightsEl.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Analyzing your case...</div>`;
+  // Specialty-specific loading messages
+  const loadingMessages = {
+    endo: `Reading your canal anatomy on tooth ${caseData.tooth_number}...`,
+    restorative: `Reviewing your restorative decisions on tooth ${caseData.tooth_number}...`,
+    surgery: `Analyzing your surgical approach on tooth ${caseData.tooth_number}...`,
+    paeds: `Reviewing your paediatric case on tooth ${caseData.tooth_number}...`,
+  };
+  const msg = loadingMessages[caseData.specialty] || `Analyzing tooth ${caseData.tooth_number}...`;
+  insightsEl.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> ${msg}</div>`;
   metricsEl.innerHTML = '';
 
   document.getElementById('report-score').innerHTML = `${complexity}<span>/10</span>`;
@@ -3070,6 +3101,15 @@ Keep each field to 1-2 sentences max. Be specific, clinical, and genuinely usefu
 function updateDashboard() {
   const total = allCases.length;
   document.getElementById('stat-total').textContent = total;
+
+  // Smart greeting
+  const hour = new Date().getHours();
+  const greetingWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const firstName = currentProfile?.first_name || 'Doctor';
+  const greetingTitle = document.getElementById('greeting-title');
+  if (greetingTitle) greetingTitle.innerHTML = `${greetingWord}, <span style="color:var(--teal)">Dr. ${firstName}</span>`;
+  const greetingSub = document.getElementById('greeting-sub');
+  if (greetingSub) greetingSub.textContent = total === 0 ? 'Welcome to Provify — your clinical record starts here' : `${total} case${total !== 1 ? 's' : ''} documented and protected`;
 
   // Welcome card
   const welcomeCard = document.getElementById('welcome-card');
@@ -4437,7 +4477,7 @@ async function autoGenerateClinicalNote(c) {
   if (!noteSection || !noteText) return;
 
   noteSection.style.display = 'block';
-  noteText.innerHTML = '<div style="color:var(--gray);font-size:0.85rem">Generating your clinical note...</div>';
+  noteText.innerHTML = '<div style="color:var(--gray);font-size:0.85rem;display:flex;align-items:center;gap:10px;"><div class="ai-dots"><span></span><span></span><span></span></div> Writing your clinical note...</div>';
 
   const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery', paeds: 'Paediatric Dentistry' }[c.specialty] || c.specialty;
   const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -5451,6 +5491,11 @@ async function submitQuickLog() {
   renderBadges();
   closeQuickLog();
   showToast('✓ Case logged! Open it from My Cases to add full details.');
+}
+
+function showFirstCaseCelebration() {
+  document.getElementById('celebration-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 // ─── ONBOARDING ───
