@@ -698,7 +698,22 @@ body::after {
 }
 .canal-wl-input:focus { border-color: rgba(124,111,255,0.3); }
 
-/* ─── QUICK LOG ─── */
+/* ─── ONBOARDING ─── */
+.ob-step-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); transition: all 0.3s;
+}
+.ob-step-dot.active { background: var(--teal); box-shadow: 0 0 10px rgba(124,111,255,0.5); }
+.ob-role-btn {
+  width: 100%; padding: 13px 16px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: rgba(250,250,250,0.75); font-family: 'Inter', sans-serif;
+  font-size: 0.875rem; font-weight: 400; cursor: pointer;
+  transition: all 0.15s; text-align: left;
+}
+.ob-role-btn:hover { border-color: rgba(124,111,255,0.3); color: var(--white); }
+.ob-role-btn.selected { background: rgba(124,111,255,0.12); border-color: rgba(124,111,255,0.4); color: var(--teal); font-weight: 500; }
 .ql-tag {
   padding: 7px 14px; border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.08);
@@ -885,6 +900,77 @@ body::after {
       </div>
       <div id="sim-feedback-sections" style="display:flex;flex-direction:column;gap:12px;"></div>
       <button onclick="loadNewSimulation()" style="width:100%;margin-top:16px;background:var(--white-faint);border:1px solid var(--white-faint);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:500;padding:11px;border-radius:10px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--white-dim)'">⚡ Generate Another Scenario</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── ONBOARDING MODAL ─── -->
+<div id="onboarding-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:600;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.25);border-radius:28px;width:100%;max-width:500px;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);">
+
+    <!-- Top accent -->
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
+
+    <!-- Steps indicator -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:24px 28px 0;">
+      <div class="ob-step-dot active" id="ob-dot-1"></div>
+      <div style="width:40px;height:1px;background:rgba(255,255,255,0.1);" id="ob-line-1"></div>
+      <div class="ob-step-dot" id="ob-dot-2"></div>
+      <div style="width:40px;height:1px;background:rgba(255,255,255,0.1);" id="ob-line-2"></div>
+      <div class="ob-step-dot" id="ob-dot-3"></div>
+    </div>
+
+    <!-- Step 1 — Welcome -->
+    <div id="ob-step-1" style="padding:32px 36px 36px;">
+      <div style="font-size:2.5rem;margin-bottom:16px;">🛡</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#FAFAFA;letter-spacing:-0.02em;margin-bottom:12px;line-height:1.2;">Welcome to Provify,<br><span id="ob-name" style="color:#7C6FFF;">Doctor</span>.</div>
+      <div style="font-size:0.9rem;color:#6B7280;line-height:1.75;margin-bottom:28px;">Every case you log becomes a timestamped, verifiable clinical record. Your portfolio. Your protection. Your career intelligence.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:10px;">
+          <div style="font-size:1.1rem;flex-shrink:0;">📋</div>
+          <div style="font-size:0.82rem;color:rgba(250,250,250,0.8);line-height:1.5;"><strong style="color:#FAFAFA;">Log cases in 3 minutes</strong> — AI feedback, clinical note, and complexity score instantly</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:10px;">
+          <div style="font-size:1.1rem;flex-shrink:0;">🛡</div>
+          <div style="font-size:0.82rem;color:rgba(250,250,250,0.8);line-height:1.5;"><strong style="color:#FAFAFA;">Medico-legal protection</strong> — every case timestamped and verifiable</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:10px;">
+          <div style="font-size:1.1rem;flex-shrink:0;">⭐</div>
+          <div style="font-size:0.82rem;color:rgba(250,250,250,0.8);line-height:1.5;"><strong style="color:#FAFAFA;">Career Assistant</strong> — AI advice built from your actual clinical data</div>
+        </div>
+      </div>
+      <button onclick="obNext(2)" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);">Let's get started →</button>
+    </div>
+
+    <!-- Step 2 — Role -->
+    <div id="ob-step-2" style="display:none;padding:32px 36px 36px;">
+      <div style="font-size:2.5rem;margin-bottom:16px;">👋</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#FAFAFA;letter-spacing:-0.02em;margin-bottom:8px;">What's your role?</div>
+      <div style="font-size:0.875rem;color:#6B7280;margin-bottom:24px;">This helps Provify tailor your AI feedback and career advice.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;" id="ob-role-list">
+        <button onclick="selectObRole('student','Dental Student',this)" class="ob-role-btn">🎓 Dental Student</button>
+        <button onclick="selectObRole('intern','Intern / House Officer',this)" class="ob-role-btn">🏥 Intern / House Officer</button>
+        <button onclick="selectObRole('resident','Resident',this)" class="ob-role-btn">🔬 Resident</button>
+        <button onclick="selectObRole('general','General Dentist',this)" class="ob-role-btn">🦷 General Dentist</button>
+        <button onclick="selectObRole('specialist','Specialist / Consultant',this)" class="ob-role-btn">⭐ Specialist / Consultant</button>
+      </div>
+      <button onclick="obNext(3)" id="ob-role-next" disabled style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);opacity:0.4;transition:opacity 0.2s;">Continue →</button>
+    </div>
+
+    <!-- Step 3 — First action -->
+    <div id="ob-step-3" style="display:none;padding:32px 36px 36px;">
+      <div style="font-size:2.5rem;margin-bottom:16px;">🚀</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#FAFAFA;letter-spacing:-0.02em;margin-bottom:8px;">You're all set.</div>
+      <div style="font-size:0.875rem;color:#6B7280;line-height:1.7;margin-bottom:28px;">Log your first case now. It takes 3 minutes and you'll get instant AI feedback, a clinical note, and your first complexity score.</div>
+
+      <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.2);border-radius:14px;padding:18px;margin-bottom:24px;">
+        <div style="font-size:0.65rem;color:#9B91FF;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px;">💡 Pro tip</div>
+        <div style="font-size:0.82rem;color:rgba(250,250,250,0.75);line-height:1.65;">Use <strong style="color:#FAFAFA;">Quick Log</strong> in the sidebar for cases you want to log in 60 seconds. Use <strong style="color:#FAFAFA;">Log Case</strong> for full AI feedback and your medico-legal record.</div>
+      </div>
+
+      <button onclick="finishOnboarding()" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">Log my first case →</button>
+      <button onclick="skipOnboarding()" style="width:100%;background:none;border:none;color:#6B7280;font-family:'Inter',sans-serif;font-size:0.82rem;cursor:pointer;padding:8px;">Skip for now</button>
     </div>
 
   </div>
@@ -2497,6 +2583,7 @@ async function showApp() {
   updateDashboard();
   renderBadges();
   updateProgress();
+  checkOnboarding();
 }
 
 // ─── AUTH ───
@@ -5364,6 +5451,73 @@ async function submitQuickLog() {
   renderBadges();
   closeQuickLog();
   showToast('✓ Case logged! Open it from My Cases to add full details.');
+}
+
+// ─── ONBOARDING ───
+let obSelectedRole = '';
+let obSelectedRoleLabel = '';
+
+function showOnboarding() {
+  const name = currentProfile?.first_name || 'Doctor';
+  document.getElementById('ob-name').textContent = name;
+  document.getElementById('onboarding-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function obNext(step) {
+  // Hide all steps
+  [1,2,3].forEach(s => {
+    document.getElementById(`ob-step-${s}`).style.display = 'none';
+    document.getElementById(`ob-dot-${s}`)?.classList.remove('active');
+  });
+  document.getElementById(`ob-step-${step}`).style.display = 'block';
+  document.getElementById(`ob-dot-${step}`)?.classList.add('active');
+  // Color lines
+  if (step >= 2) document.getElementById('ob-line-1').style.background = 'rgba(124,111,255,0.5)';
+  if (step >= 3) document.getElementById('ob-line-2').style.background = 'rgba(124,111,255,0.5)';
+}
+
+function selectObRole(role, label, btn) {
+  obSelectedRole = role;
+  obSelectedRoleLabel = label;
+  document.querySelectorAll('.ob-role-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const next = document.getElementById('ob-role-next');
+  next.disabled = false;
+  next.style.opacity = '1';
+}
+
+async function finishOnboarding() {
+  document.getElementById('onboarding-modal').style.display = 'none';
+  document.body.style.overflow = '';
+
+  // Save role if selected
+  if (obSelectedRole && currentUser) {
+    await sb.from('profiles').update({ role: obSelectedRole }).eq('id', currentUser.id);
+    if (currentProfile) currentProfile.role = obSelectedRole;
+    // Update UI
+    const roleEl = document.getElementById('profile-role');
+    if (roleEl) roleEl.value = obSelectedRole;
+  }
+
+  // Mark onboarding complete
+  localStorage.setItem(`ob_done_${currentUser?.id}`, '1');
+
+  // Take them to log case
+  showView('log');
+}
+
+function skipOnboarding() {
+  document.getElementById('onboarding-modal').style.display = 'none';
+  document.body.style.overflow = '';
+  localStorage.setItem(`ob_done_${currentUser?.id}`, '1');
+}
+
+function checkOnboarding() {
+  const done = localStorage.getItem(`ob_done_${currentUser?.id}`);
+  if (!done && allCases.length === 0) {
+    setTimeout(() => showOnboarding(), 800);
+  }
 }
 
 // ─── PROVIFY MEMORY ───
