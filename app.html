@@ -2239,16 +2239,59 @@ body::after {
             <div class="metrics-mini" id="report-metrics"></div>
           </div>
 
-          <!-- AUTO CLINICAL NOTE -->
-          <div id="auto-note-section" style="display:none; margin-top:16px; background:var(--navy-2); border:1px solid var(--white-faint); border-radius:16px; overflow:hidden;">
-            <div style="padding:16px 20px; border-bottom:1px solid var(--white-faint); display:flex; align-items:center; justify-content:space-between;">
-              <div>
-                <div style="font-size:0.65rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:2px">📋 Clinical Note — Ready to Copy</div>
-                <div style="font-size:0.75rem; color:var(--gray)">Paste directly into your hospital record system</div>
+          <!-- AUTO CLINICAL NOTE — THE WOW MOMENT -->
+          <div id="auto-note-section" style="display:none;margin-top:20px;">
+
+            <!-- Reveal header -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:16px 20px;background:linear-gradient(135deg,rgba(52,211,153,0.08),rgba(52,211,153,0.02));border:1px solid rgba(52,211,153,0.2);border-radius:16px 16px 0 0;position:relative;overflow:hidden;">
+              <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.6),transparent);"></div>
+              <div style="width:40px;height:40px;border-radius:12px;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">📋</div>
+              <div style="flex:1;">
+                <div style="font-size:0.72rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:3px;">Clinical Note — Ready</div>
+                <div style="font-size:0.8rem;color:var(--gray);">Paste directly into your hospital system — saves you 5–10 minutes</div>
               </div>
-              <button onclick="copyAutoNote()" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; padding:8px 18px; border-radius:8px; border:none; cursor:pointer; transition:all 0.2s; flex-shrink:0;">Copy Note</button>
             </div>
-            <div id="auto-note-text" style="padding:20px; font-size:0.85rem; color:var(--white-dim); line-height:1.8;"></div>
+
+            <!-- Note content -->
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-top:none;border-radius:0 0 16px 16px;overflow:hidden;">
+              <div id="auto-note-text" style="padding:20px;font-size:0.875rem;color:var(--white-dim);line-height:1.9;font-family:'Inter',sans-serif;"></div>
+
+              <!-- Action bar -->
+              <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);display:flex;gap:10px;flex-wrap:wrap;">
+                <button onclick="copyAutoNote()" id="copy-note-btn" style="flex:1;background:linear-gradient(135deg,#34D399,#6EE7B7);color:#09090B;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:700;padding:12px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy to clipboard — paste into hospital system
+                </button>
+                <button onclick="regenerateNote()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all 0.2s;" title="Regenerate note">
+                  ↺
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- THE GIFT — Verification share card -->
+          <div id="verification-share-card" style="display:none;margin-top:16px;background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div style="font-size:1.4rem;">🛡</div>
+              <div>
+                <div style="font-size:0.75rem;color:var(--teal);font-weight:600;margin-bottom:2px;">Your verification record is live</div>
+                <div style="font-size:0.72rem;color:var(--gray);">Share it with anyone — they can confirm this case is documented and timestamped</div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+              <div id="verify-url-display" style="font-size:0.72rem;color:var(--teal);font-family:monospace;">provify.app/verify.html?id=...</div>
+              <button onclick="copyVerifyUrl()" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">Copy Link</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button onclick="openVerifyPage()" style="flex:1;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;">
+                🔗 Open Verification Page
+              </button>
+              <button onclick="shareVerifyWhatsApp()" style="flex:1;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);color:#25D366;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;">
+                Share via WhatsApp
+              </button>
+            </div>
           </div>
 
         </div>
@@ -3159,6 +3202,9 @@ async function submitCase() {
   allCases.unshift(data[0]);
   btn.textContent = 'Uploading photos...';
 
+  // Show verification share card
+  showVerificationShareCard(data[0].id);
+
   // First case celebration
   if (allCases.length === 1) {
     setTimeout(() => showFirstCaseCelebration(), 500);
@@ -3176,6 +3222,7 @@ async function submitCase() {
 
   // Auto-generate clinical note
   btn.textContent = 'Generating Clinical Note...';
+  lastCaseData = caseData;
   await autoGenerateClinicalNote(caseData);
 
   // Update Provify Memory
@@ -4802,7 +4849,60 @@ Use professional dental terminology. Do not add any preamble or explanation — 
 function copyAutoNote() {
   const el = document.getElementById('auto-note-text');
   const text = el.innerText || el.textContent;
-  navigator.clipboard.writeText(text).then(() => showToast('Clinical note copied ✓'));
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-note-btn');
+    const original = btn.innerHTML;
+    btn.innerHTML = '✓ Copied to clipboard';
+    btn.style.background = 'linear-gradient(135deg,#059669,#34D399)';
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.style.background = 'linear-gradient(135deg,#34D399,#6EE7B7)';
+    }, 2000);
+  });
+}
+
+function shareNoteWhatsApp() {
+  const el = document.getElementById('auto-note-text');
+  const text = el.innerText || el.textContent;
+  const msg = encodeURIComponent(`Clinical Note — Generated by Provify\n\n${text}`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+async function regenerateNote() {
+  if (!lastCaseData) { showToast('Submit a case first.'); return; }
+  const noteText = document.getElementById('auto-note-text');
+  noteText.innerHTML = '<div style="color:var(--gray);font-size:0.85rem;display:flex;align-items:center;gap:10px;"><div class="ai-dots"><span></span><span></span><span></span></div> Rewriting your clinical note...</div>';
+  await autoGenerateClinicalNote(lastCaseData);
+}
+
+let lastSubmittedCaseId = null;
+
+function showVerificationShareCard(caseId) {
+  lastSubmittedCaseId = caseId;
+  const card = document.getElementById('verification-share-card');
+  const urlEl = document.getElementById('verify-url-display');
+  if (!card || !urlEl) return;
+  urlEl.textContent = `provify.app/verify.html?id=${caseId}`;
+  card.style.display = 'block';
+  card.style.animation = 'fadeUp 0.5s ease both';
+}
+
+function copyVerifyUrl() {
+  if (!lastSubmittedCaseId) return;
+  const url = `https://provify.app/verify.html?id=${lastSubmittedCaseId}`;
+  navigator.clipboard.writeText(url).then(() => showToast('Verification link copied ✓'));
+}
+
+function openVerifyPage() {
+  if (!lastSubmittedCaseId) return;
+  window.open(`https://provify.app/verify.html?id=${lastSubmittedCaseId}`, '_blank');
+}
+
+function shareVerifyWhatsApp() {
+  if (!lastSubmittedCaseId) return;
+  const url = `https://provify.app/verify.html?id=${lastSubmittedCaseId}`;
+  const msg = encodeURIComponent(`I just documented a clinical case on Provify. You can verify this record here:\n${url}`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
 }
 let currentModalCase = null;
 
