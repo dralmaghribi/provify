@@ -6233,36 +6233,49 @@ async function generateCareerAdvice() {
   const clinicalProfile = currentProfile?.clinical_profile || 'No profile yet.';
   const recentNarratives = allCases.slice(0,3).filter(c=>c.narrative).map(c=>c.narrative).join(' | ');
 
-  const prompt = `You are a senior dental career advisor with 20 years of experience mentoring dentists globally. You have access to a dentist's complete clinical data through Provify.
+  // Determine dominant specialty
+  const specialtyCounts = { endo: endoCnt, restorative: restoCnt, surgery: surgCnt, paeds: paedsCnt };
+  const dominantSpecialty = Object.entries(specialtyCounts).sort((a,b) => b[1]-a[1])[0][0];
+  const isSpecialist = role === 'specialist';
+  const isNarrow = isSpecialist && (specialtyCounts[dominantSpecialty] / total) > 0.85;
+
+  const specialistNote = isSpecialist
+    ? `This dentist is a specialist/consultant. Analyze ONLY within their primary specialty (${dominantSpecialty}). Do NOT mention or suggest other specialties as blind spots — specialists are expected to focus on one area. Blind spots should be about complexity, case types, or techniques within their specialty only.`
+    : `This dentist is NOT a specialist. It is appropriate to comment on their specialty balance and suggest areas to develop.`;
+
+  const prompt = `You are a senior dental career advisor with 20 years of experience mentoring dentists globally across the GCC, UK, USA, and Australia. You have access to a dentist's complete clinical and career data through Provify.
 
 DENTIST PROFILE:
 - Name: ${name}
 - Current role: ${roleLabel}
 - Total logged cases: ${total}
 - Specialty breakdown: Endo ${endoCnt} | Restorative ${restoCnt} | Surgery ${surgCnt} | Paeds ${paedsCnt}
+- Dominant specialty: ${dominantSpecialty} (${Math.round(specialtyCounts[dominantSpecialty]/total*100)}% of cases)
 - Average complexity: ${avgScore}/10
 - High complexity cases (7+): ${highComp}
 - Clinical profile: ${clinicalProfile}
 - Recent case narratives: ${recentNarratives || 'None yet'}
 
-Generate a personalized career roadmap. Structure it exactly as:
+SPECIALIST GUIDANCE: ${specialistNote}
+
+Generate a deeply personalized career roadmap. Be a real mentor — not a chatbot. Structure it EXACTLY as:
 
 WHERE YOU ARE NOW
-[2-3 sentences describing their current clinical stage based on their data]
+[2-3 sentences about their current clinical stage. Reference their actual numbers. Be honest about what the data shows.]
 
 YOUR CLINICAL IDENTITY
-[2-3 sentences about what kind of dentist they're becoming based on their specialty preference and complexity scores]
+[What kind of dentist are they becoming? What does their case mix and complexity say about them? Be specific.]
 
 YOUR NEXT 90 DAYS
-[3 specific, actionable steps tailored to their data — not generic advice]
+[3 specific, immediately actionable steps. Include: 1 clinical skill to develop, 1 course or certification to pursue with a real name (e.g. MFDS, MJDF, ITI implant course, EndoAdvance, CBCT interpretation course), 1 career move to make (apply to a specific type of clinic, join a study club, contact a specific type of mentor).]
 
 YOUR 1-YEAR TARGET
-[Where they should aim to be in 12 months, what qualifications/experience to pursue]
+[Specific career target for 12 months. Include: whether to pursue a masters/postgrad degree and in which country (e.g. UK, Australia, USA, UAE, Egypt) and why. Whether to aim for private practice, hospital, academic, or specialist practice. Which postgrad qualification to pursue (MClinDent, MDS, MSc, MFDS, FRCD, board certification). Be specific and opinionated — give a real recommendation based on their data.]
 
 THE HONEST TRUTH
-[One paragraph of direct, mentor-level honesty about what they need to hear — their main gap or risk]
+[One paragraph of direct mentor-level honesty. What is their biggest career risk right now? What are they avoiding? What do they need to hear that nobody else will tell them? Be direct. Do not soften this.]
 
-Be specific to their actual numbers. Never give generic advice. Talk directly to them. Maximum 350 words total.`;
+Maximum 400 words. Never use bullet points inside sections. Write in flowing paragraphs. Talk directly to them as "you". Be specific to their actual data — never give advice that could apply to any dentist.`;
 
   try {
     const res = await fetch('/api/analyze', {
@@ -6296,7 +6309,13 @@ Be specific to their actual numbers. Never give generic advice. Talk directly to
       const start = remaining.indexOf(s.key);
       if (start === -1) return;
       const end = nextKey ? remaining.indexOf(nextKey) : remaining.length;
-      const body = remaining.substring(start + s.key.length, end !== -1 ? end : undefined).trim().replace(/^[\s:*-]+/, '');
+      const body = remaining.substring(start + s.key.length, end !== -1 ? end : undefined)
+        .trim()
+        .replace(/^[\s:*-]+/, '')
+        .replace(/##/g, '')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .trim();
 
       html += `
         <div style="padding:16px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
