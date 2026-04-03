@@ -934,6 +934,9 @@ body::after {
       <div style="font-size:0.95rem; color:var(--white-dim); line-height:1.8; font-style:italic; padding-left:16px; border-left:2px solid var(--teal)" id="modal-narrative"></div>
     </div>
 
+    <!-- Photos & X-rays -->
+    <div id="modal-photos" style="display:none;padding:0 28px;"></div>
+
     <!-- Fields -->
     <div style="padding:8px 28px 20px" id="modal-fields"></div>
 
@@ -3250,9 +3253,13 @@ async function submitCase() {
     setTimeout(() => showFirstCaseCelebration(), 500);
   }
 
-  // Upload photos
+  // Upload photos and save URLs to case
   if (data[0]?.id) {
-    await uploadAllPhotos(data[0].id);
+    const photoUrls = await uploadAllPhotos(data[0].id);
+    if (Object.keys(photoUrls).length > 0) {
+      await sb.from('cases').update({ photo_urls: photoUrls }).eq('id', data[0].id);
+      allCases[0] = { ...allCases[0], photo_urls: photoUrls };
+    }
   }
 
   btn.textContent = 'Generating AI Report...';
@@ -3656,6 +3663,65 @@ function openCaseDetail(id) {
   document.getElementById('modal-narrative').textContent = c.narrative || '';
   document.getElementById('modal-narrative-section').style.display = c.narrative ? 'block' : 'none';
   document.getElementById('modal-fields').innerHTML = fieldsHTML + mlHTML;
+
+  // Load and display photos
+  const photoSection = document.getElementById('modal-photos');
+  if (photoSection) {
+    photoSection.innerHTML = '';
+    // Try photo_urls from case record first
+    const photoUrls = c.photo_urls || {};
+    // Also reconstruct from storage path for older cases
+    const photoIds = c.specialty === 'endo'
+      ? ['xr-preop','xr-wl','xr-obturation','xr-postop','ph-preop','ph-intraop','ph-postop']
+      : ['xr-preop','xr-postop','ph-preop','ph-intraop','ph-postop'];
+
+    const photoLabels = {
+      'xr-preop': 'Pre-op X-ray', 'xr-wl': 'Working Length', 'xr-obturation': 'Obturation',
+      'xr-postop': 'Post-op X-ray', 'ph-preop': 'Pre-op Photo', 'ph-intraop': 'Intra-op Photo',
+      'ph-postop': 'Post-op Photo'
+    };
+
+    // Get URLs — from stored record or reconstruct from storage
+    const allUrls = {};
+    for (const pid of photoIds) {
+      if (photoUrls[pid]) {
+        allUrls[pid] = photoUrls[pid];
+      } else {
+        // Try to reconstruct URL from storage
+        const extensions = ['jpg','jpeg','png','webp'];
+        for (const ext of extensions) {
+          const path = `${currentUser.id}/${c.id}/${pid}.${ext}`;
+          const { data: urlData } = sb.storage.from('case-images').getPublicUrl(path);
+          if (urlData?.publicUrl) {
+            allUrls[pid] = urlData.publicUrl;
+            break;
+          }
+        }
+      }
+    }
+
+    const validUrls = Object.entries(allUrls).filter(([,url]) => url);
+
+    if (validUrls.length > 0) {
+      photoSection.style.display = 'block';
+      photoSection.innerHTML = `
+        <div style="margin-top:16px;">
+          <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">📸 Clinical Photos & X-rays</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;">
+            ${validUrls.map(([pid, url]) => `
+              <div style="position:relative;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);cursor:pointer;" onclick="window.open('${url}','_blank')">
+                <img src="${url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" onerror="this.parentElement.style.display='none'" loading="lazy">
+                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:6px 8px;">
+                  <div style="font-size:0.55rem;color:rgba(255,255,255,0.8);font-weight:500;">${photoLabels[pid] || pid}</div>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    } else {
+      photoSection.style.display = 'none';
+    }
+  }
+
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
