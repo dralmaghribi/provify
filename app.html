@@ -6157,17 +6157,18 @@ Write a concise 3-4 sentence clinical profile that:
 Be specific to their actual data. Never be generic. Maximum 80 words.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 200,
-        messages: [{ role: 'user', content: prompt }]
+        mode: 'memory',
+        memoryPrompt: prompt,
+        caseData: { specialty: 'memory', tooth_number: 'N/A', age_range: 'N/A', complaint: 'N/A' },
+        complexity: 0
       })
     });
     const data = await res.json();
-    const profile = data.content?.[0]?.text?.trim();
+    const profile = (data.memory || '').trim();
     if (!profile) return;
 
     await sb.from('profiles').update({ clinical_profile: profile }).eq('id', currentUser.id);
@@ -6264,17 +6265,18 @@ THE HONEST TRUTH
 Be specific to their actual numbers. Never give generic advice. Talk directly to them. Maximum 350 words total.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 600,
-        messages: [{ role: 'user', content: prompt }]
+        mode: 'career',
+        careerPrompt: prompt,
+        caseData: { specialty: 'career', tooth_number: 'N/A', age_range: 'N/A', complaint: 'N/A' },
+        complexity: 0
       })
     });
     const data = await res.json();
-    const text = data.content?.[0]?.text?.trim();
+    const text = (data.career || data.note || data.content?.[0]?.text || '').trim();
     if (!text) throw new Error('No response');
 
     // Parse sections
