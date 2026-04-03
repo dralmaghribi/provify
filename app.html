@@ -3563,7 +3563,7 @@ function caseItemHTML(c, showDelete = false) {
   `;
 }
 
-function openCaseDetail(id) {
+async function openCaseDetail(id) {
   const c = allCases.find(x => x.id === id);
   if (!c) return;
   currentModalCase = c;
@@ -3667,13 +3667,8 @@ function openCaseDetail(id) {
   // Load and display photos
   const photoSection = document.getElementById('modal-photos');
   if (photoSection) {
+    photoSection.style.display = 'none';
     photoSection.innerHTML = '';
-    // Try photo_urls from case record first
-    const photoUrls = c.photo_urls || {};
-    // Also reconstruct from storage path for older cases
-    const photoIds = c.specialty === 'endo'
-      ? ['xr-preop','xr-wl','xr-obturation','xr-postop','ph-preop','ph-intraop','ph-postop']
-      : ['xr-preop','xr-postop','ph-preop','ph-intraop','ph-postop'];
 
     const photoLabels = {
       'xr-preop': 'Pre-op X-ray', 'xr-wl': 'Working Length', 'xr-obturation': 'Obturation',
@@ -3681,45 +3676,38 @@ function openCaseDetail(id) {
       'ph-postop': 'Post-op Photo'
     };
 
-    // Get URLs — from stored record or reconstruct from storage
-    const allUrls = {};
-    for (const pid of photoIds) {
-      if (photoUrls[pid]) {
-        allUrls[pid] = photoUrls[pid];
-      } else {
-        // Try to reconstruct URL from storage
-        const extensions = ['jpg','jpeg','png','webp'];
-        for (const ext of extensions) {
-          const path = `${currentUser.id}/${c.id}/${pid}.${ext}`;
-          const { data: urlData } = sb.storage.from('case-images').getPublicUrl(path);
-          if (urlData?.publicUrl) {
-            allUrls[pid] = urlData.publicUrl;
-            break;
-          }
+    // List all files in this case's storage folder
+    try {
+      const { data: files, error } = await sb.storage
+        .from('case-images')
+        .list(`${currentUser.id}/${c.id}`);
+
+      if (!error && files && files.length > 0) {
+        const photoItems = files.map(file => {
+          const pid = file.name.split('.')[0]; // e.g. "xr-preop"
+          const path = `${currentUser.id}/${c.id}/${file.name}`;
+          const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
+          return { pid, url: publicUrl, label: photoLabels[pid] || pid };
+        });
+
+        if (photoItems.length > 0) {
+          photoSection.style.display = 'block';
+          photoSection.innerHTML = `
+            <div style="margin-bottom:16px;">
+              <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">📸 Clinical Photos & X-rays</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;">
+                ${photoItems.map(({ url, label }) => `
+                  <div style="border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);cursor:pointer;position:relative;" onclick="window.open('${url}','_blank')">
+                    <img src="${url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" loading="lazy">
+                    <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));padding:6px 8px;">
+                      <div style="font-size:0.55rem;color:rgba(255,255,255,0.9);font-weight:500;">${label}</div>
+                    </div>
+                  </div>`).join('')}
+              </div>
+            </div>`;
         }
       }
-    }
-
-    const validUrls = Object.entries(allUrls).filter(([,url]) => url);
-
-    if (validUrls.length > 0) {
-      photoSection.style.display = 'block';
-      photoSection.innerHTML = `
-        <div style="margin-top:16px;">
-          <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">📸 Clinical Photos & X-rays</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;">
-            ${validUrls.map(([pid, url]) => `
-              <div style="position:relative;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);cursor:pointer;" onclick="window.open('${url}','_blank')">
-                <img src="${url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" onerror="this.parentElement.style.display='none'" loading="lazy">
-                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:6px 8px;">
-                  <div style="font-size:0.55rem;color:rgba(255,255,255,0.8);font-weight:500;">${photoLabels[pid] || pid}</div>
-                </div>
-              </div>`).join('')}
-          </div>
-        </div>`;
-    } else {
-      photoSection.style.display = 'none';
-    }
+    } catch(e) { console.log('Photo load error:', e); }
   }
 
   modal.style.display = 'flex';
