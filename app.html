@@ -606,7 +606,7 @@ body::after {
   .nav-icon { font-size: 1.2rem; }
   .nav-icon svg { width: 22px; height: 22px; }
 
-  /* Hide less-used nav items on mobile */
+  /* Hide secondary nav items on mobile */
   #nav-progress { display: none; }
   #nav-badges { display: none; }
   #nav-portfolio { display: none; }
@@ -1017,23 +1017,37 @@ body::after {
 
 <!-- ─── FIRST CASE CELEBRATION ─── -->
 <div id="celebration-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:700;align-items:center;justify-content:center;padding:20px;" onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';">
-  <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.3);border-radius:28px;width:100%;max-width:440px;padding:48px 40px;text-align:center;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
+  <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.3);border-radius:28px;width:100%;max-width:480px;padding:40px 36px;text-align:center;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
-    <div style="font-size:3.5rem;margin-bottom:20px;" id="cel-icon">🛡</div>
-    <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:12px;line-height:1.2;">Your first case is<br>documented and protected.</div>
-    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:32px;">It's timestamped. Verified. Yours forever. This is what every case you log from now on becomes.</div>
-    <div style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:14px;padding:16px;margin-bottom:28px;display:flex;align-items:center;gap:12px;text-align:left;">
-      <div style="font-size:1.5rem;flex-shrink:0;">🔗</div>
-      <div>
-        <div style="font-size:0.75rem;color:var(--teal);font-weight:500;margin-bottom:3px;">Verification record created</div>
-        <div style="font-size:0.72rem;color:var(--gray);">Your case has a unique URL — open it from My Cases anytime.</div>
+    <div style="font-size:3rem;margin-bottom:16px;">🛡</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.7rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">Your first record is<br>documented and protected.</div>
+    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:24px;">Timestamped. Verified. Yours forever. This is what every case becomes from now on.</div>
+
+    <!-- What's coming preview -->
+    <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:16px;padding:18px;margin-bottom:24px;text-align:left;">
+      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">⭐ What Provify learns about you</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;opacity:0.5;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">1</div>
+          <div style="font-size:0.8rem;color:var(--white-dim);">Your clinical identity — what kind of dentist you're becoming</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;opacity:0.35;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">5</div>
+          <div style="font-size:0.8rem;color:var(--white-dim);">Your complexity trajectory — how fast you're growing</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;opacity:0.2;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">20</div>
+          <div style="font-size:0.8rem;color:var(--white-dim);">Your exact next career move — specific to your data</div>
+        </div>
       </div>
+      <div style="font-size:0.72rem;color:var(--gray);margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">The more you log, the smarter Provify gets about you.</div>
     </div>
+
     <button onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';showView('cases');" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">
-      View My Case →
+      View My Record →
     </button>
     <button onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';" style="background:none;border:none;color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;cursor:pointer;padding:8px;">
-      Continue logging
+      Keep logging
     </button>
   </div>
 </div>
@@ -1290,25 +1304,28 @@ body::after {
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span>
         My Cases
       </button>
-      <button class="nav-item" onclick="showView('progress')" id="nav-progress">
-        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-        Growth
-      </button>
-      <button class="nav-item" onclick="showView('badges')" id="nav-badges">
-        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.56 13.38L7 22l5-3 5 3-1.56-8.62"/></svg></span>
-        Achievements
-      </button>
-      <button class="nav-item" onclick="showView('portfolio')" id="nav-portfolio">
-        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
-        Portfolio
-      </button>
       <button class="nav-item" onclick="showView('career')" id="nav-career">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-        Career Assistant
+        Career
       </button>
       <button class="nav-item" onclick="showView('profile')" id="nav-profile">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
-        My Profile
+        Profile
+      </button>
+
+      <!-- Secondary nav — desktop only -->
+      <div style="height:1px;background:rgba(255,255,255,0.06);margin:12px 8px;"></div>
+      <button class="nav-item" onclick="showView('progress')" id="nav-progress" style="opacity:0.7;">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        Growth
+      </button>
+      <button class="nav-item" onclick="showView('portfolio')" id="nav-portfolio" style="opacity:0.7;">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
+        Portfolio
+      </button>
+      <button class="nav-item" onclick="showView('badges')" id="nav-badges" style="opacity:0.7;">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.56 13.38L7 22l5-3 5 3-1.56-8.62"/></svg></span>
+        Achievements
       </button>
 
       <div class="sidebar-bottom">
@@ -3095,8 +3112,16 @@ async function submitCase() {
 
   updateDashboard();
   renderBadges();
+
+  // Cold start magic — show preview after first case
+  const isFirstCase = allCases.length === 1;
   resetForm();
-  showToast('Case logged! ✓ AI report + clinical note ready below.');
+
+  if (isFirstCase) {
+    showFirstCaseCelebration();
+  } else {
+    showToast('Case logged! ✓ AI report + clinical note ready below.');
+  }
 }
 
 async function generateAIReport(caseData, complexity) {
@@ -3838,23 +3863,26 @@ function updateGapAlerts() {
   const total = allCases.length;
   if (total < 3) return;
 
-  const gaps = [];
   const endo  = allCases.filter(c => c.specialty === 'endo').length;
   const resto = allCases.filter(c => c.specialty === 'restorative').length;
   const surg  = allCases.filter(c => c.specialty === 'surgery').length;
   const paeds = allCases.filter(c => c.specialty === 'paeds').length;
 
-  if (endo === 0)  gaps.push('⚡ No endodontic cases yet — critical for most specialty applications.');
-  if (resto === 0) gaps.push('⚡ Add restorative cases to show clinical diversity.');
-  if (surg === 0)  gaps.push('⚡ No surgical cases logged yet.');
-  if (paeds > 0 && paeds < 3) gaps.push('🧒 You have paediatric cases — log a few more to build a solid paeds portfolio.');
+  const summary = [];
+  if (endo  > 0) summary.push(`${endo} endodontic record${endo !== 1 ? 's' : ''}`);
+  if (resto > 0) summary.push(`${resto} restorative record${resto !== 1 ? 's' : ''}`);
+  if (surg  > 0) summary.push(`${surg} surgical record${surg !== 1 ? 's' : ''}`);
+  if (paeds > 0) summary.push(`${paeds} paediatric record${paeds !== 1 ? 's' : ''}`);
 
   const gapCard = document.getElementById('gap-card');
   const gapEl   = document.getElementById('gap-alerts');
 
-  if (gaps.length > 0) {
+  if (summary.length > 0) {
     gapCard.style.display = 'block';
-    gapEl.innerHTML = gaps.map(g => `<div class="gap-alert">${g}</div>`).join('');
+    // Update card title
+    const cardTitle = gapCard.querySelector('.card-title');
+    if (cardTitle) cardTitle.textContent = '📋 Your Clinical Record';
+    gapEl.innerHTML = `<div style="font-size:0.875rem;color:var(--white-dim);line-height:1.8;">Your record contains ${summary.join(', ')}. All documented and timestamped.</div>`;
   } else {
     gapCard.style.display = 'none';
   }
