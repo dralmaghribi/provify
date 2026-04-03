@@ -2480,50 +2480,38 @@ body::after {
       <!-- CAREER ASSISTANT VIEW -->
       <div class="view" id="view-career">
         <div class="page-header">
-          <div class="page-title">Career Assistant</div>
-          <div class="page-sub">Personalized career intelligence — built from your actual case history</div>
-        </div>
-
-        <!-- Memory Card -->
-        <div class="card" style="margin-bottom:20px;border-color:rgba(124,111,255,0.2);background:linear-gradient(135deg,rgba(124,111,255,0.06),rgba(124,111,255,0.02));">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-            <div style="flex:1;">
-              <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:8px;">⭐ Provify Memory</div>
-              <div style="font-size:0.875rem;color:var(--white-dim);line-height:1.7;" id="clinical-profile-display">
-                Provify is building your clinical profile. Log more cases to unlock deeper insights.
-              </div>
-            </div>
-            <button onclick="refreshClinicalProfile()" id="refresh-profile-btn" style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 16px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;">
-              ↻ Refresh
-            </button>
-          </div>
-        </div>
-
-        <!-- Career Advice -->
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div>
-              <div class="card-title" style="margin-bottom:4px;">Your Career Roadmap</div>
-              <div style="font-size:0.8rem;color:var(--gray);">AI-generated from your clinical data — not generic advice</div>
+              <div class="page-title">Career Intelligence</div>
+              <div class="page-sub" id="career-report-meta">Personalized career intelligence — built from your case history</div>
             </div>
-            <button onclick="generateCareerAdvice()" id="career-btn" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:600;padding:12px 24px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(124,111,255,0.35);white-space:nowrap;">
-              ⭐ Get My Career Advice
+            <button onclick="forceRefreshCareer()" id="career-refresh-btn" style="display:none;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 16px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;">
+              ↻ Refresh Report
             </button>
           </div>
+        </div>
 
-          <div id="career-output" style="display:none;">
-            <div id="career-loading" style="display:none;padding:24px;text-align:center;color:var(--gray);">
-              <div style="width:32px;height:32px;border:2px solid rgba(255,255,255,0.06);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
-              Analyzing your clinical history...
-            </div>
-            <div id="career-content" style="display:none;"></div>
+        <!-- Provify Memory -->
+        <div style="background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;">
+            <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:6px;">🧠 Provify Memory</div>
+            <div style="font-size:0.82rem;color:var(--white-dim);line-height:1.75;" id="clinical-profile-display">Building your clinical profile...</div>
           </div>
+        </div>
 
-          <div id="career-empty" style="text-align:center;padding:40px 20px;color:var(--gray);">
-            <div style="font-size:2.5rem;margin-bottom:16px;opacity:0.5;">⭐</div>
-            <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:var(--white-dim);margin-bottom:8px;">Your career roadmap is waiting</div>
-            <div style="font-size:0.875rem;line-height:1.6;">Log at least 5 cases and click "Get My Career Advice".<br>The more cases you log, the more specific the advice gets.</div>
-          </div>
+        <!-- Career Report — auto-loads -->
+        <div id="career-loading" style="padding:48px 20px;text-align:center;color:var(--gray);">
+          <div style="width:36px;height:36px;border:2px solid rgba(255,255,255,0.06);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
+          <div style="font-size:0.875rem;margin-bottom:6px;">Reading your clinical data...</div>
+          <div style="font-size:0.75rem;opacity:0.5;">This takes about 10 seconds</div>
+        </div>
+
+        <div id="career-content" style="display:none;"></div>
+
+        <div id="career-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--gray);">
+          <div style="font-size:3rem;margin-bottom:16px;opacity:0.4;">🧠</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white-dim);margin-bottom:10px;">Log 3 cases to unlock</div>
+          <div style="font-size:0.875rem;line-height:1.7;max-width:320px;margin:0 auto;">Your Career Intelligence Report generates automatically once you have 3 cases documented. The more you log, the more specific it gets.</div>
         </div>
       </div>
 
@@ -6195,30 +6183,85 @@ function loadClinicalProfileDisplay() {
   if (currentProfile?.clinical_profile) {
     display.textContent = currentProfile.clinical_profile;
   } else if (allCases.length > 0) {
-    display.textContent = 'Provify is analyzing your cases. Log a new case to generate your clinical profile.';
+    display.textContent = 'Provify is building your clinical profile — log more cases to unlock deeper insights.';
   } else {
     display.textContent = 'Log your first cases to start building your clinical profile.';
   }
+
+  // Auto-generate career report
+  autoLoadCareerReport();
 }
 
-// ─── CAREER ASSISTANT ───
-async function generateCareerAdvice() {
+function forceRefreshCareer() {
+  // Clear cache and regenerate
+  localStorage.removeItem('provify_career_report');
+  localStorage.removeItem('provify_career_meta');
+  autoLoadCareerReport(true);
+}
+
+async function autoLoadCareerReport(force = false) {
+  const loading = document.getElementById('career-loading');
+  const content = document.getElementById('career-content');
+  const empty   = document.getElementById('career-empty');
+  const meta    = document.getElementById('career-report-meta');
+  const refreshBtn = document.getElementById('career-refresh-btn');
+
+  if (!loading || !content || !empty) return;
+
+  // Not enough cases
   if (allCases.length < 3) {
-    showToast('Log at least 3 cases to unlock Career Assistant.');
+    loading.style.display = 'none';
+    content.style.display = 'none';
+    empty.style.display = 'block';
     return;
   }
 
-  const btn = document.getElementById('career-btn');
-  const output = document.getElementById('career-output');
-  const loading = document.getElementById('career-loading');
-  const content = document.getElementById('career-content');
-  const empty = document.getElementById('career-empty');
+  // Check cache
+  const cached = localStorage.getItem('provify_career_report');
+  const cachedMeta = JSON.parse(localStorage.getItem('provify_career_meta') || '{}');
+  const now = Date.now();
+  const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+  const casesSinceLastGen = allCases.length - (cachedMeta.caseCount || 0);
+  const daysSinceLastGen = cachedMeta.timestamp ? (now - cachedMeta.timestamp) / (24*60*60*1000) : 999;
 
-  btn.textContent = 'Reading your data...'; btn.disabled = true;
-  if (empty) empty.style.display = 'none';
-  output.style.display = 'block';
+  // Show refresh button if report is old or many new cases
+  if (cached && (daysSinceLastGen > 7 || casesSinceLastGen >= 5)) {
+    if (refreshBtn) refreshBtn.style.display = 'block';
+  }
+
+  // Use cache if fresh and not forced
+  if (!force && cached && daysSinceLastGen < 30 && casesSinceLastGen < 5) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    empty.style.display = 'none';
+    content.innerHTML = cached;
+    if (meta) meta.textContent = `Generated ${new Date(cachedMeta.timestamp).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})} · Based on ${cachedMeta.caseCount} cases`;
+    return;
+  }
+
+  // Generate fresh report
   loading.style.display = 'block';
   content.style.display = 'none';
+  empty.style.display = 'none';
+  if (meta) meta.textContent = 'Generating your Career Intelligence Report...';
+
+  await generateCareerAdvice(true);
+}
+
+// ─── CAREER ASSISTANT ───
+async function generateCareerAdvice(autoMode = false) {
+  if (allCases.length < 3) {
+    const empty = document.getElementById('career-empty');
+    const loading = document.getElementById('career-loading');
+    if (empty) { empty.style.display = 'block'; }
+    if (loading) { loading.style.display = 'none'; }
+    return;
+  }
+
+  const loading = document.getElementById('career-loading');
+  const content = document.getElementById('career-content');
+  const empty   = document.getElementById('career-empty');
+  const meta    = document.getElementById('career-report-meta');
 
   const name = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Doctor';
   const role = currentProfile?.role || 'intern';
@@ -6341,15 +6384,23 @@ Total maximum 500 words across all 6 sections. Every word must earn its place. D
 
     loading.style.display = 'none';
     content.style.display = 'block';
+    if (empty) empty.style.display = 'none';
     content.innerHTML = html;
+
+    // Cache the report
+    localStorage.setItem('provify_career_report', html);
+    localStorage.setItem('provify_career_meta', JSON.stringify({ timestamp: Date.now(), caseCount: total }));
+
+    if (meta) meta.textContent = `Generated ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})} · Based on ${total} cases`;
+
+    const refreshBtn = document.getElementById('career-refresh-btn');
+    if (refreshBtn) refreshBtn.style.display = 'none';
 
   } catch(e) {
     loading.style.display = 'none';
     content.style.display = 'block';
     content.innerHTML = '<div style="color:var(--gray);font-size:0.875rem;">Something went wrong. Please try again.</div>';
   }
-
-  btn.textContent = '⭐ Get My Career Advice'; btn.disabled = false;
 }
 
 // ─── START ───
