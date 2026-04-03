@@ -6214,8 +6214,8 @@ async function generateCareerAdvice() {
   const content = document.getElementById('career-content');
   const empty = document.getElementById('career-empty');
 
-  btn.textContent = 'Analyzing...'; btn.disabled = true;
-  empty.style.display = 'none';
+  btn.textContent = 'Reading your data...'; btn.disabled = true;
+  if (empty) empty.style.display = 'none';
   output.style.display = 'block';
   loading.style.display = 'block';
   content.style.display = 'none';
@@ -6230,52 +6230,61 @@ async function generateCareerAdvice() {
   const paedsCnt = allCases.filter(c => c.specialty === 'paeds').length;
   const avgScore = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
   const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
-  const clinicalProfile = currentProfile?.clinical_profile || 'No profile yet.';
-  const recentNarratives = allCases.slice(0,3).filter(c=>c.narrative).map(c=>c.narrative).join(' | ');
+  const lowComp  = allCases.filter(c => (c.complexity_score||0) < 3).length;
+  const clinicalProfile = currentProfile?.clinical_profile || '';
+  const recentNarratives = allCases.slice(0,5).filter(c=>c.narrative).map(c=>c.narrative).join(' | ');
+  const recentComplaints = [...new Set(allCases.slice(0,10).map(c=>c.complaint).filter(Boolean))].join(', ');
+  const avgDifficulty = allCases.filter(c=>c.difficulty_rating).length > 0
+    ? (allCases.filter(c=>c.difficulty_rating).reduce((s,c)=>s+(c.difficulty_rating||0),0) / allCases.filter(c=>c.difficulty_rating).length).toFixed(1)
+    : 'Not rated';
 
-  // Determine dominant specialty
   const specialtyCounts = { endo: endoCnt, restorative: restoCnt, surgery: surgCnt, paeds: paedsCnt };
   const dominantSpecialty = Object.entries(specialtyCounts).sort((a,b) => b[1]-a[1])[0][0];
+  const dominantPct = Math.round(specialtyCounts[dominantSpecialty]/total*100);
   const isSpecialist = role === 'specialist';
-  const isNarrow = isSpecialist && (specialtyCounts[dominantSpecialty] / total) > 0.85;
 
-  const specialistNote = isSpecialist
-    ? `This dentist is a specialist/consultant. Analyze ONLY within their primary specialty (${dominantSpecialty}). Do NOT mention or suggest other specialties as blind spots — specialists are expected to focus on one area. Blind spots should be about complexity, case types, or techniques within their specialty only.`
-    : `This dentist is NOT a specialist. It is appropriate to comment on their specialty balance and suggest areas to develop.`;
+  const specialtyFullName = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry' }[dominantSpecialty] || dominantSpecialty;
 
-  const prompt = `You are a senior dental career advisor with 20 years of experience mentoring dentists globally across the GCC, UK, USA, and Australia. You have access to a dentist's complete clinical and career data through Provify.
+  const prompt = `You are the world's most insightful dental career strategist. You have mentored dentists across the GCC, UK, USA, Australia, Germany, and Canada. You have deep knowledge of dental job markets, postgraduate pathways, specialty demand by country, salary expectations, licensing requirements, and career trajectories. You speak with the directness of a mentor who has seen hundreds of dental careers succeed and fail.
 
-DENTIST PROFILE:
+You are now analyzing the complete clinical and career data of a dentist through Provify. Your job is to give them the most valuable, specific, and honest career intelligence they have ever received. Make them feel seen. Make them feel like you've been watching their career for years. Say things they haven't heard before. Shock them with accuracy.
+
+COMPLETE CLINICAL DATA:
 - Name: ${name}
 - Current role: ${roleLabel}
-- Total logged cases: ${total}
-- Specialty breakdown: Endo ${endoCnt} | Restorative ${restoCnt} | Surgery ${surgCnt} | Paeds ${paedsCnt}
-- Dominant specialty: ${dominantSpecialty} (${Math.round(specialtyCounts[dominantSpecialty]/total*100)}% of cases)
-- Average complexity: ${avgScore}/10
-- High complexity cases (7+): ${highComp}
-- Clinical profile: ${clinicalProfile}
-- Recent case narratives: ${recentNarratives || 'None yet'}
+- Total documented cases: ${total}
+- Specialty breakdown: Endodontics ${endoCnt} (${dominantSpecialty === 'endo' ? dominantPct+'%' : Math.round(endoCnt/total*100)+'%'}) | Restorative ${restoCnt} (${Math.round(restoCnt/total*100)}%) | Oral Surgery ${surgCnt} (${Math.round(surgCnt/total*100)}%) | Paediatric ${paedsCnt} (${Math.round(paedsCnt/total*100)}%)
+- Dominant specialty: ${specialtyFullName} — ${dominantPct}% of all cases
+- Average complexity score: ${avgScore}/10
+- High complexity cases (7+/10): ${highComp} of ${total}
+- Low complexity cases (<3/10): ${lowComp} of ${total}
+- Self-rated difficulty average: ${avgDifficulty}/5
+- Common chief complaints: ${recentComplaints || 'Not recorded'}
+- Provify clinical profile: ${clinicalProfile || 'Building...'}
+- Recent case narratives (their own words): ${recentNarratives || 'None written yet'}
+- Role classification: ${isSpecialist ? 'Specialist — do NOT suggest specialty changes, focus on depth and market strategy within their specialty' : 'Pre-specialist — specialty balance and clinical breadth are fair game'}
 
-SPECIALIST GUIDANCE: ${specialistNote}
+Generate their Career Intelligence Report structured EXACTLY as these 6 sections. Each section must be a flowing paragraph — NO bullet points, NO numbered lists. Talk directly to them. Use "you" throughout. Reference their actual numbers — never give advice that could apply to any other dentist.
 
-Generate a deeply personalized career roadmap. Be a real mentor — not a chatbot. Structure it EXACTLY as:
+WHO YOU ARE AS A CLINICIAN
+[Read their data and tell them who they are as a clinician in a way they've never heard articulated. What does their case mix, complexity pattern, and self-ratings reveal about their clinical personality? What type of dentist are they becoming — and is that who they want to be? Be insightful, not descriptive. This should feel like someone who has watched them work.]
 
-WHERE YOU ARE NOW
-[2-3 sentences about their current clinical stage. Reference their actual numbers. Be honest about what the data shows.]
+YOUR MARKET VALUE RIGHT NOW
+[Based on their current data, what is their honest market value? What type of clinic or hospital would hire them today and why? What would they be turned down for and why? What is their competitive advantage compared to other dentists at their stage? Be specific about what makes them hireable or not.]
 
-YOUR CLINICAL IDENTITY
-[What kind of dentist are they becoming? What does their case mix and complexity say about them? Be specific.]
+WHERE IN THE WORLD YOU SHOULD BUILD YOUR CAREER
+[Give specific country and market recommendations based on their dominant specialty and clinical stage. For ${specialtyFullName} — which countries have the highest demand right now? Which markets pay the best? Which are easiest to enter without additional exams? Which should they avoid and why? Include specific countries: consider UAE, Saudi Arabia, Qatar, Kuwait, UK, Ireland, Australia, Canada, Germany, USA. Be opinionated. Give a real recommendation with reasons, not a list of options.]
 
-YOUR NEXT 90 DAYS
-[3 specific, immediately actionable steps. Include: 1 clinical skill to develop, 1 course or certification to pursue with a real name (e.g. MFDS, MJDF, ITI implant course, EndoAdvance, CBCT interpretation course), 1 career move to make (apply to a specific type of clinic, join a study club, contact a specific type of mentor).]
+YOUR NEXT 90 DAYS — 3 MOVES
+[Three specific, immediately executable moves. Each one should be something they can start this week. Include: one clinical skill gap to close with a specific technique or procedure to practice, one real course or qualification to research and apply for (use real qualification names: MFDS, MJDF, MDS, MClinDent, ITI implant course, EndoAdvance Dubai, CBCT course, etc.), and one career network move (who to contact, what type of mentor to find, what type of clinic to shadow at). Do NOT use bullet points — write this as a paragraph with "First...", "Second...", "Third...".]
 
-YOUR 1-YEAR TARGET
-[Specific career target for 12 months. Include: whether to pursue a masters/postgrad degree and in which country (e.g. UK, Australia, USA, UAE, Egypt) and why. Whether to aim for private practice, hospital, academic, or specialist practice. Which postgrad qualification to pursue (MClinDent, MDS, MSc, MFDS, FRCD, board certification). Be specific and opinionated — give a real recommendation based on their data.]
+YOUR 1-YEAR CAREER TARGET
+[Give them one specific, opinionated career target for 12 months. Should they stay in their current country or move? Should they pursue a postgraduate degree — and if so, which one (MClinDent, MSc, MDS, MRD, MFDS + specialty), in which country, and at which type of institution? Should they aim for private practice, specialist referral practice, academic, or hospital? What specific milestone should they hit in 12 months that will meaningfully change their career trajectory? Be specific. Give one recommendation, not options.]
 
-THE HONEST TRUTH
-[One paragraph of direct mentor-level honesty. What is their biggest career risk right now? What are they avoiding? What do they need to hear that nobody else will tell them? Be direct. Do not soften this.]
+THE THING NOBODY ELSE WILL TELL YOU
+[One paragraph of raw, honest, mentor-level truth. What is the single biggest risk to their career right now based on their data? What pattern are they falling into that they probably haven't noticed? What assumption are they making about their career that might be wrong? What are they avoiding? Do not soften this. This is the thing a real mentor says when there's nobody else in the room. Maximum 4 sentences. Make it land.]
 
-Maximum 400 words. Never use bullet points inside sections. Write in flowing paragraphs. Talk directly to them as "you". Be specific to their actual data — never give advice that could apply to any dentist.`;
+Total maximum 500 words across all 6 sections. Every word must earn its place. Do not pad. Do not generalize. Be the mentor they've never had.`;
 
   try {
     const res = await fetch('/api/analyze', {
@@ -6289,16 +6298,16 @@ Maximum 400 words. Never use bullet points inside sections. Write in flowing par
       })
     });
     const data = await res.json();
-    const text = (data.career || data.note || data.content?.[0]?.text || '').trim();
+    const text = (data.career || data.note || '').trim();
     if (!text) throw new Error('No response');
 
-    // Parse sections
     const sections = [
-      { key: 'WHERE YOU ARE NOW',    icon: '📍', color: 'var(--gray)' },
-      { key: 'YOUR CLINICAL IDENTITY', icon: '⭐', color: 'var(--teal)' },
-      { key: 'YOUR NEXT 90 DAYS',    icon: '🎯', color: '#F59E0B' },
-      { key: 'YOUR 1-YEAR TARGET',   icon: '🏆', color: '#34D399' },
-      { key: 'THE HONEST TRUTH',     icon: '💡', color: '#EF4444' },
+      { key: 'WHO YOU ARE AS A CLINICIAN',        icon: '🧠', color: '#9B91FF' },
+      { key: 'YOUR MARKET VALUE RIGHT NOW',        icon: '💼', color: '#F59E0B' },
+      { key: 'WHERE IN THE WORLD YOU SHOULD BUILD YOUR CAREER', icon: '🌍', color: '#34D399' },
+      { key: 'YOUR NEXT 90 DAYS — 3 MOVES',       icon: '🎯', color: '#7C6FFF' },
+      { key: 'YOUR 1-YEAR CAREER TARGET',          icon: '🏆', color: '#60A5FA' },
+      { key: 'THE THING NOBODY ELSE WILL TELL YOU', icon: '⚡', color: '#EF4444' },
     ];
 
     let html = '';
@@ -6311,20 +6320,24 @@ Maximum 400 words. Never use bullet points inside sections. Write in flowing par
       const end = nextKey ? remaining.indexOf(nextKey) : remaining.length;
       const body = remaining.substring(start + s.key.length, end !== -1 ? end : undefined)
         .trim()
-        .replace(/^[\s:*-]+/, '')
+        .replace(/^[\s:*\-#]+/, '')
         .replace(/##/g, '')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .trim();
 
       html += `
-        <div style="padding:16px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
-          <div style="font-size:0.65rem;color:${s.color};text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">${s.icon} ${s.key}</div>
-          <div style="font-size:0.875rem;color:var(--white-dim);line-height:1.75;">${body}</div>
+        <div style="padding:20px;border-radius:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);margin-bottom:12px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${s.color};border-radius:0 3px 3px 0;"></div>
+          <div style="font-size:0.62rem;color:${s.color};text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:10px;padding-left:4px;">${s.icon} ${s.key}</div>
+          <div style="font-size:0.875rem;color:rgba(255,255,255,0.8);line-height:1.85;padding-left:4px;">${body}</div>
         </div>`;
     });
 
     if (!html) html = `<div style="font-size:0.875rem;color:var(--white-dim);line-height:1.75;white-space:pre-wrap;">${text}</div>`;
+
+    // Add timestamp
+    html += `<div style="font-size:0.65rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:8px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">Generated ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})} · Based on ${total} documented cases</div>`;
 
     loading.style.display = 'none';
     content.style.display = 'block';
