@@ -110,7 +110,7 @@ Keep each field to 1-2 sentences max. Be specific, clinical, and genuinely usefu
 
     // ─── CAREER ASSISTANT ───
     if (mode === 'career') {
-      const text = await callClaude(careerPrompt, 700);
+      const text = await callClaude(careerPrompt, 1000);
       return res.status(200).json({ career: text });
     }
 
