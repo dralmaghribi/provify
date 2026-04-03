@@ -878,6 +878,7 @@ body::after {
 .photo-upload-box:hover { border-color: rgba(124,111,255,0.4); background: rgba(124,111,255,0.04); }
 .photo-preview-empty { color: var(--gray); font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 </style>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 </head>
 <body>
 
@@ -1038,6 +1039,32 @@ body::after {
       <button onclick="loadNewSimulation()" style="width:100%;margin-top:16px;background:var(--white-faint);border:1px solid var(--white-faint);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:500;padding:11px;border-radius:10px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal-mid)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--white-faint)';this.style.color='var(--white-dim)'">⚡ Generate Another Scenario</button>
     </div>
 
+  </div>
+</div>
+
+<!-- ─── PAYWALL MODAL ─── -->
+<div id="paywall-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:800;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.3);border-radius:28px;width:100%;max-width:460px;padding:40px 36px;text-align:center;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
+    <div style="font-size:2.5rem;margin-bottom:16px;">🛡</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">You've reached the free limit.</div>
+    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:28px;">You've logged 10 cases on the free tier. Upgrade to Pro for unlimited cases, AI feedback, medico-legal records, and your Career Assistant.</div>
+    <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px;margin-bottom:24px;text-align:left;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>Unlimited cases</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>AI case intelligence reports</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>🛡 Medico-legal record + verification URL</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>Auto clinical note generation</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>Career Assistant</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>PDF portfolio export</div>
+      </div>
+    </div>
+    <button onclick="openPaddleCheckout()" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;padding:16px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">
+      Upgrade to Pro — $29/month →
+    </button>
+    <button onclick="document.getElementById('paywall-modal').style.display='none';" style="background:none;border:none;color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;cursor:pointer;padding:8px;">
+      Maybe later
+    </button>
   </div>
 </div>
 
@@ -2572,6 +2599,11 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let currentProfile = null;
 let allCases = [];
+
+// ─── PADDLE PAYMENTS ───
+const PADDLE_PRICE_ID = 'pri_REPLACE_WITH_YOUR_PRICE_ID'; // Replace when Paddle approves
+const FREE_TIER_LIMIT = 10;
+let isPro = false;
 let selectedSpecialty = 'endo';
 let selectedRating = 0;
 let selectedToothNum = null;
@@ -2955,6 +2987,8 @@ async function loadProfile() {
     document.getElementById('user-display-name').textContent = `Dr. ${data.first_name || 'User'}`;
     document.getElementById('user-avatar').textContent = (data.first_name?.[0] || 'D') + (data.last_name?.[0] || 'R');
   }
+  checkProStatus();
+  initPaddle();
 }
 
 async function handleLogout() {
@@ -3107,6 +3141,12 @@ function calculateComplexity() {
 }
 
 async function submitCase() {
+  // Free tier limit check
+  if (!isPro && allCases.length >= FREE_TIER_LIMIT) {
+    showPaywall();
+    return;
+  }
+
   const tooth = document.getElementById('f-tooth').value;
   const age = document.getElementById('f-age').value;
   const complaint = document.getElementById('f-complaint').value;
@@ -5763,6 +5803,41 @@ function openCaseVerification() {
   if (!currentModalCase) return;
   const url = `https://provify.app/verify.html?id=${currentModalCase.id}`;
   window.open(url, '_blank');
+}
+
+// ─── PADDLE PAYMENTS ───
+function initPaddle() {
+  if (typeof Paddle === 'undefined') return;
+  Paddle.Environment.set('sandbox'); // Change to 'production' when Paddle approves
+  Paddle.Initialize({ token: 'REPLACE_WITH_CLIENT_SIDE_TOKEN' });
+}
+
+function openPaddleCheckout() {
+  if (typeof Paddle === 'undefined') {
+    showToast('Payment system loading. Try again in a moment.');
+    return;
+  }
+  Paddle.Checkout.open({
+    items: [{ priceId: PADDLE_PRICE_ID, quantity: 1 }],
+    customer: { email: currentUser?.email || '' },
+    successUrl: 'https://provify.app/app.html?upgraded=true',
+  });
+}
+
+function checkProStatus() {
+  isPro = currentProfile?.is_pro === true;
+  // Update plan display
+  const planEl = document.querySelector('.user-plan');
+  if (planEl) planEl.textContent = isPro ? 'Pro' : 'Free — 10 cases';
+  // Check URL for successful upgrade
+  if (window.location.search.includes('upgraded=true')) {
+    showToast('Welcome to Pro! All features unlocked. 🎉');
+    window.history.replaceState({}, '', '/app.html');
+  }
+}
+
+function showPaywall() {
+  document.getElementById('paywall-modal').style.display = 'flex';
 }
 
 // ─── LOG FORM STEPS ───
