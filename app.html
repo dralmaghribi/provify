@@ -3671,9 +3671,16 @@ async function openCaseDetail(id) {
     photoSection.innerHTML = '';
 
     const photoLabels = {
-      'xr-preop': 'Pre-op X-ray', 'xr-wl': 'Working Length', 'xr-obturation': 'Obturation',
-      'xr-postop': 'Post-op X-ray', 'ph-preop': 'Pre-op Photo', 'ph-intraop': 'Intra-op Photo',
-      'ph-postop': 'Post-op Photo'
+      'xr-preop': 'Pre-op X-ray',
+      'xr-wl': 'Working Length',
+      'xr-mc': 'Master Cone',
+      'xr-obturation': 'Obturation',
+      'xr-postop': 'Post-op X-ray',
+      'xr-gen-preop': 'Pre-op X-ray',
+      'xr-gen-postop': 'Post-op X-ray',
+      'cp-preop': 'Pre-op Photo',
+      'cp-postop': 'Post-op Photo',
+      'cp-intraoral': 'Intra-oral Photo'
     };
 
     // List all files in this case's storage folder
