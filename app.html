@@ -824,6 +824,32 @@ body::after {
 }
 .ob-role-btn:hover { border-color: rgba(124,111,255,0.3); color: var(--white); }
 .ob-role-btn.selected { background: rgba(124,111,255,0.12); border-color: rgba(124,111,255,0.4); color: var(--teal); font-weight: 500; }
+/* ─── LOG FORM STEPS ─── */
+.log-step-indicator {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: all 0.2s; padding: 4px 8px;
+}
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: var(--gray); font-size: 0.75rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.step-label { font-size: 0.65rem; color: var(--gray); white-space: nowrap; transition: color 0.2s; }
+.log-step-indicator.active .step-num { background: var(--teal); border-color: var(--teal); color: var(--navy); box-shadow: 0 0 12px rgba(124,111,255,0.4); }
+.log-step-indicator.active .step-label { color: var(--teal); font-weight: 500; }
+.log-step-indicator.done .step-num { background: rgba(124,111,255,0.2); border-color: rgba(124,111,255,0.4); color: var(--teal); }
+.log-step-indicator.done .step-label { color: var(--teal); }
+.step-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); margin: 0 4px; margin-bottom: 18px; transition: background 0.3s; }
+.step-line.done { background: rgba(124,111,255,0.4); }
+.log-step-panel { display: none; animation: fadeUp 0.3s ease both; }
+.log-step-panel.active { display: block; }
+.step-nav { display: flex; gap: 10px; margin-top: 20px; }
+.step-btn-next { flex: 1; background: linear-gradient(135deg,#7C6FFF,#9B91FF); color: white; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; padding: 14px; border-radius: 14px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(124,111,255,0.3); }
+.step-btn-next:hover { transform: translateY(-2px); }
+.step-btn-back { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--gray); font-family: 'Inter', sans-serif; font-size: 0.875rem; padding: 14px 20px; border-radius: 14px; cursor: pointer; transition: all 0.2s; }
+.step-btn-back:hover { color: var(--white); }
+
 .ql-tag {
   padding: 7px 14px; border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.08);
@@ -1486,20 +1512,39 @@ body::after {
         <div class="page-header">
           <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
             <div>
-              <div class="page-title">Log a Case</div>
-              <div class="page-sub">Takes about 3 minutes — your AI report is instant</div>
+              <div class="page-title" id="log-step-title">Log a Case</div>
+              <div class="page-sub" id="log-step-sub">Step 1 of 3 — The essentials</div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
-              <!-- TIMER -->
               <div style="background:var(--navy-2); border:1px solid var(--white-faint); border-radius:10px; padding:8px 14px; display:flex; align-items:center; gap:10px;">
                 <div id="timer-display" style="font-family:monospace; font-size:1rem; color:var(--white); min-width:52px">00:00</div>
                 <button onclick="toggleTimer()" id="timer-btn" style="background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s;">▶ Start</button>
               </div>
             </div>
           </div>
+          <!-- Step indicator -->
+          <div style="display:flex;align-items:center;gap:0;margin-top:20px;">
+            <div class="log-step-indicator active" id="step-ind-1" onclick="goToLogStep(1)">
+              <div class="step-num">1</div>
+              <div class="step-label">Essentials</div>
+            </div>
+            <div class="step-line" id="step-line-1"></div>
+            <div class="log-step-indicator" id="step-ind-2" onclick="goToLogStep(2)">
+              <div class="step-num">2</div>
+              <div class="step-label">Clinical Details</div>
+            </div>
+            <div class="step-line" id="step-line-2"></div>
+            <div class="log-step-indicator" id="step-ind-3" onclick="goToLogStep(3)">
+              <div class="step-num">3</div>
+              <div class="step-label">Record & Photos</div>
+            </div>
+          </div>
         </div>
 
         <div class="log-form">
+
+          <!-- ═══ STEP 1 — ESSENTIALS ═══ -->
+          <div class="log-step-panel active" id="log-step-1">
 
           <!-- QUICK TEMPLATES -->
           <div style="margin-bottom:20px;">
@@ -1635,7 +1680,17 @@ body::after {
               </div>
               <input type="hidden" id="f-tooth">
             </div>
+          </div><!-- end patient info form-section -->
+
+          <!-- Step 1 next button -->
+          <div class="step-nav">
+            <button class="step-btn-next" onclick="goToLogStep(2)">Next — Clinical Details →</button>
           </div>
+
+          </div><!-- end log-step-1 -->
+
+          <!-- ═══ STEP 2 — CLINICAL DETAILS ═══ -->
+          <div class="log-step-panel" id="log-step-2">
 
           <!-- ENDO FIELDS -->
           <div id="endo-fields">
@@ -1962,6 +2017,17 @@ body::after {
             </div>
           </div>
 
+          <!-- Step 2 nav -->
+          <div class="step-nav">
+            <button class="step-btn-back" onclick="goToLogStep(1)">← Back</button>
+            <button class="step-btn-next" onclick="goToLogStep(3)">Next — Record & Photos →</button>
+          </div>
+
+          </div><!-- end log-step-2 -->
+
+          <!-- ═══ STEP 3 — RECORD & PHOTOS ═══ -->
+          <div class="log-step-panel" id="log-step-3">
+
           <!-- X-RAYS -->
           <div class="form-section">
             <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
@@ -2143,9 +2209,16 @@ body::after {
             </div>
           </div>
 
+          <!-- Step 3 back button -->
+          <div style="margin-bottom:12px;">
+            <button class="step-btn-back" onclick="goToLogStep(2)">← Back to Clinical Details</button>
+          </div>
+
           <button class="btn btn-primary" onclick="submitCase()" id="submit-case-btn">
             Log Case & Get AI Report →
           </button>
+
+          </div><!-- end log-step-3 -->
 
           <!-- AI REPORT -->
           <div class="ai-report" id="ai-report">
@@ -2731,6 +2804,8 @@ function resetForm() {
   const templateSection = document.getElementById('template-grid');
   if (templateSection) templateSection.parentElement.style.display = 'block';
   if (templateSection) templateSection.style.display = 'grid';
+  // Reset to step 1
+  goToLogStep(1);
 }
 
 function hideLoading() {
@@ -4920,7 +4995,12 @@ function applyTemplate(type) {
     if (t.behaviour)         setSelect('f-behaviour', t.behaviour);
     if (t.dentition)         setSelect('f-dentition', t.dentition);
     if (t.space_maintainer)  setSelect('f-space-maintainer', t.space_maintainer);
-    showToast('Template applied ✓ Fill in the remaining details');
+    showToast('Template applied ✓ Select your tooth to continue');
+    // Hide template grid and advance to step 2 after a short delay
+    setTimeout(() => {
+      const tg = document.getElementById('template-grid');
+      if (tg) tg.parentElement.style.display = 'none';
+    }, 100);
   }, 200);
 }
 
@@ -5583,6 +5663,52 @@ function openCaseVerification() {
   if (!currentModalCase) return;
   const url = `https://provify.app/verify.html?id=${currentModalCase.id}`;
   window.open(url, '_blank');
+}
+
+// ─── LOG FORM STEPS ───
+let currentLogStep = 1;
+
+function goToLogStep(step) {
+  // Validate step 1 before going to step 2
+  if (step === 2 && currentLogStep === 1) {
+    const tooth = document.getElementById('f-tooth')?.value;
+    const age = document.getElementById('f-age')?.value || document.getElementById('f-age-text')?.value;
+    const complaint = document.getElementById('f-complaint')?.value;
+    if (!tooth) { showToast('Please select a tooth first.'); return; }
+    if (!age) { showToast('Please select patient age.'); return; }
+    if (!complaint) { showToast('Please select chief complaint.'); return; }
+  }
+
+  currentLogStep = step;
+
+  // Update panels
+  [1,2,3].forEach(s => {
+    const panel = document.getElementById(`log-step-${s}`);
+    if (panel) panel.classList.toggle('active', s === step);
+  });
+
+  // Update indicators
+  [1,2,3].forEach(s => {
+    const ind = document.getElementById(`step-ind-${s}`);
+    if (!ind) return;
+    ind.classList.remove('active','done');
+    if (s === step) ind.classList.add('active');
+    else if (s < step) ind.classList.add('done');
+  });
+
+  // Update step lines
+  [1,2].forEach(s => {
+    const line = document.getElementById(`step-line-${s}`);
+    if (line) line.classList.toggle('done', s < step);
+  });
+
+  // Update subtitle
+  const subs = ['', 'Step 1 of 3 — The essentials', 'Step 2 of 3 — Clinical details', 'Step 3 of 3 — Record & photos'];
+  const subEl = document.getElementById('log-step-sub');
+  if (subEl) subEl.textContent = subs[step] || '';
+
+  // Scroll to top of form
+  document.getElementById('view-log')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ─── QUICK LOG ───
