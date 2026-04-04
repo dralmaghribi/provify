@@ -2483,10 +2483,10 @@ body::after {
           <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div>
               <div class="page-title">Career Intelligence</div>
-              <div class="page-sub" id="career-report-meta">Personalized career intelligence — built from your case history</div>
+              <div class="page-sub" id="career-report-meta">Updates automatically as you log more cases</div>
             </div>
             <button onclick="forceRefreshCareer()" id="career-refresh-btn" style="display:none;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 16px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;">
-              ↻ Refresh Report
+              ↻ Regenerate
             </button>
           </div>
         </div>
@@ -6380,7 +6380,8 @@ Total maximum 500 words across all 6 sections. Every word must earn its place. D
     if (!html) html = `<div style="font-size:0.875rem;color:var(--white-dim);line-height:1.75;white-space:pre-wrap;">${text}</div>`;
 
     // Add timestamp
-    html += `<div style="font-size:0.65rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:8px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">Generated ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})} · Based on ${total} documented cases</div>`;
+    const now = new Date();
+    html += `<div style="font-size:0.65rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:8px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">Generated ${now.toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})} · Based on ${total} documented cases<br><span style="color:rgba(124,111,255,0.35);">Log more cases to get more specific advice</span></div>`;
 
     loading.style.display = 'none';
     content.style.display = 'block';
@@ -6388,13 +6389,18 @@ Total maximum 500 words across all 6 sections. Every word must earn its place. D
     content.innerHTML = html;
 
     // Cache the report
-    localStorage.setItem('provify_career_report', html);
-    localStorage.setItem('provify_career_meta', JSON.stringify({ timestamp: Date.now(), caseCount: total }));
+    try {
+      localStorage.setItem('provify_career_report', html);
+      localStorage.setItem('provify_career_meta', JSON.stringify({ timestamp: Date.now(), caseCount: total }));
+    } catch(e) {}
 
-    if (meta) meta.textContent = `Generated ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})} · Based on ${total} cases`;
+    // Update meta line
+    const metaEl = document.getElementById('career-report-meta');
+    if (metaEl) metaEl.textContent = `Last updated ${now.toLocaleDateString('en-GB', {day:'numeric',month:'long'})} · ${total} cases · Regenerate after logging more cases`;
 
+    // Show refresh button
     const refreshBtn = document.getElementById('career-refresh-btn');
-    if (refreshBtn) refreshBtn.style.display = 'none';
+    if (refreshBtn) refreshBtn.style.display = 'block';
 
   } catch(e) {
     loading.style.display = 'none';
