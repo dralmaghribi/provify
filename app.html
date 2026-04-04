@@ -6976,15 +6976,36 @@ Respond ONLY with a valid JSON object. No markdown. No explanation. Extract thes
     });
     const data = await res.json();
     const raw = (data.voice || data.note || '').trim().replace(/```json|```/g, '').trim();
-    vlExtractedData = JSON.parse(raw);
+
+    try {
+      vlExtractedData = JSON.parse(raw);
+    } catch(jsonErr) {
+      // JSON failed — build minimal object from transcript so user can still log
+      vlExtractedData = {
+        corrected_transcript: transcript,
+        specialty: vlSpecialty,
+        tooth_number: null,
+        age_range: null,
+        complaint: null,
+        narrative: transcript.substring(0, 200)
+      };
+    }
 
     clearInterval(msgInterval);
     showVLReview(vlExtractedData, transcript);
 
   } catch(e) {
     clearInterval(msgInterval);
-    showToast('Could not process speech. Please try again.');
-    showVLScreen('coach');
+    // Even on total failure — show review with raw transcript so case isn't lost
+    vlExtractedData = {
+      corrected_transcript: transcript,
+      specialty: vlSpecialty,
+      tooth_number: null,
+      age_range: null,
+      complaint: null,
+      narrative: transcript.substring(0, 200)
+    };
+    showVLReview(vlExtractedData, transcript);
   }
 }
 
