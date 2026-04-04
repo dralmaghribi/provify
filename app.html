@@ -1630,7 +1630,7 @@ body::after {
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">First Name</label>
-          <input type="text" class="form-input" id="signup-first" placeholder="Abdullah">
+          <input type="text" class="form-input" id="signup-first" placeholder="First name">
         </div>
         <div class="form-group">
           <label class="form-label">Last Name</label>
@@ -1859,6 +1859,18 @@ body::after {
             <div style="font-size:0.75rem;color:var(--gray)">Highest complexity</div>
           </div>
           <div id="best-work-list" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
+        </div>
+
+        <!-- ACHIEVEMENTS — moved from nav to dashboard -->
+        <div class="card" id="achievements-dash-card" style="display:none;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+              <div class="card-title" style="margin:0;">Achievements</div>
+              <div style="font-size:0.7rem;color:var(--gray);margin-top:2px;" id="achievements-dash-sub">Earned 0 of 0</div>
+            </div>
+            <div style="font-size:0.7rem;color:var(--teal);cursor:pointer;" onclick="showView('badges')">See all →</div>
+          </div>
+          <div id="achievements-dash-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;"></div>
         </div>
 
         <!-- REVIEWS -->
@@ -3095,11 +3107,11 @@ body::after {
           <div class="form-row" style="margin-bottom:16px">
             <div class="form-group">
               <label class="form-label">First Name</label>
-              <input type="text" class="form-input" id="profile-first" placeholder="Abdullah">
+              <input type="text" class="form-input" id="profile-first" placeholder="First name">
             </div>
             <div class="form-group">
               <label class="form-label">Last Name</label>
-              <input type="text" class="form-input" id="profile-last" placeholder="Almaghribi">
+              <input type="text" class="form-input" id="profile-last" placeholder="Last name">
             </div>
           </div>
           <div class="form-group" style="margin-bottom:16px">
@@ -3111,6 +3123,27 @@ body::after {
               <option value="general">General Dentist</option>
               <option value="specialist">Specialist</option>
             </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Primary Specialty <span style="color:var(--gray);font-size:0.7rem">— personalizes your AI feedback, career advice & achievements</span></label>
+            <select class="form-select" id="profile-specialty">
+              <option value="">Select your specialty</option>
+              <option value="general">General Dentistry</option>
+              <option value="endo">Endodontics</option>
+              <option value="restorative">Restorative Dentistry</option>
+              <option value="surgery">Oral & Maxillofacial Surgery</option>
+              <option value="paeds">Paediatric Dentistry</option>
+              <option value="prostho">Prosthodontics</option>
+              <option value="perio">Periodontics</option>
+              <option value="ortho">Orthodontics</option>
+              <option value="radiology">Oral Radiology</option>
+              <option value="public_health">Dental Public Health</option>
+              <option value="oral_medicine">Oral Medicine & Pathology</option>
+            </select>
+            <div style="font-size:0.7rem;color:var(--teal);margin-top:6px;padding:8px 12px;background:rgba(124,111,255,0.06);border-radius:8px;border:1px solid rgba(124,111,255,0.15);" id="specialty-personalization-note" style="display:none;">
+              ✓ Provify will personalize your AI feedback, achievements, and career advice for <span id="specialty-name-preview">your specialty</span>.
+            </div>
           </div>
 
           <div class="form-section-title" style="margin-top:24px">Portfolio Settings</div>
@@ -4208,6 +4241,28 @@ function updateDashboard() {
     recentEl.innerHTML = `<div class="cases-list">${recent.map(c => caseItemHTML(c)).join('')}</div>`;
   }
 
+  // Achievements on dashboard
+  const achCard = document.getElementById('achievements-dash-card');
+  const achGrid = document.getElementById('achievements-dash-grid');
+  const achSub = document.getElementById('achievements-dash-sub');
+  if (achCard && achGrid && total > 0) {
+    achCard.style.display = 'block';
+    const badges = getSpecialtyBadges();
+    const earned = badges.filter(b => b.check(allCases));
+    const nextUp = badges.filter(b => !b.check(allCases)).slice(0, 4);
+    if (achSub) achSub.textContent = `${earned.length} earned · ${nextUp.length} to unlock`;
+    // Show earned + next few to unlock
+    const toShow = [...earned.slice(-4), ...nextUp].slice(0, 8);
+    achGrid.innerHTML = toShow.map(b => {
+      const isEarned = b.check(allCases);
+      return `<div style="background:${isEarned ? 'rgba(124,111,255,0.08)' : 'rgba(255,255,255,0.02)'};border:1px solid ${isEarned ? 'rgba(124,111,255,0.25)' : 'rgba(255,255,255,0.05)'};border-radius:12px;padding:12px 8px;text-align:center;${isEarned ? '' : 'opacity:0.45;'}">
+        <div style="font-size:1.4rem;margin-bottom:6px;${isEarned ? '' : 'filter:grayscale(1);'}">${b.emoji}</div>
+        <div style="font-size:0.62rem;font-weight:600;color:${isEarned ? 'var(--white)' : 'var(--gray)'};">${b.name}</div>
+        ${isEarned ? '<div style="font-size:0.55rem;color:var(--teal);margin-top:2px;">✓ Earned</div>' : ''}
+      </div>`;
+    }).join('');
+  }
+
   updateGapAlerts();
   loadBestWork();
   loadDashboardReviews();
@@ -4819,31 +4874,99 @@ function updateGapAlerts() {
 }
 
 // ─── BADGES ───
-const BADGES = [
-  { id: 'first-case',    emoji: '🌟', name: 'First Case',       desc: 'Log your very first case',           check: (cases) => cases.length >= 1 },
-  { id: '10-cases',      emoji: '📋', name: '10 Cases',         desc: 'Log 10 cases total',                 check: (cases) => cases.length >= 10 },
-  { id: '25-cases',      emoji: '🎯', name: '25 Cases',         desc: 'Log 25 cases total',                 check: (cases) => cases.length >= 25 },
-  { id: '100-cases',     emoji: '💯', name: '100 Cases',        desc: 'Log 100 cases total',                check: (cases) => cases.length >= 100 },
-  { id: 'endo-pro',      emoji: '🦷', name: 'Endo Pro',         desc: 'Log 10 endodontic cases',            check: (cases) => cases.filter(c => c.specialty === 'endo').length >= 10 },
-  { id: 'well-rounded',  emoji: '🌐', name: 'Well Rounded',     desc: 'Log cases in all 3 core specialties',check: (cases) => ['endo','restorative','surgery'].every(s => cases.some(c => c.specialty === s)) },
-  { id: 'high-complexity',emoji: '🔥',name: 'Complexity King',  desc: 'Log a case with score 8+',           check: (cases) => cases.some(c => c.complexity_score >= 8) },
-  { id: 'retreatment',   emoji: '🔄', name: 'Retreatment Pro',  desc: 'Log 5 retreatment cases',            check: (cases) => cases.filter(c => c.case_type === 'Retreatment').length >= 5 },
-  { id: 'diverse',       emoji: '🎨', name: 'Diverse Clinician',desc: 'Log 5 cases in each core specialty', check: (cases) => ['endo','restorative','surgery'].every(s => cases.filter(c => c.specialty === s).length >= 5) },
-  { id: 'portfolio-ready',emoji:'📄', name: 'Portfolio Ready',  desc: 'Log 50 cases',                       check: (cases) => cases.length >= 50 },
-  { id: 'paeds-pro',     emoji: '🧒', name: 'Paeds Pro',        desc: 'Log 5 paediatric cases',             check: (cases) => cases.filter(c => c.specialty === 'paeds').length >= 5 },
-];
+function getSpecialtyBadges() {
+  const spec = currentProfile?.primary_specialty || 'general';
+  const role = currentProfile?.role || 'intern';
 
-function renderBadges() {
-  const grid = document.getElementById('badge-grid');
-  grid.innerHTML = BADGES.map(b => {
-    const earned = b.check(allCases);
+  // Universal badges everyone gets
+  const universal = [
+    { id: 'first-case',     emoji: '🌟', name: 'First Record',      desc: 'Log your very first case',                    check: c => c.length >= 1 },
+    { id: '10-cases',       emoji: '📋', name: '10 Cases',          desc: 'Log 10 cases',                                check: c => c.length >= 10 },
+    { id: '25-cases',       emoji: '🎯', name: '25 Cases',          desc: 'Log 25 cases',                                check: c => c.length >= 25 },
+    { id: '50-cases',       emoji: '💯', name: '50 Cases',          desc: 'Log 50 cases',                                check: c => c.length >= 50 },
+    { id: 'high-complexity',emoji: '🔥', name: 'Complex Case',      desc: 'Log a case with complexity 8+',               check: c => c.some(x => (x.complexity_score||0) >= 8) },
+    { id: 'streak-5',       emoji: '⚡', name: '5-Day Streak',      desc: 'Log cases 5 days in a row',                   check: c => calculateStreak() >= 5 },
+    { id: 'verified',       emoji: '🛡', name: 'Protected',         desc: 'Create your first medico-legal record',        check: c => c.some(x => x.note?.includes('|| ML_RECORD:')) },
+    { id: 'with-photos',    emoji: '📸', name: 'Visual Record',     desc: 'Upload X-rays or photos to a case',           check: c => c.some(x => x.photo_urls && Object.keys(x.photo_urls||{}).length > 0) },
+  ];
+
+  // Specialty-specific badges
+  const bySpecialty = {
+    endo: [
+      { id: 'endo-5',        emoji: '🦷', name: 'Canal Explorer',   desc: 'Log 5 endodontic cases',                      check: c => c.filter(x => x.specialty==='endo').length >= 5 },
+      { id: 'endo-20',       emoji: '🔬', name: 'Endo Specialist',  desc: 'Log 20 endodontic cases',                     check: c => c.filter(x => x.specialty==='endo').length >= 20 },
+      { id: 'retreatment-3', emoji: '🔄', name: 'Retreatment Pro',  desc: 'Log 3 retreatment cases',                     check: c => c.filter(x => x.case_type==='Retreatment').length >= 3 },
+      { id: 'calcified',     emoji: '💎', name: 'Calcification',    desc: 'Log a calcified canal case',                  check: c => c.some(x => x.calcification==='Yes') },
+      { id: 'multi-canal',   emoji: '🌿', name: 'Multi-Canal',      desc: 'Log a case with 4+ canals',                   check: c => c.some(x => parseInt(x.canals||0) >= 4) },
+      { id: 'severe-curve',  emoji: '🌀', name: 'Curve Master',     desc: 'Log a severe curvature case',                 check: c => c.some(x => x.curvature==='Severe') },
+    ],
+    restorative: [
+      { id: 'resto-5',       emoji: '✨', name: 'Resto Artisan',    desc: 'Log 5 restorative cases',                     check: c => c.filter(x => x.specialty==='restorative').length >= 5 },
+      { id: 'resto-20',      emoji: '🎨', name: 'Resto Expert',     desc: 'Log 20 restorative cases',                    check: c => c.filter(x => x.specialty==='restorative').length >= 20 },
+      { id: 'rubber-dam',    emoji: '🛡', name: 'Isolation Pro',    desc: 'Log 5 cases with rubber dam',                 check: c => c.filter(x => x.isolation==='Rubber Dam').length >= 5 },
+      { id: 'class-iv',      emoji: '🦷', name: 'Anterior Expert',  desc: 'Log a Class IV composite',                   check: c => c.some(x => x.cavity_class==='Class IV') },
+      { id: 'complex-resto', emoji: '🔥', name: 'Complex Resto',    desc: 'Log a 4-surface restoration',                 check: c => c.some(x => x.surfaces==='4+ Surfaces') },
+    ],
+    surgery: [
+      { id: 'surg-5',        emoji: '🔪', name: 'Surgeon',          desc: 'Log 5 surgical cases',                        check: c => c.filter(x => x.specialty==='surgery').length >= 5 },
+      { id: 'surg-20',       emoji: '⚔️', name: 'Senior Surgeon',   desc: 'Log 20 surgical cases',                       check: c => c.filter(x => x.specialty==='surgery').length >= 20 },
+      { id: 'impacted',      emoji: '💪', name: 'Impaction Pro',    desc: 'Log a fully bony impacted wisdom tooth',      check: c => c.some(x => x.impaction==='Full Bony') },
+      { id: 'surg-complex',  emoji: '🌟', name: 'Complex Surgery',  desc: 'Log a surgical case with complexity 7+',      check: c => c.some(x => x.specialty==='surgery' && (x.complexity_score||0)>=7) },
+      { id: 'apicectomy',    emoji: '🔬', name: 'Apicectomy',       desc: 'Log a surgical endodontics case',             check: c => c.some(x => x.procedure==='Surgical Endodontics') },
+    ],
+    paeds: [
+      { id: 'paeds-5',       emoji: '🧒', name: 'Paeds Clinician',  desc: 'Log 5 paediatric cases',                      check: c => c.filter(x => x.specialty==='paeds').length >= 5 },
+      { id: 'paeds-20',      emoji: '⭐', name: 'Paeds Expert',     desc: 'Log 20 paediatric cases',                     check: c => c.filter(x => x.specialty==='paeds').length >= 20 },
+      { id: 'pulpotomy-3',   emoji: '💉', name: 'Pulpotomy Pro',    desc: 'Log 3 pulpotomy cases',                       check: c => c.filter(x => x.procedure==='Pulpotomy').length >= 3 },
+      { id: 'ssc-3',         emoji: '👑', name: 'SSC Master',       desc: 'Log 3 stainless steel crown cases',           check: c => c.filter(x => x.procedure==='Stainless Steel Crown').length >= 3 },
+      { id: 'behaviour',     emoji: '🧠', name: 'Behaviour Guru',   desc: 'Log a case with nitrous oxide sedation',      check: c => c.some(x => x.isolation==='Nitrous Oxide Sedation') },
+    ],
+    prostho: [
+      { id: 'prostho-5',     emoji: '👑', name: 'Prostho Artisan',  desc: 'Log 5 prosthodontic cases',                  check: c => c.filter(x => x.specialty==='prostho').length >= 5 },
+      { id: 'prostho-20',    emoji: '💎', name: 'Prostho Expert',   desc: 'Log 20 prosthodontic cases',                 check: c => c.filter(x => x.specialty==='prostho').length >= 20 },
+      { id: 'full-mouth',    emoji: '🌟', name: 'Full Mouth Rehab', desc: 'Log a full mouth rehabilitation case',        check: c => c.some(x => x.procedure==='Full Mouth Rehabilitation') },
+      { id: 'implant-crown', emoji: '🔩', name: 'Implant Pro',      desc: 'Log 3 implant crown cases',                  check: c => c.filter(x => x.procedure==='Implant Crown').length >= 3 },
+      { id: 'zirconia',      emoji: '✨', name: 'Zirconia Master',  desc: 'Log 5 zirconia crown cases',                 check: c => c.filter(x => x.material?.includes('Zirconia')).length >= 5 },
+    ],
+    perio: [
+      { id: 'perio-5',       emoji: '🌿', name: 'Perio Clinician',  desc: 'Log 5 periodontal cases',                    check: c => c.length >= 5 },
+      { id: 'perio-20',      emoji: '🔬', name: 'Perio Expert',     desc: 'Log 20 cases',                               check: c => c.length >= 20 },
+      { id: 'high-comp',     emoji: '🔥', name: 'Complex Cases',    desc: 'Log 5 high-complexity cases',                check: c => c.filter(x => (x.complexity_score||0)>=7).length >= 5 },
+    ],
+    ortho: [
+      { id: 'ortho-5',       emoji: '📐', name: 'Ortho Clinician',  desc: 'Log 5 orthodontic cases',                    check: c => c.length >= 5 },
+      { id: 'ortho-20',      emoji: '⭐', name: 'Ortho Expert',     desc: 'Log 20 cases',                               check: c => c.length >= 20 },
+    ],
+    general: [
+      { id: 'well-rounded',  emoji: '🌐', name: 'Well Rounded',     desc: 'Log cases in 3 different specialties',       check: c => new Set(c.map(x=>x.specialty)).size >= 3 },
+      { id: 'diverse-10',    emoji: '🎨', name: 'Diverse Clinician',desc: 'Log cases in 4 different specialties',       check: c => new Set(c.map(x=>x.specialty)).size >= 4 },
+      { id: 'all-round-5',   emoji: '🏆', name: 'All-Rounder',      desc: 'Log 5 cases in 3 specialties',               check: c => ['endo','restorative','surgery'].filter(s => c.filter(x=>x.specialty===s).length>=5).length >= 3 },
+    ],
+  };
+
+  const specBadges = bySpecialty[spec] || bySpecialty.general;
+  return [...universal, ...specBadges];
+}
+
+const BADGES = []; // kept for backward compat
+
+function renderBadges(targetId = 'badge-grid') {
+  const grid = document.getElementById(targetId);
+  if (!grid) return;
+
+  const badges = getSpecialtyBadges();
+  const earned = badges.filter(b => b.check(allCases));
+  const locked = badges.filter(b => !b.check(allCases));
+
+  // Show earned first, then locked
+  grid.innerHTML = [...earned, ...locked].map(b => {
+    const isEarned = b.check(allCases);
     return `
-      <div class="badge-item ${earned ? 'earned' : 'locked'}">
-        <div class="badge-emoji">${b.emoji}</div>
-        <div class="badge-name">${b.name}</div>
-        <div class="badge-desc">${earned ? '✓ Earned' : b.desc}</div>
-      </div>
-    `;
+      <div style="background:${isEarned ? 'rgba(124,111,255,0.08)' : 'rgba(255,255,255,0.02)'};border:1px solid ${isEarned ? 'rgba(124,111,255,0.3)' : 'rgba(255,255,255,0.06)'};border-radius:14px;padding:14px;text-align:center;transition:all 0.2s;${isEarned ? '' : 'opacity:0.5;'}">
+        <div style="font-size:1.6rem;margin-bottom:8px;${isEarned ? '' : 'filter:grayscale(1);'}">${b.emoji}</div>
+        <div style="font-size:0.75rem;font-weight:600;color:${isEarned ? 'var(--white)' : 'var(--gray)'};margin-bottom:4px;">${b.name}</div>
+        <div style="font-size:0.62rem;color:${isEarned ? 'var(--teal)' : 'var(--gray)'};">${isEarned ? '✓ Earned' : b.desc}</div>
+      </div>`;
   }).join('');
 }
 
@@ -6493,8 +6616,32 @@ function loadProfileForm() {
   document.getElementById('profile-first').value = currentProfile.first_name || '';
   document.getElementById('profile-last').value = currentProfile.last_name || '';
   document.getElementById('profile-role').value = currentProfile.role || 'intern';
+  document.getElementById('profile-specialty').value = currentProfile.primary_specialty || '';
   document.getElementById('profile-username').value = currentProfile.username || '';
   document.getElementById('profile-bio').value = currentProfile.bio || '';
+
+  // Show personalization note if specialty set
+  const specNote = document.getElementById('specialty-personalization-note');
+  const specPreview = document.getElementById('specialty-name-preview');
+  const specNames = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', perio:'Periodontics', ortho:'Orthodontics', general:'General Dentistry', radiology:'Oral Radiology', public_health:'Dental Public Health', oral_medicine:'Oral Medicine' };
+  if (currentProfile.primary_specialty && specNote) {
+    specNote.style.display = 'block';
+    if (specPreview) specPreview.textContent = specNames[currentProfile.primary_specialty] || currentProfile.primary_specialty;
+  }
+
+  // Live preview on change
+  const specSelect = document.getElementById('profile-specialty');
+  if (specSelect) {
+    specSelect.onchange = () => {
+      const val = specSelect.value;
+      if (val && specNote) {
+        specNote.style.display = 'block';
+        if (specPreview) specPreview.textContent = specNames[val] || val;
+      } else if (specNote) {
+        specNote.style.display = 'none';
+      }
+    };
+  }
   updatePortfolioLinkDisplay();
 }
 
@@ -6523,6 +6670,7 @@ async function saveProfile() {
     first_name: document.getElementById('profile-first').value.trim(),
     last_name: document.getElementById('profile-last').value.trim(),
     role: document.getElementById('profile-role').value,
+    primary_specialty: document.getElementById('profile-specialty').value || null,
     username: document.getElementById('profile-username').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-'),
     bio: document.getElementById('profile-bio').value.trim(),
   };
