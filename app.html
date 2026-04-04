@@ -372,6 +372,7 @@ body::after {
 .case-specialty-badge[data-spec="restorative"] { background: var(--resto-bg);  border-color: var(--resto-border);  color: var(--resto-color); }
 .case-specialty-badge[data-spec="surgery"]     { background: var(--surg-bg);   border-color: var(--surg-border);   color: var(--surg-color); }
 .case-specialty-badge[data-spec="paeds"]       { background: var(--paeds-bg);  border-color: var(--paeds-border);  color: var(--paeds-color); }
+.case-specialty-badge[data-spec="prostho"]     { background: rgba(14,165,233,0.1); border-color: rgba(14,165,233,0.3); color: #38BDF8; }
 /* Fallback */
 .case-specialty-badge:not([data-spec]) { background: var(--teal-dim); border-color: var(--teal-mid); color: var(--teal); }
 
@@ -850,6 +851,18 @@ body::after {
 .step-btn-back { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--gray); font-family: 'Inter', sans-serif; font-size: 0.875rem; padding: 14px 20px; border-radius: 14px; cursor: pointer; transition: all 0.2s; }
 .step-btn-back:hover { color: var(--white); }
 
+/* ─── VOICE LOG ─── */
+@keyframes pulse-rec { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+@keyframes vl-wave { 0%,100%{height:8px;opacity:0.3} 50%{height:48px;opacity:1} }
+.vl-bar { width:3px;background:var(--teal);border-radius:100px;height:8px;animation:vl-wave 1s ease-in-out infinite;animation-play-state:paused; }
+.vl-bar:nth-child(2){animation-delay:0.05s}.vl-bar:nth-child(3){animation-delay:0.1s}.vl-bar:nth-child(4){animation-delay:0.15s}.vl-bar:nth-child(5){animation-delay:0.2s}.vl-bar:nth-child(6){animation-delay:0.25s}.vl-bar:nth-child(7){animation-delay:0.3s}.vl-bar:nth-child(8){animation-delay:0.25s}.vl-bar:nth-child(9){animation-delay:0.2s}.vl-bar:nth-child(10){animation-delay:0.15s}.vl-bar:nth-child(11){animation-delay:0.1s}.vl-bar:nth-child(12){animation-delay:0.05s}.vl-bar:nth-child(13){animation-delay:0s}.vl-bar:nth-child(14){animation-delay:0.05s}.vl-bar:nth-child(15){animation-delay:0.1s}.vl-bar:nth-child(16){animation-delay:0.15s}.vl-bar:nth-child(17){animation-delay:0.2s}.vl-bar:nth-child(18){animation-delay:0.25s}.vl-bar:nth-child(19){animation-delay:0.3s}.vl-bar:nth-child(20){animation-delay:0.35s}
+.vl-bar.active { animation-play-state:running; }
+.vl-field-row { padding:10px 14px;display:flex;gap:12px;border-bottom:1px solid rgba(255,255,255,0.05);align-items:center; }
+.vl-field-row:last-child { border-bottom:none; }
+.vl-field-label { font-size:0.65rem;color:var(--gray);min-width:110px;text-transform:uppercase;letter-spacing:0.05em; }
+.vl-field-value { font-size:0.82rem;color:var(--white);flex:1; }
+.vl-field-missing { color:rgba(255,255,255,0.2);font-style:italic; }
+
 .ql-tag {
   padding: 7px 14px; border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.08);
@@ -1179,6 +1192,115 @@ body::after {
   </div>
 </div>
 
+<!-- ─── VOICE LOG MODAL ─── -->
+<div id="voice-log-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.98);z-index:600;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:linear-gradient(145deg,#0C0C0F,#111118);border:1px solid rgba(124,111,255,0.25);border-radius:28px;width:100%;max-width:500px;position:relative;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,0.8);">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
+
+    <!-- Close -->
+    <button onclick="closeVoiceLog()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;padding:6px;line-height:1;z-index:10;transition:color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <!-- SCREEN 1: Coaching -->
+    <div id="vl-screen-coach" style="padding:36px 32px;">
+      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:20px;">🎙 Voice Log</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.7rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:8px;line-height:1.2;">Speak your case.<br>Provify logs it.</div>
+      <div style="font-size:0.82rem;color:var(--gray);margin-bottom:28px;line-height:1.7;">45 seconds. Say what you'd tell a colleague. We'll extract every clinical field automatically.</div>
+
+      <!-- Specialty pills -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Your specialty</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="vl-spec-row">
+          <button onclick="setVLSpecialty('endo',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(124,111,255,0.4);background:rgba(124,111,255,0.15);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;">Endo</button>
+          <button onclick="setVLSpecialty('restorative',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Restorative</button>
+          <button onclick="setVLSpecialty('surgery',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Surgery</button>
+          <button onclick="setVLSpecialty('paeds',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Paeds</button>
+          <button onclick="setVLSpecialty('prostho',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Prostho</button>
+        </div>
+      </div>
+
+      <!-- Example phrase -->
+      <div id="vl-example" style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px 18px;margin-bottom:24px;">
+        <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">💡 Say something like this</div>
+        <div id="vl-example-text" style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.75;font-style:italic;">"Tooth 36, primary RCT, three canals, moderate curvature, NaOCl and EDTA irrigation, warm vertical compaction, no complications, patient tolerated well, age 35"</div>
+      </div>
+
+      <!-- Start button -->
+      <button onclick="startVoiceRecording()" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;padding:16px;border-radius:16px;border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,111,255,0.5);display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Start Speaking
+      </button>
+      <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:var(--gray);">45 seconds max · Speak clearly · We'll handle the rest</div>
+    </div>
+
+    <!-- SCREEN 2: Recording -->
+    <div id="vl-screen-recording" style="display:none;padding:40px 32px;text-align:center;">
+      <div style="font-size:0.62rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <div style="width:8px;height:8px;background:#EF4444;border-radius:50%;animation:pulse-rec 1s ease-in-out infinite;"></div>
+        Recording
+      </div>
+
+      <!-- Waveform visualizer -->
+      <div id="vl-waveform" style="display:flex;align-items:center;justify-content:center;gap:3px;height:60px;margin-bottom:28px;">
+        <div class="vl-bar"></div><div class="vl-bar"></div><div class="vl-bar"></div>
+        <div class="vl-bar"></div><div class="vl-bar"></div><div class="vl-bar"></div>
+        <div class="vl-bar"></div><div class="vl-bar"></div><div class="vl-bar"></div>
+        <div class="vl-bar"></div><div class="vl-bar"></div><div class="vl-bar"></div>
+        <div class="vl-bar"></div><div class="vl-bar"></div><div class="vl-bar"></div>
+        <div class="vl-bar"></div><div class="vl-bar"></div><div class="vl-bar"></div>
+        <div class="vl-bar"></div><div class="vl-bar"></div>
+      </div>
+
+      <!-- Timer -->
+      <div id="vl-timer" style="font-family:'Instrument Serif',serif;font-size:3.5rem;color:var(--white);letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">45</div>
+      <div style="font-size:0.8rem;color:var(--gray);margin-bottom:32px;">seconds remaining</div>
+
+      <!-- Live transcript -->
+      <div id="vl-transcript-live" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;min-height:60px;text-align:left;font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.7;font-style:italic;margin-bottom:24px;">
+        Listening...
+      </div>
+
+      <button onclick="stopVoiceRecording()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:600;padding:12px 28px;border-radius:12px;cursor:pointer;transition:all 0.2s;">
+        Stop & Process
+      </button>
+    </div>
+
+    <!-- SCREEN 3: Processing -->
+    <div id="vl-screen-processing" style="display:none;padding:60px 32px;text-align:center;">
+      <div style="width:48px;height:48px;border:2px solid rgba(124,111,255,0.15);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 24px;"></div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--white);margin-bottom:10px;" id="vl-processing-msg">Reading your case...</div>
+      <div style="font-size:0.8rem;color:var(--gray);">Extracting clinical fields · Correcting dental terminology</div>
+    </div>
+
+    <!-- SCREEN 4: Review -->
+    <div id="vl-screen-review" style="display:none;padding:28px 32px;">
+      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">✓ Case Extracted</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white);margin-bottom:6px;" id="vl-review-title">Review your case</div>
+      <div style="font-size:0.78rem;color:var(--gray);margin-bottom:20px;">Tap any field to edit before logging</div>
+
+      <!-- Extracted fields display -->
+      <div id="vl-extracted-fields" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:4px;margin-bottom:16px;max-height:280px;overflow-y:auto;"></div>
+
+      <!-- What you said -->
+      <div style="background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.12);border-radius:10px;padding:12px 14px;margin-bottom:20px;">
+        <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;margin-bottom:6px;">What you said</div>
+        <div id="vl-transcript-final" style="font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.65;font-style:italic;"></div>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button onclick="submitVoiceCase()" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);">
+          Log This Case →
+        </button>
+        <button onclick="retryVoiceLog()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;padding:14px 18px;border-radius:14px;cursor:pointer;">
+          ↺ Retry
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ─── QUICK LOG MODAL ─── -->
 <div id="quick-log-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.96);z-index:550;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeQuickLog()">
   <div style="background:var(--navy-2);border:1px solid rgba(124,111,255,0.25);border-radius:24px;width:100%;max-width:520px;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.6);">
@@ -1338,10 +1460,16 @@ body::after {
     <!-- MOBILE TOP BAR -->
     <div id="mobile-topbar" style="display:none;position:fixed;top:0;left:0;right:0;height:52px;background:rgba(9,9,11,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.07);z-index:99;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
       <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:var(--white);letter-spacing:-0.02em;">Provify<span style="color:var(--teal);">.</span></div>
-      <button onclick="openQuickLog()" style="background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(124,111,255,0.1));border:1px solid rgba(124,111,255,0.3);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
-        Quick Log
-      </button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="openVoiceLog()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:7px 12px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>
+          Voice
+        </button>
+        <button onclick="openQuickLog()" style="background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(124,111,255,0.1));border:1px solid rgba(124,111,255,0.3);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+          Quick Log
+        </button>
+      </div>
     </div>
 
     <!-- SIDEBAR -->
@@ -1385,6 +1513,10 @@ body::after {
       </button>
 
       <div class="sidebar-bottom">
+        <button onclick="openVoiceLog()" style="width:100%; background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.08)); border:1px solid rgba(239,68,68,0.25); color:#FCA5A5; font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; padding:11px 12px; border-radius:12px; cursor:pointer; margin-bottom:8px; text-align:left; transition:all 0.2s; display:flex; align-items:center; gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Voice Log
+        </button>
         <button onclick="openQuickLog()" style="width:100%; background:linear-gradient(135deg,rgba(124,111,255,0.18),rgba(124,111,255,0.08)); border:1px solid rgba(124,111,255,0.3); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; padding:11px 12px; border-radius:12px; cursor:pointer; margin-bottom:8px; text-align:left; transition:all 0.2s; display:flex; align-items:center; gap:8px;" onmouseover="this.style.background='linear-gradient(135deg,rgba(124,111,255,0.25),rgba(124,111,255,0.12))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(124,111,255,0.18),rgba(124,111,255,0.08))'">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
           Quick Log
@@ -1665,6 +1797,17 @@ body::after {
                 </svg>
               </span>
               Paediatric
+            </button>
+            <button class="specialty-btn" onclick="selectSpecialty('prostho', this)">
+              <span class="spec-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <path d="M6 3h12a1 1 0 0 1 1 1v2a9 9 0 0 1-4 7.5V20a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-6.5A9 9 0 0 1 5 6V4a1 1 0 0 1 1-1z"/>
+                  <path d="M5 8h14" stroke-width="1.2"/>
+                  <path d="M10 8v5" stroke-width="1"/>
+                  <path d="M14 8v5" stroke-width="1"/>
+                </svg>
+              </span>
+              Prosthodontics
             </button>
           </div>
 
@@ -2046,6 +2189,218 @@ body::after {
               </div>
             </div>
           </div>
+
+          <!-- PROSTHODONTICS FIELDS -->
+          <div id="prostho-fields" style="display:none">
+
+            <div class="form-section">
+              <div class="form-section-title">Prosthesis Type</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Type of Prosthesis</label>
+                  <select class="form-select" id="f-prostho-type">
+                    <option value="">Select type</option>
+                    <optgroup label="Fixed">
+                      <option>Single Crown</option>
+                      <option>Fixed Bridge (FPD)</option>
+                      <option>Implant Crown</option>
+                      <option>Implant-Supported Bridge</option>
+                      <option>Veneer</option>
+                      <option>Onlay / Overlay</option>
+                      <option>Inlay</option>
+                      <option>Post & Core + Crown</option>
+                      <option>Full Mouth Rehabilitation</option>
+                    </optgroup>
+                    <optgroup label="Removable">
+                      <option>Complete Denture (Upper)</option>
+                      <option>Complete Denture (Lower)</option>
+                      <option>Complete Dentures (Both)</option>
+                      <option>Partial Denture (RPD)</option>
+                      <option>Implant-Supported Overdenture</option>
+                      <option>Immediate Denture</option>
+                    </optgroup>
+                    <optgroup label="Other">
+                      <option>Occlusal Splint / Night Guard</option>
+                      <option>Obturator</option>
+                      <option>Provisional / Temporary</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Restoration Material</label>
+                  <select class="form-select" id="f-prostho-material">
+                    <option value="">Select material</option>
+                    <optgroup label="All-Ceramic">
+                      <option>Zirconia (monolithic)</option>
+                      <option>Zirconia (layered)</option>
+                      <option>e.max (lithium disilicate)</option>
+                      <option>Feldspathic porcelain</option>
+                      <option>Leucite-reinforced ceramic</option>
+                    </optgroup>
+                    <optgroup label="Metal-based">
+                      <option>PFM (Porcelain-fused-to-metal)</option>
+                      <option>Full metal (gold)</option>
+                      <option>Full metal (base metal)</option>
+                      <option>Metal framework (RPD)</option>
+                    </optgroup>
+                    <optgroup label="Resin-based">
+                      <option>PMMA (acrylic)</option>
+                      <option>Composite resin</option>
+                      <option>Hybrid ceramic (VITA Enamic)</option>
+                    </optgroup>
+                    <option>Mixed materials</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Clinical Assessment</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Occlusal Scheme</label>
+                  <select class="form-select" id="f-prostho-occlusion">
+                    <option value="">Select occlusal scheme</option>
+                    <option>Mutually Protected Occlusion</option>
+                    <option>Canine-Guided Occlusion</option>
+                    <option>Group Function</option>
+                    <option>Balanced Occlusion (complete dentures)</option>
+                    <option>Lingualized Occlusion</option>
+                    <option>Existing occlusion maintained</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Vertical Dimension</label>
+                  <select class="form-select" id="f-prostho-vdo">
+                    <option value="">Select</option>
+                    <option>Maintained — No change</option>
+                    <option>Increased — Minor (1-2mm)</option>
+                    <option>Increased — Moderate (3-4mm)</option>
+                    <option>Increased — Significant (5mm+)</option>
+                    <option>Decreased — Restored</option>
+                    <option>N/A — Single unit restoration</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Preparation Design</label>
+                  <select class="form-select" id="f-prostho-prep">
+                    <option value="">Select prep design</option>
+                    <option>Shoulder (90°)</option>
+                    <option>Chamfer</option>
+                    <option>Feather edge / Knife edge</option>
+                    <option>Deep chamfer</option>
+                    <option>Butt joint (onlay)</option>
+                    <option>Minimal prep / No prep (veneer)</option>
+                    <option>N/A — Implant / Denture</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Impression / Record</label>
+                  <select class="form-select" id="f-prostho-impression">
+                    <option value="">Select method</option>
+                    <option>Conventional (PVS / Polyether)</option>
+                    <option>Digital scan (intraoral scanner)</option>
+                    <option>Combination (scan + conventional)</option>
+                    <option>Facebow + semi-adjustable articulator</option>
+                    <option>Fully adjustable articulator</option>
+                    <option>N/A</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Treatment Stage</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Stage of Treatment</label>
+                  <select class="form-select" id="f-prostho-stage">
+                    <option value="">Select stage</option>
+                    <option>Treatment planning & consent</option>
+                    <option>Tooth preparation</option>
+                    <option>Temporization</option>
+                    <option>Impression / Digital scan</option>
+                    <option>Try-in / Verification</option>
+                    <option>Fit & Cementation / Bonding</option>
+                    <option>Review & Adjustments</option>
+                    <option>Complete — Single visit</option>
+                    <option>Complete — Multiple visits</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Number of Units</label>
+                  <select class="form-select" id="f-prostho-units">
+                    <option value="">Select</option>
+                    <option>1 unit</option>
+                    <option>2-3 units</option>
+                    <option>4-6 units</option>
+                    <option>7-10 units</option>
+                    <option>Full arch (11-14 units)</option>
+                    <option>Full mouth rehabilitation</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Temporization</label>
+                  <select class="form-select" id="f-prostho-temp">
+                    <option value="">Select</option>
+                    <option>Chairside temporary (PMMA)</option>
+                    <option>Lab-fabricated temporary</option>
+                    <option>CAD/CAM temporary</option>
+                    <option>No temporary — direct to final</option>
+                    <option>N/A</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Cementation / Bonding</label>
+                  <select class="form-select" id="f-prostho-cement">
+                    <option value="">Select</option>
+                    <option>Resin cement (adhesive)</option>
+                    <option>Resin-modified GIC</option>
+                    <option>Zinc phosphate</option>
+                    <option>Zinc oxide eugenol (temporary)</option>
+                    <option>Screw-retained (implant)</option>
+                    <option>N/A — Not yet cemented</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Aesthetics & Complications</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Aesthetic Outcome</label>
+                  <select class="form-select" id="f-prostho-aesthetic">
+                    <option value="">Select</option>
+                    <option>Excellent — Patient very satisfied</option>
+                    <option>Good — Minor adjustments made</option>
+                    <option>Acceptable — Patient satisfied</option>
+                    <option>Requires further adjustment</option>
+                    <option>N/A — Posterior / Non-aesthetic zone</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Complications</label>
+                  <select class="form-select" id="f-prostho-complications">
+                    <option value="">Select</option>
+                    <option>None</option>
+                    <option>Post-operative sensitivity</option>
+                    <option>Occlusal adjustment required</option>
+                    <option>Fracture of temporary</option>
+                    <option>Poor fit — remade</option>
+                    <option>Debonding / Recementation</option>
+                    <option>Aesthetic rejection by patient</option>
+                    <option>Abutment fracture</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- end prostho-fields -->
 
           <!-- Step 2 nav -->
           <div class="step-nav">
@@ -3021,6 +3376,7 @@ function selectSpecialty(spec, btn) {
   document.getElementById('restorative-fields').style.display = spec === 'restorative' ? 'block' : 'none';
   document.getElementById('surgery-fields').style.display     = spec === 'surgery'     ? 'block' : 'none';
   document.getElementById('paeds-fields').style.display       = spec === 'paeds'       ? 'block' : 'none';
+  document.getElementById('prostho-fields').style.display     = spec === 'prostho'     ? 'block' : 'none';
   updateXraySection(spec);
 
   // Switch age field
@@ -3123,6 +3479,34 @@ function calculateComplexity() {
     const pulp = document.getElementById('f-paeds-pulp').value;
     if (pulp === 'Non-vital') score += 1;
     if (pulp === 'Pulp exposure — carious') score += 1;
+  } else if (spec === 'prostho') {
+    const type = document.getElementById('f-prostho-type').value;
+    if (type === 'Full Mouth Rehabilitation') score += 4;
+    else if (type === 'Implant-Supported Bridge') score += 3;
+    else if (type === 'Implant-Supported Overdenture') score += 3;
+    else if (type === 'Fixed Bridge (FPD)') score += 2;
+    else if (type === 'Implant Crown') score += 2;
+    else if (type === 'Post & Core + Crown') score += 1.5;
+    else if (type === 'Onlay / Overlay') score += 1.5;
+    else if (type === 'Complete Dentures (Both)') score += 2;
+    else if (type === 'Complete Denture (Upper)' || type === 'Complete Denture (Lower)') score += 1.5;
+    else if (type === 'Partial Denture (RPD)') score += 1.5;
+    else if (type === 'Single Crown') score += 1;
+    else if (type === 'Veneer') score += 1;
+
+    const units = document.getElementById('f-prostho-units').value;
+    if (units === '4-6 units') score += 1;
+    else if (units === '7-10 units') score += 2;
+    else if (units === 'Full arch (11-14 units)') score += 3;
+    else if (units === 'Full mouth rehabilitation') score += 4;
+
+    const vdo = document.getElementById('f-prostho-vdo').value;
+    if (vdo.includes('Significant')) score += 1.5;
+    else if (vdo.includes('Moderate')) score += 1;
+    else if (vdo.includes('Minor')) score += 0.5;
+
+    const complications = document.getElementById('f-prostho-complications').value;
+    if (complications && complications !== 'None') score += 0.5;
   }
 
   const rating = selectedRating;
@@ -3220,6 +3604,20 @@ async function submitCase() {
       surfaces:         document.getElementById('f-cooperation').value,
       impaction:        document.getElementById('f-space-maintainer').value,
     } : {}),
+    ...(selectedSpecialty === 'prostho' ? {
+      procedure:        document.getElementById('f-prostho-type').value,
+      material:         document.getElementById('f-prostho-material').value,
+      cavity_class:     document.getElementById('f-prostho-stage').value,
+      surfaces:         document.getElementById('f-prostho-units').value,
+      isolation:        document.getElementById('f-prostho-occlusion').value,
+      impaction:        document.getElementById('f-prostho-impression').value,
+      anaesthesia:      document.getElementById('f-prostho-prep').value,
+      sutures:          document.getElementById('f-prostho-cement').value,
+      obturation:       document.getElementById('f-prostho-temp').value,
+      calcification:    document.getElementById('f-prostho-vdo').value,
+      separated:        document.getElementById('f-prostho-complications').value,
+      case_type:        document.getElementById('f-prostho-aesthetic').value,
+    } : {}),
   };
 
   const { data, error } = await sb.from('cases').insert([caseData]).select();
@@ -3294,6 +3692,7 @@ async function generateAIReport(caseData, complexity) {
     restorative: `Reviewing your restorative decisions on tooth ${caseData.tooth_number}...`,
     surgery: `Analyzing your surgical approach on tooth ${caseData.tooth_number}...`,
     paeds: `Reviewing your paediatric case on tooth ${caseData.tooth_number}...`,
+    prostho: `Analyzing your prosthodontic case on tooth ${caseData.tooth_number}...`,
   };
   const msg = loadingMessages[caseData.specialty] || `Analyzing tooth ${caseData.tooth_number}...`;
   insightsEl.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> ${msg}</div>`;
@@ -3464,6 +3863,7 @@ function updateDashboard() {
     const restoCnt = allCases.filter(c => c.specialty === 'restorative').length;
     const surgCnt  = allCases.filter(c => c.specialty === 'surgery').length;
     const paedsCnt = allCases.filter(c => c.specialty === 'paeds').length;
+  const prosthoCnt = allCases.filter(c => c.specialty === 'prostho').length;
     const tags = [];
     if (endoCnt  > 0) tags.push(`<span style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:500;">${endoCnt} Endo</span>`);
     if (restoCnt > 0) tags.push(`<span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#F59E0B;font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:500;">${restoCnt} Restorative</span>`);
@@ -3532,7 +3932,7 @@ function updateDashboard() {
 
 function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
   const rank = getComplexityRank(c.complexity_score || 0);
   return `
     <div class="case-item" data-spec="${c.specialty}" id="case-row-${c.id}" onclick="openCaseDetail('${c.id}')">
@@ -3563,7 +3963,7 @@ async function openCaseDetail(id) {
   if (output) output.style.display = 'none';
   if (btn) { btn.textContent = '📋 Generate Clinical Note'; btn.disabled = false; }
 
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const fields = [];
@@ -3603,6 +4003,19 @@ async function openCaseDetail(id) {
     if (c.isolation) fields.push(['Behaviour Management', c.isolation]);
     if (c.surfaces) fields.push(['Child Cooperation', c.surfaces]);
     if (c.impaction) fields.push(['Space Maintainer', c.impaction]);
+  } else if (c.specialty === 'prostho') {
+    if (c.procedure) fields.push(['Prosthesis Type', c.procedure]);
+    if (c.material) fields.push(['Material', c.material]);
+    if (c.cavity_class) fields.push(['Stage', c.cavity_class]);
+    if (c.surfaces) fields.push(['Number of Units', c.surfaces]);
+    if (c.anaesthesia) fields.push(['Preparation Design', c.anaesthesia]);
+    if (c.calcification) fields.push(['Vertical Dimension', c.calcification]);
+    if (c.isolation) fields.push(['Occlusal Scheme', c.isolation]);
+    if (c.impaction) fields.push(['Impression Method', c.impaction]);
+    if (c.obturation) fields.push(['Temporization', c.obturation]);
+    if (c.sutures) fields.push(['Cementation', c.sutures]);
+    if (c.case_type) fields.push(['Aesthetic Outcome', c.case_type]);
+    if (c.separated) fields.push(['Complications', c.separated]);
   }
 
   if (c.post_op) fields.push(['Post-op Symptoms', c.post_op]);
@@ -3958,7 +4371,7 @@ async function loadBestWork() {
   if (top.length === 0) { card.style.display = 'none'; return; }
   card.style.display = 'block';
 
-  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric' };
+  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
   const photoTypes = {
     endo:        ['xr-postop','xr-obturation','xr-preop','xr-mc','xr-wl','cp-postop','cp-preop'],
     restorative: ['xr-gen-postop','xr-gen-preop','cp-postop','cp-preop','cp-intraoral'],
@@ -4151,7 +4564,7 @@ function renderPortfolioCases() {
 
   el.innerHTML = allCases.map(c => {
     const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
+    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
     const isSelected = selectedCaseIds.has(c.id);
     return `
       <div class="portfolio-case-item ${isSelected ? 'selected' : ''}" onclick="toggleCaseSelection('${c.id}', this)">
@@ -4245,7 +4658,7 @@ async function generatePortfolioPDF() {
     const PAEDS_C = [30, 150, 100];
 
     const specColor = { endo: ENDO_C, restorative: RESTO_C, surgery: SURG_C, paeds: PAEDS_C };
-    const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry' };
+    const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' };
 
     const pageW = 210;
     const pageH = 297;
@@ -4882,7 +5295,7 @@ async function autoGenerateClinicalNote(c) {
   noteSection.style.display = 'block';
   noteText.innerHTML = '<div style="color:var(--gray);font-size:0.85rem;display:flex;align-items:center;gap:10px;"><div class="ai-dots"><span></span><span></span><span></span></div> Writing your clinical note...</div>';
 
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery', paeds: 'Paediatric Dentistry' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery', paeds: 'Paediatric Dentistry', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
   const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   let clinicalDetails = '';
@@ -5006,7 +5419,7 @@ async function generateClinicalNote() {
   btn.textContent = '⏳ Generating note...';
   btn.disabled = true;
 
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery', paeds: 'Paediatric Dentistry' }[c.specialty] || c.specialty;
+  const specLabel = { endo: 'Endodontics', restorative: 'Restorative Dentistry', surgery: 'Oral Surgery', paeds: 'Paediatric Dentistry', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   let clinicalDetails = '';
@@ -5370,7 +5783,7 @@ function openSimulation() {
   if (!c) return;
   currentSimCase = c;
 
-  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric' }[c.specialty] || c.specialty;
+  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' }[c.specialty] || c.specialty;
   document.getElementById('sim-modal-title').textContent = `Tooth ${c.tooth_number} — Push Harder`;
   document.getElementById('sim-modal-sub').textContent = `${specLabel} · AI scenario based on your case`;
 
@@ -5396,7 +5809,7 @@ function closeSimModal() {
 
 async function generateSimScenario(c) {
   let baseInfo = '';
-  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry' }[c.specialty] || c.specialty;
+  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[c.specialty] || c.specialty;
   if (c.specialty === 'endo') {
     baseInfo = `Tooth ${c.tooth_number}, ${c.pulp_diagnosis||'pulp pathology'}, ${c.periapical_diagnosis||''}, ${c.case_type||'primary treatment'}, ${c.canals||'?'} canals, ${c.curvature||''} curvature, apical size ${c.apical_size||'?'}, irrigation: ${c.irrigation||'?'}, obturation: ${c.obturation||'?'}`;
   } else if (c.specialty === 'restorative') {
@@ -5936,6 +6349,357 @@ function goToLogStep(step) {
   document.getElementById('view-log')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// ─── VOICE LOG ───
+let vlSpecialty = 'endo';
+let vlRecognition = null;
+let vlTranscript = '';
+let vlTimer = null;
+let vlSecondsLeft = 45;
+let vlExtractedData = {};
+
+const VL_EXAMPLES = {
+  endo: '"Tooth 36, primary RCT, three canals, moderate curvature, NaOCl and EDTA irrigation, warm vertical compaction, no complications, patient tolerated well, age 35, pain"',
+  restorative: '"Tooth 14, class two composite, two surfaces, mesial and occlusal, rubber dam isolation, nanofilled composite, good aesthetic outcome, age 28, sensitivity"',
+  surgery: '"Tooth 48, surgical extraction, full bony impaction, inferior alveolar nerve block, flap raised, bone removed, resorbable sutures, no complications, age 22"',
+  paeds: '"Upper right primary molar, tooth 55, pulpotomy and stainless steel crown, child age 6, moderate cooperation, tell-show-do technique, no sedation needed"',
+  prostho: '"Tooth 26, zirconia crown, chamfer preparation, digital scan with intraoral scanner, temporary for two weeks, resin cement bonding, excellent aesthetic result, age 45"',
+};
+
+function openVoiceLog() {
+  document.getElementById('voice-log-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  showVLScreen('coach');
+  // Default specialty to last used
+  const lastSpec = selectedSpecialty || 'endo';
+  const btn = document.querySelector(`#vl-spec-row .vl-spec-btn`);
+  setVLSpecialty(lastSpec, null);
+}
+
+function closeVoiceLog() {
+  document.getElementById('voice-log-modal').style.display = 'none';
+  document.body.style.overflow = '';
+  stopVoiceRecording(true);
+}
+
+function showVLScreen(screen) {
+  ['coach','recording','processing','review'].forEach(s => {
+    const el = document.getElementById(`vl-screen-${s}`);
+    if (el) el.style.display = s === screen ? 'block' : 'none';
+  });
+}
+
+function setVLSpecialty(spec, btn) {
+  vlSpecialty = spec;
+  document.querySelectorAll('.vl-spec-btn').forEach(b => {
+    b.style.background = 'rgba(255,255,255,0.03)';
+    b.style.borderColor = 'rgba(255,255,255,0.08)';
+    b.style.color = 'var(--gray)';
+    b.style.fontWeight = '400';
+  });
+  if (btn) {
+    btn.style.background = 'rgba(124,111,255,0.15)';
+    btn.style.borderColor = 'rgba(124,111,255,0.4)';
+    btn.style.color = 'var(--teal)';
+    btn.style.fontWeight = '600';
+  } else {
+    // Find and highlight the right button
+    const buttons = document.querySelectorAll('.vl-spec-btn');
+    const specMap = ['endo','restorative','surgery','paeds','prostho'];
+    const idx = specMap.indexOf(spec);
+    if (idx >= 0 && buttons[idx]) {
+      buttons[idx].style.background = 'rgba(124,111,255,0.15)';
+      buttons[idx].style.borderColor = 'rgba(124,111,255,0.4)';
+      buttons[idx].style.color = 'var(--teal)';
+      buttons[idx].style.fontWeight = '600';
+    }
+  }
+  const exampleEl = document.getElementById('vl-example-text');
+  if (exampleEl) exampleEl.textContent = VL_EXAMPLES[spec] || VL_EXAMPLES.endo;
+}
+
+function startVoiceRecording() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showToast('Voice recording not supported on this browser. Use Chrome.');
+    return;
+  }
+
+  showVLScreen('recording');
+  vlTranscript = '';
+  vlSecondsLeft = 45;
+
+  // Start waveform animation
+  document.querySelectorAll('.vl-bar').forEach(b => b.classList.add('active'));
+
+  // Timer countdown
+  document.getElementById('vl-timer').textContent = vlSecondsLeft;
+  vlTimer = setInterval(() => {
+    vlSecondsLeft--;
+    const timerEl = document.getElementById('vl-timer');
+    if (timerEl) timerEl.textContent = vlSecondsLeft;
+    if (vlSecondsLeft <= 0) stopVoiceRecording();
+  }, 1000);
+
+  // Speech recognition
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  vlRecognition = new SpeechRecognition();
+  vlRecognition.continuous = true;
+  vlRecognition.interimResults = true;
+  vlRecognition.lang = 'en-US';
+  vlRecognition.maxAlternatives = 1;
+
+  vlRecognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = 0; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        final += event.results[i][0].transcript + ' ';
+      } else {
+        interim += event.results[i][0].transcript;
+      }
+    }
+    vlTranscript = final;
+    const liveEl = document.getElementById('vl-transcript-live');
+    if (liveEl) liveEl.textContent = (final + interim) || 'Listening...';
+    if (liveEl && (final || interim)) liveEl.style.color = 'rgba(255,255,255,0.8)';
+  };
+
+  vlRecognition.onerror = (e) => {
+    if (e.error !== 'no-speech') showToast('Microphone error: ' + e.error);
+  };
+
+  vlRecognition.start();
+}
+
+function stopVoiceRecording(silent = false) {
+  if (vlTimer) { clearInterval(vlTimer); vlTimer = null; }
+  if (vlRecognition) { try { vlRecognition.stop(); } catch(e){} vlRecognition = null; }
+  document.querySelectorAll('.vl-bar').forEach(b => b.classList.remove('active'));
+
+  if (silent) return;
+
+  if (!vlTranscript.trim()) {
+    showToast('No speech detected. Please try again.');
+    showVLScreen('coach');
+    return;
+  }
+
+  processVoiceTranscript(vlTranscript.trim());
+}
+
+async function processVoiceTranscript(transcript) {
+  showVLScreen('processing');
+
+  const processingMsgs = [
+    'Reading your case...',
+    'Correcting dental terminology...',
+    'Extracting clinical fields...',
+    'Almost done...'
+  ];
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % processingMsgs.length;
+    const el = document.getElementById('vl-processing-msg');
+    if (el) el.textContent = processingMsgs[msgIdx];
+  }, 1500);
+
+  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[vlSpecialty] || vlSpecialty;
+
+  const prompt = `You are a dental clinical record AI. A dentist just spoke the following description of a case they performed. Your job is to:
+1. Correct any speech recognition errors using dental terminology knowledge ("tooth two six" → "tooth 26", "candles" → "canals", "warm vertical" stays as "warm vertical", etc.)
+2. Extract all clinical fields from the corrected transcript
+
+Specialty context: ${specLabel}
+Raw transcript: "${transcript}"
+
+Respond ONLY with a valid JSON object. No markdown. No explanation. Extract these fields:
+{
+  "corrected_transcript": "the corrected version of what they said",
+  "tooth_number": "FDI tooth number as a number e.g. 36, or null",
+  "age_range": "one of: 10-20, 20-30, 30-40, 40-50, 50+ — or null",
+  "complaint": "one of: Pain, Swelling, Sensitivity, Routine, Trauma, Other — or null",
+  "specialty": "${vlSpecialty}",
+  ${vlSpecialty === 'endo' ? `
+  "pulp_diagnosis": "one of: Normal, Reversible Pulpitis, Irreversible Pulpitis, Pulp Necrosis, Previously Treated — or null",
+  "periapical_diagnosis": "one of: Normal, Symptomatic Apical Periodontitis, Asymptomatic Apical Periodontitis, Chronic Apical Abscess, Acute Apical Abscess — or null",
+  "case_type": "one of: Primary Treatment, Retreatment, Pulpotomy — or null",
+  "canals": "number as string e.g. '3' or null",
+  "curvature": "one of: Straight, Moderate, Severe — or null",
+  "irrigation": "one of: NaOCl only, NaOCl + EDTA, NaOCl + EDTA + CHX, Other — or null",
+  "obturation": "one of: Cold Lateral, Warm Vertical, Single Cone, Carrier-based — or null",
+  "calcification": "one of: Yes, No — or null",
+  "separated": "one of: Yes, No — or null"` : ''}
+  ${vlSpecialty === 'restorative' ? `
+  "cavity_class": "one of: Class I, Class II, Class III, Class IV, Class V, Class VI — or null",
+  "surfaces": "one of: 1 Surface, 2 Surfaces, 3 Surfaces, 4+ Surfaces — or null",
+  "material": "one of: Composite, Amalgam, GIC, RMGIC, Ceramic Inlay — or null",
+  "isolation": "one of: Rubber Dam, Cotton Roll, None — or null"` : ''}
+  ${vlSpecialty === 'surgery' ? `
+  "procedure": "one of: Simple Extraction, Surgical Extraction, Impacted Wisdom Tooth, Surgical Endodontics, Apicectomy, Biopsy, Implant Placement — or null",
+  "impaction": "one of: Not Applicable, Soft Tissue, Partial Bony, Full Bony — or null",
+  "anaesthesia": "one of: Local Anaesthesia, Local + Sedation, General Anaesthesia — or null",
+  "sutures": "one of: None, Resorbable, Non-resorbable — or null"` : ''}
+  ${vlSpecialty === 'paeds' ? `
+  "procedure": "one of: Pulpotomy, Pulpectomy, Stainless Steel Crown, Composite Restoration, Extraction, Fissure Sealant, Strip Crown — or null",
+  "material": "one of: Stainless Steel Crown, Composite, GIC, Strip Crown (composite) — or null",
+  "pulp_diagnosis": "one of: Vital — No symptoms, Vital — Reversible pulpitis, Non-vital, Pulp exposure — carious — or null",
+  "cavity_class": "one of: Primary, Mixed — or null"` : ''}
+  ${vlSpecialty === 'prostho' ? `
+  "procedure": "prosthesis type e.g. Single Crown, Fixed Bridge, Implant Crown, Complete Denture, Veneer, Full Mouth Rehabilitation — or null",
+  "material": "material e.g. Zirconia (monolithic), e.max (lithium disilicate), PFM, PMMA — or null",
+  "cavity_class": "stage e.g. Fit & Cementation / Bonding, Impression / Digital scan, Complete — Single visit — or null",
+  "surfaces": "units e.g. 1 unit, 2-3 units, Full arch — or null"` : ''}
+  "post_op": "post-op symptoms if mentioned — or null",
+  "narrative": "a 1-2 sentence clinical summary in professional language based on what was said"
+}`;
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'voice',
+        voicePrompt: prompt,
+        caseData: { specialty: vlSpecialty, tooth_number: 'voice', age_range: '', complaint: '' },
+        complexity: 0
+      })
+    });
+    const data = await res.json();
+    const raw = (data.voice || data.note || '').trim().replace(/```json|```/g, '').trim();
+    vlExtractedData = JSON.parse(raw);
+
+    clearInterval(msgInterval);
+    showVLReview(vlExtractedData, transcript);
+
+  } catch(e) {
+    clearInterval(msgInterval);
+    showToast('Could not process speech. Please try again.');
+    showVLScreen('coach');
+  }
+}
+
+function showVLReview(data, originalTranscript) {
+  showVLScreen('review');
+
+  const titleEl = document.getElementById('vl-review-title');
+  if (titleEl) {
+    const tooth = data.tooth_number ? `Tooth ${data.tooth_number}` : 'Case';
+    const spec = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' }[data.specialty] || data.specialty;
+    titleEl.textContent = `${tooth} — ${spec}`;
+  }
+
+  const finalEl = document.getElementById('vl-transcript-final');
+  if (finalEl) finalEl.textContent = data.corrected_transcript || originalTranscript;
+
+  const fieldsEl = document.getElementById('vl-extracted-fields');
+  if (!fieldsEl) return;
+
+  const displayFields = [
+    ['Specialty', data.specialty],
+    ['Tooth', data.tooth_number],
+    ['Age Range', data.age_range],
+    ['Complaint', data.complaint],
+    ['Pulp Diagnosis', data.pulp_diagnosis],
+    ['Periapical Diagnosis', data.periapical_diagnosis],
+    ['Case Type', data.case_type],
+    ['Canals', data.canals ? `${data.canals} canals` : null],
+    ['Curvature', data.curvature],
+    ['Irrigation', data.irrigation],
+    ['Obturation', data.obturation],
+    ['Calcification', data.calcification],
+    ['Separated Instrument', data.separated],
+    ['Procedure', data.procedure],
+    ['Material', data.material],
+    ['Surfaces / Units', data.surfaces],
+    ['Isolation / Stage', data.cavity_class],
+    ['Impaction', data.impaction],
+    ['Anaesthesia', data.anaesthesia],
+    ['Sutures', data.sutures],
+    ['Post-op', data.post_op],
+    ['Clinical Summary', data.narrative],
+  ].filter(([label, value]) => value);
+
+  fieldsEl.innerHTML = displayFields.map(([label, value]) => `
+    <div class="vl-field-row">
+      <div class="vl-field-label">${label}</div>
+      <div class="vl-field-value">${value}</div>
+    </div>`).join('');
+}
+
+async function submitVoiceCase() {
+  if (!currentUser) { showToast('Please sign in first.'); return; }
+  if (!isPro && allCases.length >= FREE_TIER_LIMIT) { showPaywall(); closeVoiceLog(); return; }
+
+  const btn = document.querySelector('#vl-screen-review button');
+  if (btn) { btn.textContent = 'Logging...'; btn.disabled = true; }
+
+  showVLScreen('processing');
+  document.getElementById('vl-processing-msg').textContent = 'Saving your case...';
+
+  const d = vlExtractedData;
+  const complexity = Math.min(10, 2 +
+    (d.case_type === 'Retreatment' ? 2 : 0) +
+    (d.curvature === 'Severe' ? 2 : d.curvature === 'Moderate' ? 1 : 0) +
+    (d.calcification === 'Yes' ? 2 : 0) +
+    (parseInt(d.canals) >= 4 ? 1 : 0) +
+    (d.procedure === 'Full Mouth Rehabilitation' ? 4 : d.procedure === 'Implant Crown' ? 2 : 0)
+  );
+
+  const caseData = {
+    user_id: currentUser.id,
+    specialty: d.specialty || vlSpecialty,
+    tooth_number: d.tooth_number || null,
+    age_range: d.age_range || null,
+    complaint: d.complaint || null,
+    complexity_score: complexity,
+    narrative: d.narrative || null,
+    post_op: d.post_op || null,
+    pulp_diagnosis: d.pulp_diagnosis || null,
+    periapical_diagnosis: d.periapical_diagnosis || null,
+    case_type: d.case_type || null,
+    canals: d.canals || null,
+    curvature: d.curvature || null,
+    irrigation: d.irrigation || null,
+    obturation: d.obturation || null,
+    calcification: d.calcification || null,
+    separated: d.separated || null,
+    procedure: d.procedure || null,
+    material: d.material || null,
+    cavity_class: d.cavity_class || null,
+    surfaces: d.surfaces || null,
+    isolation: d.isolation || null,
+    impaction: d.impaction || null,
+    anaesthesia: d.anaesthesia || null,
+    sutures: d.sutures || null,
+    created_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await sb.from('cases').insert([caseData]).select();
+  if (error) {
+    showToast('Error saving case. Please try again.');
+    showVLScreen('review');
+    return;
+  }
+
+  allCases.unshift(data[0]);
+  closeVoiceLog();
+  updateDashboard();
+  showVerificationShareCard(data[0].id);
+  showToast('Voice case logged! ✓ Check My Cases for AI feedback.');
+
+  // Switch to log view to show AI report
+  showView('log');
+  setTimeout(async () => {
+    await generateAIReport(caseData, complexity);
+    await autoGenerateClinicalNote(caseData);
+  }, 300);
+}
+
+function retryVoiceLog() {
+  vlTranscript = '';
+  vlExtractedData = {};
+  showVLScreen('coach');
+}
+
 // ─── QUICK LOG ───
 let qlSpecialty = 'endo';
 let qlComplaint = '';
@@ -6118,6 +6882,7 @@ async function updateClinicalMemory() {
   const restoCnt = allCases.filter(c => c.specialty === 'restorative').length;
   const surgCnt  = allCases.filter(c => c.specialty === 'surgery').length;
   const paedsCnt = allCases.filter(c => c.specialty === 'paeds').length;
+  const prosthoCnt = allCases.filter(c => c.specialty === 'prostho').length;
   const avgScore = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
   const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
   const recent5  = allCases.slice(0,5).map(c => `${c.specialty} tooth ${c.tooth_number} (score:${c.complexity_score||'?'})`).join(', ');
@@ -6272,6 +7037,7 @@ async function generateCareerAdvice(autoMode = false) {
   const restoCnt = allCases.filter(c => c.specialty === 'restorative').length;
   const surgCnt  = allCases.filter(c => c.specialty === 'surgery').length;
   const paedsCnt = allCases.filter(c => c.specialty === 'paeds').length;
+  const prosthoCnt = allCases.filter(c => c.specialty === 'prostho').length;
   const avgScore = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
   const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
   const lowComp  = allCases.filter(c => (c.complexity_score||0) < 3).length;
@@ -6282,12 +7048,12 @@ async function generateCareerAdvice(autoMode = false) {
     ? (allCases.filter(c=>c.difficulty_rating).reduce((s,c)=>s+(c.difficulty_rating||0),0) / allCases.filter(c=>c.difficulty_rating).length).toFixed(1)
     : 'Not rated';
 
-  const specialtyCounts = { endo: endoCnt, restorative: restoCnt, surgery: surgCnt, paeds: paedsCnt };
+  const specialtyCounts = { endo: endoCnt, restorative: restoCnt, surgery: surgCnt, paeds: paedsCnt, prostho: prosthoCnt };
   const dominantSpecialty = Object.entries(specialtyCounts).sort((a,b) => b[1]-a[1])[0][0];
   const dominantPct = Math.round(specialtyCounts[dominantSpecialty]/total*100);
   const isSpecialist = role === 'specialist';
 
-  const specialtyFullName = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry' }[dominantSpecialty] || dominantSpecialty;
+  const specialtyFullName = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[dominantSpecialty] || dominantSpecialty;
 
   const prompt = `You are the world's most insightful dental career strategist. You have mentored dentists across the GCC, UK, USA, Australia, Germany, and Canada. You have deep knowledge of dental job markets, postgraduate pathways, specialty demand by country, salary expectations, licensing requirements, and career trajectories. You speak with the directness of a mentor who has seen hundreds of dental careers succeed and fail.
 
@@ -6297,7 +7063,7 @@ COMPLETE CLINICAL DATA:
 - Name: ${name}
 - Current role: ${roleLabel}
 - Total documented cases: ${total}
-- Specialty breakdown: Endodontics ${endoCnt} (${dominantSpecialty === 'endo' ? dominantPct+'%' : Math.round(endoCnt/total*100)+'%'}) | Restorative ${restoCnt} (${Math.round(restoCnt/total*100)}%) | Oral Surgery ${surgCnt} (${Math.round(surgCnt/total*100)}%) | Paediatric ${paedsCnt} (${Math.round(paedsCnt/total*100)}%)
+- Specialty breakdown: Endodontics ${endoCnt} (${dominantSpecialty === 'endo' ? dominantPct+'%' : Math.round(endoCnt/total*100)+'%'}) | Restorative ${restoCnt} (${Math.round(restoCnt/total*100)}%) | Oral Surgery ${surgCnt} (${Math.round(surgCnt/total*100)}%) | Paediatric ${paedsCnt} (${Math.round(paedsCnt/total*100)}%) | Prosthodontics ${prosthoCnt} (${Math.round(prosthoCnt/total*100)}%)
 - Dominant specialty: ${specialtyFullName} — ${dominantPct}% of all cases
 - Average complexity score: ${avgScore}/10
 - High complexity cases (7+/10): ${highComp} of ${total}
