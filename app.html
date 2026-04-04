@@ -862,6 +862,17 @@ body::after {
 .vl-field-label { font-size:0.65rem;color:var(--gray);min-width:110px;text-transform:uppercase;letter-spacing:0.05em; }
 .vl-field-value { font-size:0.82rem;color:var(--white);flex:1; }
 .vl-field-missing { color:rgba(255,255,255,0.2);font-style:italic; }
+.vl-photo-slot {
+  aspect-ratio:1;border-radius:12px;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;transition:all 0.2s;position:relative;overflow:hidden;
+}
+.vl-photo-slot:hover { border-color:rgba(124,111,255,0.3);background:rgba(124,111,255,0.06); }
+.vl-photo-slot.has-photo { border-color:rgba(124,111,255,0.4); }
+.vl-slot-icon { font-size:1.1rem;opacity:0.5; }
+.vl-slot-label { font-size:0.55rem;color:var(--gray);text-align:center; }
+.vl-slot-img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover; }
 
 .ql-tag {
   padding: 7px 14px; border-radius: 8px;
@@ -1274,13 +1285,13 @@ body::after {
     </div>
 
     <!-- SCREEN 4: Review -->
-    <div id="vl-screen-review" style="display:none;padding:28px 32px;">
+    <div id="vl-screen-review" style="display:none;padding:28px 32px;max-height:85vh;overflow-y:auto;">
       <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">✓ Case Extracted</div>
       <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white);margin-bottom:6px;" id="vl-review-title">Review your case</div>
-      <div style="font-size:0.78rem;color:var(--gray);margin-bottom:20px;">Tap any field to edit before logging</div>
+      <div style="font-size:0.78rem;color:var(--gray);margin-bottom:20px;">Provify extracted these fields from your voice</div>
 
       <!-- Extracted fields display -->
-      <div id="vl-extracted-fields" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:4px;margin-bottom:16px;max-height:280px;overflow-y:auto;"></div>
+      <div id="vl-extracted-fields" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:4px;margin-bottom:16px;max-height:220px;overflow-y:auto;"></div>
 
       <!-- What you said -->
       <div style="background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.12);border-radius:10px;padding:12px 14px;margin-bottom:20px;">
@@ -1289,11 +1300,89 @@ body::after {
       </div>
 
       <div style="display:flex;gap:10px;">
-        <button onclick="submitVoiceCase()" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);">
-          Log This Case →
+        <button onclick="showVLScreen('photos')" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);">
+          Next — Add Photos →
         </button>
         <button onclick="retryVoiceLog()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;padding:14px 18px;border-radius:14px;cursor:pointer;">
           ↺ Retry
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: Photos -->
+    <div id="vl-screen-photos" style="display:none;padding:28px 32px;">
+      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">📸 Add Images</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white);margin-bottom:6px;">X-rays & Clinical Photos</div>
+      <div style="font-size:0.78rem;color:var(--gray);margin-bottom:24px;">Optional — up to 4 X-rays and 4 clinical photos</div>
+
+      <!-- X-rays -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">X-Rays</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-1')" id="vl-slot-xr-1">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">X-ray 1</div>
+            <img class="vl-slot-img" id="vl-img-xr-1" style="display:none;">
+            <input type="file" id="vl-xr-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-1','vl-slot-xr-1','vl-img-xr-1')">
+          </div>
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-2')" id="vl-slot-xr-2">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">X-ray 2</div>
+            <img class="vl-slot-img" id="vl-img-xr-2" style="display:none;">
+            <input type="file" id="vl-xr-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-2','vl-slot-xr-2','vl-img-xr-2')">
+          </div>
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-3')" id="vl-slot-xr-3">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">X-ray 3</div>
+            <img class="vl-slot-img" id="vl-img-xr-3" style="display:none;">
+            <input type="file" id="vl-xr-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-3','vl-slot-xr-3','vl-img-xr-3')">
+          </div>
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-4')" id="vl-slot-xr-4">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">X-ray 4</div>
+            <img class="vl-slot-img" id="vl-img-xr-4" style="display:none;">
+            <input type="file" id="vl-xr-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-4','vl-slot-xr-4','vl-img-xr-4')">
+          </div>
+        </div>
+      </div>
+
+      <!-- Clinical Photos -->
+      <div style="margin-bottom:24px;">
+        <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">Clinical Photos</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-1')" id="vl-slot-cp-1">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">Photo 1</div>
+            <img class="vl-slot-img" id="vl-img-cp-1" style="display:none;">
+            <input type="file" id="vl-cp-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-1','vl-slot-cp-1','vl-img-cp-1')">
+          </div>
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-2')" id="vl-slot-cp-2">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">Photo 2</div>
+            <img class="vl-slot-img" id="vl-img-cp-2" style="display:none;">
+            <input type="file" id="vl-cp-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-2','vl-slot-cp-2','vl-img-cp-2')">
+          </div>
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-3')" id="vl-slot-cp-3">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">Photo 3</div>
+            <img class="vl-slot-img" id="vl-img-cp-3" style="display:none;">
+            <input type="file" id="vl-cp-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-3','vl-slot-cp-3','vl-img-cp-3')">
+          </div>
+          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-4')" id="vl-slot-cp-4">
+            <div class="vl-slot-icon">📷</div>
+            <div class="vl-slot-label">Photo 4</div>
+            <img class="vl-slot-img" id="vl-img-cp-4" style="display:none;">
+            <input type="file" id="vl-cp-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-4','vl-slot-cp-4','vl-img-cp-4')">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button onclick="submitVoiceCase()" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);">
+          🛡 Log & Protect This Case →
+        </button>
+        <button onclick="submitVoiceCase()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;padding:14px 16px;border-radius:14px;cursor:pointer;white-space:nowrap;">
+          Skip Photos
         </button>
       </div>
     </div>
@@ -1480,8 +1569,8 @@ body::after {
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
         Dashboard
       </button>
-      <button class="nav-item" onclick="showView('log')" id="nav-log">
-        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span>
+      <button class="nav-item" onclick="openVoiceLog()" id="nav-log">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
         Log Case
       </button>
       <button class="nav-item" onclick="showView('cases')" id="nav-cases">
@@ -1557,11 +1646,11 @@ body::after {
             <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:12px;line-height:1.2;">Your first case is one click away.</div>
             <div style="font-size:0.95rem;color:var(--gray);line-height:1.8;max-width:480px;margin:0 auto 32px;">Every case you log becomes a timestamped, verifiable clinical record. Your protection. Your portfolio. Your career intelligence — all from one log.</div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-              <button onclick="showView('log')" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:0.95rem;padding:14px 32px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                Log My First Case →
+              <button onclick="openVoiceLog()" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:0.95rem;padding:14px 32px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                🎙 Voice Log — Speak Your Case →
               </button>
-              <button onclick="openQuickLog()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.9rem;padding:14px 24px;border-radius:12px;cursor:pointer;transition:all 0.2s;">
-                Quick Log — 60 seconds
+              <button onclick="showView('log')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.9rem;padding:14px 24px;border-radius:12px;cursor:pointer;transition:all 0.2s;">
+                Manual Form
               </button>
             </div>
           </div>
@@ -6354,7 +6443,8 @@ let vlSpecialty = 'endo';
 let vlRecognition = null;
 let vlTranscript = '';
 let vlTimer = null;
-let vlSecondsLeft = 45;
+let vlSecondsLeft = 60;
+let vlPhotoFiles = {};
 let vlExtractedData = {};
 
 const VL_EXAMPLES = {
@@ -6382,7 +6472,7 @@ function closeVoiceLog() {
 }
 
 function showVLScreen(screen) {
-  ['coach','recording','processing','review'].forEach(s => {
+  ['coach','recording','processing','review','photos'].forEach(s => {
     const el = document.getElementById(`vl-screen-${s}`);
     if (el) el.style.display = s === screen ? 'block' : 'none';
   });
@@ -6425,13 +6515,14 @@ function startVoiceRecording() {
 
   showVLScreen('recording');
   vlTranscript = '';
-  vlSecondsLeft = 45;
+  vlSecondsLeft = 60;
 
   // Start waveform animation
   document.querySelectorAll('.vl-bar').forEach(b => b.classList.add('active'));
 
   // Timer countdown
-  document.getElementById('vl-timer').textContent = vlSecondsLeft;
+  const timerEl2 = document.getElementById('vl-timer');
+    if (timerEl2) timerEl2.textContent = vlSecondsLeft;
   vlTimer = setInterval(() => {
     vlSecondsLeft--;
     const timerEl = document.getElementById('vl-timer');
@@ -6676,11 +6767,32 @@ async function submitVoiceCase() {
   const { data, error } = await sb.from('cases').insert([caseData]).select();
   if (error) {
     showToast('Error saving case. Please try again.');
-    showVLScreen('review');
+    showVLScreen('photos');
     return;
   }
 
   allCases.unshift(data[0]);
+
+  // Upload voice log photos if any
+  if (Object.keys(vlPhotoFiles).length > 0) {
+    const photoUrls = {};
+    for (const [id, file] of Object.entries(vlPhotoFiles)) {
+      try {
+        const ext = file.name.split('.').pop();
+        const path = `${currentUser.id}/${data[0].id}/${id}.${ext}`;
+        const { error: upErr } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
+        if (!upErr) {
+          const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
+          photoUrls[id] = publicUrl;
+        }
+      } catch(e) { console.log('VL photo upload error:', e); }
+    }
+    if (Object.keys(photoUrls).length > 0) {
+      await sb.from('cases').update({ photo_urls: photoUrls }).eq('id', data[0].id);
+      allCases[0] = { ...allCases[0], photo_urls: photoUrls };
+    }
+  }
+
   closeVoiceLog();
   updateDashboard();
   showVerificationShareCard(data[0].id);
@@ -6697,7 +6809,38 @@ async function submitVoiceCase() {
 function retryVoiceLog() {
   vlTranscript = '';
   vlExtractedData = {};
+  vlPhotoFiles = {};
+  // Reset photo slots
+  ['vl-xr-1','vl-xr-2','vl-xr-3','vl-xr-4','vl-cp-1','vl-cp-2','vl-cp-3','vl-cp-4'].forEach(id => {
+    const slot = document.getElementById(`vl-slot-${id}`);
+    const img = document.getElementById(`vl-img-${id}`);
+    const input = document.getElementById(id);
+    if (slot) slot.classList.remove('has-photo');
+    if (img) { img.src = ''; img.style.display = 'none'; }
+    if (input) input.value = '';
+  });
   showVLScreen('coach');
+}
+
+function triggerVLUpload(id) {
+  document.getElementById(id)?.click();
+}
+
+function handleVLPhoto(input, id, slotId, imgId) {
+  const file = input.files[0];
+  if (!file) return;
+  vlPhotoFiles[id] = file;
+  const slot = document.getElementById(slotId);
+  const img = document.getElementById(imgId);
+  if (slot) slot.classList.add('has-photo');
+  if (img) {
+    img.src = URL.createObjectURL(file);
+    img.style.display = 'block';
+    const icon = slot?.querySelector('.vl-slot-icon');
+    const label = slot?.querySelector('.vl-slot-label');
+    if (icon) icon.style.display = 'none';
+    if (label) label.style.display = 'none';
+  }
 }
 
 // ─── QUICK LOG ───
