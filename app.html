@@ -1747,96 +1747,91 @@ body::after {
 
       <!-- DASHBOARD VIEW -->
       <div class="view active" id="view-dashboard">
-        <div class="page-header">
-          <div class="page-title" id="greeting-title">Good morning, Doctor</div>
-          <div class="page-sub" id="greeting-sub">Here's your clinical overview</div>
+
+        <!-- HERO CARD — the first thing you see -->
+        <div id="dash-hero" style="position:relative;border-radius:24px;overflow:hidden;margin-bottom:20px;padding:32px;background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.2);">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.7),transparent);"></div>
+          <!-- Ambient orb -->
+          <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,111,255,0.12),transparent 70%);pointer-events:none;"></div>
+
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <div style="font-size:0.62rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:600;margin-bottom:10px;" id="dash-hero-label">YOUR CLINICAL RECORD</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:clamp(1.4rem,3vw,2rem);color:var(--white);letter-spacing:-0.02em;line-height:1.25;margin-bottom:12px;" id="dash-hero-title">Good morning, Doctor.</div>
+              <div style="font-size:0.875rem;color:rgba(255,255,255,0.5);line-height:1.8;max-width:440px;" id="dash-hero-body">Your clinical record starts with your first case.</div>
+            </div>
+
+            <!-- Complexity ring — big, center right -->
+            <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;" id="dash-ring-container">
+              <div style="position:relative;width:88px;height:88px;">
+                <svg width="88" height="88" viewBox="0 0 88 88" style="transform:rotate(-90deg);">
+                  <circle cx="44" cy="44" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5"/>
+                  <circle cx="44" cy="44" r="36" fill="none" stroke="url(#heroRingGrad)" stroke-width="5"
+                    id="dash-ring" stroke-linecap="round"
+                    stroke-dasharray="${2 * Math.PI * 36}"
+                    stroke-dashoffset="${2 * Math.PI * 36}"/>
+                  <defs>
+                    <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#7C6FFF"/>
+                      <stop offset="100%" stop-color="#34D399"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
+                  <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--white);line-height:1;" id="dash-ring-number">—</div>
+                  <div style="font-size:0.55rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;">avg score</div>
+                </div>
+              </div>
+              <div style="font-size:0.65rem;color:var(--gray);text-align:center;" id="dash-ring-label">No cases yet</div>
+            </div>
+          </div>
+
+          <!-- 4 micro stats inline -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);" id="dash-micro-stats">
+            <div style="text-align:center;">
+              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--white);line-height:1;margin-bottom:3px;" id="micro-total">0</div>
+              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Cases</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#34D399;line-height:1;margin-bottom:3px;" id="micro-protected">0</div>
+              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Protected</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#F59E0B;line-height:1;margin-bottom:3px;" id="micro-streak">0</div>
+              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Day Streak</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--teal);line-height:1;margin-bottom:3px;" id="micro-level">—</div>
+              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Level</div>
+            </div>
+          </div>
         </div>
 
         <!-- EMPTY STATE — shown only when 0 cases -->
-        <div id="welcome-card" style="display:none;margin-bottom:24px;">
-          <!-- Hero empty state -->
-          <div style="background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:24px;padding:48px;text-align:center;position:relative;overflow:hidden;margin-bottom:16px;">
-            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
-            <div style="font-size:3rem;margin-bottom:20px;">🛡</div>
-            <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:12px;line-height:1.2;">Your first case is one click away.</div>
-            <div style="font-size:0.95rem;color:var(--gray);line-height:1.8;max-width:480px;margin:0 auto 32px;">Every case you log becomes a timestamped, verifiable clinical record. Your protection. Your portfolio. Your career intelligence — all from one log.</div>
+        <div id="welcome-card" style="display:none;margin-bottom:20px;">
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:32px;text-align:center;">
+            <div style="font-size:0.9rem;color:var(--gray);line-height:1.8;max-width:380px;margin:0 auto 28px;">Speak for 60 seconds. Provify extracts every clinical field, writes your note, and creates your verified record.</div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-              <button onclick="openVoiceLog()" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:0.95rem;padding:14px 32px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                🎙 Voice Log — Speak Your Case →
+              <button onclick="openVoiceLog()" style="background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:0.9rem;padding:13px 28px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);transition:all 0.2s;display:flex;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>
+                Voice Log
               </button>
-              <button onclick="showView('log')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.9rem;padding:14px 24px;border-radius:12px;cursor:pointer;transition:all 0.2s;">
-                Manual Form
-              </button>
+              <button onclick="showView('log')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--white-dim);font-family:'Inter',sans-serif;font-size:0.875rem;padding:13px 22px;border-radius:12px;cursor:pointer;">Manual Form</button>
             </div>
-          </div>
-          <!-- 3 step checklist -->
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;text-align:center;">
-              <div style="font-size:1.5rem;margin-bottom:10px;">📋</div>
-              <div style="font-size:0.82rem;color:var(--white);font-weight:500;margin-bottom:6px;">Log a case</div>
-              <div style="font-size:0.72rem;color:var(--gray);line-height:1.5;">Tooth chart, diagnosis, treatment. AI feedback instantly.</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;text-align:center;opacity:0.6;">
-              <div style="font-size:1.5rem;margin-bottom:10px;">🛡</div>
-              <div style="font-size:0.82rem;color:var(--white);font-weight:500;margin-bottom:6px;">Document the record</div>
-              <div style="font-size:0.72rem;color:var(--gray);line-height:1.5;">Consent, risks, complications. Timestamped forever.</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;text-align:center;opacity:0.6;">
-              <div style="font-size:1.5rem;margin-bottom:10px;">⭐</div>
-              <div style="font-size:0.82rem;color:var(--white);font-weight:500;margin-bottom:6px;">Build your career</div>
-              <div style="font-size:0.72rem;color:var(--gray);line-height:1.5;">Portfolio, Career Assistant, and more unlock as you log.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card" style="border-color:rgba(124,111,255,0.2);">
-            <div class="stat-card-label">Cases Documented</div>
-            <div class="stat-card-value" id="stat-total">0</div>
-            <div class="stat-card-sub" id="stat-total-sub">Start logging →</div>
-          </div>
-          <div class="stat-card" style="border-color:rgba(52,211,153,0.2);">
-            <div class="stat-card-label">Records Protected</div>
-            <div class="stat-card-value" id="stat-protected">0</div>
-            <div class="stat-card-sub" style="color:#34D399;">🛡 Verified</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-label">Day Streak</div>
-            <div class="stat-card-value" id="stat-streak">0</div>
-            <div class="stat-card-sub">Days active</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-label">Avg Complexity</div>
-            <div class="stat-card-value" id="stat-avg">—</div>
-            <div class="stat-card-sub">Out of 10</div>
           </div>
         </div>
 
         <!-- SPECIALTY DISTRIBUTION CHART -->
         <div class="card" id="specialty-chart-card" style="display:none;margin-bottom:20px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-            <div class="card-title" style="margin:0;">Your Clinical Identity</div>
+            <div class="card-title" style="margin:0;">Clinical Breakdown</div>
             <div style="font-size:0.7rem;color:var(--gray);" id="spec-chart-total">— cases</div>
           </div>
-          <div id="specialty-bars" style="display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
-
-        <!-- PROVIFY RECORD CARD -->
-        <div class="card" id="provify-record-card" style="background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.02));border-color:rgba(124,111,255,0.2);margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;">🛡 Your Clinical Record</div>
-            <button onclick="showView('career')" style="background:none;border:none;color:var(--teal);font-family:'Inter',sans-serif;font-size:0.72rem;cursor:pointer;padding:0;">Career Assistant →</button>
-          </div>
-          <div id="dashboard-clinical-profile" style="font-size:0.875rem;color:var(--white-dim);line-height:1.75;margin-bottom:14px;">
-            Log your first case to start building your clinical record.
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="dashboard-record-stats">
-            <!-- filled by JS -->
-          </div>
+          <div id="specialty-bars" style="display:flex;flex-direction:column;gap:12px;"></div>
         </div>
 
         <!-- XP PROGRESS CARD -->
-        <div class="card" id="xp-progress-card" style="background:linear-gradient(135deg,var(--navy-2) 0%,rgba(124,111,255,0.05) 100%);border-color:var(--teal-mid)">
+        <div class="card" id="xp-progress-card" style="background:linear-gradient(135deg,var(--navy-2) 0%,rgba(124,111,255,0.05) 100%);border-color:var(--teal-mid);margin-bottom:20px;">
         </div>
 
         <!-- RECENT CASES -->
@@ -1857,8 +1852,8 @@ body::after {
         <!-- BEST WORK -->
         <div class="card" id="best-work-card" style="display:none">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-            <div class="card-title" style="margin:0">⭐ Your Best Work</div>
-            <div style="font-size:0.75rem;color:var(--gray)">Highest complexity cases</div>
+            <div class="card-title" style="margin:0">⭐ Best Work</div>
+            <div style="font-size:0.75rem;color:var(--gray)">Highest complexity</div>
           </div>
           <div id="best-work-list" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
         </div>
@@ -4026,66 +4021,88 @@ Keep each field to 1-2 sentences max. Be specific, clinical, and genuinely usefu
 // ─── DASHBOARD ───
 function updateDashboard() {
   const total = allCases.length;
-  document.getElementById('stat-total').textContent = total;
-
-  // Smart greeting
   const hour = new Date().getHours();
   const greetingWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = currentProfile?.first_name || 'Doctor';
-  const greetingTitle = document.getElementById('greeting-title');
-  if (greetingTitle) greetingTitle.innerHTML = `${greetingWord}, <span style="color:var(--teal)">Dr. ${firstName}</span>`;
-  const greetingSub = document.getElementById('greeting-sub');
-  if (greetingSub) greetingSub.textContent = total === 0 ? 'Welcome to Provify — your clinical record starts here' : `${total} case${total !== 1 ? 's' : ''} documented and protected`;
+  const avg = total > 0 ? (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total) : 0;
+  const level = getLevel(total);
+  const xp = getXP(total);
+  const rank = getComplexityRank(avg);
+  const protected_count = allCases.filter(c => c.note && c.note.includes('|| ML_RECORD:')).length;
+  const streak = calculateStreak();
+
+  // ── HERO CARD ──
+  const heroTitle = document.getElementById('dash-hero-title');
+  const heroBody = document.getElementById('dash-hero-body');
+  const heroLabel = document.getElementById('dash-hero-label');
+  const ringEl = document.getElementById('dash-ring');
+  const ringNum = document.getElementById('dash-ring-number');
+  const ringLabel = document.getElementById('dash-ring-label');
+
+  if (heroTitle) heroTitle.innerHTML = `${greetingWord}, <span style="background:linear-gradient(135deg,#7C6FFF,#34D399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Dr. ${firstName}</span>`;
+
+  if (total === 0) {
+    if (heroBody) heroBody.textContent = 'Your clinical record starts with your first case. Speak for 60 seconds — Provify does the rest.';
+    if (heroLabel) heroLabel.textContent = 'WELCOME TO PROVIFY';
+    if (ringNum) ringNum.textContent = '—';
+    if (ringLabel) ringLabel.textContent = 'No cases yet';
+  } else {
+    // Generate a dynamic, personal insight sentence
+    const dominant = ['endo','restorative','surgery','paeds','prostho']
+      .map(s => ({ s, n: allCases.filter(c => c.specialty === s).length }))
+      .sort((a,b) => b.n - a.n)[0];
+    const domNames = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+    const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
+    const phaseMsgs = [
+      total <= 5   ? `You're ${5 - total} case${5 - total !== 1 ? 's' : ''} from unlocking your first career insight.` : null,
+      total <= 10  ? `${10 - total} more case${10 - total !== 1 ? 's' : ''} to reach Level Silver.` : null,
+      total <= 25  ? `You're building your foundation. ${25 - total} cases to Gold.` : null,
+      total > 25   ? `${total} cases documented. You're in the top tier of dentists on Provify.` : null,
+    ].filter(Boolean)[0];
+
+    const insightParts = [
+      `${total} case${total !== 1 ? 's' : ''} documented.`,
+      dominant.n > 0 ? `${domNames[dominant.s]} is your dominant specialty at ${Math.round(dominant.n/total*100)}%.` : '',
+      avg > 0 ? `Average complexity ${avg.toFixed(1)}/10${avg >= 7 ? ' — you handle the hard cases.' : avg >= 4 ? ' — solid clinical range.' : ' — building your foundations.'}` : '',
+      highComp > 0 ? `${highComp} high-complexity case${highComp !== 1 ? 's' : ''} on record.` : '',
+    ].filter(Boolean).join(' ');
+
+    if (heroBody) heroBody.textContent = insightParts;
+    if (heroLabel) heroLabel.textContent = `${level.name.toUpperCase()} · LEVEL ${level.level}`;
+
+    // Animate ring
+    if (ringEl && avg > 0) {
+      const r = 36, circ = 2 * Math.PI * r;
+      ringEl.setAttribute('stroke-dasharray', circ);
+      ringEl.style.transition = 'none';
+      ringEl.setAttribute('stroke-dashoffset', circ);
+      setTimeout(() => {
+        ringEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+        ringEl.setAttribute('stroke-dashoffset', circ * (1 - avg / 10));
+      }, 200);
+    }
+    if (ringNum) ringNum.textContent = avg.toFixed(1);
+    if (ringLabel) { ringLabel.textContent = rank.rank + ' Rank'; ringLabel.style.color = rank.color; }
+  }
+
+  // Micro stats
+  const setMicro = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setMicro('micro-total', total);
+  setMicro('micro-protected', protected_count);
+  setMicro('micro-streak', streak);
+  setMicro('micro-level', total > 0 ? level.icon : '—');
+
+  // Legacy stat IDs (kept for backward compat)
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('stat-total', total);
+  setEl('stat-protected', protected_count);
+  setEl('stat-streak', streak);
+  setEl('stat-avg', total > 0 ? avg.toFixed(1) : '—');
+  setEl('stat-total-sub', total === 0 ? 'Start logging →' : total >= 10 ? '🔥 Keep going' : `${10 - total} to next level`);
 
   // Welcome card
   const welcomeCard = document.getElementById('welcome-card');
   if (welcomeCard) welcomeCard.style.display = total === 0 ? 'block' : 'none';
-
-  // Records protected — cases with ML record
-  const protected_count = allCases.filter(c => c.note && c.note.includes('|| ML_RECORD:')).length;
-  const protectedEl = document.getElementById('stat-protected');
-  if (protectedEl) protectedEl.textContent = protected_count;
-
-  // Total sub text
-  const totalSubEl = document.getElementById('stat-total-sub');
-  if (totalSubEl) totalSubEl.textContent = total === 0 ? 'Start logging →' : total >= 10 ? '🔥 Keep going' : `${10 - total} to next level`;
-
-  const avg = total > 0 ? (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total) : 0;
-  if (total > 0) document.getElementById('stat-avg').textContent = avg.toFixed(1);
-
-  const level = getLevel(total);
-  const xp = getXP(total);
-  const rank = getComplexityRank(avg);
-
-  // Update streak
-  document.getElementById('stat-streak').textContent = calculateStreak();
-
-  // Provify Record card
-  const profileEl = document.getElementById('dashboard-clinical-profile');
-  const statsEl = document.getElementById('dashboard-record-stats');
-  if (profileEl) {
-    if (currentProfile?.clinical_profile) {
-      profileEl.textContent = currentProfile.clinical_profile;
-    } else if (total > 0) {
-      profileEl.textContent = 'Provify is building your clinical profile. Log more cases to unlock your Career Assistant insights.';
-    } else {
-      profileEl.textContent = 'Log your first case to start building your verified clinical record.';
-    }
-  }
-  if (statsEl && total > 0) {
-    const endoCnt  = allCases.filter(c => c.specialty === 'endo').length;
-    const restoCnt = allCases.filter(c => c.specialty === 'restorative').length;
-    const surgCnt  = allCases.filter(c => c.specialty === 'surgery').length;
-    const paedsCnt = allCases.filter(c => c.specialty === 'paeds').length;
-  const prosthoCnt = allCases.filter(c => c.specialty === 'prostho').length;
-    const tags = [];
-    if (endoCnt  > 0) tags.push(`<span style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:500;">${endoCnt} Endo</span>`);
-    if (restoCnt > 0) tags.push(`<span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#F59E0B;font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:500;">${restoCnt} Restorative</span>`);
-    if (surgCnt  > 0) tags.push(`<span style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#EF4444;font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:500;">${surgCnt} Surgery</span>`);
-    if (paedsCnt > 0) tags.push(`<span style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:#34D399;font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:500;">${paedsCnt} Paeds</span>`);
-    if (protected_count > 0) tags.push(`<span style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:500;">🛡 ${protected_count} Protected</span>`);
-    statsEl.innerHTML = tags.join('');
-  }
 
   // Inject XP bar into dashboard
   const xpCard = document.getElementById('xp-progress-card');
