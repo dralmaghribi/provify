@@ -1112,29 +1112,34 @@ body::after {
 <!-- ─── FIRST CASE CELEBRATION ─── -->
 <div id="celebration-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:700;align-items:center;justify-content:center;padding:20px;" onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';">
   <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.3);border-radius:28px;width:100%;max-width:480px;padding:40px 36px;text-align:center;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
-    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
-    <div style="font-size:3rem;margin-bottom:16px;">🛡</div>
-    <div style="font-family:'Instrument Serif',serif;font-size:1.7rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">Your first record is<br>documented and protected.</div>
-    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:24px;">Timestamped. Verified. Yours forever. This is what every case becomes from now on.</div>
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),rgba(52,211,153,0.5),transparent);"></div>
+    <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(52,211,153,0.08),transparent 70%);pointer-events:none;"></div>
 
-    <!-- What's coming preview -->
-    <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:16px;padding:18px;margin-bottom:24px;text-align:left;">
-      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">⭐ What Provify learns about you</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;align-items:center;gap:10px;opacity:0.5;">
-          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">1</div>
-          <div style="font-size:0.8rem;color:var(--white-dim);">Your clinical identity — what kind of dentist you're becoming</div>
+    <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(52,211,153,0.1));border:1px solid rgba(124,111,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">🛡</div>
+
+    <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">Your record exists.<br>Most dentists don't have one.</div>
+    <div style="font-size:0.875rem;color:rgba(255,255,255,0.45);line-height:1.8;margin-bottom:28px;">This case is now timestamped, verified, and protected. If anyone ever questions what you did today — this is your proof. Permanent. Immutable. Yours.</div>
+
+    <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:14px;padding:16px 18px;margin-bottom:24px;text-align:left;">
+      <div style="font-size:0.62rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px;">What you just built</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
+          <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
+          A timestamped clinical record — locked forever
         </div>
-        <div style="display:flex;align-items:center;gap:10px;opacity:0.35;">
-          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">5</div>
-          <div style="font-size:0.8rem;color:var(--white-dim);">Your complexity trajectory — how fast you're growing</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
+          <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
+          A verification link — shareable with anyone
         </div>
-        <div style="display:flex;align-items:center;gap:10px;opacity:0.2;">
-          <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">20</div>
-          <div style="font-size:0.8rem;color:var(--white-dim);">Your exact next career move — specific to your data</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
+          <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
+          AI feedback from a senior specialist — instantly
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
+          <div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0;"></div>
+          The beginning of a career portfolio — that grows with every case
         </div>
       </div>
-      <div style="font-size:0.72rem;color:var(--gray);margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">The more you log, the smarter Provify gets about you.</div>
     </div>
 
     <button onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';showView('cases');" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">
@@ -1714,7 +1719,7 @@ body::after {
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
         Portfolio
       </button>
-      <button class="nav-item" onclick="showView('badges')" id="nav-badges" style="opacity:0.7;">
+      <button class="nav-item" onclick="showView('badges')" id="nav-badges" style="opacity:0.7;display:none;">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.56 13.38L7 22l5-3 5 3-1.56-8.62"/></svg></span>
         Achievements
       </button>
@@ -1751,61 +1756,70 @@ body::after {
       <!-- DASHBOARD VIEW -->
       <div class="view active" id="view-dashboard">
 
-        <!-- HERO CARD — the first thing you see -->
-        <div id="dash-hero" style="position:relative;border-radius:24px;overflow:hidden;margin-bottom:20px;padding:32px;background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.2);">
-          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.7),transparent);"></div>
-          <!-- Ambient orb -->
-          <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,111,255,0.12),transparent 70%);pointer-events:none;"></div>
+        <!-- HERO CARD -->
+        <div id="dash-hero" style="position:relative;border-radius:24px;overflow:hidden;margin-bottom:20px;padding:32px;background:linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.04),rgba(52,211,153,0.04));border:1px solid rgba(124,111,255,0.25);">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.9),rgba(52,211,153,0.5),transparent);"></div>
+          <div style="position:absolute;top:-80px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(124,111,255,0.1),transparent 65%);pointer-events:none;"></div>
+          <div style="position:absolute;bottom:-60px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(52,211,153,0.06),transparent 65%);pointer-events:none;"></div>
 
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;">
             <div style="flex:1;min-width:200px;">
-              <div style="font-size:0.62rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:600;margin-bottom:10px;" id="dash-hero-label">YOUR CLINICAL RECORD</div>
-              <div style="font-family:'Instrument Serif',serif;font-size:clamp(1.4rem,3vw,2rem);color:var(--white);letter-spacing:-0.02em;line-height:1.25;margin-bottom:12px;" id="dash-hero-title">Good morning, Doctor.</div>
-              <div style="font-size:0.875rem;color:rgba(255,255,255,0.5);line-height:1.8;max-width:440px;" id="dash-hero-body">Your clinical record starts with your first case.</div>
+              <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);padding:4px 10px;border-radius:100px;margin-bottom:14px;">
+                <div style="width:5px;height:5px;background:#34D399;border-radius:50%;animation:ep2 2s ease-in-out infinite;"></div>
+                <span style="font-size:0.6rem;color:rgba(124,111,255,0.9);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;" id="dash-hero-label">PROVIFY RECORD</span>
+              </div>
+              <div style="font-family:'Instrument Serif',serif;font-size:clamp(1.5rem,3vw,2.1rem);color:var(--white);letter-spacing:-0.03em;line-height:1.2;margin-bottom:14px;" id="dash-hero-title">Good morning, Doctor.</div>
+              <div style="font-size:0.875rem;color:rgba(255,255,255,0.55);line-height:1.85;max-width:420px;" id="dash-hero-body">Your clinical record starts with your first case.</div>
             </div>
 
-            <!-- Complexity ring — big, center right -->
-            <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;" id="dash-ring-container">
-              <div style="position:relative;width:88px;height:88px;">
-                <svg width="88" height="88" viewBox="0 0 88 88" style="transform:rotate(-90deg);">
-                  <circle cx="44" cy="44" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5"/>
-                  <circle cx="44" cy="44" r="36" fill="none" stroke="url(#heroRingGrad)" stroke-width="5"
+            <!-- Complexity ring -->
+            <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;" id="dash-ring-container">
+              <div style="position:relative;width:96px;height:96px;">
+                <svg width="96" height="96" viewBox="0 0 96 96" style="transform:rotate(-90deg);">
+                  <circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="5"/>
+                  <circle cx="48" cy="48" r="40" fill="none" stroke="url(#heroRingGrad)" stroke-width="5"
                     id="dash-ring" stroke-linecap="round"
-                    stroke-dasharray="${2 * Math.PI * 36}"
-                    stroke-dashoffset="${2 * Math.PI * 36}"/>
+                    stroke-dasharray="${2 * Math.PI * 40}"
+                    stroke-dashoffset="${2 * Math.PI * 40}"/>
                   <defs>
-                    <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stop-color="#7C6FFF"/>
+                      <stop offset="50%" stop-color="#9B91FF"/>
                       <stop offset="100%" stop-color="#34D399"/>
                     </linearGradient>
                   </defs>
                 </svg>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
-                  <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--white);line-height:1;" id="dash-ring-number">—</div>
-                  <div style="font-size:0.55rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;">avg score</div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
+                  <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--white);line-height:1;" id="dash-ring-number">—</div>
+                  <div style="font-size:0.5rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.12em;">avg score</div>
                 </div>
               </div>
-              <div style="font-size:0.65rem;color:var(--gray);text-align:center;" id="dash-ring-label">No cases yet</div>
+              <div style="font-size:0.65rem;font-weight:600;text-align:center;padding:3px 10px;border-radius:100px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);" id="dash-ring-label" style="color:var(--teal);">—</div>
             </div>
           </div>
 
-          <!-- 4 micro stats inline -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);" id="dash-micro-stats">
+          <!-- Superiority statement — only shows when user has cases -->
+          <div id="dash-superiority" style="display:none;margin-top:20px;padding:14px 16px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:12px;">
+            <div style="font-size:0.82rem;color:rgba(52,211,153,0.9);line-height:1.7;" id="dash-superiority-text"></div>
+          </div>
+
+          <!-- 4 micro stats -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.06);">
             <div style="text-align:center;">
-              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--white);line-height:1;margin-bottom:3px;" id="micro-total">0</div>
-              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Cases</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--white);line-height:1;margin-bottom:3px;" id="micro-total">0</div>
+              <div style="font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;">Cases</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#34D399;line-height:1;margin-bottom:3px;" id="micro-protected">0</div>
-              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Protected</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#34D399;line-height:1;margin-bottom:3px;" id="micro-protected">0</div>
+              <div style="font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;">Protected</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#F59E0B;line-height:1;margin-bottom:3px;" id="micro-streak">0</div>
-              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Day Streak</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#F59E0B;line-height:1;margin-bottom:3px;" id="micro-streak">0</div>
+              <div style="font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;">Streak</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--teal);line-height:1;margin-bottom:3px;" id="micro-level">—</div>
-              <div style="font-size:0.6rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;">Level</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--teal);line-height:1;margin-bottom:3px;" id="micro-level">—</div>
+              <div style="font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;">Level</div>
             </div>
           </div>
         </div>
@@ -2879,24 +2893,24 @@ body::after {
           </div>
 
           <!-- THE GIFT — Verification share card -->
-          <div id="verification-share-card" style="display:none;margin-top:16px;background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-              <div style="font-size:1.4rem;">🛡</div>
+          <div id="verification-share-card" style="display:none;margin-top:16px;background:linear-gradient(135deg,rgba(52,211,153,0.07),rgba(52,211,153,0.02));border:1px solid rgba(52,211,153,0.2);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.6),transparent);"></div>
+            <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🛡</div>
               <div>
-                <div style="font-size:0.75rem;color:var(--teal);font-weight:600;margin-bottom:2px;">Your verification record is live</div>
-                <div style="font-size:0.72rem;color:var(--gray);">Share it with anyone — they can confirm this case is documented and timestamped</div>
+                <div style="font-size:0.78rem;color:#34D399;font-weight:700;margin-bottom:4px;">This case is now permanently protected.</div>
+                <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);line-height:1.6;">Timestamped. Immutable. If this case is ever questioned — this link is your answer.</div>
               </div>
             </div>
             <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-              <div id="verify-url-display" style="font-size:0.72rem;color:var(--teal);font-family:monospace;">provify.app/verify.html?id=...</div>
-              <button onclick="copyVerifyUrl()" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">Copy Link</button>
+              <div id="verify-url-display" style="font-size:0.72rem;color:#34D399;font-family:monospace;">provify.app/verify.html?id=...</div>
+              <button onclick="copyVerifyUrl()" style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);color:#34D399;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">Copy Link</button>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button onclick="openVerifyPage()" style="flex:1;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;">
-                🔗 Open Verification Page
+              <button onclick="openVerifyPage()" style="flex:1;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);color:#34D399;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;">
+                Open Record →
               </button>
-              <button onclick="shareVerifyWhatsApp()" style="flex:1;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);color:#25D366;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;">
+              <button onclick="shareVerifyWhatsApp()" style="flex:1;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);color:#25D366;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;">
                 Share via WhatsApp
               </button>
             </div>
@@ -4111,7 +4125,7 @@ function updateDashboard() {
 
     // Animate ring
     if (ringEl && avg > 0) {
-      const r = 36, circ = 2 * Math.PI * r;
+      const r = 40, circ = 2 * Math.PI * r;
       ringEl.setAttribute('stroke-dasharray', circ);
       ringEl.style.transition = 'none';
       ringEl.setAttribute('stroke-dashoffset', circ);
@@ -4122,6 +4136,21 @@ function updateDashboard() {
     }
     if (ringNum) ringNum.textContent = avg.toFixed(1);
     if (ringLabel) { ringLabel.textContent = rank.rank + ' Rank'; ringLabel.style.color = rank.color; }
+
+    // Superiority statement
+    const superiorityEl = document.getElementById('dash-superiority');
+    const superiorityText = document.getElementById('dash-superiority-text');
+    if (superiorityEl && superiorityText && total >= 3) {
+      superiorityEl.style.display = 'block';
+      const specName = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[dominant.s] || dominant.s;
+      const msgs = [
+        `You have ${total} documented and verified cases. Most dentists at your stage have zero. Every case you log is evidence — timestamped, protected, and yours forever.`,
+        `While other dentists finish a case and move on, you've built a verified clinical record that speaks for you. ${total} cases documented. ${protected_count > 0 ? protected_count + ' medico-legally protected.' : 'Your protection grows with every log.'}`,
+        `You're in a small group of dentists who actually document what they do. ${total} cases on record. When your career is questioned — and it will be — you have proof.`,
+        `${total} cases logged. ${total} decisions protected. Most dentists your stage are invisible on paper. You're not.`,
+      ];
+      superiorityText.textContent = msgs[total % msgs.length];
+    }
   }
 
   // Micro stats
