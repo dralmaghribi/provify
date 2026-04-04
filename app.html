@@ -1269,6 +1269,9 @@ body::after {
         Start Speaking
       </button>
       <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:var(--gray);">60 seconds max · Speak clearly · We'll handle the rest</div>
+      <div style="text-align:center;margin-top:10px;">
+        <button onclick="closeVoiceLog();showView('log');" style="background:none;border:none;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;font-size:0.72rem;cursor:pointer;text-decoration:underline;padding:4px;">Prefer typing? Use the manual form →</button>
+      </div>
     </div>
 
     <!-- SCREEN 2: Recording -->
@@ -1670,9 +1673,8 @@ body::after {
           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>
           Voice
         </button>
-        <button onclick="openQuickLog()" style="background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(124,111,255,0.1));border:1px solid rgba(124,111,255,0.3);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
-          Quick Log
+        <button onclick="showView('log')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:500;padding:7px 12px;border-radius:20px;cursor:pointer;">
+          Manual
         </button>
       </div>
     </div>
@@ -1687,15 +1689,15 @@ body::after {
       </button>
       <button class="nav-item" onclick="openVoiceLog()" id="nav-log">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-        Log Case
+        <span style="display:flex;flex-direction:column;gap:1px;"><span>Log Case</span><span style="font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:400;">Voice · Manual · Quick</span></span>
       </button>
       <button class="nav-item" onclick="showView('cases')" id="nav-cases">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span>
-        My Cases
+        <span style="display:flex;flex-direction:column;gap:1px;"><span>My Cases</span><span style="font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:400;">Your clinical record</span></span>
       </button>
       <button class="nav-item" onclick="showView('career')" id="nav-career">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-        Career
+        <span style="display:flex;flex-direction:column;gap:1px;"><span>Career</span><span style="font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:400;">AI advice from your cases</span></span>
       </button>
       <button class="nav-item" onclick="showView('profile')" id="nav-profile">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
@@ -2895,7 +2897,7 @@ body::after {
       <div class="view" id="view-cases">
         <div class="page-header">
           <div class="page-title">My Cases</div>
-          <div class="page-sub">Your complete clinical record</div>
+          <div class="page-sub">Every case you've logged — tap any record to view details, get a clinical note, or share the verification link.</div>
         </div>
 
         <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -6891,6 +6893,13 @@ function stopVoiceRecording(silent = false) {
   document.querySelectorAll('.vl-bar').forEach(b => b.classList.remove('active'));
 
   if (silent) return;
+
+  // Use visible transcript as fallback — always accurate
+  const liveEl = document.getElementById('vl-transcript-live');
+  const visibleText = liveEl?.textContent?.trim();
+  if (visibleText && visibleText !== 'Listening...') {
+    vlTranscript = visibleText;
+  }
 
   if (!vlTranscript.trim()) {
     showToast('No speech detected. Please try again.');
