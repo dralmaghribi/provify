@@ -6868,7 +6868,8 @@ function startVoiceRecording() {
         interim += event.results[i][0].transcript;
       }
     }
-    vlTranscript = final;
+    // Save both — on mobile final results often never fire
+    vlTranscript = final || interim;
     const liveEl = document.getElementById('vl-transcript-live');
     if (liveEl) liveEl.textContent = (final + interim) || 'Listening...';
     if (liveEl && (final || interim)) liveEl.style.color = 'rgba(255,255,255,0.8)';
