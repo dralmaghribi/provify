@@ -68,6 +68,23 @@ Child Cooperation: ${c.surfaces || 'Not recorded'}
 Space Maintainer: ${c.impaction || 'Not required'}
 Post-op: ${c.post_op || 'None reported'}
 Complexity score: ${complexity}/10`;
+      } else if (spec === 'prostho') {
+        details = `Specialty: Prosthodontics
+Tooth/Region: ${c.tooth_number}, Age: ${c.age_range}, Complaint: ${c.complaint}
+Prosthesis Type: ${c.procedure || 'Not recorded'}
+Material: ${c.material || 'Not recorded'}
+Stage of Treatment: ${c.cavity_class || 'Not recorded'}
+Number of Units: ${c.surfaces || 'Not recorded'}
+Preparation Design: ${c.anaesthesia || 'Not recorded'}
+Vertical Dimension: ${c.calcification || 'Not recorded'}
+Occlusal Scheme: ${c.isolation || 'Not recorded'}
+Impression Method: ${c.impaction || 'Not recorded'}
+Temporization: ${c.obturation || 'Not recorded'}
+Cementation: ${c.sutures || 'Not recorded'}
+Aesthetic Outcome: ${c.case_type || 'Not recorded'}
+Complications: ${c.separated || 'None'}
+Post-op: ${c.post_op || 'None reported'}
+Complexity score: ${complexity}/10`;
       } else {
         details = `Specialty: Oral Surgery
 Tooth: ${c.tooth_number}, Age: ${c.age_range}, Complaint: ${c.complaint}
@@ -110,7 +127,7 @@ Keep each field to 1-2 sentences max. Be specific, clinical, and genuinely usefu
 
     // ─── CAREER ASSISTANT ───
     if (mode === 'career') {
-      const text = await callClaude(careerPrompt, 700);
+      const text = await callClaude(careerPrompt, 1000);
       return res.status(200).json({ career: text });
     }
 
