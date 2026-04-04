@@ -351,6 +351,7 @@ body::after {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(90deg, rgba(124,111,255,0.03), transparent);
   opacity: 0; transition: opacity 0.2s;
+  pointer-events: none;
 }
 .case-item:hover { border-color: rgba(124,111,255,0.2); border-left-color: var(--teal); transform: translateX(3px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
 .case-item:hover::before { opacity: 1; }
