@@ -125,6 +125,13 @@ Keep each field to 1-2 sentences max. Be specific, clinical, and genuinely usefu
       return res.status(200).json({ note: text });
     }
 
+    // ─── VOICE LOG PROCESSING ───
+    if (mode === 'voice') {
+      const { voicePrompt } = req.body;
+      const text = await callClaude(voicePrompt, 600);
+      return res.status(200).json({ voice: text });
+    }
+
     // ─── CAREER ASSISTANT ───
     if (mode === 'career') {
       const text = await callClaude(careerPrompt, 1000);
