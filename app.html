@@ -1031,6 +1031,25 @@ body::after {
         <span>⚡</span> Simulate a Harder Version — Test Your Reasoning
       </button>
 
+      <!-- SHIELD — Complaint Response -->
+      <button onclick="openShield()" style="width:100%;margin-top:8px;background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(239,68,68,0.03));border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;padding:11px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+        ⚖️ Provify Shield — Generate Complaint Response
+      </button>
+
+      <!-- SHIELD OUTPUT -->
+      <div id="shield-output" style="display:none;margin-top:12px;background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(239,68,68,0.02));border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:0.62rem;color:#FCA5A5;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">⚖️ Complaint Response Letter</div>
+          <button onclick="copyShieldLetter()" id="shield-copy-btn" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#FCA5A5;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:6px 12px;border-radius:8px;border:none;cursor:pointer;">Copy Letter</button>
+        </div>
+        <div id="shield-loading" style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.4);font-size:0.8rem;">
+          <div style="width:16px;height:16px;border:2px solid rgba(239,68,68,0.2);border-top-color:#EF4444;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
+          Generating your defence letter...
+        </div>
+        <div id="shield-letter-text" style="display:none;font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.9;white-space:pre-wrap;"></div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(239,68,68,0.1);font-size:0.65rem;color:rgba(255,255,255,0.25);">This letter is AI-generated from your documented case record. Review with a legal professional before submitting to regulatory bodies.</div>
+      </div>
+
       <!-- VERIFY BUTTON -->
       <button onclick="openCaseVerification()" style="width:100%;margin-top:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.borderColor='rgba(124,111,255,0.25)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='var(--gray)'">
         🛡 View Verification Record
@@ -1456,59 +1475,82 @@ body::after {
 </div>
 
 <!-- ─── VOICE RESULTS MODAL ─── -->
-<div id="voice-results-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:600;align-items:flex-end;justify-content:center;">
-  <div style="background:linear-gradient(145deg,#0C0C0F,#111118);border:1px solid rgba(124,111,255,0.2);border-radius:28px 28px 0 0;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -20px 60px rgba(0,0,0,0.6);">
-    <div style="position:sticky;top:0;background:linear-gradient(145deg,#0C0C0F,#111118);border-bottom:1px solid rgba(255,255,255,0.06);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;">
-      <div>
-        <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:4px;">✓ Case Logged & Protected</div>
-        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:var(--white);" id="vr-title">Your AI Report</div>
+<div id="voice-results-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.98);z-index:600;align-items:flex-end;justify-content:center;">
+  <div style="background:linear-gradient(145deg,#0C0C0F,#111118);border:1px solid rgba(124,111,255,0.2);border-top:2px solid transparent;border-image:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),rgba(52,211,153,0.4),transparent) 1;border-radius:28px 28px 0 0;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -20px 80px rgba(0,0,0,0.7);">
+
+    <!-- Protection moment — the FIRST thing they see -->
+    <div style="padding:28px 28px 20px;border-bottom:1px solid rgba(255,255,255,0.05);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(52,211,153,0.08),transparent 70%);pointer-events:none;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(52,211,153,0.05));border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🛡</div>
+          <div>
+            <div style="font-size:0.6rem;color:#34D399;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:2px;">Protected</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:1.15rem;color:var(--white);" id="vr-title">Case logged & protected</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="showView('cases');closeVoiceResults();" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.72rem;padding:7px 12px;border-radius:8px;cursor:pointer;">My Cases</button>
+          <button onclick="closeVoiceResults()" style="background:none;border:none;color:var(--gray);cursor:pointer;padding:4px;font-size:1.3rem;line-height:1;">×</button>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button onclick="showView('cases');closeVoiceResults();" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;padding:8px 14px;border-radius:8px;cursor:pointer;">My Cases</button>
-        <button onclick="closeVoiceResults()" style="background:none;border:none;color:var(--gray);cursor:pointer;padding:4px;font-size:1.3rem;line-height:1;">×</button>
-      </div>
+      <!-- The emotional line -->
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.4);line-height:1.75;" id="vr-protection-line">This case is now timestamped, verified, and permanently on record. If it's ever questioned — you have proof.</div>
     </div>
 
-    <!-- Complexity score -->
+    <!-- Complexity score + bar -->
     <div style="padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:16px;">
-      <div style="background:var(--teal-dim);border:1px solid var(--teal-mid);border-radius:12px;padding:12px 18px;text-align:center;flex-shrink:0;">
-        <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--teal);line-height:1;" id="vr-score">—</div>
-        <div style="font-size:0.58rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;">Complexity</div>
+      <div style="position:relative;width:56px;height:56px;flex-shrink:0;">
+        <svg width="56" height="56" viewBox="0 0 56 56" style="transform:rotate(-90deg);">
+          <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+          <circle cx="28" cy="28" r="22" fill="none" stroke="url(#vrRingGrad)" stroke-width="4"
+            id="vr-ring" stroke-linecap="round"
+            stroke-dasharray="${2 * Math.PI * 22}"
+            stroke-dashoffset="${2 * Math.PI * 22}"/>
+          <defs>
+            <linearGradient id="vrRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7C6FFF"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <span style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:var(--white);line-height:1;" id="vr-score">—</span>
+        </div>
       </div>
       <div style="flex:1;">
-        <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;margin-bottom:8px;">
-          <div id="vr-bar" style="height:100%;background:linear-gradient(90deg,var(--teal),#9B91FF);border-radius:100px;width:0%;transition:width 1s ease;"></div>
+        <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;margin-bottom:6px;">
+          <div id="vr-bar" style="height:100%;background:linear-gradient(90deg,#7C6FFF,#34D399);border-radius:100px;width:0%;transition:width 1.2s ease;"></div>
         </div>
-        <div style="font-size:0.75rem;color:var(--gray);" id="vr-spec-label">Processing your case...</div>
+        <div style="font-size:0.72rem;color:var(--gray);" id="vr-spec-label">Processing...</div>
       </div>
     </div>
 
     <!-- AI Insights -->
     <div id="vr-insights" style="padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);">
-      <div style="display:flex;align-items:center;gap:10px;color:var(--gray);font-size:0.85rem;">
-        <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.08);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
+      <div style="display:flex;align-items:center;gap:10px;color:var(--gray);font-size:0.82rem;">
+        <div style="width:18px;height:18px;border:2px solid rgba(255,255,255,0.08);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
         Analyzing your case...
       </div>
     </div>
 
     <!-- Clinical Note -->
     <div id="vr-note-section" style="display:none;padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-size:0.62rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;">📋 Clinical Note — Ready</div>
-        <button onclick="copyVRNote()" id="vr-copy-btn" style="background:linear-gradient(135deg,#34D399,#6EE7B7);color:#09090B;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:700;padding:7px 16px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;">Copy Note</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:0.62rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">📋 Clinical Note — Ready to paste</div>
+        <button onclick="copyVRNote()" id="vr-copy-btn" style="background:linear-gradient(135deg,#34D399,#6EE7B7);color:#09090B;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:700;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;">Copy</button>
       </div>
-      <div id="vr-note-text" style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.85;"></div>
+      <div id="vr-note-text" style="font-size:0.8rem;color:rgba(255,255,255,0.55);line-height:1.85;"></div>
     </div>
 
-    <!-- Verification card -->
+    <!-- Shield CTA -->
     <div style="padding:20px 28px;">
-      <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;">
-        <div style="font-size:1.4rem;flex-shrink:0;">🛡</div>
+      <div style="background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(124,111,255,0.04));border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="showView('cases');closeVoiceResults();">
+        <div style="font-size:1.3rem;flex-shrink:0;">⚖️</div>
         <div style="flex:1;">
-          <div style="font-size:0.75rem;color:var(--teal);font-weight:600;margin-bottom:3px;">Verification record created</div>
-          <div style="font-size:0.7rem;color:var(--gray);">Timestamped and stored. Share the link from My Cases.</div>
+          <div style="font-size:0.75rem;color:#FCA5A5;font-weight:600;margin-bottom:3px;">If this case is ever complained about</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);line-height:1.6;">Open the case → tap Shield → get your complaint response letter in 60 seconds. Your record, your defence, generated automatically.</div>
         </div>
-        <button onclick="showView('cases');closeVoiceResults();" style="background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">View →</button>
       </div>
     </div>
   </div>
@@ -6844,9 +6886,31 @@ async function showVoiceResults(caseData, complexity, caseId) {
   const scoreEl = document.getElementById('vr-score');
   const barEl = document.getElementById('vr-bar');
   const specLabelEl = document.getElementById('vr-spec-label');
+  const ringEl = document.getElementById('vr-ring');
+  const protectionLine = document.getElementById('vr-protection-line');
+
   if (scoreEl) scoreEl.textContent = complexity;
-  if (barEl) setTimeout(() => { barEl.style.width = `${complexity * 10}%`; }, 100);
-  if (specLabelEl) specLabelEl.textContent = `Complexity Score · ${specLabel}`;
+
+  // Animate ring
+  if (ringEl && complexity > 0) {
+    const r = 22, circ = 2 * Math.PI * r;
+    ringEl.setAttribute('stroke-dasharray', circ);
+    ringEl.style.transition = 'none';
+    ringEl.setAttribute('stroke-dashoffset', circ);
+    setTimeout(() => {
+      ringEl.style.transition = 'stroke-dashoffset 1s ease';
+      ringEl.setAttribute('stroke-dashoffset', circ * (1 - complexity / 10));
+    }, 300);
+  }
+
+  if (barEl) setTimeout(() => { barEl.style.width = `${complexity * 10}%`; }, 200);
+  if (specLabelEl) specLabelEl.textContent = `Complexity ${complexity}/10 · ${specLabel}`;
+
+  // Personalised protection line
+  const firstName = currentProfile?.first_name || 'Doctor';
+  if (protectionLine) {
+    protectionLine.textContent = `Dr. ${firstName} — this case is now timestamped, verified, and permanently on record. If it's ever questioned, you have proof. Most dentists don't.`;
+  }
 
   const insightsEl = document.getElementById('vr-insights');
   const noteSection = document.getElementById('vr-note-section');
@@ -7469,7 +7533,81 @@ function handleVLPhoto(input, id, slotId, imgId) {
   }
 }
 
-// ─── QUICK LOG ───
+// ─── PROVIFY SHIELD ───
+async function openShield() {
+  const c = currentModalCase;
+  if (!c) return;
+
+  const shieldOutput = document.getElementById('shield-output');
+  const shieldLoading = document.getElementById('shield-loading');
+  const shieldText = document.getElementById('shield-letter-text');
+
+  shieldOutput.style.display = 'block';
+  shieldLoading.style.display = 'flex';
+  shieldText.style.display = 'none';
+
+  // Scroll to it
+  shieldOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[c.specialty] || c.specialty;
+  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  const drName = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'The treating clinician';
+
+  const prompt = `You are a dental medicolegal expert helping a dentist respond to a patient complaint. Generate a professional, legally-appropriate complaint response letter based on the documented clinical record below.
+
+CLINICIAN: ${drName}
+DATE OF TREATMENT: ${date}
+SPECIALTY: ${specLabel}
+TOOTH: ${c.tooth_number}
+CHIEF COMPLAINT: ${c.complaint || 'Not recorded'}
+DIAGNOSIS: ${c.pulp_diagnosis || c.procedure || 'See record'}
+TREATMENT: ${c.case_type || c.procedure || specLabel}
+POST-OP: ${c.post_op || 'None reported'}
+CLINICAL NARRATIVE: ${c.narrative || 'Not recorded'}
+VERIFICATION URL: https://provify.app/verify.html?id=${c.id}
+
+Write a formal complaint response letter that:
+1. Acknowledges receipt of the complaint professionally
+2. States the facts of treatment clearly based on the documented record
+3. References that contemporaneous clinical notes were made and are verified
+4. Includes the verification URL as evidence of documentation
+5. Is calm, professional, and factual — not defensive or emotional
+6. Ends with willingness to cooperate with any investigation
+
+Format as a proper letter with date, subject line, body paragraphs, and closing. Use [Patient Name] as placeholder. Keep it under 350 words.`;
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'shield', shieldPrompt: prompt, caseData: c, complexity: 0 })
+    });
+    const data = await res.json();
+    const letter = (data.shield || data.note || '').trim();
+
+    if (letter) {
+      window._shieldLetter = letter;
+      shieldLoading.style.display = 'none';
+      shieldText.style.display = 'block';
+      shieldText.textContent = letter;
+    } else {
+      shieldLoading.innerHTML = '<span style="color:rgba(255,255,255,0.3);">Could not generate letter. Please try again.</span>';
+    }
+  } catch(e) {
+    shieldLoading.innerHTML = '<span style="color:rgba(255,255,255,0.3);">Could not generate letter. Please try again.</span>';
+  }
+}
+
+function copyShieldLetter() {
+  const text = window._shieldLetter || document.getElementById('shield-letter-text')?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('shield-copy-btn');
+    if (btn) {
+      btn.textContent = '✓ Copied';
+      setTimeout(() => { btn.textContent = 'Copy Letter'; }, 2000);
+    }
+  });
+}
 let qlSpecialty = 'endo';
 let qlComplaint = '';
 let qlDifficulty = 0;
