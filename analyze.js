@@ -125,6 +125,20 @@ Keep each field to 1-2 sentences max. Be specific, clinical, and genuinely usefu
       return res.status(200).json({ note: text });
     }
 
+    // ─── PROVIFY SHIELD ───
+    if (mode === 'shield') {
+      const { shieldPrompt } = req.body;
+      const text = await callClaude(shieldPrompt, 800);
+      return res.status(200).json({ shield: text });
+    }
+
+    // ─── VOICE LOG PROCESSING ───
+    if (mode === 'voice') {
+      const { voicePrompt } = req.body;
+      const text = await callClaude(voicePrompt, 600);
+      return res.status(200).json({ voice: text });
+    }
+
     // ─── CAREER ASSISTANT ───
     if (mode === 'career') {
       const text = await callClaude(careerPrompt, 1000);
