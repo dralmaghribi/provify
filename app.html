@@ -1217,7 +1217,7 @@ body::after {
     <div id="vl-screen-coach" style="padding:36px 32px;">
       <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:20px;">🎙 Voice Log</div>
       <div style="font-family:'Instrument Serif',serif;font-size:1.7rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:8px;line-height:1.2;">Speak your case.<br>Provify logs it.</div>
-      <div style="font-size:0.82rem;color:var(--gray);margin-bottom:28px;line-height:1.7;">45 seconds. Say what you'd tell a colleague. We'll extract every clinical field automatically.</div>
+      <div style="font-size:0.82rem;color:var(--gray);margin-bottom:28px;line-height:1.7;">60 seconds. Say what you'd tell a colleague. We'll extract every clinical field automatically.</div>
 
       <!-- Specialty pills -->
       <div style="margin-bottom:20px;">
@@ -1242,7 +1242,7 @@ body::after {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Start Speaking
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:var(--gray);">45 seconds max · Speak clearly · We'll handle the rest</div>
+      <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:var(--gray);">60 seconds max · Speak clearly · We'll handle the rest</div>
     </div>
 
     <!-- SCREEN 2: Recording -->
@@ -1387,6 +1387,65 @@ body::after {
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ─── VOICE RESULTS MODAL ─── -->
+<div id="voice-results-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:600;align-items:flex-end;justify-content:center;">
+  <div style="background:linear-gradient(145deg,#0C0C0F,#111118);border:1px solid rgba(124,111,255,0.2);border-radius:28px 28px 0 0;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -20px 60px rgba(0,0,0,0.6);">
+    <div style="position:sticky;top:0;background:linear-gradient(145deg,#0C0C0F,#111118);border-bottom:1px solid rgba(255,255,255,0.06);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;">
+      <div>
+        <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:4px;">✓ Case Logged & Protected</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:var(--white);" id="vr-title">Your AI Report</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="showView('cases');closeVoiceResults();" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;padding:8px 14px;border-radius:8px;cursor:pointer;">My Cases</button>
+        <button onclick="closeVoiceResults()" style="background:none;border:none;color:var(--gray);cursor:pointer;padding:4px;font-size:1.3rem;line-height:1;">×</button>
+      </div>
+    </div>
+
+    <!-- Complexity score -->
+    <div style="padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:16px;">
+      <div style="background:var(--teal-dim);border:1px solid var(--teal-mid);border-radius:12px;padding:12px 18px;text-align:center;flex-shrink:0;">
+        <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--teal);line-height:1;" id="vr-score">—</div>
+        <div style="font-size:0.58rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;">Complexity</div>
+      </div>
+      <div style="flex:1;">
+        <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;margin-bottom:8px;">
+          <div id="vr-bar" style="height:100%;background:linear-gradient(90deg,var(--teal),#9B91FF);border-radius:100px;width:0%;transition:width 1s ease;"></div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--gray);" id="vr-spec-label">Processing your case...</div>
+      </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div id="vr-insights" style="padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div style="display:flex;align-items:center;gap:10px;color:var(--gray);font-size:0.85rem;">
+        <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.08);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
+        Analyzing your case...
+      </div>
+    </div>
+
+    <!-- Clinical Note -->
+    <div id="vr-note-section" style="display:none;padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:0.62rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;">📋 Clinical Note — Ready</div>
+        <button onclick="copyVRNote()" id="vr-copy-btn" style="background:linear-gradient(135deg,#34D399,#6EE7B7);color:#09090B;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:700;padding:7px 16px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;">Copy Note</button>
+      </div>
+      <div id="vr-note-text" style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.85;"></div>
+    </div>
+
+    <!-- Verification card -->
+    <div style="padding:20px 28px;">
+      <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:1.4rem;flex-shrink:0;">🛡</div>
+        <div style="flex:1;">
+          <div style="font-size:0.75rem;color:var(--teal);font-weight:600;margin-bottom:3px;">Verification record created</div>
+          <div style="font-size:0.7rem;color:var(--gray);">Timestamped and stored. Share the link from My Cases.</div>
+        </div>
+        <button onclick="showView('cases');closeVoiceResults();" style="background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">View →</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -6438,6 +6497,114 @@ function goToLogStep(step) {
   document.getElementById('view-log')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+async function showVoiceResults(caseData, complexity, caseId) {
+  const modal = document.getElementById('voice-results-modal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  // Set title and score
+  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' }[caseData.specialty] || caseData.specialty;
+  const titleEl = document.getElementById('vr-title');
+  if (titleEl) titleEl.textContent = `Tooth ${caseData.tooth_number} — ${specLabel}`;
+
+  const scoreEl = document.getElementById('vr-score');
+  const barEl = document.getElementById('vr-bar');
+  const specLabelEl = document.getElementById('vr-spec-label');
+  if (scoreEl) scoreEl.textContent = complexity;
+  if (barEl) setTimeout(() => { barEl.style.width = `${complexity * 10}%`; }, 100);
+  if (specLabelEl) specLabelEl.textContent = `Complexity Score · ${specLabel}`;
+
+  const insightsEl = document.getElementById('vr-insights');
+  const noteSection = document.getElementById('vr-note-section');
+
+  // Load AI report
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'report', caseData, complexity })
+    });
+    const data = await res.json();
+
+    insightsEl.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${data.strength ? `<div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:12px;padding:14px;">
+          <div style="font-size:0.6rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;">✓ What you did well</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.7;">${data.strength}</div>
+        </div>` : ''}
+        ${data.watch ? `<div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:12px;padding:14px;">
+          <div style="font-size:0.6rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;">⚡ Watch next time</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.7;">${data.watch}</div>
+        </div>` : ''}
+        ${data.tip ? `<div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:12px;padding:14px;">
+          <div style="font-size:0.6rem;color:#9B91FF;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;">💡 Clinical pearl</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.7;">${data.tip}</div>
+        </div>` : ''}
+      </div>`;
+  } catch(e) {
+    insightsEl.innerHTML = `<div style="font-size:0.82rem;color:var(--gray);">AI report unavailable. View in My Cases.</div>`;
+  }
+
+  // Load clinical note
+  try {
+    const specLabel2 = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[caseData.specialty] || caseData.specialty;
+    const date = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    const notePrompt = `You are a dental clinical documentation assistant. Generate a professional clinical note ready to paste into a hospital dental record system.
+
+Date: ${date}
+Specialty: ${specLabel2}
+Tooth: ${caseData.tooth_number}
+Age Range: ${caseData.age_range || 'Not recorded'}
+Chief Complaint: ${caseData.complaint || 'Not recorded'}
+Case Type: ${caseData.case_type || 'Not recorded'}
+Canals: ${caseData.canals || 'Not recorded'}
+Curvature: ${caseData.curvature || 'Not recorded'}
+Irrigation: ${caseData.irrigation || 'Not recorded'}
+Obturation: ${caseData.obturation || 'Not recorded'}
+Post-op: ${caseData.post_op || 'None'}
+Narrative: ${caseData.narrative || 'Not provided'}
+
+Generate a complete clinical note in 2-3 paragraphs. Professional, third person, past tense. Output the note text only.`;
+
+    const res2 = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'clinical_note', notePrompt, caseData, complexity })
+    });
+    const data2 = await res2.json();
+    const note = data2.note || '';
+    if (note) {
+      window._vrNote = note;
+      const noteTextEl = document.getElementById('vr-note-text');
+      if (noteTextEl) noteTextEl.innerHTML = note.replace(/\n\n/g, '</p><p style="margin-bottom:12px">').replace(/\n/g, '<br>');
+      if (noteSection) noteSection.style.display = 'block';
+
+      // Save note to case
+      await sb.from('cases').update({ note: note }).eq('id', caseId);
+    }
+  } catch(e) { console.log('VR note error:', e); }
+}
+
+function closeVoiceResults() {
+  document.getElementById('voice-results-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function copyVRNote() {
+  const text = window._vrNote || document.getElementById('vr-note-text')?.innerText || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('vr-copy-btn');
+    if (btn) {
+      btn.textContent = '✓ Copied';
+      btn.style.background = 'linear-gradient(135deg,#059669,#34D399)';
+      setTimeout(() => {
+        btn.textContent = 'Copy Note';
+        btn.style.background = 'linear-gradient(135deg,#34D399,#6EE7B7)';
+      }, 2000);
+    }
+  });
+}
+
 // ─── VOICE LOG ───
 let vlSpecialty = 'endo';
 let vlRecognition = null;
@@ -6796,14 +6963,9 @@ async function submitVoiceCase() {
   closeVoiceLog();
   updateDashboard();
   showVerificationShareCard(data[0].id);
-  showToast('Voice case logged! ✓ Check My Cases for AI feedback.');
 
-  // Switch to log view to show AI report
-  showView('log');
-  setTimeout(async () => {
-    await generateAIReport(caseData, complexity);
-    await autoGenerateClinicalNote(caseData);
-  }, 300);
+  // Show dedicated voice results modal instead of log view
+  showVoiceResults(caseData, complexity, data[0].id);
 }
 
 function retryVoiceLog() {
