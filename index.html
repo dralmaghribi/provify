@@ -161,6 +161,7 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
 .stitle em{font-style:italic;background:linear-gradient(135deg,var(--v),var(--rose));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .ssub{font-size:1rem;color:var(--g);line-height:1.75;max-width:480px;font-weight:300;}
 @keyframes fu{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes vl-demo{0%,100%{height:8px;opacity:0.4}50%{height:44px;opacity:1}}
 .rev{opacity:0;transform:translateY(28px);transition:opacity 0.75s ease,transform 0.75s ease;}
 .rev.v{opacity:1;transform:translateY(0);}
 .d1{transition-delay:0.1s;}.d2{transition-delay:0.2s;}
@@ -171,6 +172,7 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
   .fear-stats,.answer-grid,.ts-grid,.prg{grid-template-columns:1fr;}
   .vdemo-inner,.hi{grid-template-columns:1fr;gap:48px;}
   .fear-card{padding:32px 24px;}
+  .voice-demo-grid{grid-template-columns:1fr!important;gap:32px!important;}
 }
 </style>
 </head>
@@ -192,11 +194,11 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
 <section class="hero">
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
   <div class="grid"></div>
-  <div class="eyebrow"><div class="ep"></div>Built by a dentist &mdash; for every dentist</div>
-  <h1>Every case.<br><span class="hl">Documented.</span><br>Verified. Protected.</h1>
-  <p class="hero-sub">Log your cases in 3 minutes. Get instant AI feedback. Build a portfolio that proves your work &mdash; and create a timestamped record that protects your career.</p>
+  <div class="eyebrow"><div class="ep"></div>The AI-powered clinical companion for dentists</div>
+  <h1>Speak your case.<br><span class="hl">AI logs it.</span><br>Verified. Protected.</h1>
+  <p class="hero-sub">Speak for 60 seconds. Provify extracts every clinical field, writes your note, generates AI feedback, and creates a verified timestamped record. The fastest clinical documentation on earth.</p>
   <div class="hero-btns">
-    <a href="/app.html" class="btn-main">Start for free &rarr;</a>
+    <a href="/app.html" class="btn-main">🎙 Try Voice Log Free &rarr;</a>
     <a href="#problem" class="btn-sec">Why it matters</a>
   </div>
   <div class="proof">
@@ -235,6 +237,112 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
     <h2 class="stitle" style="text-align:center;margin:0 auto 16px;">Provify gives every dentist<br><em>a record they actually own</em></h2>
     <p class="ssub" style="text-align:center;margin:0 auto;">Every case documented. Every decision timestamped. Every record verifiable &mdash; by anyone, anytime.</p>
   </div>
+
+  <!-- VOICE LOG HERO CARD — full width, most prominent -->
+  <div class="rev" style="margin-bottom:24px;">
+    <div style="background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(124,111,255,0.06));border:1px solid rgba(239,68,68,0.2);border-radius:24px;padding:48px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(239,68,68,0.6),rgba(124,111,255,0.6),transparent);"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;" class="voice-demo-grid">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;font-size:0.65rem;font-weight:700;padding:5px 12px;border-radius:100px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px;">
+            <div style="width:6px;height:6px;background:#EF4444;border-radius:50%;animation:ep2 1s ease-in-out infinite;"></div>
+            New — Voice Log
+          </div>
+          <h3 style="font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--w);letter-spacing:-0.03em;line-height:1.15;margin-bottom:16px;">Speak your case.<br><em style="background:linear-gradient(135deg,#EF4444,#7C6FFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Provify logs it.</em></h3>
+          <p style="font-size:0.95rem;color:var(--g);line-height:1.8;margin-bottom:28px;">Walk out of your operatory, tap the mic, speak for 60 seconds. Provify extracts every clinical field, corrects dental terminology, writes your clinical note, generates AI feedback, and creates a verified timestamped record. Done before you reach the next patient.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--wd);">
+              <div style="width:6px;height:6px;background:#EF4444;border-radius:50%;flex-shrink:0;"></div>
+              AI corrects all speech recognition errors using dental knowledge
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--wd);">
+              <div style="width:6px;height:6px;background:#EF4444;border-radius:50%;flex-shrink:0;"></div>
+              Extracts specialty, tooth, diagnosis, treatment — automatically
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--wd);">
+              <div style="width:6px;height:6px;background:#EF4444;border-radius:50%;flex-shrink:0;"></div>
+              Add X-rays and photos in one tap — optional
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.875rem;color:var(--wd);">
+              <div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0;"></div>
+              Verified record + AI report + clinical note — all from 60 seconds of speech
+            </div>
+          </div>
+          <a href="/app.html" class="btn-main" style="background:linear-gradient(135deg,#EF4444,#7C6FFF);">🎙 Try Voice Log Free &rarr;</a>
+        </div>
+
+        <!-- Voice log mockup -->
+        <div style="background:rgba(9,9,11,0.8);border:1px solid rgba(239,68,68,0.2);border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.6);">
+          <!-- Header -->
+          <div style="background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(124,111,255,0.06));border-bottom:1px solid rgba(255,255,255,0.06);padding:18px 20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <div style="font-family:'Instrument Serif',serif;font-size:0.85rem;color:var(--w);">Provify<span style="color:#7C6FFF;">.</span></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:0.65rem;color:#FCA5A5;font-weight:600;">
+                <div style="width:6px;height:6px;background:#EF4444;border-radius:50%;animation:ep2 1s ease-in-out infinite;"></div>
+                Recording
+              </div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--g);">🎙 Voice Log — Endodontics</div>
+          </div>
+
+          <!-- Waveform -->
+          <div style="padding:24px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <div style="display:flex;align-items:center;justify-content:center;gap:3px;height:48px;margin-bottom:16px;">
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.05s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.1s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.15s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.2s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.25s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.3s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.25s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.2s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.15s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.1s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.05s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.05s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.1s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.15s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.2s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.25s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.3s"></div>
+              <div style="width:3px;background:#7C6FFF;border-radius:100px;height:8px;animation:vl-demo 1s ease-in-out infinite;animation-delay:0.35s"></div>
+            </div>
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);font-style:italic;line-height:1.6;">"Tooth 36, retreatment, three canals, moderate curvature, calcified MB2, NaOCl and EDTA, warm vertical, no complications..."</div>
+          </div>
+
+          <!-- Extracted fields -->
+          <div style="padding:16px 20px;">
+            <div style="font-size:0.58rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px;">✓ Extracted automatically</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;gap:10px;font-size:0.7rem;">
+                <div style="color:var(--g);min-width:90px;">Tooth</div>
+                <div style="color:var(--w);">36</div>
+              </div>
+              <div style="display:flex;gap:10px;font-size:0.7rem;">
+                <div style="color:var(--g);min-width:90px;">Case Type</div>
+                <div style="color:var(--w);">Retreatment</div>
+              </div>
+              <div style="display:flex;gap:10px;font-size:0.7rem;">
+                <div style="color:var(--g);min-width:90px;">Canals</div>
+                <div style="color:var(--w);">3</div>
+              </div>
+              <div style="display:flex;gap:10px;font-size:0.7rem;">
+                <div style="color:var(--g);min-width:90px;">Curvature</div>
+                <div style="color:var(--w);">Moderate</div>
+              </div>
+              <div style="display:flex;gap:10px;font-size:0.7rem;">
+                <div style="color:var(--g);min-width:90px;">Obturation</div>
+                <div style="color:var(--w);">Warm Vertical</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="answer-grid rev d1">
     <div class="answer-card">
       <span class="ac-icon">&#128737;</span>
@@ -258,8 +366,8 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
     </div>
     <div class="answer-card">
       <span class="ac-icon">&#11088;</span>
-      <div class="ac-title">Career Assistant</div>
-      <div class="ac-desc">AI that reads your entire case history and tells you your next career move. Not generic advice &mdash; specific to your actual complexity scores, specialty distribution, and clinical trajectory.</div>
+      <div class="ac-title">Career Intelligence</div>
+      <div class="ac-desc">AI that reads your entire case history and tells you your market value, which countries to target, and your exact next career move &mdash; specific to your actual data, not generic advice.</div>
     </div>
     <div class="answer-card">
       <span class="ac-icon">&#128196;</span>
@@ -319,7 +427,7 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
       <div class="slabel">How it works</div>
       <h2 class="stitle">3 minutes.<br><em>Complete record.</em><br>For life.</h2>
       <div class="stps">
-        <div class="stp"><div class="sn">01</div><div><div class="sti">Log your case</div><div class="std">Select the tooth on a real tooth chart. Fill in diagnosis, treatment, and technique. Upload your X-rays. Takes 3 minutes. Quick Log takes 60 seconds.</div></div></div>
+        <div class="stp"><div class="sn">01</div><div><div class="sti">Speak or type your case</div><div class="std">Tap Voice Log and speak for 60 seconds — Provify extracts every clinical field automatically. Or use the manual form for full detail. Your choice, every time.</div></div></div>
         <div class="stp"><div class="sn">02</div><div><div class="sti">Document the record</div><div class="std">Consent obtained. Risks discussed. Complications noted. One section, 20 seconds. Stored with an exact timestamp the moment you submit.</div></div></div>
         <div class="stp"><div class="sn">03</div><div><div class="sti">Get AI feedback + clinical note</div><div class="std">Instant AI analysis of your case &mdash; strengths, what to improve, a clinical pearl. Plus an auto-generated note ready to paste into your hospital system.</div></div></div>
         <div class="stp"><div class="sn">04</div><div><div class="sti">Your record exists. Forever.</div><div class="std">A unique verification URL is created. Your case is timestamped and stored. Share it with anyone &mdash; a board, a patient, a program director &mdash; at any point in your career.</div></div></div>
