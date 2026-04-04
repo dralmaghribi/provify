@@ -957,8 +957,8 @@ body::after {
         <textarea id="edit-narrative" rows="3" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:10px 14px;border-radius:10px;outline:none;resize:vertical;line-height:1.6;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'"></textarea>
       </div>
       <div style="margin-top:10px;">
-        <label style="font-size:0.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:6px;">Personal Note</label>
-        <input type="text" id="edit-note" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:10px 14px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
+        <label style="font-size:0.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:6px;">Private Nickname <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;">— only you can see this</span></label>
+        <input type="text" id="edit-nickname" placeholder='e.g. "Referred from Dr. Ahmed" or "Anxious patient"' style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:10px 14px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
       </div>
       <div style="display:flex;gap:10px;margin-top:14px;">
         <button onclick="saveCaseEdit()" id="save-edit-btn" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:600;padding:11px;border-radius:10px;border:none;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(124,111,255,0.3);">Save Changes</button>
@@ -2968,6 +2968,25 @@ body::after {
           <div class="page-sub">Every case you've logged — tap any record to view details, get a clinical note, or share the verification link.</div>
         </div>
 
+        <!-- HEATMAP -->
+        <div class="card" style="margin-bottom:16px;padding:20px 24px;" id="cases-heatmap-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.72rem;color:var(--gray);">Activity — last 12 weeks</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.62rem;color:var(--gray);">
+              <div style="width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,0.06);"></div>
+              None
+              <div style="width:8px;height:8px;border-radius:2px;background:rgba(124,111,255,0.3);"></div>
+              1
+              <div style="width:8px;height:8px;border-radius:2px;background:rgba(124,111,255,0.6);"></div>
+              2-3
+              <div style="width:8px;height:8px;border-radius:2px;background:#7C6FFF;"></div>
+              4+
+            </div>
+          </div>
+          <div id="cases-heatmap" style="display:flex;gap:3px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;" id="heatmap-labels"></div>
+        </div>
+
         <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
           <div style="flex:1;min-width:180px;position:relative;">
             <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:0.9rem;pointer-events:none;">🔍</span>
@@ -3657,7 +3676,7 @@ function showView(view) {
   document.getElementById('view-' + view).classList.add('active');
   document.getElementById('nav-' + view).classList.add('active');
 
-  if (view === 'cases') renderAllCases();
+  if (view === 'cases') { renderAllCases(); renderHeatmap(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderPortfolioCases();
@@ -4344,12 +4363,13 @@ function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
   const rank = getComplexityRank(c.complexity_score || 0);
+  const nickname = getCaseNickname(c.id);
   return `
     <div class="case-item" data-spec="${c.specialty}" id="case-row-${c.id}">
       <div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;" onclick="openCaseDetail('${c.id}')">
         <div class="case-specialty-badge" data-spec="${c.specialty}">${specLabel}</div>
         <div class="case-info">
-          <div class="case-tooth">Tooth ${c.tooth_number}</div>
+          <div class="case-tooth">Tooth ${c.tooth_number}${nickname ? ` <span style="color:rgba(255,255,255,0.3);font-size:0.7rem;font-weight:400;">· ${nickname}</span>` : ''}</div>
           <div class="case-date">${date}</div>
         </div>
       </div>
@@ -4619,6 +4639,10 @@ function toggleCaseEdit() {
     }
     document.getElementById('edit-note').value = personalNote;
 
+    // Load nickname
+    const nicknameEl = document.getElementById('edit-nickname');
+    if (nicknameEl) nicknameEl.value = getCaseNickname(c.id);
+
     panel.style.display = 'block';
     btn.textContent = '✕ Cancel Edit';
     btn.onmouseover = null; btn.onmouseout = null;
@@ -4653,6 +4677,10 @@ async function saveCaseEdit() {
     mlPart = c.note.split('|| ML_RECORD:')[1] || '';
   }
   updates.note = mlPart ? `${newNote} || ML_RECORD: ${mlPart}`.trim() : (newNote || null);
+
+  // Save nickname locally
+  const nicknameEl = document.getElementById('edit-nickname');
+  if (nicknameEl) saveCaseNickname(c.id, nicknameEl.value.trim());
 
   const { error } = await sb.from('cases').update(updates).eq('id', c.id).eq('user_id', currentUser.id);
 
@@ -7531,6 +7559,52 @@ function handleVLPhoto(input, id, slotId, imgId) {
     if (icon) icon.style.display = 'none';
     if (label) label.style.display = 'none';
   }
+}
+
+// ─── CASE NICKNAMES ───
+function getCaseNickname(caseId) {
+  try { return localStorage.getItem(`nick_${caseId}`) || ''; } catch(e) { return ''; }
+}
+function saveCaseNickname(caseId, name) {
+  try {
+    if (name) localStorage.setItem(`nick_${caseId}`, name);
+    else localStorage.removeItem(`nick_${caseId}`);
+  } catch(e) {}
+}
+
+// ─── HEATMAP ───
+function renderHeatmap() {
+  const heatmap = document.getElementById('cases-heatmap');
+  if (!heatmap) return;
+
+  const weeks = 12;
+  const today = new Date();
+  today.setHours(23,59,59,999);
+
+  const counts = {};
+  allCases.forEach(c => {
+    const d = new Date(c.created_at).toDateString();
+    counts[d] = (counts[d] || 0) + 1;
+  });
+
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - (weeks * 7) + 1);
+
+  let html = '';
+  for (let w = 0; w < weeks; w++) {
+    html += `<div style="display:flex;flex-direction:column;gap:3px;">`;
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + w * 7 + d);
+      if (date > today) { html += `<div style="width:10px;height:10px;"></div>`; continue; }
+      const count = counts[date.toDateString()] || 0;
+      const bg = count === 0 ? 'rgba(255,255,255,0.06)' : count === 1 ? 'rgba(124,111,255,0.3)' : count <= 3 ? 'rgba(124,111,255,0.6)' : '#7C6FFF';
+      const label = `${date.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}: ${count} case${count!==1?'s':''}`;
+      html += `<div style="width:10px;height:10px;border-radius:2px;background:${bg};cursor:default;transition:transform 0.1s;" title="${label}" onmouseover="this.style.transform='scale(1.5)'" onmouseout="this.style.transform='none'"></div>`;
+    }
+    html += `</div>`;
+  }
+  heatmap.innerHTML = html;
 }
 
 // ─── PROVIFY SHIELD ───
