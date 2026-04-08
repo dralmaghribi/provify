@@ -8408,8 +8408,13 @@ Respond ONLY with this exact JSON structure:
       })
     });
     const data = await res.json();
-    const raw = (data.career || data.note || '').trim().replace(/```json|```/g,'').trim();
-    const r = JSON.parse(raw);
+    let raw = (data.career || data.note || '').trim();
+    // Strip markdown code fences
+    raw = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    // Extract JSON object if wrapped in extra text
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON found in response');
+    const r = JSON.parse(jsonMatch[0]);
 
     const now = new Date();
     const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8' };
