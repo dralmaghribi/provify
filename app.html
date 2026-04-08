@@ -4996,7 +4996,9 @@ function showLevelUpAnimation(level, molarsEarned) {
   overlay.addEventListener('click', () => overlay.remove());
   document.body.appendChild(overlay);
 }
-  const molars = getTotalMolars(typeof total === 'number' ? allCases.slice(0, total) : allCases);
+
+function getLevel(total) {
+  const molars = getTotalMolars(allCases);
   for (let i = LEVELS.length - 1; i >= 0; i--) {
     if (molars >= LEVELS[i].min) return { ...LEVELS[i], molars };
   }
