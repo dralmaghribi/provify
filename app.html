@@ -8337,57 +8337,64 @@ async function generateCareerAdvice(autoMode = false) {
   const clinicalProfile = currentProfile?.clinical_profile || '';
   const recentNarratives = allCases.slice(0,5).filter(c=>c.narrative).map(c=>c.narrative).join(' | ');
   const recentComplaints = [...new Set(allCases.slice(0,10).map(c=>c.complaint).filter(Boolean))].join(', ');
-  const avgDifficulty = allCases.filter(c=>c.difficulty_rating).length > 0
-    ? (allCases.filter(c=>c.difficulty_rating).reduce((s,c)=>s+(c.difficulty_rating||0),0) / allCases.filter(c=>c.difficulty_rating).length).toFixed(1)
-    : 'Not rated';
 
   const specialtyCounts = { endo: endoCnt, restorative: restoCnt, surgery: surgCnt, paeds: paedsCnt, prostho: prosthoCnt };
   const dominantSpecialty = Object.entries(specialtyCounts).sort((a,b) => b[1]-a[1])[0][0];
   const dominantPct = Math.round(specialtyCounts[dominantSpecialty]/total*100);
   const isSpecialist = role === 'specialist';
-
   const specialtyFullName = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[dominantSpecialty] || dominantSpecialty;
 
-  const prompt = `You are the world's most insightful dental career strategist. You have mentored dentists across the GCC, UK, USA, Australia, Germany, and Canada. You have deep knowledge of dental job markets, postgraduate pathways, specialty demand by country, salary expectations, licensing requirements, and career trajectories. You speak with the directness of a mentor who has seen hundreds of dental careers succeed and fail.
+  const prompt = `You are the world's most insightful dental career strategist. Analyze this dentist's data and respond ONLY with a valid JSON object — no markdown, no preamble, no explanation.
 
-You are now analyzing the complete clinical and career data of a dentist through Provify. Your job is to give them the most valuable, specific, and honest career intelligence they have ever received. Make them feel seen. Make them feel like you've been watching their career for years. Say things they haven't heard before. Shock them with accuracy.
+CLINICAL DATA:
+- Name: ${name} | Role: ${roleLabel}
+- Total cases: ${total} | Avg complexity: ${avgScore}/10
+- Specialty breakdown: Endo ${endoCnt} (${Math.round(endoCnt/total*100)}%) | Resto ${restoCnt} (${Math.round(restoCnt/total*100)}%) | Surgery ${surgCnt} (${Math.round(surgCnt/total*100)}%) | Paeds ${paedsCnt} (${Math.round(paedsCnt/total*100)}%) | Prostho ${prosthoCnt} (${Math.round(prosthoCnt/total*100)}%)
+- High complexity (7+): ${highComp} | Low complexity (<3): ${lowComp}
+- Dominant specialty: ${specialtyFullName} at ${dominantPct}%
+- Clinical profile: ${clinicalProfile || 'Building'}
+- Role scope: ${isSpecialist ? 'Specialist - focus within specialty only' : 'Pre-specialist - breadth matters'}
 
-COMPLETE CLINICAL DATA:
-- Name: ${name}
-- Current role: ${roleLabel}
-- Total documented cases: ${total}
-- Specialty breakdown: Endodontics ${endoCnt} (${dominantSpecialty === 'endo' ? dominantPct+'%' : Math.round(endoCnt/total*100)+'%'}) | Restorative ${restoCnt} (${Math.round(restoCnt/total*100)}%) | Oral Surgery ${surgCnt} (${Math.round(surgCnt/total*100)}%) | Paediatric ${paedsCnt} (${Math.round(paedsCnt/total*100)}%) | Prosthodontics ${prosthoCnt} (${Math.round(prosthoCnt/total*100)}%)
-- Dominant specialty: ${specialtyFullName} — ${dominantPct}% of all cases
-- Average complexity score: ${avgScore}/10
-- High complexity cases (7+/10): ${highComp} of ${total}
-- Low complexity cases (<3/10): ${lowComp} of ${total}
-- Self-rated difficulty average: ${avgDifficulty}/5
-- Common chief complaints: ${recentComplaints || 'Not recorded'}
-- Provify clinical profile: ${clinicalProfile || 'Building...'}
-- Recent case narratives (their own words): ${recentNarratives || 'None written yet'}
-- Role classification: ${isSpecialist ? 'Specialist — do NOT suggest specialty changes, focus on depth and market strategy within their specialty' : 'Pre-specialist — specialty balance and clinical breadth are fair game'}
-
-Generate their Career Intelligence Report structured EXACTLY as these 6 sections. Each section must be a flowing paragraph — NO bullet points, NO numbered lists. Talk directly to them. Use "you" throughout. Reference their actual numbers — never give advice that could apply to any other dentist.
-
-WHO YOU ARE AS A CLINICIAN
-[Read their data and tell them who they are as a clinician in a way they've never heard articulated. What does their case mix, complexity pattern, and self-ratings reveal about their clinical personality? What type of dentist are they becoming — and is that who they want to be? Be insightful, not descriptive. This should feel like someone who has watched them work.]
-
-YOUR MARKET VALUE RIGHT NOW
-[Based on their current data, what is their honest market value? What type of clinic or hospital would hire them today and why? What would they be turned down for and why? What is their competitive advantage compared to other dentists at their stage? Be specific about what makes them hireable or not.]
-
-WHERE IN THE WORLD YOU SHOULD BUILD YOUR CAREER
-[Give specific country and market recommendations based on their dominant specialty and clinical stage. For ${specialtyFullName} — which countries have the highest demand right now? Which markets pay the best? Which are easiest to enter without additional exams? Which should they avoid and why? Include specific countries: consider UAE, Saudi Arabia, Qatar, Kuwait, UK, Ireland, Australia, Canada, Germany, USA. Be opinionated. Give a real recommendation with reasons, not a list of options.]
-
-YOUR NEXT 90 DAYS — 3 MOVES
-[Three specific, immediately executable moves. Each one should be something they can start this week. Include: one clinical skill gap to close with a specific technique or procedure to practice, one real course or qualification to research and apply for (use real qualification names: MFDS, MJDF, MDS, MClinDent, ITI implant course, EndoAdvance Dubai, CBCT course, etc.), and one career network move (who to contact, what type of mentor to find, what type of clinic to shadow at). Do NOT use bullet points — write this as a paragraph with "First...", "Second...", "Third...".]
-
-YOUR 1-YEAR CAREER TARGET
-[Give them one specific, opinionated career target for 12 months. Should they stay in their current country or move? Should they pursue a postgraduate degree — and if so, which one (MClinDent, MSc, MDS, MRD, MFDS + specialty), in which country, and at which type of institution? Should they aim for private practice, specialist referral practice, academic, or hospital? What specific milestone should they hit in 12 months that will meaningfully change their career trajectory? Be specific. Give one recommendation, not options.]
-
-THE THING NOBODY ELSE WILL TELL YOU
-[One paragraph of raw, honest, mentor-level truth. What is the single biggest risk to their career right now based on their data? What pattern are they falling into that they probably haven't noticed? What assumption are they making about their career that might be wrong? What are they avoiding? Do not soften this. This is the thing a real mentor says when there's nobody else in the room. Maximum 4 sentences. Make it land.]
-
-Total maximum 500 words across all 6 sections. Every word must earn its place. Do not pad. Do not generalize. Be the mentor they've never had.`;
+Respond ONLY with this exact JSON structure:
+{
+  "identity": {
+    "headline": "6-8 word punchy label for who they are as a clinician",
+    "insight": "2-3 sentence honest insight about their clinical personality based on data. Talk directly to them.",
+    "strength": "Their single biggest clinical strength in one sentence",
+    "risk": "The single pattern that could limit them in one sentence"
+  },
+  "market": {
+    "value_label": "Short label e.g. Entry-level Associate",
+    "salary_min": 2500,
+    "salary_max": 4500,
+    "salary_currency": "USD/month",
+    "hireable_for": "What they'd get hired for today in one sentence",
+    "not_hireable_for": "What they'd get rejected for today in one sentence",
+    "advantage": "Their competitive edge vs peers in one sentence"
+  },
+  "countries": [
+    { "name": "UAE", "flag": "🇦🇪", "demand": 9, "ease": 8, "pay": 8, "verdict": "One sentence why this is recommended or not" },
+    { "name": "Saudi Arabia", "flag": "🇸🇦", "demand": 8, "ease": 7, "pay": 9, "verdict": "One sentence" },
+    { "name": "UK", "flag": "🇬🇧", "demand": 7, "ease": 5, "pay": 7, "verdict": "One sentence" },
+    { "name": "Australia", "flag": "🇦🇺", "demand": 7, "ease": 4, "pay": 8, "verdict": "One sentence" },
+    { "name": "Canada", "flag": "🇨🇦", "demand": 6, "ease": 3, "pay": 8, "verdict": "One sentence" }
+  ],
+  "top_country": "UAE",
+  "moves": [
+    { "icon": "🔬", "label": "Clinical Skill", "action": "Specific technique or procedure to practice this week", "urgency": "high" },
+    { "icon": "📚", "label": "Qualification", "action": "Specific real course name and why e.g. EndoAdvance Dubai — apply this month", "urgency": "medium" },
+    { "icon": "🤝", "label": "Network Move", "action": "Specific type of mentor to find or clinic to shadow", "urgency": "medium" }
+  ],
+  "target": {
+    "headline": "Your 12-month destination in 6 words",
+    "description": "2-3 sentences. One specific opinionated target — stay or move, which degree, which country, which type of practice. No options, just the answer.",
+    "milestone": "The one thing that will change their trajectory in 12 months"
+  },
+  "truth": {
+    "headline": "5-6 word uncomfortable truth headline",
+    "body": "3-4 sentences of raw mentor-level honesty. What they're avoiding. What assumption is wrong. What the real risk is. Make it land."
+  }
+}`;
 
   try {
     const res = await fetch('/api/analyze', {
@@ -8401,71 +8408,230 @@ Total maximum 500 words across all 6 sections. Every word must earn its place. D
       })
     });
     const data = await res.json();
-    const text = (data.career || data.note || '').trim();
-    if (!text) throw new Error('No response');
+    const raw = (data.career || data.note || '').trim().replace(/```json|```/g,'').trim();
+    const r = JSON.parse(raw);
 
-    const sections = [
-      { key: 'WHO YOU ARE AS A CLINICIAN',        icon: '🧠', color: '#9B91FF' },
-      { key: 'YOUR MARKET VALUE RIGHT NOW',        icon: '💼', color: '#F59E0B' },
-      { key: 'WHERE IN THE WORLD YOU SHOULD BUILD YOUR CAREER', icon: '🌍', color: '#34D399' },
-      { key: 'YOUR NEXT 90 DAYS — 3 MOVES',       icon: '🎯', color: '#7C6FFF' },
-      { key: 'YOUR 1-YEAR CAREER TARGET',          icon: '🏆', color: '#60A5FA' },
-      { key: 'THE THING NOBODY ELSE WILL TELL YOU', icon: '⚡', color: '#EF4444' },
-    ];
-
-    let html = '';
-    let remaining = text;
-
-    sections.forEach((s, i) => {
-      const nextKey = sections[i+1]?.key;
-      const start = remaining.indexOf(s.key);
-      if (start === -1) return;
-      const end = nextKey ? remaining.indexOf(nextKey) : remaining.length;
-      const body = remaining.substring(start + s.key.length, end !== -1 ? end : undefined)
-        .trim()
-        .replace(/^[\s:*\-#]+/, '')
-        .replace(/##/g, '')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .trim();
-
-      html += `
-        <div style="padding:20px;border-radius:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);margin-bottom:12px;position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${s.color};border-radius:0 3px 3px 0;"></div>
-          <div style="font-size:0.62rem;color:${s.color};text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:10px;padding-left:4px;">${s.icon} ${s.key}</div>
-          <div style="font-size:0.875rem;color:rgba(255,255,255,0.8);line-height:1.85;padding-left:4px;">${body}</div>
-        </div>`;
-    });
-
-    if (!html) html = `<div style="font-size:0.875rem;color:var(--white-dim);line-height:1.75;white-space:pre-wrap;">${text}</div>`;
-
-    // Add timestamp
     const now = new Date();
-    html += `<div style="font-size:0.65rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:8px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">Generated ${now.toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})} · Based on ${total} documented cases<br><span style="color:rgba(124,111,255,0.35);">Log more cases to get more specific advice</span></div>`;
+    const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8' };
+    const domColor = specColors[dominantSpecialty] || '#7C6FFF';
+
+    // Build spider chart SVG for specialty radar
+    const specData = [
+      { label:'Endo', val: Math.round(endoCnt/total*100), color:'#7C6FFF' },
+      { label:'Resto', val: Math.round(restoCnt/total*100), color:'#F59E0B' },
+      { label:'Surgery', val: Math.round(surgCnt/total*100), color:'#EF4444' },
+      { label:'Paeds', val: Math.round(paedsCnt/total*100), color:'#34D399' },
+      { label:'Prostho', val: Math.round(prosthoCnt/total*100), color:'#38BDF8' },
+    ];
+    const cx=100, cy=100, maxR=75;
+    const angleStep = (2*Math.PI)/5;
+    const pts = specData.map((s,i) => {
+      const angle = -Math.PI/2 + i*angleStep;
+      const r = (s.val/100)*maxR;
+      return { x: cx+r*Math.cos(angle), y: cy+r*Math.sin(angle), lx: cx+(maxR+18)*Math.cos(angle), ly: cy+(maxR+18)*Math.sin(angle), ...s };
+    });
+    const polyPts = pts.map(p=>`${p.x},${p.y}`).join(' ');
+    // grid rings
+    const gridRings = [25,50,75].map(r=>{
+      const gPts = specData.map((_,i)=>{
+        const angle = -Math.PI/2+i*angleStep;
+        return `${cx+r*Math.cos(angle)},${cy+r*Math.sin(angle)}`;
+      }).join(' ');
+      return `<polygon points="${gPts}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    }).join('');
+    const gridLines = specData.map((_,i)=>{
+      const angle = -Math.PI/2+i*angleStep;
+      return `<line x1="${cx}" y1="${cy}" x2="${cx+maxR*Math.cos(angle)}" y2="${cy+maxR*Math.sin(angle)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    }).join('');
+    const radarSVG = `
+      <svg viewBox="0 0 200 200" style="width:180px;height:180px;flex-shrink:0;">
+        ${gridRings}${gridLines}
+        <polygon points="${polyPts}" fill="${domColor}22" stroke="${domColor}" stroke-width="1.5" stroke-linejoin="round"/>
+        ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4" fill="${p.color}" stroke="rgba(0,0,0,0.5)" stroke-width="1"/>`).join('')}
+        ${pts.map(p=>`<text x="${p.lx}" y="${p.ly}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.5)" font-family="Inter,sans-serif">${p.label}</text>`).join('')}
+      </svg>`;
+
+    // Country bars
+    const countryHTML = (r.countries||[]).map((c,i) => {
+      const isTop = c.name === r.top_country;
+      const demandW = Math.round(c.demand*10);
+      return `
+        <div style="background:${isTop?'rgba(52,211,153,0.06)':'rgba(255,255,255,0.02)'};border:1px solid ${isTop?'rgba(52,211,153,0.25)':'rgba(255,255,255,0.07)'};border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;">
+          ${isTop?`<div style="position:absolute;top:8px;right:10px;font-size:0.55rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;background:rgba(52,211,153,0.1);padding:2px 7px;border-radius:100px;">Top Pick</div>`:''}
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-size:1.4rem;">${c.flag}</span>
+            <span style="font-size:0.9rem;font-weight:600;color:white;">${c.name}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+            ${[['Demand',c.demand,'#7C6FFF'],['Entry',c.ease,'#34D399'],['Pay',c.pay,'#F59E0B']].map(([label,val,col])=>`
+              <div>
+                <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${label}</div>
+                <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+                  <div style="height:100%;width:${val*10}%;background:${col};border-radius:100px;"></div>
+                </div>
+              </div>`).join('')}
+          </div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);line-height:1.5;">${c.verdict}</div>
+        </div>`;
+    }).join('');
+
+    // Mission cards
+    const movesHTML = (r.moves||[]).map((m,i) => `
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${['#7C6FFF','#34D399','#F59E0B'][i]},transparent);"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:${['rgba(124,111,255,0.12)','rgba(52,211,153,0.12)','rgba(245,158,11,0.12)'][i]};border:1px solid ${['rgba(124,111,255,0.25)','rgba(52,211,153,0.25)','rgba(245,158,11,0.25)'][i]};display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${m.icon}</div>
+          <div>
+            <div style="font-size:0.6rem;color:${['#9B91FF','#34D399','#F59E0B'][i]};text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Move ${i+1} · ${m.label}</div>
+          </div>
+        </div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.65;">${m.action}</div>
+      </div>`).join('');
+
+    const html = `
+    <style>
+      @keyframes careerFadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+      .career-card{animation:careerFadeUp 0.5s ease both;}
+      .career-card:nth-child(1){animation-delay:0.05s}
+      .career-card:nth-child(2){animation-delay:0.1s}
+      .career-card:nth-child(3){animation-delay:0.15s}
+      .career-card:nth-child(4){animation-delay:0.2s}
+      .career-card:nth-child(5){animation-delay:0.25s}
+      .career-card:nth-child(6){animation-delay:0.3s}
+      .truth-reveal{display:none;}
+      .truth-locked{cursor:pointer;}
+      .truth-locked:hover{border-color:rgba(239,68,68,0.4)!important;}
+    </style>
+
+    <!-- SECTION 1: Identity -->
+    <div class="career-card" style="background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.2);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7C6FFF,transparent);"></div>
+      <div style="font-size:0.6rem;color:#9B91FF;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🧠 Who You Are</div>
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+        ${radarSVG}
+        <div style="flex:1;min-width:200px;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:12px;">${r.identity?.headline || '—'}</div>
+          <div style="font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.75;margin-bottom:16px;">${r.identity?.insight || ''}</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:10px;padding:10px 12px;">
+              <span style="color:#34D399;font-size:0.8rem;flex-shrink:0;">✦</span>
+              <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.identity?.strength || ''}</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:10px 12px;">
+              <span style="color:#EF4444;font-size:0.8rem;flex-shrink:0;">⚠</span>
+              <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.identity?.risk || ''}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Market Value -->
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#F59E0B,transparent);"></div>
+      <div style="font-size:0.6rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">💼 Your Market Value</div>
+
+      <!-- Salary visual -->
+      <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:16px;padding:20px;margin-bottom:16px;">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
+          <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:#F59E0B;letter-spacing:-0.04em;">${r.market?.salary_currency === 'USD/month' ? '$' : ''}${(r.market?.salary_min||0).toLocaleString()} – ${(r.market?.salary_max||0).toLocaleString()}</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.3);">${r.market?.salary_currency || 'USD/month'}</div>
+        </div>
+        <div style="font-size:0.72rem;color:rgba(245,158,11,0.7);margin-bottom:12px;">${r.market?.value_label || ''}</div>
+        <!-- Salary spectrum bar -->
+        <div style="position:relative;height:8px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+          <div style="position:absolute;left:10%;width:30%;height:100%;background:linear-gradient(90deg,#F59E0B,#FFD080);border-radius:100px;box-shadow:0 0 12px rgba(245,158,11,0.4);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.2);margin-top:5px;">
+          <span>Student</span><span>Associate</span><span>Specialist</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div style="width:20px;height:20px;border-radius:6px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;font-size:0.65rem;flex-shrink:0;margin-top:1px;">✓</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.market?.hireable_for || ''}</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div style="width:20px;height:20px;border-radius:6px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#EF4444;flex-shrink:0;margin-top:1px;">✕</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.market?.not_hireable_for || ''}</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div style="width:20px;height:20px;border-radius:6px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#9B91FF;flex-shrink:0;margin-top:1px;">⚡</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.market?.advantage || ''}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Countries -->
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;margin-bottom:12px;">
+      <div style="position:relative;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#34D399,transparent);margin-bottom:16px;transform:translateY(-24px);"></div></div>
+      <div style="font-size:0.6rem;color:#34D399;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🌍 Where To Build Your Career</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">${countryHTML}</div>
+    </div>
+
+    <!-- SECTION 4: 90-Day Moves -->
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;margin-bottom:12px;">
+      <div style="font-size:0.6rem;color:#7C6FFF;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🎯 Your Next 90 Days</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">${movesHTML}</div>
+    </div>
+
+    <!-- SECTION 5: 1-Year Target — Boarding Pass -->
+    <div class="career-card" style="background:linear-gradient(135deg,rgba(96,165,250,0.08),rgba(96,165,250,0.02));border:1px solid rgba(96,165,250,0.2);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#60A5FA,transparent);"></div>
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(96,165,250,0.1),transparent 70%);pointer-events:none;"></div>
+      <div style="font-size:0.6rem;color:#60A5FA;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🏆 Your 1-Year Target</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:12px;">${r.target?.headline || '—'}</div>
+      <div style="font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.75;margin-bottom:16px;">${r.target?.description || ''}</div>
+      <div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.2rem;">🎯</span>
+        <span style="font-size:0.82rem;color:rgba(96,165,250,0.9);line-height:1.5;">${r.target?.milestone || ''}</span>
+      </div>
+    </div>
+
+    <!-- SECTION 6: Truth — Locked Card -->
+    <div class="career-card truth-locked" id="truth-card" style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.2);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer;" onclick="document.getElementById('truth-locked-view').style.display='none';document.getElementById('truth-reveal').style.display='block';">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#EF4444,transparent);"></div>
+      <!-- Locked state -->
+      <div id="truth-locked-view">
+        <div style="text-align:center;padding:12px 0;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">🔒</div>
+          <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:6px;">The Thing Nobody Will Tell You</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Tap to reveal — raw mentor truth</div>
+        </div>
+      </div>
+      <!-- Revealed state -->
+      <div id="truth-reveal" style="display:none;">
+        <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:12px;">⚡ The Thing Nobody Will Tell You</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:#EF4444;letter-spacing:-0.02em;margin-bottom:12px;opacity:0.9;">${r.truth?.headline || '—'}</div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);line-height:1.8;">${r.truth?.body || ''}</div>
+      </div>
+    </div>
+
+    <div style="font-size:0.62rem;color:rgba(255,255,255,0.15);text-align:center;padding-top:8px;">
+      Generated ${now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Based on ${total} cases · Log more to sharpen the analysis
+    </div>`;
 
     loading.style.display = 'none';
     content.style.display = 'block';
     if (empty) empty.style.display = 'none';
     content.innerHTML = html;
 
-    // Cache the report
     try {
       localStorage.setItem('provify_career_report', html);
       localStorage.setItem('provify_career_meta', JSON.stringify({ timestamp: Date.now(), caseCount: total }));
     } catch(e) {}
 
-    // Update meta line
     const metaEl = document.getElementById('career-report-meta');
-    if (metaEl) metaEl.textContent = `Last updated ${now.toLocaleDateString('en-GB', {day:'numeric',month:'long'})} · ${total} cases · Regenerate after logging more cases`;
+    if (metaEl) metaEl.textContent = `Generated ${now.toLocaleDateString('en-GB',{day:'numeric',month:'long'})} · ${total} cases`;
 
-    // Show refresh button
     const refreshBtn = document.getElementById('career-refresh-btn');
     if (refreshBtn) refreshBtn.style.opacity = '1';
 
   } catch(e) {
     loading.style.display = 'none';
     content.style.display = 'block';
-    content.innerHTML = '<div style="color:var(--gray);font-size:0.875rem;">Something went wrong. Please try again.</div>';
+    content.innerHTML = '<div style="color:var(--gray);font-size:0.875rem;text-align:center;padding:40px 20px;">Something went wrong generating your report. Please try again.</div>';
   }
 }
 
