@@ -4437,14 +4437,57 @@ function updateDashboard() {
   updateStreakCard();
 }
 
+// ─── SMART CASE LABEL ───
+function getSmartCaseLabel(c) {
+  const tooth = c.tooth_number ? `Tooth ${c.tooth_number}` : '';
+  if (c.specialty === 'endo') {
+    const parts = [];
+    if (c.case_type) parts.push(c.case_type === 'Primary Treatment' ? 'RCT' : c.case_type === 'Retreatment' ? 'Retreatment' : c.case_type);
+    if (c.canals) parts.push(`${c.canals} canals`);
+    if (c.curvature && c.curvature !== 'Straight') parts.push(c.curvature + ' curve');
+    if (c.obturation) parts.push(c.obturation);
+    return parts.length ? parts.join(' · ') : tooth;
+  }
+  if (c.specialty === 'restorative') {
+    const parts = [];
+    if (c.cavity_class) parts.push(c.cavity_class);
+    if (c.material) parts.push(c.material);
+    if (c.surfaces) parts.push(c.surfaces);
+    if (c.isolation) parts.push(c.isolation);
+    return parts.length ? parts.join(' · ') : tooth;
+  }
+  if (c.specialty === 'surgery') {
+    const parts = [];
+    if (c.procedure) parts.push(c.procedure);
+    if (c.impaction && c.impaction !== 'Not Applicable') parts.push(c.impaction);
+    if (c.anaesthesia) parts.push(c.anaesthesia);
+    return parts.length ? parts.join(' · ') : tooth;
+  }
+  if (c.specialty === 'paeds') {
+    const parts = [];
+    if (c.procedure) parts.push(c.procedure);
+    if (c.material) parts.push(c.material);
+    if (c.isolation) parts.push(c.isolation);
+    return parts.length ? parts.join(' · ') : tooth;
+  }
+  if (c.specialty === 'prostho') {
+    const parts = [];
+    if (c.procedure) parts.push(c.procedure);
+    if (c.material) parts.push(c.material);
+    if (c.cavity_class) parts.push(c.cavity_class);
+    return parts.length ? parts.join(' · ') : tooth;
+  }
+  return tooth;
+}
+
 function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
   const specShort = { endo: 'ENDO', restorative: 'RESTO', surgery: 'SURG', paeds: 'PAEDS', prostho: 'PROSTHO' }[c.specialty] || c.specialty.toUpperCase();
   const specColors = { endo: '#7C6FFF', restorative: '#F59E0B', surgery: '#EF4444', paeds: '#34D399', prostho: '#38BDF8' };
   const color = specColors[c.specialty] || '#7C6FFF';
   const rank = getComplexityRank(c.complexity_score || 0);
   const nickname = getCaseNickname(c.id);
+  const smartLabel = getSmartCaseLabel(c);
   const score = c.complexity_score || 0;
   const circumference = 2 * Math.PI * 18;
   const offset = circumference * (1 - score / 10);
@@ -4453,35 +4496,26 @@ function caseItemHTML(c, showDelete = false) {
     <div class="case-item" data-spec="${c.specialty}" id="case-row-${c.id}" style="
       background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));
       border:1px solid rgba(255,255,255,0.07);
-      border-radius:18px;
-      padding:16px;
-      margin-bottom:8px;
-      position:relative;
-      overflow:hidden;
+      border-radius:18px;padding:16px;margin-bottom:8px;
+      position:relative;overflow:hidden;
       transition:border-color 0.2s,transform 0.2s;
-      cursor:pointer;
     "
     onmouseover="this.style.borderColor='${color}40';this.style.transform='translateY(-1px)'"
-    onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='none'"
-    onclick="openCaseDetail('${c.id}')">
+    onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='none'">
 
       <!-- Left color accent -->
       <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,${color},${color}40);border-radius:18px 0 0 18px;"></div>
-
-      <!-- Top shimmer on hover (static) -->
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${color}30,transparent);"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${color}20,transparent);"></div>
 
       <div style="display:flex;align-items:center;gap:12px;padding-left:8px;">
 
         <!-- Score ring -->
-        <div style="position:relative;width:44px;height:44px;flex-shrink:0;">
+        <div style="position:relative;width:44px;height:44px;flex-shrink:0;cursor:pointer;" onclick="openCaseDetail('${c.id}')">
           <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
             <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
             <circle cx="22" cy="22" r="18" fill="none" stroke="${color}" stroke-width="3"
-              stroke-dasharray="${circumference}"
-              stroke-dashoffset="${offset}"
-              stroke-linecap="round"
-              style="filter:drop-shadow(0 0 4px ${color}60);"/>
+              stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+              stroke-linecap="round" style="filter:drop-shadow(0 0 4px ${color}60);"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
             <span style="font-size:0.75rem;font-weight:700;color:${color};font-family:'Inter',sans-serif;">${score || '—'}</span>
@@ -4489,27 +4523,50 @@ function caseItemHTML(c, showDelete = false) {
         </div>
 
         <!-- Case info -->
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-            <span style="font-size:0.88rem;color:var(--white);font-weight:500;">Tooth ${c.tooth_number}</span>
-            ${nickname ? `<span style="font-size:0.68rem;color:rgba(255,255,255,0.25);">· ${nickname}</span>` : ''}
+        <div style="flex:1;min-width:0;cursor:pointer;" onclick="openCaseDetail('${c.id}')">
+          <!-- Nickname or tooth number as title -->
+          <div style="font-size:0.9rem;color:var(--white);font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${nickname ? `<span style="color:white;">${nickname}</span>` : `Tooth ${c.tooth_number}`}
           </div>
+          <!-- Smart label -->
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;">${smartLabel || date}</div>
+          <!-- Spec badge + date -->
           <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:0.58rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${specShort}</span>
-            <span style="font-size:0.68rem;color:rgba(255,255,255,0.3);">${date}</span>
+            <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${specShort}</span>
+            <span style="font-size:0.65rem;color:rgba(255,255,255,0.25);">${date}</span>
           </div>
         </div>
 
-        <!-- Right: rank + delete -->
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-          <div style="font-size:0.62rem;color:${rank.color};background:${rank.color}15;padding:3px 8px;border-radius:100px;font-weight:600;white-space:nowrap;">${rank.label}</div>
-          ${showDelete ? `<button onclick="event.stopPropagation();deleteCase('${c.id}')" style="background:none;border:none;color:rgba(255,255,255,0.2);cursor:pointer;font-size:1rem;padding:4px;line-height:1;transition:color 0.2s;" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">✕</button>` : ''}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <!-- Right: nickname edit + rank + arrow -->
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <!-- Nickname edit button -->
+          <button onclick="event.stopPropagation();promptNickname('${c.id}')" title="Name this case" style="
+            background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+            color:rgba(255,255,255,0.3);font-size:0.65rem;padding:4px 8px;border-radius:8px;
+            cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;
+          " onmouseover="this.style.borderColor='${color}50';this.style.color='${color}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.3)'">
+            ${nickname ? '✏' : '+ Name'}
+          </button>
+          <div style="font-size:0.6rem;color:${rank.color};background:${rank.color}15;padding:3px 8px;border-radius:100px;font-weight:600;white-space:nowrap;">${rank.label}</div>
+          ${showDelete ? `<button onclick="event.stopPropagation();deleteCase('${c.id}')" style="background:none;border:none;color:rgba(255,255,255,0.2);cursor:pointer;font-size:0.9rem;padding:4px;transition:color 0.2s;" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">✕</button>` : ''}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2" stroke-linecap="round" onclick="openCaseDetail('${c.id}')" style="cursor:pointer;"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
 
       </div>
     </div>
   `;
+}
+
+// Quick nickname prompt directly from list
+function promptNickname(caseId) {
+  const current = getCaseNickname(caseId);
+  const name = prompt('Name this case (e.g. "First calcified RCT" or "Tricky wisdom tooth"):', current || '');
+  if (name === null) return; // cancelled
+  saveCaseNickname(caseId, name.trim());
+  // Refresh the case row
+  const row = document.getElementById(`case-row-${caseId}`);
+  const c = allCases.find(x => x.id === caseId);
+  if (row && c) row.outerHTML = caseItemHTML(c, row.closest('#view-cases') !== null);
 }
 
 async function openCaseDetail(id) {
@@ -8364,10 +8421,7 @@ Respond ONLY with this exact JSON structure:
     "risk": "The single pattern that could limit them in one sentence"
   },
   "market": {
-    "value_label": "Short label e.g. Entry-level Associate",
-    "salary_min": 2500,
-    "salary_max": 4500,
-    "salary_currency": "USD/month",
+    "value_label": "Short qualitative label e.g. Early-stage Endo Associate or Junior General Dentist",
     "hireable_for": "What they'd get hired for today in one sentence",
     "not_hireable_for": "What they'd get rejected for today in one sentence",
     "advantage": "Their competitive edge vs peers in one sentence"
@@ -8536,19 +8590,16 @@ Respond ONLY with this exact JSON structure:
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#F59E0B,transparent);"></div>
       <div style="font-size:0.6rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">💼 Your Market Value</div>
 
-      <!-- Salary visual -->
+      <!-- Salary visual — qualitative only, no hallucinated numbers -->
       <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:16px;padding:20px;margin-bottom:16px;">
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
-          <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:#F59E0B;letter-spacing:-0.04em;">${r.market?.salary_currency === 'USD/month' ? '$' : ''}${(r.market?.salary_min||0).toLocaleString()} – ${(r.market?.salary_max||0).toLocaleString()}</div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.3);">${r.market?.salary_currency || 'USD/month'}</div>
-        </div>
-        <div style="font-size:0.72rem;color:rgba(245,158,11,0.7);margin-bottom:12px;">${r.market?.value_label || ''}</div>
-        <!-- Salary spectrum bar -->
+        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#F59E0B;letter-spacing:-0.03em;margin-bottom:4px;">${r.market?.value_label || 'Early-stage Associate'}</div>
+        <div style="font-size:0.75rem;color:rgba(245,158,11,0.5);margin-bottom:12px;">Your current market position</div>
+        <!-- Career stage spectrum -->
         <div style="position:relative;height:8px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
-          <div style="position:absolute;left:10%;width:30%;height:100%;background:linear-gradient(90deg,#F59E0B,#FFD080);border-radius:100px;box-shadow:0 0 12px rgba(245,158,11,0.4);"></div>
+          <div style="position:absolute;left:10%;width:25%;height:100%;background:linear-gradient(90deg,#F59E0B,#FFD080);border-radius:100px;box-shadow:0 0 12px rgba(245,158,11,0.4);"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.2);margin-top:5px;">
-          <span>Student</span><span>Associate</span><span>Specialist</span>
+          <span>Student</span><span>Associate</span><span>Senior</span><span>Specialist</span>
         </div>
       </div>
 
