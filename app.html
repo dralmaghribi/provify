@@ -1108,7 +1108,7 @@ body::after {
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
     <div style="font-size:2.5rem;margin-bottom:16px;">🛡</div>
     <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">You've reached the free limit.</div>
-    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:28px;">You've logged 10 cases on the free tier. Upgrade to Pro for unlimited cases, AI feedback, medico-legal records, and your Career Assistant.</div>
+    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:28px;">You've logged 3 cases on the free tier. Upgrade to Pro for unlimited cases, AI feedback, medico-legal records, and full career intelligence.</div>
     <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px;margin-bottom:24px;text-align:left;">
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>Unlimited cases</div>
@@ -3319,7 +3319,7 @@ let allCases = [];
 
 // ─── PADDLE PAYMENTS ───
 const PADDLE_PRICE_ID = 'pri_REPLACE_WITH_YOUR_PRICE_ID'; // Replace when Paddle approves
-const FREE_TIER_LIMIT = 10;
+const FREE_TIER_LIMIT = 3;
 let isPro = false;
 let selectedSpecialty = 'endo';
 let selectedRating = 0;
@@ -3709,6 +3709,53 @@ async function loadProfile() {
   }
   checkProStatus();
   initPaddle();
+  applyRoleBasedUI();
+}
+
+// ─── ROLE-BASED UI ───
+function applyRoleBasedUI() {
+  const role = currentProfile?.role || 'intern';
+  const isSenior = role === 'specialist' || role === 'general';
+
+  // ── NAV LABELS ──
+  const careerNav = document.getElementById('nav-career');
+  if (careerNav) {
+    const label = careerNav.querySelector('span > span:first-child');
+    const sub = careerNav.querySelector('span > span:last-child');
+    if (label) label.textContent = isSenior ? 'Analytics' : 'Career';
+    if (sub) sub.textContent = isSenior ? 'Practice intelligence' : 'AI advice from your cases';
+  }
+
+  // ── CAREER PAGE TITLE ──
+  const careerTitle = document.querySelector('#view-career .page-title');
+  if (careerTitle) careerTitle.textContent = isSenior ? 'Practice Intelligence' : 'Career Intelligence';
+
+  // ── PORTFOLIO NAV LABEL ──
+  const portfolioNav = document.getElementById('nav-portfolio');
+  if (portfolioNav) {
+    const sub = portfolioNav.querySelector('span > span:last-child');
+    if (sub) sub.textContent = isSenior ? 'Clinical record' : 'Your clinical portfolio';
+  }
+
+  // ── PORTFOLIO PAGE TITLE ──
+  const portfolioTitle = document.querySelector('#view-portfolio .page-title');
+  if (portfolioTitle) portfolioTitle.textContent = isSenior ? 'Clinical Record' : 'Generate Portfolio';
+
+  // ── DASHBOARD HERO LABEL ──
+  const heroLabel = document.getElementById('dash-hero-label');
+  if (heroLabel && isSenior) heroLabel.textContent = 'PROVIFY · PRACTICE RECORD';
+
+  // ── CAREER EMPTY STATE MESSAGE ──
+  const careerEmpty = document.getElementById('career-empty');
+  if (careerEmpty) {
+    const msg = careerEmpty.querySelector('div:last-child');
+    if (msg) msg.textContent = isSenior
+      ? 'Your Practice Intelligence Report generates automatically once you have 3 cases documented. The more complex your cases, the more specific the analysis.'
+      : 'Your Career Intelligence Report generates automatically once you have 3 cases documented. The more you log, the more specific it gets.';
+  }
+
+  // ── CAREER PROMPT CONTEXT — tell AI who it's talking to ──
+  window._provifyRoleIsSenior = isSenior;
 }
 
 async function handleLogout() {
@@ -7153,7 +7200,7 @@ function checkProStatus() {
   isPro = currentProfile?.is_pro === true;
   // Update plan display
   const planEl = document.querySelector('.user-plan');
-  if (planEl) planEl.textContent = isPro ? 'Pro' : 'Free — 10 cases';
+  if (planEl) planEl.textContent = isPro ? 'Pro' : 'Free — 3 cases';
   // Check URL for successful upgrade
   if (window.location.search.includes('upgraded=true')) {
     showToast('Welcome to Pro! All features unlocked. 🎉');
@@ -8561,6 +8608,8 @@ async function generateCareerAdvice(autoMode = false) {
     return;
   }
 
+  const isSenior = window._provifyRoleIsSenior || false;
+
   const loading = document.getElementById('career-loading');
   const content = document.getElementById('career-content');
   const empty   = document.getElementById('career-empty');
@@ -8588,7 +8637,56 @@ async function generateCareerAdvice(autoMode = false) {
   const isSpecialist = role === 'specialist';
   const specialtyFullName = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[dominantSpecialty] || dominantSpecialty;
 
-  const prompt = `You are the world's most insightful dental career strategist. Analyze this dentist's data and respond ONLY with a valid JSON object — no markdown, no preamble, no explanation.
+  const prompt = isSenior
+  ? `You are a world-class dental practice intelligence analyst. Analyze this established dentist's data and respond ONLY with a valid JSON object — no markdown, no preamble, no explanation.
+
+CLINICAL DATA:
+- Name: ${name} | Role: ${roleLabel}
+- Total documented cases: ${total} | Avg complexity: ${avgScore}/10
+- Specialty breakdown: Endo ${endoCnt} (${Math.round(endoCnt/total*100)}%) | Resto ${restoCnt} (${Math.round(restoCnt/total*100)}%) | Surgery ${surgCnt} (${Math.round(surgCnt/total*100)}%) | Paeds ${paedsCnt} (${Math.round(paedsCnt/total*100)}%) | Prostho ${prosthoCnt} (${Math.round(prosthoCnt/total*100)}%)
+- High complexity (7+): ${highComp} | Low complexity (<3): ${lowComp}
+- Dominant specialty: ${specialtyFullName} at ${dominantPct}%
+- Clinical profile: ${clinicalProfile || 'Building'}
+- This is an established clinician. Do NOT give career advice. Focus on practice excellence, medico-legal protection, market positioning, and clinical mastery.
+
+Respond ONLY with this exact JSON structure:
+{
+  "identity": {
+    "headline": "6-8 word label defining their clinical identity and specialty strength",
+    "insight": "2-3 sentences about their clinical profile, complexity pattern, and what their case mix reveals about their practice. Talk directly to them.",
+    "strength": "Their single strongest clinical asset in one sentence",
+    "risk": "The single biggest risk to their practice or reputation in one sentence"
+  },
+  "market": {
+    "value_label": "Their practice positioning e.g. High-complexity Endo Specialist or Established GDP with Surgical Focus",
+    "hireable_for": "What referral or employment opportunities their profile commands in one sentence",
+    "not_hireable_for": "What their profile currently cannot compete for in one sentence",
+    "advantage": "Their competitive edge over peers in one sentence"
+  },
+  "countries": [
+    { "name": "UAE", "flag": "🇦🇪", "demand": 9, "ease": 8, "pay": 8, "verdict": "One sentence on market opportunity for their specialty level" },
+    { "name": "Saudi Arabia", "flag": "🇸🇦", "demand": 8, "ease": 7, "pay": 9, "verdict": "One sentence" },
+    { "name": "UK", "flag": "🇬🇧", "demand": 7, "ease": 5, "pay": 7, "verdict": "One sentence" },
+    { "name": "Australia", "flag": "🇦🇺", "demand": 7, "ease": 4, "pay": 8, "verdict": "One sentence" },
+    { "name": "Canada", "flag": "🇨🇦", "demand": 6, "ease": 3, "pay": 8, "verdict": "One sentence" }
+  ],
+  "top_country": "UAE",
+  "moves": [
+    { "icon": "🔬", "label": "Elevate Your Practice", "action": "One specific advanced technique or complex case type to pursue this month to raise your complexity ceiling", "urgency": "high" },
+    { "icon": "🛡", "label": "Protect Your Practice", "action": "One specific medico-legal or documentation habit to implement immediately given their case profile", "urgency": "high" },
+    { "icon": "📈", "label": "Grow Your Reputation", "action": "One specific move to increase referrals, visibility, or specialist positioning this quarter", "urgency": "medium" }
+  ],
+  "target": {
+    "headline": "Your 12-month practice target in 6 words",
+    "description": "2-3 sentences. One specific opinionated target for where their practice should be in 12 months — complexity level, case mix, market position, or expansion. No options, just the answer.",
+    "milestone": "The one measurable thing that will define success in 12 months"
+  },
+  "truth": {
+    "headline": "5-6 word uncomfortable practice truth",
+    "body": "3-4 sentences of raw honesty about what pattern in their data could quietly undermine their practice, reputation, or medico-legal standing. Make it land."
+  }
+}`
+  : `You are the world's most insightful dental career strategist. Analyze this dentist's data and respond ONLY with a valid JSON object — no markdown, no preamble, no explanation.
 
 CLINICAL DATA:
 - Name: ${name} | Role: ${roleLabel}
