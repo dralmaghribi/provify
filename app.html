@@ -7419,25 +7419,25 @@ function setVLSpecialty(spec, btn) {
   if (exampleEl) exampleEl.textContent = VL_EXAMPLES[spec] || VL_EXAMPLES.endo;
 }
 
-// ─── BULLETPROOF VOICE RECORDING ───
-// Fixes: mobile SpeechRecognition timeouts, final results never firing,
-// silent crashes, Safari fallback, auto-restart on unexpected stops.
+// ─── WHISPER VOICE RECORDING ───
+// Uses MediaRecorder API to record actual audio, then sends to Whisper.
+// Works on Safari, Chrome, Firefox — any browser that supports MediaRecorder.
 
-let vlFinalTranscript = '';   // accumulates confirmed final results across restarts
-let vlIsRecording = false;    // true while user intends to record
-let vlIsEnding = false;       // true when user explicitly stops
+let vlMediaRecorder = null;
+let vlAudioChunks = [];
+let vlIsRecording = false;
 
 function startVoiceRecording() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    showToast('Voice recording not supported on this browser. Please use Chrome.');
+  // Check MediaRecorder support (works on all modern browsers including Safari)
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    showToast('Voice recording not supported on this browser. Please update your browser.');
     return;
   }
 
   showVLScreen('recording');
   vlTranscript = '';
-  vlFinalTranscript = '';
+  vlAudioChunks = [];
   vlIsRecording = true;
-  vlIsEnding = false;
   vlSecondsLeft = 60;
 
   document.querySelectorAll('.vl-bar').forEach(b => b.classList.add('active'));
@@ -7451,101 +7451,159 @@ function startVoiceRecording() {
     if (vlSecondsLeft <= 0) stopVoiceRecording();
   }, 1000);
 
-  startRecognitionSession();
-}
-
-function startRecognitionSession() {
-  if (!vlIsRecording) return;
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  vlRecognition = new SpeechRecognition();
-  vlRecognition.continuous = true;
-  vlRecognition.interimResults = true;
-  vlRecognition.lang = 'en-US';
-  vlRecognition.maxAlternatives = 1;
-
-  vlRecognition.onresult = (event) => {
-    let sessionFinal = '';
-    let interim = '';
-
-    for (let i = 0; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        sessionFinal += event.results[i][0].transcript + ' ';
-      } else {
-        interim += event.results[i][0].transcript;
-      }
-    }
-
-    // Accumulate finals across restarts
-    if (sessionFinal) {
-      vlFinalTranscript = (vlFinalTranscript + ' ' + sessionFinal).trim();
-    }
-
-    // Best transcript = all confirmed finals + current interim
-    vlTranscript = (vlFinalTranscript + ' ' + interim).trim();
-
-    const liveEl = document.getElementById('vl-transcript-live');
-    if (liveEl && vlTranscript) {
-      liveEl.textContent = vlTranscript;
-      liveEl.style.color = 'rgba(255,255,255,0.8)';
-    }
-  };
-
-  vlRecognition.onerror = (e) => {
-    // 'no-speech' and 'aborted' are normal — don't show error
-    if (e.error === 'no-speech' || e.error === 'aborted') return;
-    // 'not-allowed' means mic permission denied
-    if (e.error === 'not-allowed') {
-      showToast('Microphone permission denied. Please allow mic access and try again.');
-      stopVoiceRecording(true);
-      showVLScreen('coach');
-      return;
-    }
-    // All other errors: silently restart
-  };
-
-  vlRecognition.onend = () => {
-    // If user hasn't explicitly stopped, auto-restart to keep recording
-    if (vlIsRecording && !vlIsEnding) {
-      setTimeout(() => startRecognitionSession(), 100);
-    }
-  };
-
-  try {
-    vlRecognition.start();
-  } catch(e) {
-    // Already started — wait and retry
-    setTimeout(() => startRecognitionSession(), 300);
+  // Show live indicator
+  const liveEl = document.getElementById('vl-transcript-live');
+  if (liveEl) {
+    liveEl.textContent = '🎙 Recording... speak your case now';
+    liveEl.style.color = 'rgba(124,111,255,0.8)';
   }
+
+  // Request mic and start recording
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+      // Pick best supported format
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm'
+        : MediaRecorder.isTypeSupported('audio/mp4')
+        ? 'audio/mp4'
+        : '';
+
+      vlMediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+
+      vlMediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) vlAudioChunks.push(e.data);
+      };
+
+      vlMediaRecorder.onstop = async () => {
+        // Stop all tracks to release mic
+        stream.getTracks().forEach(t => t.stop());
+
+        if (!vlIsRecording) return; // was cancelled silently
+
+        if (vlAudioChunks.length === 0) {
+          showToast('No audio recorded. Please try again.');
+          showVLScreen('coach');
+          return;
+        }
+
+        // Build audio blob
+        const mimeUsed = vlMediaRecorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(vlAudioChunks, { type: mimeUsed });
+
+        // Send to Whisper
+        await transcribeWithWhisper(audioBlob, mimeUsed);
+      };
+
+      vlMediaRecorder.start(250); // collect chunks every 250ms
+    })
+    .catch(err => {
+      vlIsRecording = false;
+      if (vlTimer) { clearInterval(vlTimer); vlTimer = null; }
+      document.querySelectorAll('.vl-bar').forEach(b => b.classList.remove('active'));
+      if (err.name === 'NotAllowedError') {
+        showToast('Microphone permission denied. Please allow mic access in your browser settings.');
+      } else {
+        showToast('Could not access microphone. Please try again.');
+      }
+      showVLScreen('coach');
+    });
 }
 
 function stopVoiceRecording(silent = false) {
-  vlIsRecording = false;
-  vlIsEnding = true;
-
   if (vlTimer) { clearInterval(vlTimer); vlTimer = null; }
-  if (vlRecognition) { try { vlRecognition.stop(); } catch(e){} vlRecognition = null; }
   document.querySelectorAll('.vl-bar').forEach(b => b.classList.remove('active'));
 
-  if (silent) return;
-
-  // Best transcript: accumulated finals + whatever is visible on screen
-  const liveEl = document.getElementById('vl-transcript-live');
-  const visibleText = liveEl?.textContent?.trim();
-
-  // Use whichever is longer — visible text vs accumulated finals
-  let best = vlFinalTranscript || vlTranscript || '';
-  if (visibleText && visibleText !== 'Listening...' && visibleText.length > best.length) {
-    best = visibleText;
-  }
-
-  if (!best.trim()) {
-    showToast('No speech detected. Please try again.');
-    showVLScreen('coach');
+  if (silent) {
+    vlIsRecording = false;
+    if (vlMediaRecorder && vlMediaRecorder.state !== 'inactive') {
+      try { vlMediaRecorder.stop(); } catch(e) {}
+    }
+    vlMediaRecorder = null;
+    vlAudioChunks = [];
     return;
   }
 
-  processVoiceTranscript(best.trim());
+  if (vlMediaRecorder && vlMediaRecorder.state !== 'inactive') {
+    try { vlMediaRecorder.stop(); } catch(e) {}
+    // onstop will handle the rest
+  } else {
+    vlIsRecording = false;
+    showToast('No audio recorded. Please try again.');
+    showVLScreen('coach');
+  }
+}
+
+async function transcribeWithWhisper(audioBlob, mimeType) {
+  showVLScreen('processing');
+  const liveEl = document.getElementById('vl-transcript-live');
+
+  const processingMsgs = [
+    'Transcribing your audio...',
+    'Correcting dental terminology...',
+    'Extracting clinical fields...',
+    'Almost done...'
+  ];
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % processingMsgs.length;
+    const el = document.getElementById('vl-processing-msg');
+    if (el) el.textContent = processingMsgs[msgIdx];
+  }, 1500);
+
+  try {
+    // Determine file extension from mime type
+    const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
+    const formData = new FormData();
+    formData.append('audio', audioBlob, `recording.${ext}`);
+
+    const whisperRes = await fetch('/api/whisper', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!whisperRes.ok) throw new Error('Whisper failed');
+
+    const whisperData = await whisperRes.json();
+    const transcript = (whisperData.transcript || '').trim();
+
+    clearInterval(msgInterval);
+
+    if (!transcript) {
+      showToast('Could not transcribe audio. Please speak clearly and try again.');
+      showVLScreen('coach');
+      vlIsRecording = false;
+      return;
+    }
+
+    vlIsRecording = false;
+    vlTranscript = transcript;
+
+    // Update live transcript display
+    if (liveEl) {
+      liveEl.textContent = transcript;
+      liveEl.style.color = 'rgba(255,255,255,0.8)';
+    }
+
+    // Now process with Claude as before
+    await processVoiceTranscript(transcript);
+
+  } catch(e) {
+    clearInterval(msgInterval);
+    console.error('Whisper error:', e);
+    vlIsRecording = false;
+    // Fallback — show review with empty fields so case isn't lost
+    vlExtractedData = {
+      corrected_transcript: vlTranscript || '',
+      specialty: vlSpecialty,
+      tooth_number: null,
+      age_range: null,
+      complaint: null,
+      narrative: ''
+    };
+    showVLReview(vlExtractedData, vlTranscript || '');
+  }
 }
 
 async function processVoiceTranscript(transcript) {
