@@ -1323,9 +1323,9 @@ body::after {
         </div>
       </div>
 
-      <!-- Timer -->
-      <div id="vl-timer" style="font-family:'Instrument Serif',serif;font-size:3.5rem;color:var(--white);letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">45</div>
-      <div style="font-size:0.8rem;color:var(--gray);margin-bottom:32px;">seconds remaining</div>
+      <!-- Timer — elapsed, not countdown -->
+      <div id="vl-timer" style="font-family:'Instrument Serif',serif;font-size:3.5rem;color:var(--white);letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">0</div>
+      <div id="vl-timer-label" style="font-size:0.8rem;color:var(--gray);margin-bottom:32px;">seconds</div>
 
       <!-- Live transcript -->
       <div id="vl-transcript-live" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;min-height:60px;text-align:left;font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.7;font-style:italic;margin-bottom:24px;">
@@ -1347,22 +1347,14 @@ body::after {
     <!-- SCREEN 4: Review -->
     <div id="vl-screen-review" style="display:none;padding:28px 32px;max-height:85vh;overflow-y:auto;">
 
-      <!-- Countdown bar -->
-      <div style="margin-bottom:20px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;">✓ Looks good?</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="font-size:0.75rem;color:var(--gray);">Logging in <span id="vl-countdown-num" style="color:var(--white);font-weight:600;">10</span>s</div>
-            <div style="width:6px;height:6px;background:#34D399;border-radius:50%;animation:ep2 1s ease-in-out infinite;"></div>
-          </div>
-        </div>
-        <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
-          <div id="vl-countdown-bar" style="height:100%;background:linear-gradient(90deg,var(--teal),#9B91FF);border-radius:100px;width:100%;transition:width 1s linear;"></div>
-        </div>
+      <!-- Header — no timer, no anxiety -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <div style="width:8px;height:8px;background:#34D399;border-radius:50%;box-shadow:0 0 8px rgba(52,211,153,0.6);"></div>
+        <div style="font-size:0.62rem;color:#34D399;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;">Extracted successfully</div>
       </div>
 
-      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white);margin-bottom:6px;" id="vl-review-title">Review your case</div>
-      <div style="font-size:0.78rem;color:var(--gray);margin-bottom:20px;">Provify extracted these fields — tap Edit if anything's wrong</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white);margin-bottom:6px;" id="vl-review-title">Does this look right?</div>
+      <div style="font-size:0.78rem;color:var(--gray);margin-bottom:20px;">Take your time — tap Edit if anything needs fixing</div>
 
       <!-- Extracted fields — view mode -->
       <div id="vl-extracted-fields" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:4px;margin-bottom:12px;max-height:200px;overflow-y:auto;"></div>
@@ -7438,17 +7430,28 @@ function startVoiceRecording() {
   vlTranscript = '';
   vlAudioChunks = [];
   vlIsRecording = true;
-  vlSecondsLeft = 60;
+  vlSecondsLeft = 0; // now counts UP
 
   document.querySelectorAll('.vl-bar').forEach(b => b.classList.add('active'));
 
   const timerEl2 = document.getElementById('vl-timer');
-  if (timerEl2) timerEl2.textContent = vlSecondsLeft;
+  if (timerEl2) timerEl2.textContent = '0';
+
   vlTimer = setInterval(() => {
-    vlSecondsLeft--;
+    vlSecondsLeft++;
     const timerEl = document.getElementById('vl-timer');
+    const labelEl = document.getElementById('vl-timer-label');
     if (timerEl) timerEl.textContent = vlSecondsLeft;
-    if (vlSecondsLeft <= 0) stopVoiceRecording();
+    // After 60s, hint they can stop — but never force stop
+    if (labelEl) {
+      if (vlSecondsLeft === 60) {
+        labelEl.textContent = 'seconds — you can stop now';
+        labelEl.style.color = 'rgba(124,111,255,0.7)';
+      } else if (vlSecondsLeft < 60) {
+        labelEl.textContent = 'seconds';
+        labelEl.style.color = '';
+      }
+    }
   }, 1000);
 
   // Show live indicator
@@ -7855,38 +7858,12 @@ async function submitVoiceCase() {
   showVoiceResults(caseData, complexity, data[0].id);
 }
 
-// ─── VOICE LOG COUNTDOWN & EDIT ───
+// ─── VOICE LOG EDIT ───
 let vlCountdownTimer = null;
-let vlCountdownSecs = 10;
 let vlEditMode = false;
 
-function startVLCountdown() {
-  vlCountdownSecs = 10;
-  vlEditMode = false;
-  const numEl = document.getElementById('vl-countdown-num');
-  const barEl = document.getElementById('vl-countdown-bar');
-  if (numEl) numEl.textContent = vlCountdownSecs;
-  if (barEl) barEl.style.width = '100%';
-
-  vlCountdownTimer = setInterval(() => {
-    vlCountdownSecs--;
-    if (numEl) numEl.textContent = vlCountdownSecs;
-    if (barEl) barEl.style.width = `${vlCountdownSecs * 10}%`;
-    if (vlCountdownSecs <= 0) {
-      clearInterval(vlCountdownTimer);
-      vlCountdownTimer = null;
-      if (!vlEditMode) proceedVoiceToPhotos();
-    }
-  }, 1000);
-}
-
-function stopVLCountdown() {
-  if (vlCountdownTimer) { clearInterval(vlCountdownTimer); vlCountdownTimer = null; }
-  const numEl = document.getElementById('vl-countdown-num');
-  const barEl = document.getElementById('vl-countdown-bar');
-  if (numEl) numEl.textContent = '—';
-  if (barEl) barEl.style.width = '0%';
-}
+function startVLCountdown() { /* timer removed — no countdown */ }
+function stopVLCountdown() { /* timer removed — no countdown */ }
 
 function toggleVLEdit() {
   vlEditMode = true;
