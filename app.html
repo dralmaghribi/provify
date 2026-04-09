@@ -576,37 +576,43 @@ body::after {
 
   /* ── LAYOUT ── */
   .app-layout { flex-direction: column; }
-  .main-content { margin-left: 0; max-width: 100%; padding: 20px 16px 88px; }
+  .main-content { margin-left: 0; max-width: 100%; padding: 20px 16px 96px; }
 
   /* ── BOTTOM NAV BAR ── */
   .sidebar {
-    width: 100%; height: 68px; position: fixed;
+    width: 100%; height: 72px; position: fixed;
     bottom: 0; left: 0; right: 0; top: auto;
-    flex-direction: row; padding: 0 8px;
-    border-right: none; border-top: 1px solid rgba(255,255,255,0.07);
-    background: rgba(9,9,11,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    z-index: 100; overflow-x: auto; overflow-y: hidden;
+    flex-direction: row; padding: 0 4px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-right: none;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(9,9,11,0.97);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    z-index: 100; overflow-x: hidden; overflow-y: hidden;
     justify-content: space-around; align-items: center; gap: 0;
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+    box-shadow: 0 -1px 0 rgba(255,255,255,0.05), 0 -12px 32px rgba(0,0,0,0.5);
   }
   .sidebar::after { display: none; }
   .sidebar-logo { display: none; }
   .sidebar-bottom { display: none; }
 
   .nav-item {
-    flex-direction: column; gap: 3px;
-    font-size: 0.58rem; font-weight: 500;
-    padding: 8px 4px; border-radius: 10px;
+    flex-direction: column; gap: 4px;
+    font-size: 0.55rem; font-weight: 600;
+    padding: 8px 6px 6px; border-radius: 12px;
     min-width: 0; flex: 1; text-align: center;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    transition: all 0.2s;
   }
   .nav-item.active {
     background: rgba(124,111,255,0.12);
     color: var(--teal);
     border: none; box-shadow: none;
   }
-  .nav-icon { font-size: 1.2rem; }
-  .nav-icon svg { width: 22px; height: 22px; }
+  .nav-item.active .nav-icon svg { stroke: var(--teal); }
+  .nav-icon { font-size: 1.1rem; margin-bottom: 1px; }
+  .nav-icon svg { width: 20px; height: 20px; stroke: rgba(255,255,255,0.3); transition: stroke 0.2s; }
 
   /* Hide secondary nav items on mobile */
   #nav-progress { display: none; }
@@ -4462,11 +4468,22 @@ function updateDashboard() {
     const toShow = [...earned.slice(-4), ...nextUp].slice(0, 8);
     achGrid.innerHTML = toShow.map(b => {
       const isEarned = b.check(allCases);
-      return `<div style="background:${isEarned ? 'rgba(124,111,255,0.08)' : 'rgba(255,255,255,0.02)'};border:1px solid ${isEarned ? 'rgba(124,111,255,0.25)' : 'rgba(255,255,255,0.05)'};border-radius:12px;padding:12px 8px;text-align:center;${isEarned ? '' : 'opacity:0.45;'}">
-        <div style="font-size:1.4rem;margin-bottom:6px;${isEarned ? '' : 'filter:grayscale(1);'}">${b.emoji}</div>
-        <div style="font-size:0.62rem;font-weight:600;color:${isEarned ? 'var(--white)' : 'var(--gray)'};">${b.name}</div>
-        ${isEarned ? '<div style="font-size:0.55rem;color:var(--teal);margin-top:2px;">✓ Earned</div>' : ''}
-      </div>`;
+      const specColors = { '🦷':'#7C6FFF','🔬':'#7C6FFF','🔄':'#9B91FF','💎':'#B9F2FF','🌿':'#34D399','🌀':'#7C6FFF','✨':'#F59E0B','🎨':'#F59E0B','🛡':'#34D399','🔥':'#EF4444','🧒':'#34D399','⭐':'#F59E0B','💉':'#60A5FA','👑':'#F59E0B','🧠':'#9B91FF','💪':'#EF4444','⚔️':'#EF4444','🔪':'#EF4444','🌟':'#F59E0B','📋':'#7C6FFF','🎯':'#34D399','💯':'#F59E0B','⚡':'#F59E0B','📸':'#60A5FA','🌐':'#34D399','🏆':'#F59E0B','🔩':'#9CA3AF' };
+      const color = specColors[b.emoji] || '#7C6FFF';
+      return `
+        <div style="
+          background:${isEarned ? `linear-gradient(135deg,${color}15,${color}05)` : 'rgba(255,255,255,0.02)'};
+          border:1px solid ${isEarned ? `${color}35` : 'rgba(255,255,255,0.06)'};
+          border-radius:16px;padding:14px 8px;text-align:center;
+          position:relative;overflow:hidden;
+          ${isEarned ? `box-shadow:0 4px 20px ${color}15;` : 'opacity:0.4;'}
+          transition:all 0.2s;
+        ">
+          ${isEarned ? `<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${color}50,transparent);"></div>` : ''}
+          <div style="font-size:${isEarned ? '1.6' : '1.3'}rem;margin-bottom:6px;${isEarned ? '' : 'filter:grayscale(1) opacity(0.4);'}">${b.emoji}</div>
+          <div style="font-size:0.6rem;font-weight:700;color:${isEarned ? 'var(--white)' : 'var(--gray)'};letter-spacing:0.02em;line-height:1.3;">${b.name}</div>
+          ${isEarned ? `<div style="font-size:0.5rem;color:${color};margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">✓ Earned</div>` : '<div style="font-size:0.5rem;color:rgba(255,255,255,0.2);margin-top:4px;">Locked</div>'}
+        </div>`;
     }).join('');
   }
 
@@ -4568,7 +4585,7 @@ function caseItemHTML(c, showDelete = false) {
             ${nickname ? `<span style="color:white;">${nickname}</span>` : `Tooth ${c.tooth_number}`}
           </div>
           <!-- Smart label -->
-          <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;">${smartLabel || date}</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;">${smartLabel || date}</div>
           <!-- Spec badge + date -->
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${specShort}</span>
