@@ -1387,9 +1387,9 @@ body::after {
 
     <!-- SCREEN 5: Photos -->
     <div id="vl-screen-photos" style="display:none;padding:28px 32px;">
-      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">📸 Add Images</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white);margin-bottom:6px;">X-rays & Clinical Photos</div>
-      <div style="font-size:0.78rem;color:var(--gray);margin-bottom:24px;">Optional — up to 4 X-rays and 4 clinical photos</div>
+
+      <!-- Smart photo guidance — injected dynamically -->
+      <div id="vl-photo-guidance" style="margin-bottom:24px;"></div>
 
       <!-- X-rays -->
       <div style="margin-bottom:20px;">
@@ -7928,7 +7928,155 @@ function applyVLEdits() {
 
 function proceedVoiceToPhotos() {
   stopVLCountdown();
+  injectPhotoGuidance(vlExtractedData);
   showVLScreen('photos');
+}
+
+// ─── SMART PHOTO GUIDANCE ───
+function getPhotoGuidance(c) {
+  const spec = c?.specialty || vlSpecialty;
+  const tooth = c?.tooth_number ? `tooth ${c.tooth_number}` : 'this tooth';
+  const procedure = c?.procedure || c?.case_type || '';
+
+  // Each entry: { prompt, tip, slots } 
+  // prompt = the one psychological line
+  // tip = ultra-brief how-to (optional, max 8 words)
+  // slots = which photo slots to highlight first
+
+  if (spec === 'endo') {
+    const isRetreatment = procedure?.toLowerCase().includes('retreat');
+    const isPulpotomy = procedure?.toLowerCase().includes('pulpotomy');
+    if (isPulpotomy) return {
+      prompt: `Post-op X-ray of ${tooth}. That's the one that matters.`,
+      tip: 'Aim straight down — no angle needed.',
+      slots: ['xr-1'],
+      time: '15 seconds'
+    };
+    if (isRetreatment) return {
+      prompt: `Pre and post X-rays for ${tooth}. Two shots, strongest possible protection.`,
+      tip: 'Pre-op first if you still have it open.',
+      slots: ['xr-1', 'xr-2'],
+      time: '20 seconds'
+    };
+    return {
+      prompt: `Post-op X-ray of ${tooth}. Best medico-legal shot you can take right now.`,
+      tip: 'Straight on, patient still in chair.',
+      slots: ['xr-1'],
+      time: '15 seconds'
+    };
+  }
+
+  if (spec === 'restorative') {
+    return {
+      prompt: `Before and after of ${tooth}. Two taps — you're done.`,
+      tip: 'Use your mirror for the angle shot.',
+      slots: ['cp-1', 'cp-2'],
+      time: '20 seconds'
+    };
+  }
+
+  if (spec === 'surgery') {
+    const isWisdom = procedure?.toLowerCase().includes('wisdom') || procedure?.toLowerCase().includes('impact') || (c?.tooth_number && ['18','28','38','48'].includes(String(c.tooth_number)));
+    if (isWisdom) return {
+      prompt: `Socket photo before you pack it — strongest surgical record you can have.`,
+      tip: 'Widen cheek slightly, aim straight in.',
+      slots: ['cp-1'],
+      time: '10 seconds'
+    };
+    return {
+      prompt: `Quick socket shot of ${tooth}. Ten seconds, done.`,
+      tip: 'Post-op X-ray too if you took one.',
+      slots: ['cp-1', 'xr-1'],
+      time: '15 seconds'
+    };
+  }
+
+  if (spec === 'paeds') {
+    const isSSC = procedure?.toLowerCase().includes('crown') || procedure?.toLowerCase().includes('ssc');
+    if (isSSC) return {
+      prompt: `Smile shot showing the crown — parents love this, and it's great documentation.`,
+      tip: 'Get the child to smile wide.',
+      slots: ['cp-1'],
+      time: '10 seconds'
+    };
+    return {
+      prompt: `Post-op shot of ${tooth}. Quick clinical photo is all you need.`,
+      tip: 'X-ray too if you have it from today.',
+      slots: ['cp-1', 'xr-1'],
+      time: '15 seconds'
+    };
+  }
+
+  if (spec === 'prostho') {
+    const isCrown = procedure?.toLowerCase().includes('crown') || procedure?.toLowerCase().includes('veneer');
+    const isImplant = procedure?.toLowerCase().includes('implant');
+    if (isImplant) return {
+      prompt: `Post-op X-ray confirms placement — most important implant shot.`,
+      tip: 'Clinical photo of the site too if possible.',
+      slots: ['xr-1', 'cp-1'],
+      time: '20 seconds'
+    };
+    if (isCrown) return {
+      prompt: `Shade, fit, and smile — three shots that tell the whole story.`,
+      tip: 'Natural light for shade photo if possible.',
+      slots: ['cp-1', 'cp-2', 'cp-3'],
+      time: '25 seconds'
+    };
+    return {
+      prompt: `Before and after clinical photo of ${tooth}. Two shots is all you need.`,
+      tip: 'Consistent angle for both shots.',
+      slots: ['cp-1', 'cp-2'],
+      time: '20 seconds'
+    };
+  }
+
+  // Default
+  return {
+    prompt: `Quick clinical photo of ${tooth}. One shot is better than none.`,
+    tip: 'Use dental mirror for posterior teeth.',
+    slots: ['cp-1'],
+    time: '10 seconds'
+  };
+}
+
+function injectPhotoGuidance(c) {
+  const guidance = getPhotoGuidance(c);
+  const guidanceEl = document.getElementById('vl-photo-guidance');
+  if (!guidanceEl) return;
+
+  guidanceEl.innerHTML = `
+    <div style="background:linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.04));border:1px solid rgba(124,111,255,0.25);border-radius:20px;padding:20px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
+
+      <!-- Timer badge -->
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);border-radius:100px;padding:4px 10px;margin-bottom:14px;">
+        <div style="width:5px;height:5px;background:#34D399;border-radius:50%;"></div>
+        <span style="font-size:0.6rem;color:#34D399;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Takes ~${guidance.time}</span>
+      </div>
+
+      <!-- The one line that matters -->
+      <div style="font-family:'Instrument Serif',serif;font-size:1.25rem;color:white;letter-spacing:-0.02em;line-height:1.35;margin-bottom:10px;">${guidance.prompt}</div>
+
+      <!-- Ultra-brief tip -->
+      ${guidance.tip ? `<div style="font-size:0.75rem;color:rgba(255,255,255,0.35);font-style:italic;">${guidance.tip}</div>` : ''}
+    </div>
+  `;
+
+  // Highlight the priority slots
+  // Dim all slots first, then highlight priority ones
+  ['xr-1','xr-2','xr-3','xr-4','cp-1','cp-2','cp-3','cp-4'].forEach(id => {
+    const slot = document.getElementById(`vl-slot-${id}`);
+    if (!slot) return;
+    if (guidance.slots.includes(id)) {
+      slot.style.opacity = '1';
+      slot.style.borderColor = 'rgba(124,111,255,0.4)';
+      slot.style.background = 'rgba(124,111,255,0.06)';
+    } else {
+      slot.style.opacity = '0.35';
+      slot.style.borderColor = '';
+      slot.style.background = '';
+    }
+  });
 }
 
 function retryVoiceLog() {
@@ -7957,7 +8105,11 @@ function handleVLPhoto(input, id, slotId, imgId) {
   vlPhotoFiles[id] = file;
   const slot = document.getElementById(slotId);
   const img = document.getElementById(imgId);
-  if (slot) slot.classList.add('has-photo');
+  // Reset opacity — they chose to add this photo
+  if (slot) {
+    slot.style.opacity = '1';
+    slot.classList.add('has-photo');
+  }
   if (img) {
     img.src = URL.createObjectURL(file);
     img.style.display = 'block';
