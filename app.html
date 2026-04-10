@@ -3243,14 +3243,6 @@ body::after {
           </div>
         </div>
 
-        <!-- Provify Memory -->
-        <div style="background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
-          <div style="flex:1;">
-            <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:6px;">🧠 Provify Memory</div>
-            <div style="font-size:0.82rem;color:var(--white-dim);line-height:1.75;" id="clinical-profile-display">Building your clinical profile...</div>
-          </div>
-        </div>
-
         <!-- Career Report — auto-loads -->
         <div id="career-loading" style="padding:48px 20px;text-align:center;color:var(--gray);">
           <div style="width:36px;height:36px;border:2px solid rgba(255,255,255,0.06);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
@@ -8949,38 +8941,35 @@ Respond ONLY with this exact JSON structure:
     // Country bars
     const countryHTML = (r.countries||[]).map((c,i) => {
       const isTop = c.name === r.top_country;
-      const demandW = Math.round(c.demand*10);
       return `
-        <div style="background:${isTop?'rgba(52,211,153,0.06)':'rgba(255,255,255,0.02)'};border:1px solid ${isTop?'rgba(52,211,153,0.25)':'rgba(255,255,255,0.07)'};border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;">
-          ${isTop?`<div style="position:absolute;top:8px;right:10px;font-size:0.55rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;background:rgba(52,211,153,0.1);padding:2px 7px;border-radius:100px;">Top Pick</div>`:''}
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-size:1.4rem;">${c.flag}</span>
-            <span style="font-size:0.9rem;font-weight:600;color:white;">${c.name}</span>
+        <div style="background:${isTop?'rgba(52,211,153,0.06)':'rgba(255,255,255,0.02)'};border:1px solid ${isTop?'rgba(52,211,153,0.2)':'rgba(255,255,255,0.06)'};border-radius:12px;padding:12px 14px;position:relative;">
+          ${isTop?`<div style="position:absolute;top:8px;right:10px;font-size:0.52rem;color:#34D399;font-weight:700;background:rgba(52,211,153,0.1);padding:2px 7px;border-radius:100px;text-transform:uppercase;">Top Pick</div>`:''}
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:1.2rem;">${c.flag}</span>
+            <span style="font-size:0.85rem;font-weight:600;color:white;">${c.name}</span>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
             ${[['Demand',c.demand,'#7C6FFF'],['Entry',c.ease,'#34D399'],['Pay',c.pay,'#F59E0B']].map(([label,val,col])=>`
               <div>
-                <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${label}</div>
-                <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+                <div style="font-size:0.52rem;color:rgba(255,255,255,0.25);text-transform:uppercase;margin-bottom:3px;">${label}</div>
+                <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
                   <div style="height:100%;width:${val*10}%;background:${col};border-radius:100px;"></div>
                 </div>
               </div>`).join('')}
           </div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);line-height:1.5;">${c.verdict}</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);line-height:1.4;">${c.verdict}</div>
         </div>`;
     }).join('');
 
-    // Mission cards
+    // Mission cards — compact
     const movesHTML = (r.moves||[]).map((m,i) => `
-      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;display:flex;gap:12px;align-items:flex-start;">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${['#7C6FFF','#34D399','#F59E0B'][i]},transparent);"></div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <div style="width:36px;height:36px;border-radius:10px;background:${['rgba(124,111,255,0.12)','rgba(52,211,153,0.12)','rgba(245,158,11,0.12)'][i]};border:1px solid ${['rgba(124,111,255,0.25)','rgba(52,211,153,0.25)','rgba(245,158,11,0.25)'][i]};display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${m.icon}</div>
-          <div>
-            <div style="font-size:0.6rem;color:${['#9B91FF','#34D399','#F59E0B'][i]};text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Move ${i+1} · ${m.label}</div>
-          </div>
+        <div style="width:32px;height:32px;border-radius:10px;background:${['rgba(124,111,255,0.12)','rgba(52,211,153,0.12)','rgba(245,158,11,0.12)'][i]};border:1px solid ${['rgba(124,111,255,0.25)','rgba(52,211,153,0.25)','rgba(245,158,11,0.25)'][i]};display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;margin-top:1px;">${m.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:0.58rem;color:${['#9B91FF','#34D399','#F59E0B'][i]};text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Move ${i+1} · ${m.label}</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;">${m.action}</div>
         </div>
-        <div style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.65;">${m.action}</div>
       </div>`).join('');
 
     const html = `
@@ -8993,115 +8982,106 @@ Respond ONLY with this exact JSON structure:
       .career-card:nth-child(4){animation-delay:0.2s}
       .career-card:nth-child(5){animation-delay:0.25s}
       .career-card:nth-child(6){animation-delay:0.3s}
+      .career-card:nth-child(7){animation-delay:0.35s}
       .truth-reveal{display:none;}
       .truth-locked{cursor:pointer;}
       .truth-locked:hover{border-color:rgba(239,68,68,0.4)!important;}
     </style>
 
-    <!-- SECTION 1: Identity -->
-    <div class="career-card" style="background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.2);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7C6FFF,transparent);"></div>
-      <div style="font-size:0.6rem;color:#9B91FF;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🧠 Who You Are</div>
+    <!-- ═══ OPENING STATEMENT — The one thing that makes them feel seen ═══ -->
+    <div class="career-card" style="background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(124,111,255,0.04));border:1px solid rgba(124,111,255,0.25);border-radius:24px;padding:32px;margin-bottom:12px;position:relative;overflow:hidden;text-align:center;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7C6FFF,#34D399,transparent);"></div>
+      <div style="position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(124,111,255,0.1),transparent 65%);pointer-events:none;"></div>
+      <div style="font-size:0.6rem;color:rgba(124,111,255,0.6);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:20px;">Provify reads your data</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:clamp(1.6rem,3.5vw,2.4rem);color:white;letter-spacing:-0.04em;line-height:1.25;max-width:600px;margin:0 auto;">${r.identity?.headline || '—'}</div>
+      <div style="margin-top:20px;font-size:0.82rem;color:rgba(255,255,255,0.4);max-width:480px;margin-left:auto;margin-right:auto;line-height:1.65;">${(r.identity?.insight || '').split('.').slice(0,2).join('.') + '.'}</div>
+    </div>
+
+    <!-- SECTION 1: Identity — compact -->
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;">
       <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
         ${radarSVG}
-        <div style="flex:1;min-width:200px;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:12px;">${r.identity?.headline || '—'}</div>
-          <div style="font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.75;margin-bottom:16px;">${r.identity?.insight || ''}</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:10px;padding:10px 12px;">
-              <span style="color:#34D399;font-size:0.8rem;flex-shrink:0;">✦</span>
-              <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.identity?.strength || ''}</span>
-            </div>
-            <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:10px 12px;">
-              <span style="color:#EF4444;font-size:0.8rem;flex-shrink:0;">⚠</span>
-              <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.identity?.risk || ''}</span>
-            </div>
+        <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:8px;justify-content:center;">
+          <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:10px;padding:10px 12px;">
+            <span style="color:#34D399;flex-shrink:0;">✦</span>
+            <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.strength || ''}</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:10px 12px;">
+            <span style="color:#EF4444;flex-shrink:0;">⚠</span>
+            <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.risk || ''}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SECTION 2: Market Value -->
-    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;">
+    <!-- SECTION 2: Market Value — compact -->
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#F59E0B,transparent);"></div>
-      <div style="font-size:0.6rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">💼 Your Market Value</div>
-
-      <!-- Salary visual — qualitative only, no hallucinated numbers -->
-      <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:16px;padding:20px;margin-bottom:16px;">
-        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#F59E0B;letter-spacing:-0.03em;margin-bottom:4px;">${r.market?.value_label || 'Early-stage Associate'}</div>
-        <div style="font-size:0.75rem;color:rgba(245,158,11,0.5);margin-bottom:12px;">Your current market position</div>
-        <!-- Career stage spectrum -->
-        <div style="position:relative;height:8px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
-          <div style="position:absolute;left:10%;width:25%;height:100%;background:linear-gradient(90deg,#F59E0B,#FFD080);border-radius:100px;box-shadow:0 0 12px rgba(245,158,11,0.4);"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.2);margin-top:5px;">
-          <span>Student</span><span>Associate</span><span>Senior</span><span>Specialist</span>
-        </div>
+      <div style="font-size:0.6rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">💼 Market Value</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:#F59E0B;letter-spacing:-0.02em;flex:1;">${r.market?.value_label || '—'}</div>
       </div>
-
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:flex-start;gap:8px;">
-          <div style="width:20px;height:20px;border-radius:6px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;font-size:0.65rem;flex-shrink:0;margin-top:1px;">✓</div>
-          <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.market?.hireable_for || ''}</div>
+      <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;margin-bottom:6px;">
+        <div style="width:25%;height:100%;background:linear-gradient(90deg,#F59E0B,#FFD080);border-radius:100px;margin-left:10%;box-shadow:0 0 10px rgba(245,158,11,0.4);"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.58rem;color:rgba(255,255,255,0.2);margin-bottom:14px;"><span>Student</span><span>Associate</span><span>Senior</span><span>Specialist</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:18px;height:18px;border-radius:5px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;font-size:0.6rem;flex-shrink:0;margin-top:1px;">✓</div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.4;">${r.market?.hireable_for || ''}</div>
         </div>
-        <div style="display:flex;align-items:flex-start;gap:8px;">
-          <div style="width:20px;height:20px;border-radius:6px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#EF4444;flex-shrink:0;margin-top:1px;">✕</div>
-          <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.market?.not_hireable_for || ''}</div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:18px;height:18px;border-radius:5px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:#EF4444;flex-shrink:0;margin-top:1px;">✕</div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.4;">${r.market?.not_hireable_for || ''}</div>
         </div>
-        <div style="display:flex;align-items:flex-start;gap:8px;">
-          <div style="width:20px;height:20px;border-radius:6px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#9B91FF;flex-shrink:0;margin-top:1px;">⚡</div>
-          <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;">${r.market?.advantage || ''}</div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:18px;height:18px;border-radius:5px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:#9B91FF;flex-shrink:0;margin-top:1px;">⚡</div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.4;">${r.market?.advantage || ''}</div>
         </div>
       </div>
     </div>
 
-    <!-- SECTION 3: Countries -->
-    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;margin-bottom:12px;">
-      <div style="position:relative;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#34D399,transparent);margin-bottom:16px;transform:translateY(-24px);"></div></div>
-      <div style="font-size:0.6rem;color:#34D399;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🌍 Where To Build Your Career</div>
+    <!-- SECTION 3: Countries — compact -->
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;">
+      <div style="font-size:0.6rem;color:#34D399;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">🌍 Where To Build Your Career</div>
       <div style="display:flex;flex-direction:column;gap:8px;">${countryHTML}</div>
     </div>
 
-    <!-- SECTION 4: 90-Day Moves -->
-    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;margin-bottom:12px;">
-      <div style="font-size:0.6rem;color:#7C6FFF;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🎯 Your Next 90 Days</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">${movesHTML}</div>
+    <!-- SECTION 4: 90-Day Moves — compact -->
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;">
+      <div style="font-size:0.6rem;color:#7C6FFF;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">🎯 Your Next 90 Days</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">${movesHTML}</div>
     </div>
 
-    <!-- SECTION 5: 1-Year Target — Boarding Pass -->
-    <div class="career-card" style="background:linear-gradient(135deg,rgba(96,165,250,0.08),rgba(96,165,250,0.02));border:1px solid rgba(96,165,250,0.2);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;">
+    <!-- SECTION 5: 1-Year Target — compact -->
+    <div class="career-card" style="background:linear-gradient(135deg,rgba(96,165,250,0.08),rgba(96,165,250,0.02));border:1px solid rgba(96,165,250,0.2);border-radius:24px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#60A5FA,transparent);"></div>
-      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(96,165,250,0.1),transparent 70%);pointer-events:none;"></div>
-      <div style="font-size:0.6rem;color:#60A5FA;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">🏆 Your 1-Year Target</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:12px;">${r.target?.headline || '—'}</div>
-      <div style="font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.75;margin-bottom:16px;">${r.target?.description || ''}</div>
-      <div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:1.2rem;">🎯</span>
-        <span style="font-size:0.82rem;color:rgba(96,165,250,0.9);line-height:1.5;">${r.target?.milestone || ''}</span>
+      <div style="font-size:0.6rem;color:#60A5FA;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:10px;">🏆 1-Year Target</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:8px;">${r.target?.headline || '—'}</div>
+      <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:12px;">${(r.target?.description || '').split('.').slice(0,2).join('.') + '.'}</div>
+      <div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1rem;">🎯</span>
+        <span style="font-size:0.78rem;color:rgba(96,165,250,0.9);line-height:1.4;">${r.target?.milestone || ''}</span>
       </div>
     </div>
 
-    <!-- SECTION 6: Truth — Locked Card -->
-    <div class="career-card truth-locked" id="truth-card" style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.2);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer;" onclick="document.getElementById('truth-locked-view').style.display='none';document.getElementById('truth-reveal').style.display='block';">
+    <!-- SECTION 6: Truth — Locked -->
+    <div class="career-card truth-locked" id="truth-card" style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.2);border-radius:24px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer;" onclick="document.getElementById('truth-locked-view').style.display='none';document.getElementById('truth-reveal').style.display='block';">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#EF4444,transparent);"></div>
-      <!-- Locked state -->
-      <div id="truth-locked-view">
-        <div style="text-align:center;padding:12px 0;">
-          <div style="font-size:1.8rem;margin-bottom:10px;">🔒</div>
-          <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:6px;">The Thing Nobody Will Tell You</div>
-          <div style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Tap to reveal — raw mentor truth</div>
-        </div>
+      <div id="truth-locked-view" style="text-align:center;padding:8px 0;">
+        <div style="font-size:1.6rem;margin-bottom:8px;">🔒</div>
+        <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:4px;">The Thing Nobody Will Tell You</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Tap to reveal</div>
       </div>
-      <!-- Revealed state -->
       <div id="truth-reveal" style="display:none;">
-        <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:12px;">⚡ The Thing Nobody Will Tell You</div>
-        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:#EF4444;letter-spacing:-0.02em;margin-bottom:12px;opacity:0.9;">${r.truth?.headline || '—'}</div>
-        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);line-height:1.8;">${r.truth?.body || ''}</div>
+        <div style="font-size:0.6rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:10px;">⚡ The Thing Nobody Will Tell You</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#EF4444;letter-spacing:-0.02em;margin-bottom:10px;opacity:0.9;">${r.truth?.headline || '—'}</div>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.7;">${r.truth?.body || ''}</div>
       </div>
     </div>
 
-    <div style="font-size:0.62rem;color:rgba(255,255,255,0.15);text-align:center;padding-top:8px;">
-      Generated ${now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Based on ${total} cases · Log more to sharpen the analysis
+    <div style="font-size:0.6rem;color:rgba(255,255,255,0.12);text-align:center;padding-top:4px;">
+      ${now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · ${total} cases
     </div>`;
 
     loading.style.display = 'none';
