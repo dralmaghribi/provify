@@ -3233,7 +3233,7 @@ body::after {
         <div class="page-header">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div>
-              <div class="page-title">Career Intelligence</div>
+              <div class="page-title" id="career-page-title">Career Intelligence</div>
               <div class="page-sub" id="career-report-meta">Updates automatically as you log more cases</div>
             </div>
             <button onclick="forceRefreshCareer()" id="career-refresh-btn" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.3);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;padding:9px 18px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(124,111,255,0.22)'" onmouseout="this.style.background='rgba(124,111,255,0.12)'">
@@ -3242,6 +3242,9 @@ body::after {
             </button>
           </div>
         </div>
+
+        <!-- ═══ LIVE VISUAL DASHBOARD — always on, no generate needed ═══ -->
+        <div id="career-live-dashboard" style="display:none;margin-bottom:24px;"></div>
 
         <!-- Career Report — auto-loads -->
         <div id="career-loading" style="padding:48px 20px;text-align:center;color:var(--gray);">
@@ -3255,7 +3258,7 @@ body::after {
         <div id="career-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--gray);">
           <div style="font-size:3rem;margin-bottom:16px;opacity:0.4;">🧠</div>
           <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white-dim);margin-bottom:10px;">Your career intelligence — log 3 cases to unlock</div>
-          <div style="font-size:0.875rem;line-height:1.7;max-width:320px;margin:0 auto;">Your Career Intelligence Report generates automatically once you have 3 cases documented — no trial limit on career features. The more you log, the more specific it gets.</div>
+          <div style="font-size:0.875rem;line-height:1.7;max-width:320px;margin:0 auto;">Your Career Intelligence Report generates automatically once you have 3 cases documented. The more you log, the more specific it gets.</div>
         </div>
       </div>
 
@@ -3835,7 +3838,7 @@ function showView(view) {
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderPortfolioCases();
   if (view === 'profile') loadProfileForm();
-  if (view === 'career') loadClinicalProfileDisplay();
+  if (view === 'career') { renderLiveCareerDashboard(); loadClinicalProfileDisplay(); }
 }
 
 // ─── CASES ───
@@ -8668,6 +8671,307 @@ async function refreshClinicalProfile() {
   await updateClinicalMemory();
   btn.textContent = '↻ Refresh'; btn.disabled = false;
   showToast('Clinical profile updated ✓');
+}
+
+// ═══ LIVE CAREER DASHBOARD ═══
+// Real salary data researched from ERI, Glassdoor, industry sources 2025-2026
+const CAREER_DATA = {
+  salaries: {
+    general: {
+      'UAE':         { min: 15000,  max: 35000,  currency: 'AED', taxFree: true  },
+      'Saudi Arabia':{ min: 12000,  max: 28000,  currency: 'SAR', taxFree: true  },
+      'UK':          { min: 5000,   max: 12000,  currency: 'GBP', taxFree: false },
+      'Australia':   { min: 8000,   max: 18000,  currency: 'AUD', taxFree: false },
+      'Canada':      { min: 7000,   max: 16000,  currency: 'CAD', taxFree: false },
+      'USA':         { min: 12000,  max: 22000,  currency: 'USD', taxFree: false },
+      'Germany':     { min: 5000,   max: 11000,  currency: 'EUR', taxFree: false },
+      'Qatar':       { min: 18000,  max: 38000,  currency: 'QAR', taxFree: true  },
+    },
+    endo: {
+      'UAE':         { min: 35000,  max: 70000,  currency: 'AED', taxFree: true  },
+      'Saudi Arabia':{ min: 28000,  max: 55000,  currency: 'SAR', taxFree: true  },
+      'UK':          { min: 8000,   max: 18000,  currency: 'GBP', taxFree: false },
+      'Australia':   { min: 12000,  max: 25000,  currency: 'AUD', taxFree: false },
+      'Canada':      { min: 15000,  max: 30000,  currency: 'CAD', taxFree: false },
+      'USA':         { min: 20000,  max: 35000,  currency: 'USD', taxFree: false },
+      'Germany':     { min: 7000,   max: 14000,  currency: 'EUR', taxFree: false },
+      'Qatar':       { min: 30000,  max: 65000,  currency: 'QAR', taxFree: true  },
+    },
+    surgery: {
+      'UAE':         { min: 40000,  max: 85000,  currency: 'AED', taxFree: true  },
+      'Saudi Arabia':{ min: 32000,  max: 65000,  currency: 'SAR', taxFree: true  },
+      'UK':          { min: 9000,   max: 20000,  currency: 'GBP', taxFree: false },
+      'Australia':   { min: 14000,  max: 28000,  currency: 'AUD', taxFree: false },
+      'Canada':      { min: 16000,  max: 32000,  currency: 'CAD', taxFree: false },
+      'USA':         { min: 22000,  max: 40000,  currency: 'USD', taxFree: false },
+      'Germany':     { min: 8000,   max: 16000,  currency: 'EUR', taxFree: false },
+      'Qatar':       { min: 35000,  max: 75000,  currency: 'QAR', taxFree: true  },
+    },
+    prostho: {
+      'UAE':         { min: 38000,  max: 75000,  currency: 'AED', taxFree: true  },
+      'Saudi Arabia':{ min: 30000,  max: 60000,  currency: 'SAR', taxFree: true  },
+      'UK':          { min: 8000,   max: 18000,  currency: 'GBP', taxFree: false },
+      'Australia':   { min: 13000,  max: 26000,  currency: 'AUD', taxFree: false },
+      'Canada':      { min: 15000,  max: 30000,  currency: 'CAD', taxFree: false },
+      'USA':         { min: 20000,  max: 36000,  currency: 'USD', taxFree: false },
+      'Germany':     { min: 7000,   max: 15000,  currency: 'EUR', taxFree: false },
+      'Qatar':       { min: 32000,  max: 68000,  currency: 'QAR', taxFree: true  },
+    },
+    paeds: {
+      'UAE':         { min: 25000,  max: 55000,  currency: 'AED', taxFree: true  },
+      'Saudi Arabia':{ min: 20000,  max: 45000,  currency: 'SAR', taxFree: true  },
+      'UK':          { min: 6000,   max: 14000,  currency: 'GBP', taxFree: false },
+      'Australia':   { min: 10000,  max: 22000,  currency: 'AUD', taxFree: false },
+      'Canada':      { min: 12000,  max: 25000,  currency: 'CAD', taxFree: false },
+      'USA':         { min: 16000,  max: 28000,  currency: 'USD', taxFree: false },
+      'Germany':     { min: 6000,   max: 12000,  currency: 'EUR', taxFree: false },
+      'Qatar':       { min: 22000,  max: 50000,  currency: 'QAR', taxFree: true  },
+    },
+  },
+  // Demand score 0-10 per specialty per country (10 = highest demand)
+  demand: {
+    general: {
+      'UAE':9,'Saudi Arabia':8,'UK':9,'Australia':8,'Canada':8,'USA':7,'Germany':6,'Qatar':8
+    },
+    endo: {
+      'UAE':9,'Saudi Arabia':9,'UK':8,'Australia':7,'Canada':7,'USA':8,'Germany':6,'Qatar':9
+    },
+    surgery: {
+      'UAE':8,'Saudi Arabia':9,'UK':7,'Australia':8,'Canada':8,'USA':9,'Germany':7,'Qatar':8
+    },
+    prostho: {
+      'UAE':9,'Saudi Arabia':8,'UK':6,'Australia':7,'Canada':7,'USA':8,'Germany':8,'Qatar':8
+    },
+    paeds: {
+      'UAE':7,'Saudi Arabia':8,'UK':8,'Australia':9,'Canada':9,'USA':9,'Germany':7,'Qatar':7
+    },
+  },
+  // Entry difficulty 0-10 (10 = easiest to enter)
+  entry: {
+    general: {
+      'UAE':7,'Saudi Arabia':7,'UK':5,'Australia':4,'Canada':4,'USA':3,'Germany':4,'Qatar':7
+    },
+    endo: {
+      'UAE':7,'Saudi Arabia':7,'UK':5,'Australia':4,'Canada':4,'USA':3,'Germany':4,'Qatar':7
+    },
+    surgery: {
+      'UAE':6,'Saudi Arabia':6,'UK':4,'Australia':3,'Canada':3,'USA':2,'Germany':4,'Qatar':6
+    },
+    prostho: {
+      'UAE':7,'Saudi Arabia':7,'UK':5,'Australia':4,'Canada':4,'USA':3,'Germany':5,'Qatar':7
+    },
+    paeds: {
+      'UAE':7,'Saudi Arabia':7,'UK':5,'Australia':4,'Canada':5,'USA':3,'Germany':4,'Qatar':7
+    },
+  }
+};
+
+function getCareerSpecialty() {
+  const role = currentProfile?.role || 'intern';
+  const dominant = ['endo','restorative','surgery','paeds','prostho']
+    .map(s => ({ s, n: allCases.filter(c => c.specialty === s).length }))
+    .sort((a,b) => b.n - a.n)[0];
+  if (!dominant || dominant.n === 0) return 'general';
+  return dominant.s === 'restorative' ? 'general' : dominant.s;
+}
+
+function getClinicianScore() {
+  const total = allCases.length;
+  if (total === 0) return 0;
+  const avg = allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total;
+  const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
+  const specialties = new Set(allCases.map(c => c.specialty)).size;
+  const withPhotos = allCases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0).length;
+  // Score formula: volume(30%) + complexity(40%) + breadth(20%) + documentation(10%)
+  const volumeScore = Math.min(total / 50, 1) * 30;
+  const complexScore = (avg / 10) * 40;
+  const breadthScore = (Math.min(specialties, 4) / 4) * 20;
+  const docScore = (Math.min(withPhotos / Math.max(total, 1), 1)) * 10;
+  return Math.round(volumeScore + complexScore + breadthScore + docScore);
+}
+
+function getMarketMatch(country, spec) {
+  const total = allCases.length;
+  const avg = total > 0 ? allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total : 0;
+  const demand = CAREER_DATA.demand[spec]?.[country] || 5;
+  const entry = CAREER_DATA.entry[spec]?.[country] || 5;
+  // Match based on: case volume, complexity, entry ease
+  const volumeMatch = Math.min(total / 30, 1) * 30;
+  const complexMatch = (avg / 10) * 40;
+  const entryMatch = (entry / 10) * 30;
+  return Math.round(volumeMatch + complexMatch + entryMatch);
+}
+
+function renderLiveCareerDashboard() {
+  const dashboard = document.getElementById('career-live-dashboard');
+  if (!dashboard || allCases.length < 1) return;
+
+  dashboard.style.display = 'block';
+
+  const spec = getCareerSpecialty();
+  const score = getClinicianScore();
+  const total = allCases.length;
+  const avg = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : 0;
+
+  const specSalaries = CAREER_DATA.salaries[spec] || CAREER_DATA.salaries.general;
+  const specDemand = CAREER_DATA.demand[spec] || CAREER_DATA.demand.general;
+
+  const specLabel = { endo:'Endodontics', surgery:'Oral Surgery', prostho:'Prosthodontics', paeds:'Paediatric Dentistry', general:'General Dentistry' }[spec] || 'General Dentistry';
+
+  // Top 3 countries by opportunity score (demand + entry + salary weight)
+  const countryRanking = Object.keys(specSalaries).map(c => ({
+    name: c,
+    demand: specDemand[c] || 5,
+    entry: CAREER_DATA.entry[spec]?.[c] || 5,
+    match: getMarketMatch(c, spec),
+    sal: specSalaries[c],
+    opportunity: ((specDemand[c] || 5) + (CAREER_DATA.entry[spec]?.[c] || 5)) / 2
+  })).sort((a,b) => b.opportunity - a.opportunity);
+
+  const top3 = countryRanking.slice(0, 3);
+  const topCountry = top3[0];
+
+  // Score ring circumference
+  const r = 52, circ = 2 * Math.PI * r;
+  const scoreDash = (score / 100) * circ;
+
+  // Salary bar for top country
+  const topSal = topCountry.sal;
+
+  const flags = { 'UAE':'🇦🇪','Saudi Arabia':'🇸🇦','UK':'🇬🇧','Australia':'🇦🇺','Canada':'🇨🇦','USA':'🇺🇸','Germany':'🇩🇪','Qatar':'🇶🇦' };
+
+  dashboard.innerHTML = `
+  <style>
+    @keyframes dashFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes scoreRingAnim{from{stroke-dashoffset:${circ}}to{stroke-dashoffset:${circ - scoreDash}}}
+    @keyframes barGrow{from{width:0}to{width:100%}}
+    .cd-card{animation:dashFadeUp 0.4s ease both;}
+    .cd-card:nth-child(1){animation-delay:0.05s}
+    .cd-card:nth-child(2){animation-delay:0.1s}
+    .cd-card:nth-child(3){animation-delay:0.15s}
+    .cd-card:nth-child(4){animation-delay:0.2s}
+  </style>
+
+  <!-- ROW 1: Clinician Score + Top Market -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+
+    <!-- CLINICIAN SCORE -->
+    <div class="cd-card" style="background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(124,111,255,0.04));border:1px solid rgba(124,111,255,0.25);border-radius:20px;padding:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7C6FFF,transparent);"></div>
+      <div style="font-size:0.52rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:12px;">Clinician Score</div>
+      <div style="position:relative;width:120px;height:120px;">
+        <svg width="120" height="120" viewBox="0 0 120 120" style="transform:rotate(-90deg);">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="8"/>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="url(#scoreGrad)" stroke-width="8"
+            stroke-linecap="round"
+            stroke-dasharray="${circ}"
+            stroke-dashoffset="${circ - scoreDash}"
+            style="animation:scoreRingAnim 1.2s cubic-bezier(0.34,1.2,0.64,1) 0.3s both;"/>
+          <defs>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#7C6FFF"/>
+              <stop offset="100%" stop-color="#34D399"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:white;line-height:1;letter-spacing:-0.04em;">${score}</div>
+          <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">/100</div>
+        </div>
+      </div>
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:10px;line-height:1.3;">Grows with every<br>case you log</div>
+    </div>
+
+    <!-- TOP MARKET -->
+    <div class="cd-card" style="background:linear-gradient(135deg,rgba(52,211,153,0.1),rgba(52,211,153,0.03));border:1px solid rgba(52,211,153,0.2);border-radius:20px;padding:20px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#34D399,transparent);"></div>
+      <div style="font-size:0.52rem;color:rgba(52,211,153,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:8px;">Best Market For You</div>
+      <div style="font-size:2rem;margin-bottom:4px;">${flags[topCountry.name] || '🌍'}</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;margin-bottom:4px;letter-spacing:-0.02em;">${topCountry.name}</div>
+      <div style="font-size:0.65rem;color:rgba(52,211,153,0.6);margin-bottom:12px;">${topCountry.sal.taxFree ? '✦ Tax-free' : ''}</div>
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:4px;">Monthly salary</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#34D399;letter-spacing:-0.02em;">${topSal.min.toLocaleString()}–${topSal.max.toLocaleString()} <span style="font-size:0.65rem;color:rgba(52,211,153,0.5);">${topSal.currency}</span></div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-bottom:3px;">Your market match</div>
+        <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+          <div style="height:100%;width:${topCountry.match}%;background:linear-gradient(90deg,#34D399,#7C6FFF);border-radius:100px;transition:width 1s ease;"></div>
+        </div>
+        <div style="font-size:0.6rem;color:#34D399;margin-top:3px;">${topCountry.match}% match</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: Salary by Country -->
+  <div class="cd-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:0.55rem;color:rgba(245,158,11,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;">💰 Monthly Salary — ${specLabel}</div>
+      ${topSal.taxFree ? '<div style="font-size:0.52rem;color:rgba(52,211,153,0.5);background:rgba(52,211,153,0.08);padding:2px 8px;border-radius:100px;">Tax-free highlighted</div>' : ''}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${Object.entries(specSalaries).map(([country, sal]) => {
+        const maxSalUSD = sal.max;
+        const globalMax = Math.max(...Object.values(specSalaries).map(s => s.max));
+        const barWidth = Math.round((maxSalUSD / globalMax) * 100);
+        const isTop = country === topCountry.name;
+        return `
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:20px;text-align:center;font-size:1rem;">${flags[country] || '🌍'}</div>
+            <div style="width:90px;font-size:0.7rem;color:rgba(255,255,255,${isTop ? '0.9' : '0.5'});font-weight:${isTop ? '600' : '400'};">${country}</div>
+            <div style="flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;">
+              <div style="height:100%;width:${barWidth}%;background:${isTop ? 'linear-gradient(90deg,#34D399,#7C6FFF)' : sal.taxFree ? 'rgba(52,211,153,0.4)' : 'rgba(124,111,255,0.35)'};border-radius:100px;transition:width 1s ease 0.3s;"></div>
+            </div>
+            <div style="width:80px;text-align:right;font-size:0.65rem;color:${isTop ? '#34D399' : 'rgba(255,255,255,0.35)'};">${sal.min.toLocaleString()}–${sal.max.toLocaleString()} <span style="font-size:0.55rem;opacity:0.6;">${sal.currency}</span></div>
+          </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- ROW 3: Country Opportunity Map (visual cards) -->
+  <div class="cd-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:10px;">
+    <div style="font-size:0.55rem;color:rgba(96,165,250,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">🌍 Opportunity by Country — ${specLabel}</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+      ${Object.keys(specSalaries).map(country => {
+        const demand = specDemand[country] || 5;
+        const entry = CAREER_DATA.entry[spec]?.[country] || 5;
+        const match = getMarketMatch(country, spec);
+        const isTop = country === topCountry.name;
+        const heatColor = demand >= 8 ? '#34D399' : demand >= 6 ? '#F59E0B' : '#EF4444';
+        return `
+          <div style="background:${isTop ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.02)'};border:1px solid ${isTop ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.06)'};border-radius:14px;padding:12px 8px;text-align:center;position:relative;">
+            ${isTop ? '<div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:0.45rem;color:#34D399;background:rgba(52,211,153,0.15);padding:1px 6px;border-radius:0 0 6px 6px;font-weight:700;white-space:nowrap;">TOP</div>' : ''}
+            <div style="font-size:1.3rem;margin-bottom:4px;">${flags[country] || '🌍'}</div>
+            <div style="font-size:0.58rem;color:rgba(255,255,255,${isTop ? '0.8' : '0.4'});margin-bottom:6px;font-weight:${isTop ? '600' : '400'};">${country.replace('Saudi Arabia','KSA').replace('Australia','AUS').replace('Germany','DE')}</div>
+            <!-- Demand heat dot -->
+            <div style="width:8px;height:8px;border-radius:50%;background:${heatColor};margin:0 auto 4px;box-shadow:0 0 6px ${heatColor}50;"></div>
+            <div style="font-size:0.52rem;color:rgba(255,255,255,0.25);">Demand ${demand}/10</div>
+          </div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
+      <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);">Demand:</div>
+      <div style="display:flex;align-items:center;gap:4px;"><div style="width:6px;height:6px;border-radius:50%;background:#34D399;"></div><span style="font-size:0.52rem;color:rgba(255,255,255,0.2);">High (8+)</span></div>
+      <div style="display:flex;align-items:center;gap:4px;"><div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;"></div><span style="font-size:0.52rem;color:rgba(255,255,255,0.2);">Medium</span></div>
+      <div style="display:flex;align-items:center;gap:4px;"><div style="width:6px;height:6px;border-radius:50%;background:#EF4444;"></div><span style="font-size:0.52rem;color:rgba(255,255,255,0.2);">Lower</span></div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Market Match per country -->
+  <div class="cd-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;">
+    <div style="font-size:0.55rem;color:rgba(155,145,255,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">⚡ Your Profile Match — Updates as you log</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${countryRanking.slice(0,5).map((c, i) => `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:20px;text-align:center;font-size:0.9rem;">${flags[c.name] || '🌍'}</div>
+          <div style="width:80px;font-size:0.7rem;color:rgba(255,255,255,${i === 0 ? '0.9' : '0.5'});">${c.name.replace('Saudi Arabia','KSA')}</div>
+          <div style="flex:1;height:8px;background:rgba(255,255,255,0.04);border-radius:100px;overflow:hidden;">
+            <div style="height:100%;width:${c.match}%;background:${i === 0 ? 'linear-gradient(90deg,#7C6FFF,#34D399)' : 'rgba(124,111,255,0.3)'};border-radius:100px;transition:width 1.2s ease ${i * 0.1}s;"></div>
+          </div>
+          <div style="width:36px;text-align:right;font-size:0.68rem;color:${i === 0 ? '#9B91FF' : 'rgba(255,255,255,0.3)'};">${c.match}%</div>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:12px;font-size:0.62rem;color:rgba(255,255,255,0.15);text-align:center;">Log more complex cases to increase your match percentage</div>
+  </div>`;
 }
 
 function loadClinicalProfileDisplay() {
