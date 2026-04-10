@@ -8680,83 +8680,239 @@ async function refreshClinicalProfile() {
 }
 
 // ═══ CAREER GPS ENGINE ═══
-const GPS_GOALS = {
-  specialist: {
-    label: 'Become a Specialist',
-    icon: '🔬',
-    color: '#7C6FFF',
-    stages: [
-      { id: 'intern',     icon: '🎓', label: 'Complete Internship',     desc: 'Finish your intern year',                    auto: c => c.total >= 10,                          metric: (c) => `${Math.min(c.total,10)}/10 cases` },
-      { id: 'caseload',   icon: '📋', label: 'Build Case Volume',        desc: '50+ documented cases',                       auto: c => c.total >= 50,                          metric: (c) => `${Math.min(c.total,50)}/50 cases` },
-      { id: 'complexity', icon: '⚡', label: 'Raise Complexity',         desc: 'Avg complexity 6+/10',                       auto: c => c.avg >= 6,                             metric: (c) => `${c.avg}/10 avg` },
-      { id: 'apply',      icon: '📝', label: 'Apply to Masters',         desc: 'Submit applications',                        auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'residency',  icon: '🏥', label: 'Complete Residency',       desc: '2-3 year program',                           auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'license',    icon: '🛡', label: 'Get Specialist License',   desc: 'Register with authority',                    auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'brand',      icon: '⭐', label: 'Build Your Name',          desc: 'Known specialist in your city',              auto: () => false,                                 metric: () => 'Manual step' },
-    ]
+// ═══ CAREER GPS — ONE UNIVERSAL ROADMAP ═══
+// One path. Everyone starts here. Branches based on ambition.
+// Steps are Provify-native — only meaningful inside this app.
+
+const CAREER_STAGES = [
+  // ── FOUNDATION (everyone) ──
+  {
+    id: 'student',
+    phase: 'foundation',
+    icon: '📚',
+    label: 'Dental Student',
+    sublabel: 'Start documenting from day one',
+    provifyAction: 'Log your first case on Provify — most students never do.',
+    auto: c => c.total >= 1,
+    metric: c => `${Math.min(c.total,1)}/1 case logged`,
+    weight: 1,
+    color: '#6B7280',
   },
-  practice: {
-    label: 'Open My Own Practice',
-    icon: '🏢',
-    color: '#34D399',
-    stages: [
-      { id: 'experience', icon: '💼', label: '3 Years Associate',        desc: 'Build clinical experience',                  auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'cases',      icon: '📋', label: 'Document 100+ Cases',      desc: 'Build your clinical record',                 auto: c => c.total >= 100,                         metric: (c) => `${Math.min(c.total,100)}/100` },
-      { id: 'capital',    icon: '💰', label: 'Save Startup Capital',      desc: '$50k–$150k depending on country',            auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'license',    icon: '📄', label: 'Get Trade License',         desc: 'Register your business',                    auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'location',   icon: '📍', label: 'Secure Location',           desc: 'Sign your clinic lease',                    auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'team',       icon: '👥', label: 'Hire First Team',           desc: 'Nurse + receptionist minimum',               auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'breakeven',  icon: '📈', label: 'Hit Break-Even',            desc: 'Month 8 target',                             auto: () => false,                                 metric: () => 'Manual step' },
-    ]
-  },
-  brand: {
-    label: 'Build a Personal Brand',
-    icon: '⭐',
-    color: '#F59E0B',
-    stages: [
-      { id: 'document',   icon: '📋', label: 'Document Everything',      desc: 'Every case logged on Provify',               auto: c => c.total >= 20,                          metric: (c) => `${Math.min(c.total,20)}/20 cases` },
-      { id: 'identity',   icon: '🎯', label: 'Pick Your Niche',           desc: 'One specialty, one city',                    auto: c => c.dominant >= 0.6,                      metric: (c) => `${Math.round(c.dominant*100)}% focused` },
-      { id: 'content',    icon: '📱', label: 'Start Posting Content',     desc: '2x per week clinical content',               auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'speak',      icon: '🎤', label: 'Speak at One Event',        desc: 'Local dental conference or study club',      auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'network',    icon: '🤝', label: 'Build Referral Network',    desc: '10 dentists sending you cases',              auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'publish',    icon: '✍️', label: 'Publish Case Study',        desc: 'One article or featured case',               auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'authority',  icon: '👑', label: 'Become the Authority',      desc: 'Go-to name in your specialty',               auto: () => false,                                 metric: () => 'Ongoing' },
-    ]
-  },
-  international: {
-    label: 'Work Internationally',
-    icon: '🌍',
-    color: '#60A5FA',
-    stages: [
-      { id: 'cases',      icon: '📋', label: 'Build Case Record',         desc: '30+ documented cases',                       auto: c => c.total >= 30,                          metric: (c) => `${Math.min(c.total,30)}/30 cases` },
-      { id: 'complexity', icon: '⚡', label: 'Prove Clinical Level',      desc: 'Avg complexity 5+/10',                       auto: c => c.avg >= 5,                             metric: (c) => `${c.avg}/10 avg` },
-      { id: 'research',   icon: '🔍', label: 'Research Target Country',   desc: 'Licensing requirements & visa',              auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'exams',      icon: '📝', label: 'Pass Licensing Exams',      desc: 'Country-specific exam',                     auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'apply',      icon: '✈️', label: 'Apply & Relocate',          desc: 'Secure job offer first',                     auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'establish',  icon: '🏥', label: 'Establish Locally',         desc: 'Build patient base in new country',          auto: () => false,                                 metric: () => 'Manual step' },
-    ]
-  },
-  academic: {
-    label: 'Academic & Teaching Career',
+  {
+    id: 'intern',
+    phase: 'foundation',
     icon: '🎓',
+    label: 'Intern',
+    sublabel: 'Build your first real clinical record',
+    provifyAction: 'Log 30+ cases. Your Provify record is your first CV.',
+    auto: c => c.total >= 30,
+    metric: c => `${Math.min(c.total,30)}/30 cases`,
+    weight: 2,
+    color: '#7C6FFF',
+  },
+  {
+    id: 'gp',
+    phase: 'foundation',
+    icon: '🦷',
+    label: 'General Dentist',
+    sublabel: 'Work in a clinic, earn, build your reputation',
+    provifyAction: 'Hit 80+ cases with avg complexity 4+. Show this record when negotiating your next salary.',
+    auto: c => c.total >= 80 && c.avg >= 4,
+    metric: c => `${Math.min(c.total,80)}/80 cases · ${c.avg}/4 avg complexity`,
+    weight: 3,
+    color: '#34D399',
+  },
+
+  // ── BRANCH: SPECIALIST ──
+  {
+    id: 'spec_focus',
+    phase: 'specialist',
+    icon: '🔬',
+    label: 'Prove Specialty Focus',
+    sublabel: 'Masters programs look at your case mix',
+    provifyAction: 'Log 50+ cases in your target specialty. 70%+ focus in one area is what gets you shortlisted.',
+    auto: c => c.total >= 50 && c.dominant >= 0.65,
+    metric: c => `${Math.round(c.dominant*100)}% specialty focus · ${Math.min(c.total,50)}/50 cases`,
+    weight: 2,
+    color: '#7C6FFF',
+    branch: 'specialist',
+  },
+  {
+    id: 'spec_complexity',
+    phase: 'specialist',
+    icon: '⚡',
+    label: 'Raise Your Clinical Ceiling',
+    sublabel: 'Low complexity cases won\'t get you into a Masters',
+    provifyAction: 'Get avg complexity to 6+/10 on Provify. Seek the hard cases, document every one.',
+    auto: c => c.avg >= 6,
+    metric: c => `${c.avg}/10 avg — need 6.0`,
+    weight: 2,
     color: '#9B91FF',
-    stages: [
-      { id: 'cases',      icon: '📋', label: 'Build Clinical Record',     desc: '50+ diverse documented cases',               auto: c => c.total >= 50,                          metric: (c) => `${Math.min(c.total,50)}/50` },
-      { id: 'specialty',  icon: '🔬', label: 'Complete Specialty',        desc: 'Masters or specialist qualification',        auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'publish',    icon: '✍️', label: 'Publish Research',          desc: 'First peer-reviewed paper',                  auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'teach',      icon: '👨‍🏫', label: 'Start Teaching',           desc: 'Guest lecturer or demonstrator role',        auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'position',   icon: '🏛', label: 'University Position',       desc: 'Lecturer or clinical faculty role',          auto: () => false,                                 metric: () => 'Manual step' },
-      { id: 'phd',        icon: '🎓', label: 'PhD or Higher Degree',      desc: 'Research doctorate',                         auto: () => false,                                 metric: () => 'Manual step' },
-    ]
-  }
+    branch: 'specialist',
+  },
+  {
+    id: 'spec_apply',
+    phase: 'specialist',
+    icon: '📨',
+    label: 'Apply to Masters Program',
+    sublabel: 'Your Provify portfolio is your application',
+    provifyAction: 'Export your Provify portfolio PDF. It shows your case volume, complexity, and specialty depth. Send it with every application.',
+    auto: () => false,
+    metric: () => 'Unlock: export portfolio from Provify',
+    weight: 3,
+    color: '#7C6FFF',
+    branch: 'specialist',
+  },
+  {
+    id: 'spec_residency',
+    phase: 'specialist',
+    icon: '🏥',
+    label: 'Complete Residency',
+    sublabel: '2–3 years. Work clinically in parallel if possible.',
+    provifyAction: 'Keep logging during residency. Your complexity score will jump — that jump is proof of your training.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 4,
+    color: '#7C6FFF',
+    branch: 'specialist',
+  },
+  {
+    id: 'spec_qualified',
+    phase: 'specialist',
+    icon: '🏆',
+    label: 'Qualified Specialist',
+    sublabel: 'You are now in the top 5% of dentists',
+    provifyAction: 'Update your Provify profile to Specialist. Your career section now shows specialist salary data for your market.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 5,
+    color: '#F59E0B',
+    branch: 'specialist',
+  },
+
+  // ── BRANCH: PRACTICE OWNER ──
+  {
+    id: 'own_record',
+    phase: 'owner',
+    icon: '📋',
+    label: 'Build a Record Worth Showing',
+    sublabel: 'Banks and investors want to see clinical credibility',
+    provifyAction: 'Hit 100+ documented cases. This is the number that makes a bank take you seriously when you apply for a clinic loan.',
+    auto: c => c.total >= 100,
+    metric: c => `${Math.min(c.total,100)}/100 cases`,
+    weight: 2,
+    color: '#34D399',
+    branch: 'owner',
+  },
+  {
+    id: 'own_capital',
+    phase: 'owner',
+    icon: '💰',
+    label: 'Save or Secure $80–150k',
+    sublabel: 'Start small. One chair. One location.',
+    provifyAction: 'Work as a general dentist for 3–5 years while saving. $80k covers a small single-chair setup in GCC. $150k gives you a real start.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 3,
+    color: '#F59E0B',
+    branch: 'owner',
+  },
+  {
+    id: 'own_open',
+    phase: 'owner',
+    icon: '🏢',
+    label: 'Open First Clinic',
+    sublabel: 'Start with one chair. Prove the model first.',
+    provifyAction: 'Document every case from day one in your own clinic on Provify. Your record protects you from day one as an owner.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 4,
+    color: '#34D399',
+    branch: 'owner',
+  },
+  {
+    id: 'own_scale',
+    phase: 'owner',
+    icon: '📈',
+    label: 'Scale to Multiple Clinics',
+    sublabel: 'Hire other dentists. You become the brand.',
+    provifyAction: 'Your Provify case history shows the clinical standard you built the business on.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 5,
+    color: '#34D399',
+    branch: 'owner',
+  },
+
+  // ── PINNACLE: PERSONAL BRAND (unlocks after specialist OR owner) ──
+  {
+    id: 'brand_identity',
+    phase: 'brand',
+    icon: '🎯',
+    label: 'Own One Thing in Dentistry',
+    sublabel: 'The best brands are known for one specific thing',
+    provifyAction: 'Your Provify specialty focus shows what you are. When 80%+ of your cases are one specialty — that\'s your identity.',
+    auto: c => c.dominant >= 0.75,
+    metric: c => `${Math.round(c.dominant*100)}% specialty focus`,
+    weight: 2,
+    color: '#F59E0B',
+    branch: 'brand',
+  },
+  {
+    id: 'brand_content',
+    phase: 'brand',
+    icon: '📱',
+    label: 'Teach Publicly',
+    sublabel: 'Post clinical content. Share cases. Educate.',
+    provifyAction: 'Use your Provify case record as content fuel. Every documented case is a potential post.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 2,
+    color: '#F59E0B',
+    branch: 'brand',
+  },
+  {
+    id: 'brand_speak',
+    phase: 'brand',
+    icon: '🎤',
+    label: 'Speak at a Dental Event',
+    sublabel: 'One talk changes how your peers see you',
+    provifyAction: 'Your Provify complexity history and case record is your speaking credential.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 3,
+    color: '#F59E0B',
+    branch: 'brand',
+  },
+  {
+    id: 'brand_authority',
+    phase: 'brand',
+    icon: '👑',
+    label: 'Become the Name',
+    sublabel: 'The dentist everyone in your city knows for your specialty',
+    provifyAction: 'You built this on Provify from case one.',
+    auto: () => false,
+    metric: () => 'Manual milestone',
+    weight: 5,
+    color: '#F59E0B',
+    branch: 'brand',
+  },
+];
+
+// Which stages show per goal selection
+const GOAL_STAGES = {
+  specialist: ['student','intern','gp','spec_focus','spec_complexity','spec_apply','spec_residency','spec_qualified'],
+  owner:      ['student','intern','gp','own_record','own_capital','own_open','own_scale'],
+  brand:      ['student','intern','gp','spec_focus','spec_qualified','own_open','brand_identity','brand_content','brand_speak','brand_authority'],
+  gp:         ['student','intern','gp','own_record'],
 };
 
 function getGPSData() {
-  return JSON.parse(localStorage.getItem(`provify_gps_${currentUser?.id}`) || 'null');
+  try { return JSON.parse(localStorage.getItem(`provify_gps_${currentUser?.id}`) || 'null'); } catch(e) { return null; }
 }
 
 function saveGPSData(data) {
-  localStorage.setItem(`provify_gps_${currentUser?.id}`, JSON.stringify(data));
+  try { localStorage.setItem(`provify_gps_${currentUser?.id}`, JSON.stringify(data)); } catch(e) {}
 }
 
 function getGPSContext() {
@@ -8771,11 +8927,8 @@ function renderCareerGPS() {
   const gpsData = getGPSData();
   const setupEl = document.getElementById('career-gps-setup');
   const roadmapEl = document.getElementById('career-gps-roadmap');
-
   if (!setupEl || !roadmapEl) return;
-
   if (!gpsData) {
-    // Show setup screen
     setupEl.style.display = 'block';
     roadmapEl.style.display = 'none';
     renderGPSSetup(setupEl);
@@ -8789,238 +8942,267 @@ function renderCareerGPS() {
 function renderGPSSetup(el) {
   el.innerHTML = `
   <style>
-    @keyframes gpsSetupFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-    .gps-goal-btn{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:18px 16px;cursor:pointer;transition:all 0.2s;text-align:left;width:100%;display:flex;align-items:center;gap:14px;}
-    .gps-goal-btn:hover{transform:translateY(-2px);border-color:rgba(124,111,255,0.3);background:rgba(124,111,255,0.06);}
-    .gps-goal-btn.selected{border-color:rgba(124,111,255,0.5);background:rgba(124,111,255,0.1);}
-    .gps-pos-btn{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;cursor:pointer;transition:all 0.2s;text-align:center;flex:1;}
-    .gps-pos-btn:hover{border-color:rgba(124,111,255,0.3);}
-    .gps-pos-btn.selected{border-color:rgba(52,211,153,0.5);background:rgba(52,211,153,0.06);}
+    @keyframes gpsIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .gps-goal-opt{background:rgba(255,255,255,0.02);border:2px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px 18px;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:16px;}
+    .gps-goal-opt:hover{transform:translateY(-2px);border-color:rgba(124,111,255,0.35);}
+    .gps-goal-opt.sel{border-color:rgba(124,111,255,0.6);background:rgba(124,111,255,0.08);}
   </style>
-  <div style="animation:gpsSetupFade 0.4s ease both;">
-
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(124,111,255,0.04));border:1px solid rgba(124,111,255,0.2);border-radius:24px;padding:28px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;">
+  <div style="animation:gpsIn 0.5s ease both;">
+    <div style="background:linear-gradient(135deg,rgba(124,111,255,0.15),rgba(52,211,153,0.05));border:1px solid rgba(124,111,255,0.25);border-radius:28px;padding:32px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7C6FFF,#34D399,transparent);"></div>
-      <div style="font-size:2rem;margin-bottom:12px;">🗺</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;letter-spacing:-0.03em;margin-bottom:6px;">Your Career GPS</div>
-      <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);">Set once. Guides you forever.</div>
+      <div style="font-size:2.5rem;margin-bottom:12px;">🗺</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:white;letter-spacing:-0.04em;line-height:1.2;margin-bottom:8px;">Your Career GPS</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.35);max-width:280px;margin:0 auto;">One roadmap. Built around your Provify data. Updates as you grow.</div>
     </div>
 
-    <!-- Step 1: Current Position -->
-    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:10px;">
-      <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">Where are you now?</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="gps-position-btns">
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:12px;">
+      <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:14px;">What's your ultimate goal?</div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="gps-goal-opts">
         ${[
-          {id:'student',   icon:'📚', label:'Student'},
-          {id:'intern',    icon:'🎓', label:'Intern'},
-          {id:'associate', icon:'💼', label:'Associate'},
-          {id:'senior',    icon:'⭐', label:'Senior GP'},
-          {id:'specialist',icon:'🔬', label:'Specialist'},
-        ].map(p => `
-          <button class="gps-pos-btn" onclick="selectGPSPosition('${p.id}')" id="gps-pos-${p.id}">
-            <div style="font-size:1.3rem;margin-bottom:4px;">${p.icon}</div>
-            <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);font-weight:600;">${p.label}</div>
-          </button>`).join('')}
-      </div>
-    </div>
-
-    <!-- Step 2: Goal -->
-    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:10px;">
-      <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">What's your goal?</div>
-      <div style="display:flex;flex-direction:column;gap:8px;" id="gps-goal-btns">
-        ${Object.entries(GPS_GOALS).map(([id, g]) => `
-          <button class="gps-goal-btn" onclick="selectGPSGoal('${id}')" id="gps-goal-${id}">
-            <div style="font-size:1.5rem;">${g.icon}</div>
+          {id:'specialist', icon:'🔬', label:'Become a Specialist',        sub:'Masters → Specialist license → Top of your field'},
+          {id:'owner',      icon:'🏢', label:'Own My Own Clinic',           sub:'Build a practice from scratch → Scale it'},
+          {id:'brand',      icon:'👑', label:'Build a Personal Brand',      sub:'The most ambitious path — specialist + owner + known name'},
+          {id:'gp',         icon:'🦷', label:'Excel as a General Dentist',  sub:'Best GP in your city — respected, well-paid, unstoppable'},
+        ].map(g => `
+          <div class="gps-goal-opt" onclick="selectGPSGoalNew('${g.id}')" id="gps-opt-${g.id}">
+            <div style="font-size:1.8rem;flex-shrink:0;">${g.icon}</div>
             <div>
-              <div style="font-size:0.82rem;color:rgba(255,255,255,0.8);font-weight:600;">${g.label}</div>
+              <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:2px;">${g.label}</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);">${g.sub}</div>
             </div>
-          </button>`).join('')}
+          </div>`).join('')}
       </div>
     </div>
 
-    <!-- CTA -->
-    <button onclick="confirmGPSSetup()" id="gps-confirm-btn" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#34D399);color:white;font-family:'Inter',sans-serif;font-weight:700;font-size:1rem;padding:16px;border-radius:16px;border:none;cursor:pointer;opacity:0.3;pointer-events:none;transition:all 0.3s;" disabled>
+    <button onclick="confirmGPSNew()" id="gps-build-btn" disabled style="width:100%;background:linear-gradient(135deg,#7C6FFF,#34D399);color:white;font-family:'Inter',sans-serif;font-weight:700;font-size:1rem;padding:18px;border-radius:18px;border:none;cursor:pointer;opacity:0.3;pointer-events:none;transition:all 0.3s;letter-spacing:-0.01em;">
       Build My Roadmap →
     </button>
   </div>`;
-
-  window._gpsPosition = null;
-  window._gpsGoal = null;
+  window._gpsGoalNew = null;
 }
 
-function selectGPSPosition(id) {
-  document.querySelectorAll('.gps-pos-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById(`gps-pos-${id}`)?.classList.add('selected');
-  window._gpsPosition = id;
-  checkGPSReady();
+function selectGPSGoalNew(id) {
+  document.querySelectorAll('.gps-goal-opt').forEach(b => b.classList.remove('sel'));
+  document.getElementById(`gps-opt-${id}`)?.classList.add('sel');
+  window._gpsGoalNew = id;
+  const btn = document.getElementById('gps-build-btn');
+  if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; btn.disabled = false; }
 }
 
-function selectGPSGoal(id) {
-  document.querySelectorAll('.gps-goal-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById(`gps-goal-${id}`)?.classList.add('selected');
-  window._gpsGoal = id;
-  checkGPSReady();
-}
-
-function checkGPSReady() {
-  const btn = document.getElementById('gps-confirm-btn');
-  if (btn && window._gpsPosition && window._gpsGoal) {
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = 'auto';
-    btn.disabled = false;
-  }
-}
-
-function confirmGPSSetup() {
-  if (!window._gpsPosition || !window._gpsGoal) return;
-  const data = {
-    position: window._gpsPosition,
-    goal: window._gpsGoal,
-    manualChecks: {},
-    createdAt: new Date().toISOString()
-  };
-  saveGPSData(data);
+function confirmGPSNew() {
+  if (!window._gpsGoalNew) return;
+  saveGPSData({ goal: window._gpsGoalNew, manualChecks: {}, unlockedAt: {}, createdAt: new Date().toISOString() });
   renderCareerGPS();
 }
 
-function toggleGPSCheck(stageId) {
+function unlockGPSStage(stageId) {
   const data = getGPSData();
   if (!data) return;
+  // Show confirmation modal
+  const stage = CAREER_STAGES.find(s => s.id === stageId);
+  if (!stage) return;
+  // Animate then save
+  const nodeEl = document.getElementById(`gps-node-${stageId}`);
+  if (nodeEl) {
+    nodeEl.style.transform = 'scale(1.3)';
+    nodeEl.style.transition = 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)';
+    setTimeout(() => { nodeEl.style.transform = 'scale(1)'; }, 400);
+  }
   data.manualChecks = data.manualChecks || {};
+  data.unlockedAt = data.unlockedAt || {};
   data.manualChecks[stageId] = !data.manualChecks[stageId];
+  if (data.manualChecks[stageId]) {
+    data.unlockedAt[stageId] = new Date().toISOString();
+    showGPSUnlockMoment(stage);
+  }
   saveGPSData(data);
   const roadmapEl = document.getElementById('career-gps-roadmap');
   if (roadmapEl) renderGPSRoadmap(roadmapEl, data);
 }
 
+function showGPSUnlockMoment(stage) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);
+    background:linear-gradient(135deg,rgba(12,12,15,0.98),rgba(20,20,24,0.98));
+    border:1px solid ${stage.color}50;border-radius:24px;padding:32px 40px;
+    text-align:center;z-index:9999;
+    box-shadow:0 0 60px ${stage.color}30,0 24px 60px rgba(0,0,0,0.8);
+    animation:gpsUnlock 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    max-width:280px;
+  `;
+  toast.innerHTML = `
+    <style>@keyframes gpsUnlock{to{transform:translate(-50%,-50%) scale(1);opacity:1}}</style>
+    <div style="font-size:3rem;margin-bottom:12px;">${stage.icon}</div>
+    <div style="font-size:0.55rem;color:${stage.color};text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:8px;">Milestone Unlocked</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;letter-spacing:-0.02em;">${stage.label}</div>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.animation = 'none'; toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s'; setTimeout(() => toast.remove(), 400); }, 2500);
+}
+
 function resetGPS() {
-  if (currentUser) localStorage.removeItem(`provify_gps_${currentUser.id}`);
+  try { localStorage.removeItem(`provify_gps_${currentUser?.id}`); } catch(e) {}
   renderCareerGPS();
 }
 
 function renderGPSRoadmap(el, data) {
-  const goal = GPS_GOALS[data.goal];
-  if (!goal) return;
-
+  const stageIds = GOAL_STAGES[data.goal] || GOAL_STAGES.gp;
+  const stages = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
   const ctx = getGPSContext();
   const manualChecks = data.manualChecks || {};
+  const unlockedAt = data.unlockedAt || {};
 
-  const stages = goal.stages.map((s, i) => {
+  const stagesWithState = stages.map((s, i) => {
     const autoComplete = s.auto(ctx);
     const manualComplete = manualChecks[s.id] || false;
     const completed = autoComplete || manualComplete;
-    return { ...s, completed, autoComplete, manualComplete, index: i };
+    return { ...s, completed, autoComplete, index: i };
   });
 
-  const completedCount = stages.filter(s => s.completed).length;
+  const completedCount = stagesWithState.filter(s => s.completed).length;
   const progress = Math.round((completedCount / stages.length) * 100);
-  const currentStageIndex = stages.findIndex(s => !s.completed);
-  const currentStage = currentStageIndex >= 0 ? stages[currentStageIndex] : stages[stages.length - 1];
+  const nextStageIndex = stagesWithState.findIndex(s => !s.completed);
+  const nextStage = nextStageIndex >= 0 ? stagesWithState[nextStageIndex] : null;
 
-  const posLabels = { student:'Student', intern:'Intern', associate:'Associate', senior:'Senior GP', specialist:'Specialist' };
+  const goalMeta = {
+    specialist: { label: 'Become a Specialist', icon: '🔬', color: '#7C6FFF' },
+    owner:      { label: 'Own My Own Clinic',    icon: '🏢', color: '#34D399' },
+    brand:      { label: 'Build a Personal Brand', icon: '👑', color: '#F59E0B' },
+    gp:         { label: 'Excel as a General Dentist', icon: '🦷', color: '#9B91FF' },
+  }[data.goal] || { label: 'Your Career', icon: '🎯', color: '#7C6FFF' };
+
+  // Phase labels
+  const phaseLabels = { foundation: 'Foundation', specialist: 'Specialist Track', owner: 'Practice Track', brand: 'Brand Track' };
 
   el.innerHTML = `
   <style>
-    @keyframes roadmapFade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes progressGrow{from{width:0}to{width:${progress}%}}
-    .gps-stage{animation:roadmapFade 0.4s ease both;}
-    .gps-stage:nth-child(1){animation-delay:0.05s}
-    .gps-stage:nth-child(2){animation-delay:0.08s}
-    .gps-stage:nth-child(3){animation-delay:0.11s}
-    .gps-stage:nth-child(4){animation-delay:0.14s}
-    .gps-stage:nth-child(5){animation-delay:0.17s}
-    .gps-stage:nth-child(6){animation-delay:0.2s}
-    .gps-stage:nth-child(7){animation-delay:0.23s}
+    @keyframes roadIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pgrow{from{width:0}to{width:${progress}%}}
+    @keyframes nodePop{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
+    .gps-node-row{animation:roadIn 0.35s ease both;}
+    .gps-node-row:nth-child(1){animation-delay:0.03s}.gps-node-row:nth-child(2){animation-delay:0.06s}
+    .gps-node-row:nth-child(3){animation-delay:0.09s}.gps-node-row:nth-child(4){animation-delay:0.12s}
+    .gps-node-row:nth-child(5){animation-delay:0.15s}.gps-node-row:nth-child(6){animation-delay:0.18s}
+    .gps-node-row:nth-child(7){animation-delay:0.21s}.gps-node-row:nth-child(8){animation-delay:0.24s}
+    .gps-node-row:nth-child(9){animation-delay:0.27s}.gps-node-row:nth-child(10){animation-delay:0.30s}
   </style>
 
-  <!-- Header: Goal + Progress -->
-  <div style="background:linear-gradient(135deg,rgba(${goal.color === '#7C6FFF' ? '124,111,255' : goal.color === '#34D399' ? '52,211,153' : goal.color === '#F59E0B' ? '245,158,11' : goal.color === '#60A5FA' ? '96,165,250' : '155,145,255'},0.12),rgba(0,0,0,0));border:1px solid rgba(${goal.color === '#7C6FFF' ? '124,111,255' : goal.color === '#34D399' ? '52,211,153' : goal.color === '#F59E0B' ? '245,158,11' : goal.color === '#60A5FA' ? '96,165,250' : '155,145,255'},0.25);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${goal.color},transparent);"></div>
+  <!-- Progress header -->
+  <div style="background:linear-gradient(135deg,rgba(20,20,28,0.9),rgba(12,12,18,0.9));border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;margin-bottom:10px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${goalMeta.color},transparent);"></div>
+    <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,${goalMeta.color}18,transparent 65%);pointer-events:none;"></div>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="font-size:1.5rem;">${goal.icon}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:1.6rem;">${goalMeta.icon}</div>
         <div>
-          <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;">Your Goal</div>
-          <div style="font-size:0.9rem;color:white;font-weight:600;">${goal.label}</div>
+          <div style="font-size:0.52rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:2px;">Ultimate Goal</div>
+          <div style="font-size:0.95rem;color:white;font-weight:700;">${goalMeta.label}</div>
         </div>
       </div>
-      <button onclick="resetGPS()" style="background:none;border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;font-size:0.6rem;padding:5px 10px;border-radius:8px;cursor:pointer;">Change</button>
+      <button onclick="resetGPS()" style="background:none;border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.2);font-family:'Inter',sans-serif;font-size:0.58rem;padding:5px 10px;border-radius:8px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.15)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">Change goal</button>
     </div>
 
-    <!-- Progress bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-      <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);">Starting as ${posLabels[data.position] || data.position}</div>
-      <div style="font-size:0.7rem;color:${goal.color};font-weight:700;">${completedCount}/${stages.length} complete</div>
-    </div>
-    <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;margin-bottom:6px;">
-      <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,${goal.color},${goal.color}99);border-radius:100px;animation:progressGrow 1s cubic-bezier(0.34,1.2,0.64,1) 0.2s both;box-shadow:0 0 12px ${goal.color}40;"></div>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:0.55rem;color:rgba(255,255,255,0.15);">
-      <span>Start</span><span style="color:${goal.color};">${progress}%</span><span>Done</span>
-    </div>
-
-    ${currentStageIndex >= 0 ? `
-    <!-- Current focus -->
-    <div style="margin-top:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;">
-      <div style="font-size:1.2rem;">${currentStage.icon}</div>
-      <div>
-        <div style="font-size:0.52rem;color:${goal.color};text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Next step</div>
-        <div style="font-size:0.82rem;color:white;font-weight:500;">${currentStage.label}</div>
+    <!-- Big progress ring + stats -->
+    <div style="display:flex;align-items:center;gap:20px;">
+      <!-- Ring -->
+      <div style="position:relative;flex-shrink:0;">
+        <svg width="90" height="90" viewBox="0 0 90 90" style="transform:rotate(-90deg);">
+          <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
+          <circle cx="45" cy="45" r="36" fill="none" stroke="${goalMeta.color}" stroke-width="6"
+            stroke-linecap="round"
+            stroke-dasharray="${2*Math.PI*36}"
+            stroke-dashoffset="${2*Math.PI*36 * (1 - progress/100)}"
+            style="transition:stroke-dashoffset 1.2s cubic-bezier(0.34,1.2,0.64,1);"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;line-height:1;">${progress}</div>
+          <div style="font-size:0.5rem;color:rgba(255,255,255,0.3);">%</div>
+        </div>
       </div>
-      <div style="margin-left:auto;font-size:0.65rem;color:rgba(255,255,255,0.3);">${currentStage.metric(ctx)}</div>
-    </div>` : `
-    <div style="margin-top:16px;text-align:center;padding:10px;">
-      <div style="font-size:1.5rem;margin-bottom:4px;">🏆</div>
-      <div style="font-size:0.82rem;color:${goal.color};font-weight:600;">Roadmap Complete</div>
-    </div>`}
+      <!-- Stats -->
+      <div style="flex:1;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px 12px;">
+            <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${goalMeta.color};line-height:1;">${completedCount}</div>
+            <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);margin-top:2px;">of ${stages.length} done</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px 12px;">
+            <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;line-height:1;">${ctx.total}</div>
+            <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);margin-top:2px;">cases logged</div>
+          </div>
+        </div>
+        ${nextStage ? `
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;">
+          <div style="font-size:1rem;">${nextStage.icon}</div>
+          <div>
+            <div style="font-size:0.5rem;color:${goalMeta.color};text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Up next</div>
+            <div style="font-size:0.72rem;color:white;font-weight:500;">${nextStage.label}</div>
+          </div>
+        </div>` : `
+        <div style="text-align:center;padding:8px;">
+          <div style="font-size:0.8rem;color:${goalMeta.color};font-weight:600;">🏆 Roadmap Complete</div>
+        </div>`}
+      </div>
+    </div>
   </div>
 
-  <!-- Stage nodes — visual path -->
-  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:12px;">
-    <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:16px;">Roadmap</div>
+  <!-- Stage path -->
+  <div style="background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);border-radius:24px;padding:20px 20px 16px;margin-bottom:10px;">
     <div style="position:relative;">
-      <!-- Vertical line -->
-      <div style="position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:rgba(255,255,255,0.06);border-radius:100px;"></div>
-      <!-- Progress line -->
-      <div style="position:absolute;left:19px;top:20px;width:2px;height:${Math.max(0, (completedCount / stages.length) * (stages.length > 1 ? 100 - (100/stages.length) : 0))}%;background:linear-gradient(180deg,${goal.color},${goal.color}40);border-radius:100px;transition:height 1s ease;"></div>
+      <!-- Connector line -->
+      <div style="position:absolute;left:21px;top:24px;bottom:24px;width:2px;background:rgba(255,255,255,0.05);border-radius:100px;"></div>
+      <div style="position:absolute;left:21px;top:24px;width:2px;height:${Math.max(0, Math.min(completedCount, stages.length-1)) / Math.max(stages.length-1,1) * 100}%;background:linear-gradient(180deg,${goalMeta.color},${goalMeta.color}30);border-radius:100px;transition:height 1s ease;"></div>
 
-      <div style="display:flex;flex-direction:column;gap:0;">
-        ${stages.map((s, i) => {
-          const isActive = i === currentStageIndex;
-          const isPast = s.completed;
-          const isFuture = !s.completed && i !== currentStageIndex;
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        ${stagesWithState.map((s, i) => {
+          const isNext = i === nextStageIndex;
+          const isFuture = !s.completed && !isNext;
+          const canManualUnlock = !s.autoComplete && !s.completed;
+          const phaseLabel = i === 0 || stagesWithState[i-1]?.phase !== s.phase ? phaseLabels[s.phase] : null;
+
           return `
-          <div class="gps-stage" style="display:flex;align-items:center;gap:14px;padding:10px 0;position:relative;">
+          ${phaseLabel && i > 0 ? `<div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin:8px 0 4px 50px;">${phaseLabel}</div>` : ''}
+          <div class="gps-node-row" style="display:flex;align-items:flex-start;gap:12px;padding:8px 0;">
             <!-- Node -->
-            <div onclick="${!s.autoComplete ? `toggleGPSCheck('${s.id}')` : ''}" style="
-              width:38px;height:38px;border-radius:50%;flex-shrink:0;
-              background:${isPast ? goal.color : isActive ? 'rgba(124,111,255,0.15)' : 'rgba(255,255,255,0.04)'};
-              border:2px solid ${isPast ? goal.color : isActive ? '#7C6FFF' : 'rgba(255,255,255,0.08)'};
-              display:flex;align-items:center;justify-content:center;
-              font-size:${isPast ? '0.9rem' : '1rem'};
-              cursor:${s.autoComplete ? 'default' : 'pointer'};
-              box-shadow:${isPast ? `0 0 16px ${goal.color}40` : isActive ? '0 0 12px rgba(124,111,255,0.3)' : 'none'};
-              transition:all 0.3s;
-              z-index:1;position:relative;
-            ">${isPast ? '✓' : s.icon}</div>
+            <div id="gps-node-${s.id}"
+              onclick="${canManualUnlock ? `unlockGPSStage('${s.id}')` : ''}"
+              style="
+                width:44px;height:44px;border-radius:50%;flex-shrink:0;
+                background:${s.completed ? s.color : isNext ? 'rgba(124,111,255,0.12)' : 'rgba(255,255,255,0.03)'};
+                border:2px solid ${s.completed ? s.color : isNext ? 'rgba(124,111,255,0.4)' : 'rgba(255,255,255,0.07)'};
+                display:flex;align-items:center;justify-content:center;
+                font-size:${s.completed ? '0.9rem' : '1.1rem'};
+                cursor:${canManualUnlock ? 'pointer' : 'default'};
+                box-shadow:${s.completed ? `0 0 20px ${s.color}35` : isNext ? '0 0 14px rgba(124,111,255,0.2)' : 'none'};
+                transition:all 0.3s;
+                position:relative;z-index:1;
+                ${isFuture ? 'opacity:0.3;' : ''}
+              "
+              ${canManualUnlock ? `title="Tap to unlock"` : ''}
+            >${s.completed ? '✓' : s.icon}</div>
 
             <!-- Content -->
-            <div style="flex:1;opacity:${isFuture ? 0.4 : 1};">
-              <div style="font-size:0.78rem;color:${isPast ? 'rgba(255,255,255,0.5)' : isActive ? 'white' : 'rgba(255,255,255,0.5)'};font-weight:${isActive ? '600' : '400'};text-decoration:${isPast ? 'line-through' : 'none'};">${s.label}</div>
-              ${isActive ? `<div style="font-size:0.62rem;color:rgba(255,255,255,0.3);margin-top:2px;">${s.metric(ctx)}</div>` : ''}
-            </div>
-
-            <!-- Status -->
-            <div style="font-size:0.6rem;color:${isPast ? goal.color : isActive ? '#7C6FFF' : 'rgba(255,255,255,0.15)'};white-space:nowrap;">
-              ${isPast ? (s.autoComplete ? 'Auto ✓' : 'Done ✓') : isActive ? 'In progress' : ''}
+            <div style="flex:1;padding-top:4px;${isFuture ? 'opacity:0.35;' : ''}">
+              <div style="font-size:0.82rem;color:${s.completed ? 'rgba(255,255,255,0.4)' : isNext ? 'white' : 'rgba(255,255,255,0.55)'};font-weight:${isNext ? '600' : '400'};${s.completed ? 'text-decoration:line-through;' : ''}margin-bottom:2px;">${s.label}</div>
+              ${isNext ? `
+                <div style="font-size:0.65rem;color:rgba(255,255,255,0.25);line-height:1.4;margin-bottom:6px;">${s.sublabel}</div>
+                <div style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.15);border-radius:8px;padding:8px 10px;">
+                  <div style="font-size:0.6rem;color:rgba(124,111,255,0.7);font-weight:600;margin-bottom:2px;">Provify action</div>
+                  <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);line-height:1.5;">${s.provifyAction}</div>
+                </div>
+                ${!s.autoComplete ? `<div style="margin-top:8px;"><button onclick="unlockGPSStage('${s.id}')" style="background:linear-gradient(135deg,${s.color}22,${s.color}11);border:1px solid ${s.color}40;color:${s.color};font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Mark as achieved →</button></div>` : `<div style="margin-top:6px;font-size:0.6rem;color:rgba(255,255,255,0.2);">Auto-unlocks from your Provify data · ${s.metric(ctx)}</div>`}
+              ` : s.completed ? `
+                <div style="font-size:0.6rem;color:${s.color};opacity:0.6;">${s.autoComplete ? 'Auto-unlocked from your cases' : `Unlocked ${unlockedAt[s.id] ? new Date(unlockedAt[s.id]).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''}`}</div>
+              ` : `
+                <div style="font-size:0.62rem;color:rgba(255,255,255,0.2);">${s.sublabel}</div>
+              `}
             </div>
           </div>`;
         }).join('')}
       </div>
     </div>
-    ${stages.some(s => !s.autoComplete && !s.completed) ? `<div style="font-size:0.58rem;color:rgba(255,255,255,0.15);text-align:center;margin-top:8px;">Tap a stage to mark as complete</div>` : ''}
   </div>`;
 }
 
