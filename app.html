@@ -9013,23 +9013,26 @@ function confirmGPSNew() {
 function unlockGPSStage(stageId) {
   const data = getGPSData();
   if (!data) return;
-  // Show confirmation modal
   const stage = CAREER_STAGES.find(s => s.id === stageId);
   if (!stage) return;
-  // Animate then save
-  const nodeEl = document.getElementById(`gps-node-${stageId}`);
-  if (nodeEl) {
-    nodeEl.style.transform = 'scale(1.3)';
-    nodeEl.style.transition = 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)';
-    setTimeout(() => { nodeEl.style.transform = 'scale(1)'; }, 400);
-  }
+
   data.manualChecks = data.manualChecks || {};
   data.unlockedAt = data.unlockedAt || {};
-  data.manualChecks[stageId] = !data.manualChecks[stageId];
-  if (data.manualChecks[stageId]) {
+
+  const isCurrentlyComplete = data.manualChecks[stageId];
+
+  if (isCurrentlyComplete) {
+    // Undo — show confirmation
+    if (!confirm(`Undo "${stage.label}"? This will mark it as incomplete.`)) return;
+    data.manualChecks[stageId] = false;
+    delete data.unlockedAt[stageId];
+  } else {
+    // Unlock with celebration
+    data.manualChecks[stageId] = true;
     data.unlockedAt[stageId] = new Date().toISOString();
     showGPSUnlockMoment(stage);
   }
+
   saveGPSData(data);
   const roadmapEl = document.getElementById('career-gps-roadmap');
   if (roadmapEl) renderGPSRoadmap(roadmapEl, data);
@@ -9171,6 +9174,7 @@ function renderGPSRoadmap(el, data) {
           const isNext = i === nextStageIndex;
           const isFuture = !s.completed && !isNext;
           const canManualUnlock = !s.autoComplete && !s.completed;
+          const canUndo = !s.autoComplete && s.completed;
           const phaseLabel = i === 0 || stagesWithState[i-1]?.phase !== s.phase ? phaseLabels[s.phase] : null;
 
           return `
@@ -9178,20 +9182,20 @@ function renderGPSRoadmap(el, data) {
           <div class="gps-node-row" style="display:flex;align-items:flex-start;gap:12px;padding:8px 0;">
             <!-- Node -->
             <div id="gps-node-${s.id}"
-              onclick="${canManualUnlock ? `unlockGPSStage('${s.id}')` : ''}"
+              onclick="${canManualUnlock || canUndo ? `unlockGPSStage('${s.id}')` : ''}"
               style="
                 width:44px;height:44px;border-radius:50%;flex-shrink:0;
                 background:${s.completed ? s.color : isNext ? 'rgba(124,111,255,0.12)' : 'rgba(255,255,255,0.03)'};
                 border:2px solid ${s.completed ? s.color : isNext ? 'rgba(124,111,255,0.4)' : 'rgba(255,255,255,0.07)'};
                 display:flex;align-items:center;justify-content:center;
                 font-size:${s.completed ? '0.9rem' : '1.1rem'};
-                cursor:${canManualUnlock ? 'pointer' : 'default'};
+                cursor:${canManualUnlock || canUndo ? 'pointer' : 'default'};
                 box-shadow:${s.completed ? `0 0 20px ${s.color}35` : isNext ? '0 0 14px rgba(124,111,255,0.2)' : 'none'};
                 transition:all 0.3s;
                 position:relative;z-index:1;
                 ${isFuture ? 'opacity:0.3;' : ''}
               "
-              ${canManualUnlock ? `title="Tap to unlock"` : ''}
+              title="${canUndo ? 'Tap to undo' : canManualUnlock ? 'Tap to mark complete' : 'Auto-tracked from Provify'}"
             >${s.completed ? '✓' : s.icon}</div>
 
             <!-- Content -->
@@ -9205,7 +9209,7 @@ function renderGPSRoadmap(el, data) {
                 </div>
                 ${!s.autoComplete ? `<div style="margin-top:8px;"><button onclick="unlockGPSStage('${s.id}')" style="background:linear-gradient(135deg,${s.color}22,${s.color}11);border:1px solid ${s.color}40;color:${s.color};font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Mark as achieved →</button></div>` : `<div style="margin-top:6px;font-size:0.6rem;color:rgba(255,255,255,0.2);">Auto-unlocks from your Provify data · ${s.metric(ctx)}</div>`}
               ` : s.completed ? `
-                <div style="font-size:0.6rem;color:${s.color};opacity:0.6;">${s.autoComplete ? 'Auto-unlocked from your cases' : `Unlocked ${unlockedAt[s.id] ? new Date(unlockedAt[s.id]).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''}`}</div>
+                <div style="font-size:0.6rem;color:${s.color};opacity:0.6;">${s.autoComplete ? 'Auto-unlocked from your cases' : `Unlocked ${unlockedAt[s.id] ? new Date(unlockedAt[s.id]).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''} · tap to undo`}</div>
               ` : `
                 <div style="font-size:0.62rem;color:rgba(255,255,255,0.2);">${s.sublabel}</div>
               `}
@@ -9500,21 +9504,6 @@ function renderLiveCareerDashboard() {
     </div>
   </div>
 
-  <!-- ROW 4: Market Match per country -->
-  <div class="cd-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;">
-    <div style="font-size:0.55rem;color:rgba(155,145,255,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">⚡ Your Profile Match — Updates as you log</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      ${countryRanking.slice(0,5).map((c, i) => `
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:20px;text-align:center;font-size:0.9rem;">${flags[c.name] || '🌍'}</div>
-          <div style="width:80px;font-size:0.7rem;color:rgba(255,255,255,${i === 0 ? '0.9' : '0.5'});">${c.name.replace('Saudi Arabia','KSA')}</div>
-          <div style="flex:1;height:8px;background:rgba(255,255,255,0.04);border-radius:100px;overflow:hidden;">
-            <div style="height:100%;width:${c.match}%;background:${i === 0 ? 'linear-gradient(90deg,#7C6FFF,#34D399)' : 'rgba(124,111,255,0.3)'};border-radius:100px;transition:width 1.2s ease ${i * 0.1}s;"></div>
-          </div>
-          <div style="width:36px;text-align:right;font-size:0.68rem;color:${i === 0 ? '#9B91FF' : 'rgba(255,255,255,0.3)'};">${c.match}%</div>
-        </div>`).join('')}
-    </div>
-    <div style="margin-top:12px;font-size:0.62rem;color:rgba(255,255,255,0.15);text-align:center;">Log more complex cases to increase your match percentage</div>
   </div>`;
 }
 
@@ -9886,30 +9875,6 @@ Respond ONLY with this exact JSON structure:
           <div style="width:18px;height:18px;border-radius:5px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:#9B91FF;flex-shrink:0;margin-top:1px;">⚡</div>
           <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.4;">${r.market?.advantage || ''}</div>
         </div>
-      </div>
-    </div>
-
-    <!-- SECTION 3: Countries — compact -->
-    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;">
-      <div style="font-size:0.6rem;color:#34D399;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">🌍 Where To Build Your Career</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">${countryHTML}</div>
-    </div>
-
-    <!-- SECTION 4: 90-Day Moves — compact -->
-    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;">
-      <div style="font-size:0.6rem;color:#7C6FFF;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">🎯 Your Next 90 Days</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">${movesHTML}</div>
-    </div>
-
-    <!-- SECTION 5: 1-Year Target — compact -->
-    <div class="career-card" style="background:linear-gradient(135deg,rgba(96,165,250,0.08),rgba(96,165,250,0.02));border:1px solid rgba(96,165,250,0.2);border-radius:24px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#60A5FA,transparent);"></div>
-      <div style="font-size:0.6rem;color:#60A5FA;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:10px;">🏆 1-Year Target</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:8px;">${r.target?.headline || '—'}</div>
-      <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:12px;">${(r.target?.description || '').split('.').slice(0,2).join('.') + '.'}</div>
-      <div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:1rem;">🎯</span>
-        <span style="font-size:0.78rem;color:rgba(96,165,250,0.9);line-height:1.4;">${r.target?.milestone || ''}</span>
       </div>
     </div>
 
