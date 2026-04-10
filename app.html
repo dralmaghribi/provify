@@ -1114,7 +1114,7 @@ body::after {
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
     <div style="font-size:2.5rem;margin-bottom:16px;">🛡</div>
     <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">You've reached the free limit.</div>
-    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:28px;">You've logged 3 cases on the free tier. Upgrade to Pro for unlimited cases, AI feedback, medico-legal records, and full career intelligence.</div>
+    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:28px;">Your 14-day free trial has ended. Upgrade to Pro to keep logging cases, accessing your career intelligence, and protecting your clinical record.</div>
     <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px;margin-bottom:24px;text-align:left;">
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>Unlimited cases</div>
@@ -1964,7 +1964,7 @@ body::after {
             <div style="width:40px;height:40px;border-radius:12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">🔒</div>
             <div style="flex:1;">
               <div style="font-size:0.82rem;color:rgba(255,255,255,0.6);font-weight:500;margin-bottom:3px;">Career Intelligence Report</div>
-              <div style="font-size:0.7rem;color:rgba(255,255,255,0.25);">Log 3 cases to unlock your market value, top country, and 90-day career plan</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.25);">Unlocks after your first 3 cases — your market value, top country & 90-day plan</div>
             </div>
             <div style="font-size:0.65rem;color:rgba(255,255,255,0.2);white-space:nowrap;">0 / 3</div>
           </div>
@@ -3262,8 +3262,8 @@ body::after {
 
         <div id="career-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--gray);">
           <div style="font-size:3rem;margin-bottom:16px;opacity:0.4;">🧠</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white-dim);margin-bottom:10px;">Log 3 cases to unlock</div>
-          <div style="font-size:0.875rem;line-height:1.7;max-width:320px;margin:0 auto;">Your Career Intelligence Report generates automatically once you have 3 cases documented. The more you log, the more specific it gets.</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--white-dim);margin-bottom:10px;">Your career intelligence — log 3 cases to unlock</div>
+          <div style="font-size:0.875rem;line-height:1.7;max-width:320px;margin:0 auto;">Your Career Intelligence Report generates automatically once you have 3 cases documented — no trial limit on career features. The more you log, the more specific it gets.</div>
         </div>
       </div>
 
@@ -3366,7 +3366,25 @@ let allCases = [];
 
 // ─── PADDLE PAYMENTS ───
 const PADDLE_PRICE_ID = 'pri_REPLACE_WITH_YOUR_PRICE_ID'; // Replace when Paddle approves
-const FREE_TIER_LIMIT = 3;
+const FREE_TIER_LIMIT = 3; // kept for backward compat but not used for paywall
+const TRIAL_DAYS = 14;
+
+function isTrialActive() {
+  if (isPro) return false;
+  if (!currentProfile?.created_at) return true; // give benefit of doubt
+  const created = new Date(currentProfile.created_at);
+  const now = new Date();
+  const daysSince = (now - created) / (1000 * 60 * 60 * 24);
+  return daysSince <= TRIAL_DAYS;
+}
+
+function getDaysLeftInTrial() {
+  if (!currentProfile?.created_at) return TRIAL_DAYS;
+  const created = new Date(currentProfile.created_at);
+  const now = new Date();
+  const daysSince = (now - created) / (1000 * 60 * 60 * 24);
+  return Math.max(0, Math.ceil(TRIAL_DAYS - daysSince));
+}
 let isPro = false;
 let selectedSpecialty = 'endo';
 let selectedRating = 0;
@@ -3797,8 +3815,8 @@ function applyRoleBasedUI() {
   if (careerEmpty) {
     const msg = careerEmpty.querySelector('div:last-child');
     if (msg) msg.textContent = isSenior
-      ? 'Your Practice Intelligence Report generates automatically once you have 3 cases documented. The more complex your cases, the more specific the analysis.'
-      : 'Your Career Intelligence Report generates automatically once you have 3 cases documented. The more you log, the more specific it gets.';
+      ? 'Your Practice Intelligence Report generates automatically once you have 3 cases documented — no trial limit on career features. The more complex your cases, the more specific the analysis.'
+      : 'Your Career Intelligence Report generates automatically once you have 3 cases documented — no trial limit on career features. The more you log, the more specific it gets.';
   }
 
   // ── CAREER PROMPT CONTEXT — tell AI who it's talking to ──
@@ -3984,8 +4002,8 @@ function calculateComplexity() {
 }
 
 async function submitCase() {
-  // Free tier limit check
-  if (!isPro && allCases.length >= FREE_TIER_LIMIT) {
+  // Trial check
+  if (!isPro && !isTrialActive()) {
     showPaywall();
     return;
   }
@@ -7326,7 +7344,14 @@ function checkProStatus() {
   isPro = currentProfile?.is_pro === true;
   // Update plan display
   const planEl = document.querySelector('.user-plan');
-  if (planEl) planEl.textContent = isPro ? 'Pro' : 'Free — 3 cases';
+  if (planEl) {
+    if (isPro) {
+      planEl.textContent = 'Pro';
+    } else {
+      const daysLeft = getDaysLeftInTrial();
+      planEl.textContent = daysLeft > 0 ? `Free Trial — ${daysLeft}d left` : 'Trial ended';
+    }
+  }
   // Check URL for successful upgrade
   if (window.location.search.includes('upgraded=true')) {
     showToast('Welcome to Pro! All features unlocked. 🎉');
@@ -7945,7 +7970,7 @@ function showVLReview(data, originalTranscript) {
 
 async function submitVoiceCase() {
   if (!currentUser) { showToast('Please sign in first.'); return; }
-  if (!isPro && allCases.length >= FREE_TIER_LIMIT) { showPaywall(); closeVoiceLog(); return; }
+  if (!isPro && !isTrialActive()) { showPaywall(); closeVoiceLog(); return; }
 
   const btn = document.querySelector('#vl-screen-review button');
   if (btn) { btn.textContent = 'Logging...'; btn.disabled = true; }
