@@ -8903,8 +8903,8 @@ const CAREER_STAGES = [
 const GOAL_STAGES = {
   specialist: ['student','intern','gp','spec_focus','spec_complexity','spec_apply','spec_residency','spec_qualified'],
   owner:      ['student','intern','gp','own_record','own_capital','own_open','own_scale'],
-  brand:      ['student','intern','gp','spec_focus','spec_qualified','own_open','brand_identity','brand_content','brand_speak','brand_authority'],
-  gp:         ['student','intern','gp','own_record'],
+  brand:      ['student','intern','gp','spec_focus','spec_complexity','spec_qualified','own_open','own_scale','brand_identity','brand_content','brand_speak','brand_authority'],
+  gp:         ['student','intern','gp','own_record','own_capital','own_open'],
 };
 
 function getGPSData() {
@@ -8928,7 +8928,14 @@ function renderCareerGPS() {
   const setupEl = document.getElementById('career-gps-setup');
   const roadmapEl = document.getElementById('career-gps-roadmap');
   if (!setupEl || !roadmapEl) return;
-  if (!gpsData) {
+
+  // Validate goal is one of the known goals — if old/invalid data, reset
+  const validGoals = ['specialist','owner','brand','gp'];
+  const isValid = gpsData && validGoals.includes(gpsData.goal);
+
+  if (!isValid) {
+    // Clear stale data
+    try { localStorage.removeItem(`provify_gps_${currentUser?.id}`); } catch(e) {}
     setupEl.style.display = 'block';
     roadmapEl.style.display = 'none';
     renderGPSSetup(setupEl);
@@ -8937,6 +8944,14 @@ function renderCareerGPS() {
     roadmapEl.style.display = 'block';
     renderGPSRoadmap(roadmapEl, gpsData);
   }
+}
+
+function resetGPS() {
+  try { localStorage.removeItem(`provify_gps_${currentUser?.id}`); } catch(e) {}
+  const setupEl = document.getElementById('career-gps-setup');
+  const roadmapEl = document.getElementById('career-gps-roadmap');
+  if (setupEl) { setupEl.style.display = 'block'; renderGPSSetup(setupEl); }
+  if (roadmapEl) roadmapEl.style.display = 'none';
 }
 
 function renderGPSSetup(el) {
@@ -9041,10 +9056,6 @@ function showGPSUnlockMoment(stage) {
   setTimeout(() => { toast.style.animation = 'none'; toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s'; setTimeout(() => toast.remove(), 400); }, 2500);
 }
 
-function resetGPS() {
-  try { localStorage.removeItem(`provify_gps_${currentUser?.id}`); } catch(e) {}
-  renderCareerGPS();
-}
 
 function renderGPSRoadmap(el, data) {
   const stageIds = GOAL_STAGES[data.goal] || GOAL_STAGES.gp;
