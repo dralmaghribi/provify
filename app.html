@@ -4419,13 +4419,15 @@ function updateDashboard() {
     }).join('');
   }
 
-  // Recent cases
+  // Recent cases — element removed from dashboard, kept for safety
   const recentEl = document.getElementById('recent-cases-list');
-  if (allCases.length === 0) {
-    recentEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🦷</div><div class="empty-title">No cases yet</div><div class="empty-sub">Hit the button above to log your first case.</div></div>`;
-  } else {
-    const recent = allCases.slice(0, 5);
-    recentEl.innerHTML = `<div class="cases-list">${recent.map(c => caseItemHTML(c)).join('')}</div>`;
+  if (recentEl) {
+    if (allCases.length === 0) {
+      recentEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🦷</div><div class="empty-title">No cases yet</div><div class="empty-sub">Hit the button above to log your first case.</div></div>`;
+    } else {
+      const recent = allCases.slice(0, 5);
+      recentEl.innerHTML = `<div class="cases-list">${recent.map(c => caseItemHTML(c)).join('')}</div>`;
+    }
   }
 
   // Achievements on dashboard
