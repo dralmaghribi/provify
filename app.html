@@ -1996,6 +1996,9 @@ body::after {
         <!-- MONTHLY OBJECTIVES -->
         <div id="monthly-objectives" style="display:none;"></div>
 
+        <!-- SKILL PROGRESS GRAPH -->
+        <div id="skill-progress-card" style="display:none;margin-bottom:16px;"></div>
+
         <!-- RECENT CASES -->
         <div class="card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -4574,6 +4577,7 @@ function updateDashboard() {
   updateStreakCard();
   renderMonthlyObjectives();
   renderInactivityAlert();
+  renderSkillProgressGraph();
 
   // ── PROGRESSIVE NAV DISCLOSURE ──
   // Show secondary nav items progressively as user logs more cases
@@ -10235,6 +10239,156 @@ function renderInactivityAlert() {
       </div>
       <div style="font-size:0.65rem;color:rgba(255,255,255,0.2);text-align:right;">Score<br><span style="font-size:1rem;color:rgba(239,68,68,0.6);font-weight:700;">${score}</span></div>
     </div>`;
+}
+
+// ─── SKILL PROGRESS GRAPH ───
+function renderSkillProgressGraph() {
+  const el = document.getElementById('skill-progress-card');
+  if (!el || allCases.length < 3) { if (el) el.style.display = 'none'; return; }
+  el.style.display = 'block';
+
+  // Sort cases oldest to newest
+  const sorted = [...allCases].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+
+  // Get last 20 cases max
+  const cases = sorted.slice(-20);
+  const scores = cases.map(c => c.complexity_score || 0);
+  const total = cases.length;
+
+  // Calculate trend
+  const firstHalf = scores.slice(0, Math.floor(total/2));
+  const secondHalf = scores.slice(Math.floor(total/2));
+  const avgFirst = firstHalf.reduce((a,b) => a+b, 0) / firstHalf.length;
+  const avgSecond = secondHalf.reduce((a,b) => a+b, 0) / secondHalf.length;
+  const trend = avgSecond - avgFirst;
+  const isImproving = trend > 0.3;
+  const isPlateauing = Math.abs(trend) <= 0.3;
+  const isDeclining = trend < -0.3;
+
+  // Trend message
+  const trendMsg = isImproving
+    ? `Your complexity is rising. Not guessing — proven.`
+    : isPlateauing
+    ? `You've been consistent. Push for harder cases to grow.`
+    : `Your recent cases are simpler. Seek more complexity.`;
+
+  const trendColor = isImproving ? '#34D399' : isPlateauing ? '#F59E0B' : '#EF4444';
+  const trendIcon = isImproving ? '📈' : isPlateauing ? '➡️' : '📉';
+
+  // Graph dimensions
+  const W = 320, H = 80, PAD = 8;
+  const maxScore = 10;
+  const minScore = 0;
+  const xStep = (W - PAD*2) / Math.max(total - 1, 1);
+
+  // Generate SVG path
+  const points = scores.map((s, i) => ({
+    x: PAD + i * xStep,
+    y: H - PAD - ((s - minScore) / (maxScore - minScore)) * (H - PAD*2)
+  }));
+
+  // Smooth path using quadratic bezier
+  let path = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i-1];
+    const curr = points[i];
+    const mx = (prev.x + curr.x) / 2;
+    path += ` Q ${mx} ${prev.y} ${curr.x} ${curr.y}`;
+  }
+
+  // Fill path
+  const fillPath = path + ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z`;
+
+  // Specialty breakdown for last 10 cases
+  const recent10 = sorted.slice(-10);
+  const specCounts = {};
+  recent10.forEach(c => { specCounts[c.specialty] = (specCounts[c.specialty]||0) + 1; });
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#60A5FA' };
+  const specLabels = { endo:'Endo', restorative:'Resto', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho' };
+
+  // AI praise aggregation from case notes
+  const allStrengths = allCases
+    .filter(c => c.ai_feedback)
+    .map(c => { try { return JSON.parse(c.ai_feedback)?.strength; } catch(e) { return null; } })
+    .filter(Boolean)
+    .slice(-5);
+
+  // Current avg vs early avg
+  const currentAvg = avgSecond.toFixed(1);
+  const earlyAvg = avgFirst.toFixed(1);
+  const improvement = (avgSecond - avgFirst).toFixed(1);
+
+  el.innerHTML = `
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">Skill Progress</div>
+        <div style="font-size:0.68rem;color:${trendColor};margin-top:3px;font-weight:500;">${trendIcon} ${trendMsg}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:${trendColor};line-height:1;">${isImproving ? '+'+improvement : improvement}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);">complexity change</div>
+      </div>
+    </div>
+
+    <!-- Graph -->
+    <div style="position:relative;margin-bottom:16px;background:rgba(255,255,255,0.02);border-radius:12px;overflow:hidden;padding:4px 0;">
+      <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;">
+        <defs>
+          <linearGradient id="graphGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="${trendColor}" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="${trendColor}" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        ${[2,4,6,8].map(v => {
+          const y = H - PAD - ((v-minScore)/(maxScore-minScore))*(H-PAD*2);
+          return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <text x="${PAD-2}" y="${y+3}" text-anchor="end" font-size="7" fill="rgba(255,255,255,0.15)" font-family="Inter">${v}</text>`;
+        }).join('')}
+        <!-- Fill -->
+        <path d="${fillPath}" fill="url(#graphGrad)"/>
+        <!-- Line -->
+        <path d="${path}" fill="none" stroke="${trendColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Dots -->
+        ${points.map((p, i) => {
+          const isLast = i === points.length - 1;
+          return isLast
+            ? `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${trendColor}" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
+               <circle cx="${p.x}" cy="${p.y}" r="7" fill="none" stroke="${trendColor}" stroke-width="1" opacity="0.4"/>`
+            : `<circle cx="${p.x}" cy="${p.y}" r="2.5" fill="${trendColor}" opacity="0.6"/>`;
+        }).join('')}
+      </svg>
+      <!-- Latest score label -->
+      <div style="position:absolute;bottom:6px;right:8px;font-size:0.58rem;color:rgba(255,255,255,0.2);">last ${total} cases</div>
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:${allStrengths.length ? '16px' : '0'};">
+      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.5);line-height:1;">${earlyAvg}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;">early avg</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:${trendColor};line-height:1;">${currentAvg}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;">current avg</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:white;line-height:1;">${allCases.length}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;">total cases</div>
+      </div>
+    </div>
+
+    ${allStrengths.length ? `
+    <!-- AI praise aggregation -->
+    <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:12px;">
+      <div style="font-size:0.52rem;color:rgba(52,211,153,0.5);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:8px;">What your cases say about you</div>
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);line-height:1.6;font-style:italic;">"${allStrengths[allStrengths.length-1]}"</div>
+    </div>` : ''}
+
+  </div>`;
 }
 
 // ─── START ───
