@@ -3084,6 +3084,9 @@ body::after {
           <div style="display:flex;justify-content:space-between;margin-top:8px;" id="heatmap-labels"></div>
         </div>
 
+        <!-- SPECIALTY BREAKDOWN — visual chart -->
+        <div id="cases-specialty-chart" style="margin-bottom:16px;display:none;"></div>
+
         <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
           <div style="flex:1;min-width:180px;position:relative;">
             <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:0.9rem;pointer-events:none;">🔍</span>
@@ -3844,7 +3847,7 @@ function showView(view) {
   document.getElementById('view-' + view).classList.add('active');
   document.getElementById('nav-' + view).classList.add('active');
 
-  if (view === 'cases') { renderAllCases(); renderHeatmap(); }
+  if (view === 'cases') { renderAllCases(); renderHeatmap(); renderSpecialtyChart(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderPortfolioCases();
@@ -8690,17 +8693,16 @@ async function refreshClinicalProfile() {
 // Steps are Provify-native — only meaningful inside this app.
 
 const CAREER_STAGES = [
-  // ── FOUNDATION (everyone) ──
+  // ── FOUNDATION ──
   {
     id: 'student',
     phase: 'foundation',
     icon: '📚',
     label: 'Dental Student',
-    sublabel: 'Start documenting from day one',
-    provifyAction: 'Log your first case on Provify — most students never do.',
+    sublabel: 'Start before everyone else does',
+    provifyAction: 'Log your first case today. Most students wait until internship. You don\'t.',
     auto: c => c.total >= 1,
-    metric: c => `${Math.min(c.total,1)}/1 case logged`,
-    weight: 1,
+    metric: c => `${Math.min(c.total,1)}/1 case`,
     color: '#6B7280',
   },
   {
@@ -8708,11 +8710,10 @@ const CAREER_STAGES = [
     phase: 'foundation',
     icon: '🎓',
     label: 'Intern',
-    sublabel: 'Build your first real clinical record',
-    provifyAction: 'Log 30+ cases. Your Provify record is your first CV.',
+    sublabel: 'Your Provify record IS your first CV',
+    provifyAction: 'Log 30+ cases. Every case documented now is leverage when you walk into your first job interview. Most interns can\'t show anything. You can.',
     auto: c => c.total >= 30,
     metric: c => `${Math.min(c.total,30)}/30 cases`,
-    weight: 2,
     color: '#7C6FFF',
   },
   {
@@ -8720,25 +8721,23 @@ const CAREER_STAGES = [
     phase: 'foundation',
     icon: '🦷',
     label: 'General Dentist',
-    sublabel: 'Work in a clinic, earn, build your reputation',
-    provifyAction: 'Hit 80+ cases with avg complexity 4+. Show this record when negotiating your next salary.',
+    sublabel: 'Your documented record raises your salary',
+    provifyAction: 'Reach 80+ cases with avg complexity 4+. Walk into your next clinic negotiation with your Provify record open. Dentists who document earn more — they can prove what they do.',
     auto: c => c.total >= 80 && c.avg >= 4,
-    metric: c => `${Math.min(c.total,80)}/80 cases · ${c.avg}/4 avg complexity`,
-    weight: 3,
+    metric: c => `${Math.min(c.total,80)}/80 cases · ${c.avg}/4.0 avg`,
     color: '#34D399',
   },
 
-  // ── BRANCH: SPECIALIST ──
+  // ── SPECIALIST BRANCH ──
   {
     id: 'spec_focus',
     phase: 'specialist',
     icon: '🔬',
-    label: 'Prove Specialty Focus',
-    sublabel: 'Masters programs look at your case mix',
-    provifyAction: 'Log 50+ cases in your target specialty. 70%+ focus in one area is what gets you shortlisted.',
+    label: 'Prove Your Specialty Focus',
+    sublabel: 'Masters programs read your case mix, not your grades',
+    provifyAction: 'Log 50+ cases with 70%+ in your target specialty. Export your Provify portfolio — this IS your application. Programs see: focused, disciplined, serious. That\'s who gets shortlisted.',
     auto: c => c.total >= 50 && c.dominant >= 0.65,
-    metric: c => `${Math.round(c.dominant*100)}% specialty focus · ${Math.min(c.total,50)}/50 cases`,
-    weight: 2,
+    metric: c => `${Math.round(c.dominant*100)}% focus · ${Math.min(c.total,50)}/50 cases`,
     color: '#7C6FFF',
     branch: 'specialist',
   },
@@ -8746,12 +8745,11 @@ const CAREER_STAGES = [
     id: 'spec_complexity',
     phase: 'specialist',
     icon: '⚡',
-    label: 'Raise Your Clinical Ceiling',
-    sublabel: 'Low complexity cases won\'t get you into a Masters',
-    provifyAction: 'Get avg complexity to 6+/10 on Provify. Seek the hard cases, document every one.',
+    label: 'Raise Your Complexity Ceiling',
+    sublabel: 'Simple cases won\'t get you into any Masters program',
+    provifyAction: 'Push your avg complexity to 6+/10 on Provify. Seek the hard cases — calcified canals, curved roots, surgical extractions. Log every one. Your complexity graph is the proof of your growth.',
     auto: c => c.avg >= 6,
-    metric: c => `${c.avg}/10 avg — need 6.0`,
-    weight: 2,
+    metric: c => `${c.avg}/10 avg — target 6.0`,
     color: '#9B91FF',
     branch: 'specialist',
   },
@@ -8759,12 +8757,11 @@ const CAREER_STAGES = [
     id: 'spec_apply',
     phase: 'specialist',
     icon: '📨',
-    label: 'Apply to Masters Program',
-    sublabel: 'Your Provify portfolio is your application',
-    provifyAction: 'Export your Provify portfolio PDF. It shows your case volume, complexity, and specialty depth. Send it with every application.',
+    label: 'Apply to Masters',
+    sublabel: 'Your Provify portfolio goes with every application',
+    provifyAction: 'Export your Provify portfolio PDF. It shows case volume, complexity progression, specialty depth, and verified records. Send it with every application. Most applicants have nothing like this.',
     auto: () => false,
-    metric: () => 'Unlock: export portfolio from Provify',
-    weight: 3,
+    metric: () => 'Export portfolio from Provify first',
     color: '#7C6FFF',
     branch: 'specialist',
   },
@@ -8773,11 +8770,10 @@ const CAREER_STAGES = [
     phase: 'specialist',
     icon: '🏥',
     label: 'Complete Residency',
-    sublabel: '2–3 years. Work clinically in parallel if possible.',
-    provifyAction: 'Keep logging during residency. Your complexity score will jump — that jump is proof of your training.',
+    sublabel: '2–3 years. Keep logging — your complexity will spike.',
+    provifyAction: 'Don\'t stop logging during residency. Your complexity score will jump from 4 to 8+. That jump visible on Provify is proof of your training — show it to every employer after.',
     auto: () => false,
     metric: () => 'Manual milestone',
-    weight: 4,
     color: '#7C6FFF',
     branch: 'specialist',
   },
@@ -8786,26 +8782,24 @@ const CAREER_STAGES = [
     phase: 'specialist',
     icon: '🏆',
     label: 'Qualified Specialist',
-    sublabel: 'You are now in the top 5% of dentists',
-    provifyAction: 'Update your Provify profile to Specialist. Your career section now shows specialist salary data for your market.',
+    sublabel: 'Top 5% of dentists. Your earning power just tripled.',
+    provifyAction: 'Update your Provify role to Specialist. Your salary benchmarks, market match, and career data all recalibrate to specialist level immediately.',
     auto: () => false,
     metric: () => 'Manual milestone',
-    weight: 5,
     color: '#F59E0B',
     branch: 'specialist',
   },
 
-  // ── BRANCH: PRACTICE OWNER ──
+  // ── PRACTICE OWNER BRANCH ──
   {
     id: 'own_record',
     phase: 'owner',
     icon: '📋',
     label: 'Build a Record Worth Showing',
-    sublabel: 'Banks and investors want to see clinical credibility',
-    provifyAction: 'Hit 100+ documented cases. This is the number that makes a bank take you seriously when you apply for a clinic loan.',
+    sublabel: 'Banks and investors want clinical credibility',
+    provifyAction: 'Hit 100+ documented cases on Provify. When you sit in front of a bank asking for a clinic loan, open your Provify record. 100 verified cases says: this person is serious, experienced, and disciplined.',
     auto: c => c.total >= 100,
     metric: c => `${Math.min(c.total,100)}/100 cases`,
-    weight: 2,
     color: '#34D399',
     branch: 'owner',
   },
@@ -8813,12 +8807,11 @@ const CAREER_STAGES = [
     id: 'own_capital',
     phase: 'owner',
     icon: '💰',
-    label: 'Save or Secure $80–150k',
-    sublabel: 'Start small. One chair. One location.',
-    provifyAction: 'Work as a general dentist for 3–5 years while saving. $80k covers a small single-chair setup in GCC. $150k gives you a real start.',
+    label: 'Save $80–150k',
+    sublabel: 'Single chair setup. Prove the model before scaling.',
+    provifyAction: 'Work as a GP for 3–5 years while saving. $80k covers a small single-chair clinic in GCC. Don\'t wait for perfect — start small, prove it works, then expand.',
     auto: () => false,
     metric: () => 'Manual milestone',
-    weight: 3,
     color: '#F59E0B',
     branch: 'owner',
   },
@@ -8827,11 +8820,10 @@ const CAREER_STAGES = [
     phase: 'owner',
     icon: '🏢',
     label: 'Open First Clinic',
-    sublabel: 'Start with one chair. Prove the model first.',
-    provifyAction: 'Document every case from day one in your own clinic on Provify. Your record protects you from day one as an owner.',
+    sublabel: 'One chair. One location. Prove the model.',
+    provifyAction: 'Document every single case from day one in your clinic on Provify. You are now an owner — your medico-legal exposure doubled. Every case needs a verified record.',
     auto: () => false,
     metric: () => 'Manual milestone',
-    weight: 4,
     color: '#34D399',
     branch: 'owner',
   },
@@ -8840,26 +8832,24 @@ const CAREER_STAGES = [
     phase: 'owner',
     icon: '📈',
     label: 'Scale to Multiple Clinics',
-    sublabel: 'Hire other dentists. You become the brand.',
-    provifyAction: 'Your Provify case history shows the clinical standard you built the business on.',
+    sublabel: 'Hire dentists. You become the brand, not the dentist.',
+    provifyAction: 'The clinical standard you built on Provify becomes the standard every dentist in your clinics must meet.',
     auto: () => false,
     metric: () => 'Manual milestone',
-    weight: 5,
     color: '#34D399',
     branch: 'owner',
   },
 
-  // ── PINNACLE: PERSONAL BRAND (unlocks after specialist OR owner) ──
+  // ── PERSONAL BRAND BRANCH ──
   {
     id: 'brand_identity',
     phase: 'brand',
     icon: '🎯',
-    label: 'Own One Thing in Dentistry',
-    sublabel: 'The best brands are known for one specific thing',
-    provifyAction: 'Your Provify specialty focus shows what you are. When 80%+ of your cases are one specialty — that\'s your identity.',
+    label: 'Own One Thing',
+    sublabel: 'The strongest brands are the most specific',
+    provifyAction: 'When 75%+ of your Provify cases are one specialty — that\'s your identity. Don\'t spread yourself. The dentist known for one thing gets more referrals than the dentist who does everything.',
     auto: c => c.dominant >= 0.75,
-    metric: c => `${Math.round(c.dominant*100)}% specialty focus`,
-    weight: 2,
+    metric: c => `${Math.round(c.dominant*100)}% — target 75%`,
     color: '#F59E0B',
     branch: 'brand',
   },
@@ -8868,11 +8858,10 @@ const CAREER_STAGES = [
     phase: 'brand',
     icon: '📱',
     label: 'Teach Publicly',
-    sublabel: 'Post clinical content. Share cases. Educate.',
-    provifyAction: 'Use your Provify case record as content fuel. Every documented case is a potential post.',
+    sublabel: 'Post your cases. Educate your peers.',
+    provifyAction: 'Every case you document on Provify is potential content. Your documented complexity shows you know what you\'re talking about. Post 2x per week — clinical insights, case outcomes, real data.',
     auto: () => false,
     metric: () => 'Manual milestone',
-    weight: 2,
     color: '#F59E0B',
     branch: 'brand',
   },
@@ -8881,11 +8870,10 @@ const CAREER_STAGES = [
     phase: 'brand',
     icon: '🎤',
     label: 'Speak at a Dental Event',
-    sublabel: 'One talk changes how your peers see you',
-    provifyAction: 'Your Provify complexity history and case record is your speaking credential.',
+    sublabel: 'One talk changes how 200 colleagues see you',
+    provifyAction: 'Your Provify case record is your speaking credential. "I\'ve documented 200 endo cases with an average complexity of 7.2" is an opening line nobody else has.',
     auto: () => false,
     metric: () => 'Manual milestone',
-    weight: 3,
     color: '#F59E0B',
     branch: 'brand',
   },
@@ -8894,11 +8882,10 @@ const CAREER_STAGES = [
     phase: 'brand',
     icon: '👑',
     label: 'Become the Name',
-    sublabel: 'The dentist everyone in your city knows for your specialty',
-    provifyAction: 'You built this on Provify from case one.',
+    sublabel: 'The dentist your city calls for your specialty',
+    provifyAction: 'You built this reputation case by case, documented on Provify from the beginning. That record is now your legacy.',
     auto: () => false,
-    metric: () => 'Manual milestone',
-    weight: 5,
+    metric: () => 'Ongoing',
     color: '#F59E0B',
     branch: 'brand',
   },
@@ -9044,24 +9031,73 @@ function unlockGPSStage(stageId) {
 }
 
 function showGPSUnlockMoment(stage) {
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);
-    background:linear-gradient(135deg,rgba(12,12,15,0.98),rgba(20,20,24,0.98));
-    border:1px solid ${stage.color}50;border-radius:24px;padding:32px 40px;
-    text-align:center;z-index:9999;
-    box-shadow:0 0 60px ${stage.color}30,0 24px 60px rgba(0,0,0,0.8);
-    animation:gpsUnlock 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
-    max-width:280px;
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;
+    display:flex;align-items:center;justify-content:center;
+    animation:overlayIn 0.3s ease forwards;
   `;
-  toast.innerHTML = `
-    <style>@keyframes gpsUnlock{to{transform:translate(-50%,-50%) scale(1);opacity:1}}</style>
-    <div style="font-size:3rem;margin-bottom:12px;">${stage.icon}</div>
-    <div style="font-size:0.55rem;color:${stage.color};text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:8px;">Milestone Unlocked</div>
-    <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;letter-spacing:-0.02em;">${stage.label}</div>
+
+  const card = document.createElement('div');
+  card.style.cssText = `
+    background:linear-gradient(135deg,#0C0C12,#14141C);
+    border:1px solid ${stage.color}40;
+    border-radius:28px;padding:40px 48px;text-align:center;
+    max-width:320px;width:90%;
+    box-shadow:0 0 80px ${stage.color}25,0 32px 80px rgba(0,0,0,0.8);
+    animation:unlockPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    position:relative;overflow:hidden;
   `;
-  document.body.appendChild(toast);
-  setTimeout(() => { toast.style.animation = 'none'; toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s'; setTimeout(() => toast.remove(), 400); }, 2500);
+
+  card.innerHTML = `
+    <style>
+      @keyframes overlayIn{from{opacity:0}to{opacity:1}}
+      @keyframes unlockPop{from{opacity:0;transform:scale(0.7) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+      @keyframes shimmer{0%{left:-100%}100%{left:200%}}
+      @keyframes iconBounce{0%{transform:scale(0)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+      @keyframes particle{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+    </style>
+    <!-- Top shimmer line -->
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${stage.color},transparent);"></div>
+    <!-- Shimmer sweep -->
+    <div style="position:absolute;top:0;bottom:0;width:60px;background:linear-gradient(90deg,transparent,${stage.color}15,transparent);animation:shimmer 1.5s ease 0.5s both;left:-100%;"></div>
+
+    <div style="font-size:3.5rem;margin-bottom:16px;animation:iconBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;display:inline-block;">${stage.icon}</div>
+    <div style="font-size:0.55rem;color:${stage.color};text-transform:uppercase;letter-spacing:0.25em;font-weight:700;margin-bottom:10px;">Milestone Achieved</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:8px;">${stage.label}</div>
+    <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);line-height:1.5;">${stage.sublabel}</div>
+    <div style="margin-top:24px;width:100%;height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+      <div style="height:100%;background:linear-gradient(90deg,${stage.color},${stage.color}80);border-radius:100px;animation:pgrow 1.5s ease 0.3s both;width:0;" id="unlock-progress-bar"></div>
+    </div>
+    <div style="margin-top:12px;font-size:0.62rem;color:rgba(255,255,255,0.2);">Tap anywhere to continue</div>
+  `;
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  // Animate progress bar
+  setTimeout(() => {
+    const bar = card.querySelector('#unlock-progress-bar');
+    if (bar) bar.style.width = '100%';
+    if (bar) bar.style.transition = 'width 1.5s ease';
+  }, 50);
+
+  // Dismiss on tap
+  overlay.addEventListener('click', () => {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.3s';
+    setTimeout(() => overlay.remove(), 300);
+  });
+
+  // Auto-dismiss after 3s
+  setTimeout(() => {
+    if (overlay.parentNode) {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.3s';
+      setTimeout(() => overlay.remove(), 300);
+    }
+  }, 3000);
 }
 
 
@@ -9221,6 +9257,70 @@ function renderGPSRoadmap(el, data) {
             </div>
           </div>`;
         }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── SPECIALTY CHART FOR MY CASES ───
+function renderSpecialtyChart() {
+  const el = document.getElementById('cases-specialty-chart');
+  if (!el || allCases.length === 0) { if (el) el.style.display = 'none'; return; }
+  el.style.display = 'block';
+
+  const specs = [
+    { key: 'endo',        label: 'Endo',      color: '#7C6FFF' },
+    { key: 'restorative', label: 'Resto',     color: '#F59E0B' },
+    { key: 'surgery',     label: 'Surgery',   color: '#EF4444' },
+    { key: 'paeds',       label: 'Paeds',     color: '#34D399' },
+    { key: 'prostho',     label: 'Prostho',   color: '#60A5FA' },
+  ].map(s => ({ ...s, count: allCases.filter(c => c.specialty === s.key).length }))
+   .filter(s => s.count > 0)
+   .sort((a,b) => b.count - a.count);
+
+  if (specs.length === 0) { el.style.display = 'none'; return; }
+
+  const total = allCases.length;
+  const avg = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
+  const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
+  const dominant = specs[0];
+
+  el.innerHTML = `
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">Clinical Breakdown</div>
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);">${total} cases · avg ${avg}/10</div>
+    </div>
+
+    <!-- Specialty bars -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+      ${specs.map(s => {
+        const pct = Math.round(s.count / total * 100);
+        return `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:52px;font-size:0.68rem;color:rgba(255,255,255,0.5);text-align:right;">${s.label}</div>
+          <div style="flex:1;height:8px;background:rgba(255,255,255,0.04);border-radius:100px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${s.color};border-radius:100px;transition:width 0.8s ease;box-shadow:0 0 8px ${s.color}40;"></div>
+          </div>
+          <div style="width:32px;font-size:0.65rem;color:${s.color};font-weight:600;">${s.count}</div>
+          <div style="width:28px;font-size:0.6rem;color:rgba(255,255,255,0.2);">${pct}%</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${dominant.color};line-height:1;">${Math.round(dominant.count/total*100)}%</div>
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);margin-top:3px;">${dominant.label} focus</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;line-height:1;">${avg}</div>
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);margin-top:3px;">avg complexity</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:#EF4444;line-height:1;">${highComp}</div>
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);margin-top:3px;">complex (7+)</div>
       </div>
     </div>
   </div>`;
@@ -9841,25 +9941,6 @@ Respond ONLY with this exact JSON structure:
       <div style="font-size:0.6rem;color:rgba(124,111,255,0.6);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:20px;">Provify reads your data</div>
       <div style="font-family:'Instrument Serif',serif;font-size:clamp(1.6rem,3.5vw,2.4rem);color:white;letter-spacing:-0.04em;line-height:1.25;max-width:600px;margin:0 auto;">${r.identity?.headline || '—'}</div>
       <div style="margin-top:20px;font-size:0.82rem;color:rgba(255,255,255,0.4);max-width:480px;margin-left:auto;margin-right:auto;line-height:1.65;">${(r.identity?.insight || '').split('.').slice(0,2).join('.') + '.'}</div>
-    </div>
-
-    <!-- SECTION 1: Identity — compact -->
-    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;overflow:hidden;">
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:16px;align-items:center;">
-        <div style="flex-shrink:0;">
-          ${radarSVG.replace('width:180px;height:180px','width:100%;height:auto;max-width:160px')}
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
-          <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:10px;padding:10px 12px;">
-            <span style="color:#34D399;flex-shrink:0;">✦</span>
-            <span style="font-size:0.78rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.strength || ''}</span>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:10px 12px;">
-            <span style="color:#EF4444;flex-shrink:0;">⚠</span>
-            <span style="font-size:0.78rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.risk || ''}</span>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- SECTION 2: Market Value — compact -->
