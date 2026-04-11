@@ -5356,6 +5356,8 @@ function updateGapAlerts() {
   const gapCard = document.getElementById('gap-card');
   const gapEl   = document.getElementById('gap-alerts');
 
+  if (!gapCard || !gapEl) return;
+
   if (summary.length > 0) {
     gapCard.style.display = 'block';
     // Update card title
