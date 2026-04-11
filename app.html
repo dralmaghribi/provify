@@ -3084,9 +3084,6 @@ body::after {
           <div style="display:flex;justify-content:space-between;margin-top:8px;" id="heatmap-labels"></div>
         </div>
 
-        <!-- CLINICAL STATS CHARTS — live salary & market data -->
-        <div id="career-live-dashboard" style="display:none;margin-bottom:16px;"></div>
-
         <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
           <div style="flex:1;min-width:180px;position:relative;">
             <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:0.9rem;pointer-events:none;">🔍</span>
@@ -3246,7 +3243,10 @@ body::after {
         <!-- ═══ 2. CAREER GPS ROADMAP — always live, no button needed ═══ -->
         <div id="career-gps-roadmap" style="display:none;margin-bottom:24px;"></div>
 
-        <!-- ═══ 3. AI CLINICAL IDENTITY — needs regenerate ═══ -->
+        <!-- ═══ 3. LIVE SALARY & MARKET CHARTS ═══ -->
+        <div id="career-live-dashboard" style="display:none;margin-bottom:24px;"></div>
+
+        <!-- ═══ 4. AI CLINICAL IDENTITY — needs regenerate ═══ -->
         <div id="career-ai-section" style="display:none;margin-bottom:24px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">Clinical Identity · AI Analysis</div>
@@ -3844,12 +3844,12 @@ function showView(view) {
   document.getElementById('view-' + view).classList.add('active');
   document.getElementById('nav-' + view).classList.add('active');
 
-  if (view === 'cases') { renderAllCases(); renderHeatmap(); renderLiveCareerDashboard(); }
+  if (view === 'cases') { renderAllCases(); renderHeatmap(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderPortfolioCases();
   if (view === 'profile') loadProfileForm();
-  if (view === 'career') { renderCareerGPS(); loadClinicalProfileDisplay(); }
+  if (view === 'career') { renderCareerGPS(); renderLiveCareerDashboard(); loadClinicalProfileDisplay(); }
 }
 
 // ─── CASES ───
@@ -9844,17 +9844,19 @@ Respond ONLY with this exact JSON structure:
     </div>
 
     <!-- SECTION 1: Identity — compact -->
-    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;">
-      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;">
-        ${radarSVG}
-        <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:8px;justify-content:center;">
+    <div class="career-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:20px;margin-bottom:12px;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:160px 1fr;gap:16px;align-items:center;">
+        <div style="flex-shrink:0;">
+          ${radarSVG.replace('width:180px;height:180px','width:100%;height:auto;max-width:160px')}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
           <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:10px;padding:10px 12px;">
             <span style="color:#34D399;flex-shrink:0;">✦</span>
-            <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.strength || ''}</span>
+            <span style="font-size:0.78rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.strength || ''}</span>
           </div>
           <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:10px 12px;">
             <span style="color:#EF4444;flex-shrink:0;">⚠</span>
-            <span style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.risk || ''}</span>
+            <span style="font-size:0.78rem;color:rgba(255,255,255,0.7);line-height:1.4;">${r.identity?.risk || ''}</span>
           </div>
         </div>
       </div>
