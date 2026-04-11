@@ -1894,22 +1894,22 @@ body::after {
                 <div style="font-size:0.52rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">Cases</div>
               </div>
 
-              <div class="stat-pill" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:16px;padding:14px 8px;text-align:center;position:relative;overflow:hidden;">
-                <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.5),transparent);"></div>
-                <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:#34D399;line-height:1;margin-bottom:4px;" id="micro-protected">0</div>
-                <div style="font-size:0.52rem;color:rgba(52,211,153,0.5);text-transform:uppercase;letter-spacing:0.1em;">Protected</div>
-              </div>
-
               <div class="stat-pill" style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:16px;padding:14px 8px;text-align:center;position:relative;overflow:hidden;">
                 <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent);"></div>
                 <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:#F59E0B;line-height:1;margin-bottom:4px;" id="micro-streak">0</div>
                 <div style="font-size:0.52rem;color:rgba(245,158,11,0.5);text-transform:uppercase;letter-spacing:0.1em;">Streak</div>
               </div>
 
+              <div class="stat-pill" style="background:rgba(192,192,192,0.06);border:1px solid rgba(192,192,192,0.15);border-radius:16px;padding:14px 8px;text-align:center;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(192,192,192,0.4),transparent);"></div>
+                <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#C0C0C0;line-height:1;margin-bottom:4px;margin-top:4px;" id="micro-rank">—</div>
+                <div style="font-size:0.52rem;color:rgba(192,192,192,0.4);text-transform:uppercase;letter-spacing:0.1em;">Rank</div>
+              </div>
+
               <div class="stat-pill" style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:14px 8px;text-align:center;position:relative;overflow:hidden;">
                 <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
-                <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--teal);line-height:1;margin-bottom:4px;" id="micro-level">—</div>
-                <div style="font-size:0.52rem;color:rgba(124,111,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">Level</div>
+                <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--teal);line-height:1;margin-bottom:4px;" id="micro-molars">0</div>
+                <div style="font-size:0.52rem;color:rgba(124,111,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">🦷 Molars</div>
               </div>
 
             </div>
@@ -1971,25 +1971,6 @@ body::after {
 
         </div>
 
-        <!-- SPECIALTY DISTRIBUTION — ELITE ORBS -->
-        <div id="specialty-chart-card" style="display:none;margin-bottom:16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:24px;position:relative;overflow:hidden;">
-          <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(124,111,255,0.06),transparent 70%);pointer-events:none;"></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-            <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.15em;font-weight:600;">Clinical DNA</div>
-            <div style="font-size:0.7rem;color:var(--gray);background:rgba(255,255,255,0.04);padding:3px 10px;border-radius:100px;" id="spec-chart-total">— cases</div>
-          </div>
-          <style>
-            @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-            .spec-orb{border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:default;transition:transform 0.3s;}
-            .spec-orb:hover{transform:scale(1.12) translateY(-4px);}
-          </style>
-          <div id="specialty-bars" style="display:flex;justify-content:space-around;align-items:flex-end;gap:8px;padding-bottom:4px;"></div>
-        </div>
-
-        <!-- XP PROGRESS CARD -->
-        <div class="card" id="xp-progress-card" style="background:linear-gradient(135deg,var(--navy-2) 0%,rgba(124,111,255,0.05) 100%);border-color:var(--teal-mid);margin-bottom:20px;">
-        </div>
-
         <!-- INACTIVITY ALERT -->
         <div id="inactivity-alert" style="display:none;"></div>
 
@@ -1998,21 +1979,6 @@ body::after {
 
         <!-- SKILL PROGRESS GRAPH -->
         <div id="skill-progress-card" style="display:none;margin-bottom:16px;"></div>
-
-        <!-- RECENT CASES -->
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <div class="card-title" style="margin:0;">Recent Records</div>
-            <button onclick="showView('cases')" style="background:none;border:none;color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;cursor:pointer;padding:0;">View all →</button>
-          </div>
-          <div id="recent-cases-list">
-            <div class="empty-state">
-              <div class="empty-icon">🛡</div>
-              <div class="empty-title">No records yet</div>
-              <div class="empty-sub">Log your first case — it becomes a timestamped,<br>verified record instantly.</div>
-            </div>
-          </div>
-        </div>
 
         <!-- BEST WORK -->
         <div class="card" id="best-work-card" style="display:none">
@@ -2023,35 +1989,6 @@ body::after {
           <div id="best-work-list" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
         </div>
 
-        <!-- ACHIEVEMENTS — moved from nav to dashboard -->
-        <div class="card" id="achievements-dash-card" style="display:none;margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <div>
-              <div class="card-title" style="margin:0;">Achievements</div>
-              <div style="font-size:0.7rem;color:var(--gray);margin-top:2px;" id="achievements-dash-sub">Earned 0 of 0</div>
-            </div>
-            <div style="font-size:0.7rem;color:var(--teal);cursor:pointer;" onclick="showView('badges')">See all →</div>
-          </div>
-          <div id="achievements-dash-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;"></div>
-        </div>
-
-        <!-- REVIEWS -->
-        <div class="card" id="dashboard-reviews-card" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-            <div class="card-title" style="margin:0">🌟 Your Reviews</div>
-            <div id="dashboard-avg-rating" style="font-size:0.85rem;color:var(--amber, #F59E0B);font-weight:600"></div>
-          </div>
-          <div id="dashboard-reviews-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
-
-        <!-- GAP ALERT -->
-        <div class="card" id="gap-card" style="display:none">
-          <div class="card-title">⚡ Portfolio Insights</div>
-          <div id="gap-alerts"></div>
-        </div>
-
-        <!-- STREAK URGENCY -->
-        <div id="streak-card" style="display:none;margin-bottom:20px;"></div>
       </div>
 
       <!-- LOG CASE VIEW -->
@@ -4410,9 +4347,9 @@ function updateDashboard() {
   // Micro stats
   const setMicro = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   setMicro('micro-total', total);
-  setMicro('micro-protected', protected_count);
   setMicro('micro-streak', streak);
-  setMicro('micro-level', total > 0 ? level.icon : '—');
+  setMicro('micro-rank', total > 0 ? level.name : '—');
+  setMicro('micro-molars', total > 0 ? getTotalMolars(allCases) : 0);
 
   // Legacy stat IDs (kept for backward compat)
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -4427,59 +4364,12 @@ function updateDashboard() {
   if (welcomeCard) welcomeCard.style.display = total === 0 ? 'block' : 'none';
 
   // Inject Molars/XP bar into dashboard
-  const xpCard = document.getElementById('xp-progress-card');
-  if (xpCard) {
-    const totalMolars = xp.totalMolars;
-    const nextLevelName = level.level < 10 ? LEVELS[level.level].name : null;
-    const nextLevelIcon = level.level < 10 ? LEVELS[level.level].icon : null;
-    xpCard.style.cssText = `background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.2);border-radius:24px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden;`;
-    xpCard.innerHTML = `
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${level.color}80,transparent);"></div>
-      <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,${level.color}15,transparent 70%);pointer-events:none;"></div>
-
-      <!-- Header row -->
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-        <div style="width:56px;height:56px;border-radius:16px;background:${level.color}18;border:1px solid ${level.color}35;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;box-shadow:0 0 20px ${level.color}20;">${level.icon}</div>
-        <div style="flex:1;">
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px;">
-            <span style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:${level.color};letter-spacing:-0.03em;">${level.name}</span>
-            <span style="font-size:0.65rem;color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:100px;">Lv.${level.level}</span>
-          </div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);font-style:italic;">${level.title}</div>
-        </div>
-        <!-- Total Molars -->
-        <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">Total</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:${level.color};line-height:1;">${totalMolars}</div>
-          <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);">🦷 Molars</div>
-        </div>
-      </div>
-
-      <!-- Progress bar -->
-      <div style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.68rem;margin-bottom:8px;">
-          <span style="color:rgba(255,255,255,0.3);">${xp.current} / ${xp.needed} Molars</span>
-          ${nextLevelName ? `<span style="color:${level.color};opacity:0.7;">${nextLevelIcon} ${nextLevelName} in ${xp.toNext} 🦷</span>` : `<span style="color:${level.color};">✦ Max Rank</span>`}
-        </div>
-        <div style="height:10px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;position:relative;">
-          <div id="xp-bar-fill" style="height:100%;background:linear-gradient(90deg,${level.color},${level.color}aa);border-radius:100px;width:0%;transition:width 1.4s cubic-bezier(0.4,0,0.2,1);position:relative;box-shadow:0 0 12px ${level.color}60;">
-            <div style="position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:14px;height:14px;background:white;border-radius:50%;box-shadow:0 0 10px ${level.color};"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mini tags -->
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;">
-        ${allCases.length >= 1 ? `<div style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-size:0.58rem;padding:3px 9px;border-radius:100px;font-weight:600;">🎯 First Case</div>` : ''}
-        ${allCases.length >= 10 ? `<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#F59E0B;font-size:0.58rem;padding:3px 9px;border-radius:100px;font-weight:600;">🔥 10 Cases</div>` : ''}
-        ${totalMolars >= 100 ? `<div style="background:rgba(192,192,192,0.1);border:1px solid rgba(192,192,192,0.25);color:#C0C0C0;font-size:0.58rem;padding:3px 9px;border-radius:100px;font-weight:600;">🥈 100 Molars</div>` : ''}
-        ${avg >= 7 ? `<div style="background:rgba(229,228,226,0.1);border:1px solid rgba(229,228,226,0.25);color:#E5E4E2;font-size:0.58rem;padding:3px 9px;border-radius:100px;font-weight:600;">💎 High Complexity</div>` : ''}
-      </div>
-    `;
-    setTimeout(() => {
-      const bar = document.getElementById('xp-bar-fill');
-      if (bar) bar.style.width = `${xp.pct}%`;
-    }, 120);
+  // Rank pill color — update dynamically
+  const rankPill = document.querySelector('#micro-rank')?.closest('.stat-pill');
+  if (rankPill && total > 0) {
+    rankPill.style.background = `${level.color}12`;
+    rankPill.style.borderColor = `${level.color}30`;
+    rankPill.querySelector('#micro-rank').style.color = level.color;
   }
 
   // Specialty distribution chart
