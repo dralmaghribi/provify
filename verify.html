@@ -465,7 +465,12 @@ const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Ora
 const photoLabels = {
   'xr-preop':'Pre-op X-ray','xr-wl':'Working Length','xr-mc':'Master Cone',
   'xr-obturation':'Obturation','xr-postop':'Post-op X-ray','xr-gen-preop':'Pre-op X-ray',
-  'xr-gen-postop':'Post-op X-ray','cp-preop':'Pre-op Photo','cp-postop':'Post-op Photo','cp-intraoral':'Intra-oral Photo'
+  'xr-gen-postop':'Post-op X-ray','cp-preop':'Pre-op Photo','cp-postop':'Post-op Photo',
+  'cp-intraoral':'Intra-oral Photo',
+  // vl- prefix variants
+  'vl-cp-1':'Clinical Photo 1','vl-cp-2':'Clinical Photo 2','vl-cp-3':'Clinical Photo 3',
+  'vl-xr-1':'X-ray 1','vl-xr-2':'X-ray 2','vl-xr-3':'X-ray 3',
+  'vl-preop':'Pre-op Photo','vl-postop':'Post-op Photo','vl-xray':'X-ray',
 };
 
 function getComplexityLabel(score) {
@@ -519,7 +524,7 @@ async function loadCase() {
         photos = files.map(f => {
           const pid = f.name.split('.')[0];
           const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(`${c.user_id}/${c.id}/${f.name}`);
-          return { pid, url: publicUrl, label: photoLabels[pid] || pid };
+          return { pid, url: publicUrl, label: photoLabels[pid] || pid.replace(/[-_]/g,' ').replace(/\b\w/g,l=>l.toUpperCase()) };
         });
       }
     } catch(e) {}
