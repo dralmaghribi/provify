@@ -274,7 +274,10 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
           <div style="font-size:0.75rem;color:var(--g);">Intern · Endodontics</div>
         </div>
         <div style="padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-          ${['47<br><span style="font-size:0.55rem;color:rgba(155,145,255,0.5);">CASES</span>','5.8<br><span style="font-size:0.55rem;color:rgba(52,211,153,0.5);">AVG SCORE</span>','8<br><span style="font-size:0.55rem;color:rgba(239,68,68,0.5);">COMPLEX</span>','6<br><span style="font-size:0.55rem;color:rgba(245,158,11,0.5);">MONTHS</span>'].map(s => `<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 8px;text-align:center;font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--w);">${s}</div>`).join('')}
+          <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 8px;text-align:center;font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--w);">47<br><span style="font-size:0.55rem;color:rgba(155,145,255,0.5);">CASES</span></div>
+          <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 8px;text-align:center;font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--w);">5.8<br><span style="font-size:0.55rem;color:rgba(52,211,153,0.5);">AVG</span></div>
+          <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 8px;text-align:center;font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--w);">8<br><span style="font-size:0.55rem;color:rgba(239,68,68,0.5);">COMPLEX</span></div>
+          <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 8px;text-align:center;font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--w);">6<br><span style="font-size:0.55rem;color:rgba(245,158,11,0.5);">MONTHS</span></div>
         </div>
         <div style="padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);">
           <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:10px;">Complexity Growth</div>
@@ -290,7 +293,9 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
         <div style="padding:12px 24px;">
           <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:8px;">Specialties</div>
           <div style="display:flex;flex-direction:column;gap:5px;">
-            ${[['Endo','#7C6FFF',72],['Resto','#F59E0B',18],['Surgery','#EF4444',10]].map(([s,c,p]) => `<div style="display:flex;align-items:center;gap:8px;"><div style="width:40px;font-size:0.6rem;color:rgba(255,255,255,0.4);text-align:right;">${s}</div><div style="flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:100px;"><div style="width:${p}%;height:100%;background:${c};border-radius:100px;"></div></div><div style="font-size:0.6rem;color:${c};width:24px;">${p}%</div></div>`).join('')}
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:40px;font-size:0.6rem;color:rgba(255,255,255,0.4);text-align:right;">Endo</div><div style="flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:100px;"><div style="width:72%;height:100%;background:#7C6FFF;border-radius:100px;"></div></div><div style="font-size:0.6rem;color:#7C6FFF;width:28px;">72%</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:40px;font-size:0.6rem;color:rgba(255,255,255,0.4);text-align:right;">Resto</div><div style="flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:100px;"><div style="width:18%;height:100%;background:#F59E0B;border-radius:100px;"></div></div><div style="font-size:0.6rem;color:#F59E0B;width:28px;">18%</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:40px;font-size:0.6rem;color:rgba(255,255,255,0.4);text-align:right;">Surgery</div><div style="flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:100px;"><div style="width:10%;height:100%;background:#EF4444;border-radius:100px;"></div></div><div style="font-size:0.6rem;color:#EF4444;width:28px;">10%</div></div>
           </div>
         </div>
       </div>
@@ -562,24 +567,23 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
     </div>
     <div class="prg rev d1">
       <div class="prcard">
-        <div class="prpl">Free</div>
-        <div class="prn">$0<span>/month</span></div>
-        <div class="prd">For dentists getting started with case documentation.</div>
+        <div class="prpl">Free Trial</div>
+        <div class="prn">$0<span>/14 days</span></div>
+        <div class="prd">Try everything free for 14 days. No credit card needed.</div>
         <ul class="prl">
-          <li><div class="chk">&#10003;</div>Log up to 10 cases</li>
-          <li><div class="chk">&#10003;</div>Complexity scoring</li>
-          <li><div class="chk">&#10003;</div>Quick Log &mdash; 60 seconds</li>
-          <li><div class="chk">&#10003;</div>Public portfolio page</li>
-          <li><div class="crs">&#215;</div>AI case feedback</li>
-          <li><div class="crs">&#215;</div>Medico-legal record + verification</li>
-          <li><div class="crs">&#215;</div>Career Assistant</li>
+          <li><div class="chk">&#10003;</div>Full access — all features</li>
+          <li><div class="chk">&#10003;</div>Voice log — speak your cases</div></li>
+          <li><div class="chk">&#10003;</div>Medico-legal verification URL</li>
+          <li><div class="chk">&#10003;</div>PDF portfolio generator</li>
+          <li><div class="chk">&#10003;</div>Career intelligence report</li>
+          <li><div class="chk">&#10003;</div>No credit card required</li>
         </ul>
-        <a href="/app.html" class="prbtn prbg">Get started free</a>
+        <a href="/app.html" class="prbtn prbg">Start Free Trial &rarr;</a>
       </div>
       <div class="prcard pro">
         <div class="prpl">Pro</div>
         <div class="prn">$29<span>/month</span></div>
-        <div class="prd">For dentists who take their documentation and career seriously.</div>
+        <div class="prd">For dentists who take their documentation and career seriously. After your 14-day trial.</div>
         <ul class="prl">
           <li><div class="chk">&#10003;</div>Unlimited cases</li>
           <li><div class="chk">&#10003;</div>AI case intelligence reports</li>
@@ -594,7 +598,7 @@ footer{padding:48px 6% 32px;border-top:1px solid var(--wf);}
         <a href="/app.html" class="prbtn prbv">Start Pro free &rarr;</a>
       </div>
     </div>
-    <p style="text-align:center;font-size:0.8rem;color:var(--g);margin-top:20px;">Beta users get Pro free. No credit card required.</p>
+    <p style="text-align:center;font-size:0.8rem;color:var(--g);margin-top:20px;">14-day free trial · No credit card · Cancel anytime · Your cases stay yours forever</p>
   </div>
 </div>
 
