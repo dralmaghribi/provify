@@ -934,6 +934,10 @@ body::after {
         <button onclick="toggleCaseEdit()" id="edit-case-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='var(--gray)'">
           ✏️ Edit
         </button>
+        <button onclick="shareCase()" id="share-case-btn" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);color:#34D399;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:5px;" onmouseover="this.style.background='rgba(52,211,153,0.15)'" onmouseout="this.style.background='rgba(52,211,153,0.08)'">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
         <div style="text-align:center; background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:10px; padding:8px 14px;position:relative;">
           <div style="position:relative;width:48px;height:48px;margin:0 auto;">
             <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg);">
@@ -4605,79 +4609,58 @@ function caseItemHTML(c, showDelete = false) {
       <!-- Top color line -->
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${color},${color}40,transparent);"></div>
 
-      ${firstPhoto ? `
-      <!-- Photo banner -->
-      <div style="position:relative;height:140px;overflow:hidden;border-radius:20px 20px 0 0;">
-        <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy"/>
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.7));"></div>
-        <!-- Spec badge on photo -->
-        <div style="position:absolute;top:10px;left:12px;background:${color}CC;backdrop-filter:blur(8px);color:white;font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;padding:4px 10px;border-radius:100px;">${specShort}</div>
-        <!-- Score on photo -->
-        <div style="position:absolute;top:8px;right:12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);border:1px solid ${color}60;border-radius:12px;padding:6px 10px;text-align:center;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:${color};line-height:1;">${score}</div>
-          <div style="font-size:0.45rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;">score</div>
-        </div>
-        ${photos.length > 1 ? `<div style="position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);color:rgba(255,255,255,0.7);font-size:0.58rem;padding:3px 8px;border-radius:100px;">+${photos.length - 1} more</div>` : ''}
-      </div>
-      ` : ''}
-
       <!-- Content -->
-      <div style="padding:${firstPhoto ? '14px' : '16px'} 16px 14px;">
-
+      <div style="padding:14px 16px;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
 
-          ${!firstPhoto ? `
+          ${firstPhoto ? `
+          <!-- Square thumbnail -->
+          <div style="width:56px;height:56px;flex-shrink:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
+            <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy"/>
+          </div>
+          ` : `
           <!-- Score ring — only shown when no photo -->
-          <div style="position:relative;width:40px;height:40px;flex-shrink:0;">
-            <svg width="40" height="40" viewBox="0 0 40 40" style="transform:rotate(-90deg);">
-              <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
-              <circle cx="20" cy="20" r="16" fill="none" stroke="${color}" stroke-width="3"
-                stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+          <div style="position:relative;width:44px;height:44px;flex-shrink:0;">
+            <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
+              <circle cx="22" cy="22" r="16" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
+              <circle cx="22" cy="22" r="16" fill="none" stroke="${color}" stroke-width="3"
+                stroke-dasharray="${2*Math.PI*16}" stroke-dashoffset="${2*Math.PI*16*(1-score/10)}"
                 stroke-linecap="round" style="filter:drop-shadow(0 0 4px ${color}60);"/>
             </svg>
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
               <span style="font-size:0.72rem;font-weight:700;color:${color};font-family:'Inter',sans-serif;">${score || '—'}</span>
             </div>
           </div>
-          ` : ''}
+          `}
 
           <!-- Main info -->
           <div style="flex:1;min-width:0;">
-            <!-- Title -->
-            <div style="font-size:0.92rem;color:white;font-weight:600;margin-bottom:3px;line-height:1.3;">
-              ${nickname
-                ? `<span>${nickname}</span>`
-                : `<span style="color:rgba(255,255,255,0.9);">Tooth ${c.tooth_number || '—'}</span>`
-              }
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+              <div style="flex:1;min-width:0;">
+                <!-- Title -->
+                <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                  ${nickname ? `${nickname}` : `Tooth ${c.tooth_number || '—'}`}
+                </div>
+                <!-- Smart label -->
+                ${smartLabel ? `<div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${smartLabel}</div>` : ''}
+                <!-- Meta row -->
+                <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                  <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${c.specialty === 'restorative' ? 'Resto' : c.specialty === 'surgery' ? 'Surgery' : c.specialty === 'paeds' ? 'Paeds' : c.specialty === 'prostho' ? 'Prostho' : 'Endo'}</span>
+                  ${firstPhoto ? `<span style="font-size:0.55rem;font-weight:700;color:${color};background:${color}15;padding:2px 7px;border-radius:100px;">${score}/10</span>` : ''}
+                  <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
+                  <span style="font-size:0.58rem;color:${rank.color};background:${rank.color}15;padding:2px 7px;border-radius:100px;font-weight:600;">${rank.label}</span>
+                  ${photos.length > 1 ? `<span style="font-size:0.55rem;color:rgba(255,255,255,0.2);">+${photos.length-1} photos</span>` : ''}
+                </div>
+                ${aiStrength ? `<div style="margin-top:5px;font-size:0.65rem;color:rgba(52,211,153,0.55);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">✦ ${aiStrength}</div>` : ''}
+              </div>
+
+              <!-- Right actions -->
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
+                <button onclick="event.stopPropagation();promptNickname('${c.id}')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);font-size:0.58rem;padding:3px 8px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.borderColor='${color}50';this.style.color='${color}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.25)'">${nickname ? '✏' : '+ Name'}</button>
+                ${showDelete ? `<button onclick="event.stopPropagation();deleteCase('${c.id}')" style="background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:0.8rem;padding:2px;transition:color 0.2s;" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='rgba(255,255,255,0.15)'">✕</button>` : ''}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
             </div>
-
-            <!-- Smart label -->
-            ${smartLabel ? `<div style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${smartLabel}</div>` : ''}
-
-            <!-- Meta row -->
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-              ${!firstPhoto ? `<span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 8px;border-radius:100px;">${specShort.replace('Endodontics','Endo').replace('Restorative','Resto').replace('Oral Surgery','Surgery').replace('Paediatric','Paeds').replace('Prosthodontics','Prostho')}</span>` : ''}
-              <span style="font-size:0.62rem;color:rgba(255,255,255,0.2);">${date}</span>
-              <span style="font-size:0.6rem;color:${rank.color};background:${rank.color}15;padding:2px 8px;border-radius:100px;font-weight:600;">${rank.label}</span>
-            </div>
-
-            ${aiStrength ? `
-            <!-- AI insight -->
-            <div style="margin-top:8px;font-size:0.68rem;color:rgba(52,211,153,0.6);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">✦ ${aiStrength}</div>
-            ` : ''}
-          </div>
-
-          <!-- Right actions -->
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
-            <button onclick="event.stopPropagation();promptNickname('${c.id}')" style="
-              background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
-              color:rgba(255,255,255,0.25);font-size:0.6rem;padding:4px 8px;border-radius:8px;
-              cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;
-            " onmouseover="this.style.borderColor='${color}50';this.style.color='${color}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.25)'">
-              ${nickname ? '✏ Rename' : '+ Name'}
-            </button>
-            ${showDelete ? `<button onclick="event.stopPropagation();deleteCase('${c.id}')" style="background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:0.85rem;padding:4px;transition:color 0.2s;" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='rgba(255,255,255,0.15)'">✕</button>` : ''}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
 
         </div>
@@ -4877,8 +4860,40 @@ async function openCaseDetail(id) {
     } catch(e) { console.log('Photo load error:', e); }
   }
 
+  modal.dataset.caseId = c.id;
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+}
+
+function shareCase() {
+  const caseId = document.getElementById('case-detail-modal')?.dataset?.caseId;
+  const c = allCases.find(x => x.id === caseId);
+  if (!c) return;
+
+  const verifyUrl = `https://provify.app/verify.html?id=${c.id}`;
+  const nickname = getCaseNickname(c.id);
+  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+  const spec = specLabels[c.specialty] || c.specialty;
+  const title = nickname || `Tooth ${c.tooth_number} — ${spec}`;
+  const text = `${title}\nDocumented & verified on Provify.\n${verifyUrl}`;
+
+  if (navigator.share) {
+    navigator.share({ title, text, url: verifyUrl })
+      .catch(() => copyToClipboard(verifyUrl));
+  } else {
+    copyToClipboard(verifyUrl);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('share-case-btn');
+    if (!btn) return;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!';
+    btn.style.background = 'rgba(52,211,153,0.2)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = 'rgba(52,211,153,0.08)'; }, 2000);
+  });
 }
 
 function closeCaseDetail() {
