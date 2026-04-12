@@ -3,882 +3,751 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clinical Portfolio — Provify</title>
+<title>Clinical Portfolio · Provify</title>
+<meta name="description" content="Verified clinical record — cases documented, complexity proven, growth measured.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy: #09090B;
-  --navy-2: #0F0F12;
-  --navy-3: #141418;
-  --teal: #7C6FFF;
-  --teal-dim: rgba(124,111,255,0.08);
-  --teal-mid: rgba(124,111,255,0.22);
-  --white: #F4F7F9;
-  --white-dim: #F4F7F970;
-  --white-faint: #F4F7F912;
-  --gray: #8892A4;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+  :root {
+    --navy: #07090F;
+    --navy-2: #0C0F18;
+    --navy-3: #111520;
+    --teal: #34D399;
+    --purple: #7C6FFF;
+    --amber: #F59E0B;
+    --red: #EF4444;
+    --blue: #60A5FA;
+    --white: #F0F4FF;
+    --gray: rgba(240,244,255,0.35);
+  }
 
-body {
-  background: var(--navy);
-  color: var(--white);
-  font-family: 'Inter', sans-serif;
-  font-weight: 300;
-  min-height: 100vh;
-}
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* NOISE */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 100;
-  opacity: 0.3;
-}
+  /* Atmospheric background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 100% 60% at 50% -20%, rgba(124,111,255,0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 80%, rgba(52,211,153,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* LOADING */
-.loading {
-  position: fixed;
-  inset: 0;
-  background: var(--navy);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 200;
-}
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 100px;
+  }
 
-.loading-logo {
-  font-family: 'Instrument Serif', serif;
-  font-size: 1.8rem;
-  color: var(--white);
-}
-.loading-logo span { color: var(--teal); }
+  /* Loading */
+  #loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 16px;
+  }
 
-.spinner {
-  width: 28px; height: 28px;
-  border: 2px solid var(--white-faint);
-  border-top-color: var(--teal);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid rgba(255,255,255,0.06);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
 
-/* NOT FOUND */
-.not-found {
-  display: none;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-  text-align: center;
-  padding: 40px;
-}
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-.not-found h1 {
-  font-family: 'Instrument Serif', serif;
-  font-size: 3rem;
-  color: var(--white);
-}
+  #error {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    gap: 12px;
+  }
 
-.not-found p { color: var(--gray); font-size: 1rem; }
+  #content { display: none; }
 
-/* NAV */
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 50;
-  padding: 16px 5%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(180deg, var(--navy) 0%, transparent 100%);
-}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-.nav-logo {
-  font-family: 'Instrument Serif', serif;
-  font-size: 1.3rem;
-  color: var(--white);
-  text-decoration: none;
-  letter-spacing: -0.02em;
-}
-.nav-logo span { color: var(--teal); }
+  /* Hero section */
+  .hero {
+    padding: 72px 0 48px;
+    text-align: center;
+    animation: fadeUp 0.6s ease both;
+  }
 
-.nav-cta {
-  background: var(--teal);
-  color: var(--navy);
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-size: 0.8rem;
-  padding: 8px 20px;
-  border-radius: 100px;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-.nav-cta:hover { background: #9B91FF; }
+  .avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--teal));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 40px rgba(124,111,255,0.3);
+  }
 
-/* PORTFOLIO CONTENT */
-.portfolio {
-  display: none;
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 100px 24px 80px;
-}
+  .dr-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
 
-/* HEADER */
-.portfolio-header {
-  padding-bottom: 40px;
-  border-bottom: 1px solid var(--white-faint);
-  margin-bottom: 60px;
-  animation: fadeUp 0.7s ease both;
-}
+  .dr-meta {
+    font-size: 0.88rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+  }
 
-.portfolio-name {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  color: var(--white);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin-bottom: 8px;
-}
+  .verified-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 0.68rem;
+    color: var(--teal);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
 
-.portfolio-role {
-  font-size: 1rem;
-  color: var(--teal);
-  font-weight: 400;
-  margin-bottom: 16px;
-  letter-spacing: 0.02em;
-}
+  .verified-pill .dot {
+    width: 5px; height: 5px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
 
-.portfolio-bio {
-  font-size: 1rem;
-  color: var(--gray);
-  line-height: 1.7;
-  max-width: 560px;
-  margin-bottom: 24px;
-}
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
 
-.portfolio-meta {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  align-items: center;
-}
+  /* Positioning line */
+  .positioning {
+    text-align: center;
+    margin: 0 0 40px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
 
-.portfolio-meta-item {
-  font-size: 0.8rem;
-  color: var(--gray);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+  .positioning-line {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    color: rgba(255,255,255,0.5);
+    letter-spacing: -0.02em;
+    font-style: italic;
+  }
 
-.portfolio-meta-item strong {
-  color: var(--white);
-  font-weight: 500;
-}
+  .positioning-line strong {
+    color: var(--white);
+    font-style: normal;
+  }
 
-.powered-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--teal-dim);
-  border: 1px solid var(--teal-mid);
-  color: var(--teal);
-  font-size: 0.75rem;
-  padding: 4px 12px;
-  border-radius: 100px;
-  text-decoration: none;
-  margin-left: auto;
-}
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.6s ease 0.15s both;
+  }
 
-/* CASE CARDS */
-.cases-section {
-  animation: fadeUp 0.7s 0.2s ease both;
-}
+  @media (max-width: 480px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
 
-.section-label {
-  font-size: 0.7rem;
-  color: var(--gray);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 32px;
-}
+  .stat-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px;
+    padding: 18px 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-.case-card {
-  background: var(--navy-2);
-  border: 1px solid var(--white-faint);
-  border-radius: 20px;
-  overflow: hidden;
-  margin-bottom: 40px;
-  transition: border-color 0.3s;
-  animation: fadeUp 0.6s ease both;
-}
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
 
-.case-card:hover { border-color: var(--teal-mid); }
+  .stat-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
 
-/* CASE HEADER */
-.case-header {
-  padding: 28px 32px 20px;
-  border-bottom: 1px solid var(--white-faint);
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
+  .stat-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+  }
 
-.case-header-left { flex: 1; }
+  /* Growth chart */
+  .section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 22px;
+    padding: 24px;
+    margin-bottom: 14px;
+    animation: fadeUp 0.6s ease 0.2s both;
+    position: relative;
+    overflow: hidden;
+  }
 
-.case-specialty-tag {
-  display: inline-block;
-  background: var(--teal-dim);
-  border: 1px solid var(--teal-mid);
-  color: var(--teal);
-  font-size: 0.65rem;
-  font-weight: 500;
-  padding: 3px 10px;
-  border-radius: 100px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 10px;
-}
+  .section-title {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 16px;
+  }
 
-.case-tooth-title {
-  font-family: 'Instrument Serif', serif;
-  font-size: 1.6rem;
-  color: var(--white);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
+  /* Specialty bars */
+  .spec-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
 
-.case-date {
-  font-size: 0.8rem;
-  color: var(--gray);
-  margin-top: 4px;
-}
+  .spec-bar-row:last-child { margin-bottom: 0; }
 
-.complexity-badge {
-  background: var(--navy-3);
-  border: 1px solid var(--white-faint);
-  border-radius: 12px;
-  padding: 12px 16px;
-  text-align: center;
-  flex-shrink: 0;
-}
+  .spec-name {
+    width: 60px;
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.5);
+    text-align: right;
+    flex-shrink: 0;
+  }
 
-.complexity-number {
-  font-family: 'Instrument Serif', serif;
-  font-size: 1.8rem;
-  color: var(--teal);
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
+  .spec-bar-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 100px;
+    overflow: hidden;
+  }
 
-.complexity-label {
-  font-size: 0.6rem;
-  color: var(--gray);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 2px;
-}
+  .spec-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1s ease;
+  }
 
-/* NARRATIVE */
-.case-narrative {
-  padding: 24px 32px;
-  border-bottom: 1px solid var(--white-faint);
-}
+  .spec-count {
+    width: 24px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-align: left;
+    flex-shrink: 0;
+  }
 
-.narrative-text {
-  font-size: 1rem;
-  color: var(--white-dim);
-  line-height: 1.8;
-  font-style: italic;
-  position: relative;
-  padding-left: 20px;
-}
+  /* Best cases */
+  .cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
 
-.narrative-text::before {
-  content: '"';
-  position: absolute;
-  left: 0;
-  top: -4px;
-  font-family: 'Instrument Serif', serif;
-  font-size: 2.5rem;
-  color: var(--teal);
-  line-height: 1;
-  opacity: 0.7;
-}
+  .case-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.25s;
+    cursor: pointer;
+    text-decoration: none;
+  }
 
-/* PHOTOS */
-.case-photos {
-  padding: 24px 32px;
-  border-bottom: 1px solid var(--white-faint);
-}
+  .case-card:hover {
+    border-color: rgba(124,111,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(124,111,255,0.1);
+  }
 
-.photos-label {
-  font-size: 0.65rem;
-  color: var(--gray);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 14px;
-}
+  .case-photo {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+  }
 
-.photos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
-}
+  .case-photo-placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    background: rgba(255,255,255,0.02);
+  }
 
-.photo-item {
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--navy-3);
-  aspect-ratio: 1;
-  position: relative;
-}
+  .case-info {
+    padding: 12px 14px;
+  }
 
-.photo-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  cursor: pointer;
-  transition: transform 0.3s;
-}
+  .case-spec {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
 
-.photo-item img:hover { transform: scale(1.03); }
+  .case-title-text {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.photo-item-label {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(8,15,30,0.9));
-  color: var(--white-dim);
-  font-size: 0.6rem;
-  padding: 8px 6px 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
+  .case-narrative-preview {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
 
-.photo-empty {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--white-faint);
-  font-size: 1.5rem;
-}
+  .case-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
 
-/* CASE DETAILS */
-.case-details {
-  padding: 20px 32px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
+  /* Growth insight */
+  .growth-insight {
+    background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.02));
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    animation: fadeUp 0.6s ease 0.25s both;
+    position: relative;
+    overflow: hidden;
+  }
 
-.detail-item { }
+  .growth-insight::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  }
 
-.detail-label {
-  font-size: 0.65rem;
-  color: var(--gray);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 2px;
-}
+  /* CTA footer */
+  .footer-cta {
+    text-align: center;
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    animation: fadeUp 0.6s ease 0.35s both;
+  }
 
-.detail-value {
-  font-size: 0.85rem;
-  color: var(--white-dim);
-  font-weight: 400;
-}
+  .footer-eyebrow {
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 16px;
+  }
 
-/* LIGHTBOX */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(8, 15, 30, 0.97);
-  z-index: 300;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
+  .footer-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
 
-.lightbox.active { display: flex; }
+  .footer-sub {
+    font-size: 0.82rem;
+    color: var(--gray);
+    margin-bottom: 24px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
 
-.lightbox img {
-  max-width: 100%;
-  max-height: 90vh;
-  border-radius: 12px;
-  object-fit: contain;
-}
+  .cta-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--purple), #9B91FF);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 15px 36px;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 8px 32px rgba(124,111,255,0.3);
+    letter-spacing: -0.01em;
+  }
 
-.lightbox-close {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  color: var(--gray);
-  font-size: 2rem;
-  cursor: pointer;
-  background: none;
-  border: none;
-  transition: color 0.2s;
-}
-.lightbox-close:hover { color: var(--white); }
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(124,111,255,0.45);
+  }
 
-.lightbox-caption {
-  position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--gray);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
+  .provify-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.3);
+    margin-top: 20px;
+    letter-spacing: -0.02em;
+  }
 
-/* EMPTY PORTFOLIO */
-.empty-portfolio {
-  text-align: center;
-  padding: 80px 20px;
-  color: var(--gray);
-}
+  .provify-logo span { color: var(--teal); }
 
-.empty-portfolio h2 {
-  font-family: 'Instrument Serif', serif;
-  font-size: 1.8rem;
-  color: var(--white-dim);
-  margin-bottom: 12px;
-}
-
-/* ANIMATIONS */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  .portfolio { padding: 80px 16px 60px; }
-  .case-header { padding: 20px; }
-  .case-narrative { padding: 20px; }
-  .case-photos { padding: 20px; }
-  .case-details { padding: 16px 20px; }
-  .portfolio-meta { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .powered-badge { margin-left: 0; }
-}
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
 </style>
 </head>
 <body>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">×</button>
-  <img id="lightbox-img" src="" alt="">
-  <div class="lightbox-caption" id="lightbox-caption"></div>
-</div>
-
-<!-- LOADING -->
-<div class="loading" id="loading">
-  <div class="loading-logo">Provify<span>.</span></div>
+<div id="loading">
   <div class="spinner"></div>
+  <div style="font-size:0.78rem;color:var(--gray);">Loading portfolio...</div>
 </div>
 
-<!-- NOT FOUND -->
-<div class="not-found" id="not-found">
-  <h1>Portfolio not found</h1>
-  <p>This portfolio doesn't exist or hasn't been made public yet.</p>
-  <a href="https://provify.app" style="color:var(--teal); text-decoration:none; margin-top:8px">← Back to Provify</a>
+<div id="error">
+  <div style="font-size:3rem;margin-bottom:8px;">🔍</div>
+  <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;margin-bottom:8px;">Portfolio not found</div>
+  <div style="font-size:0.82rem;color:var(--gray);">This portfolio may have been removed or the link is invalid.</div>
+  <a href="https://provify.app" style="margin-top:20px;color:var(--teal);font-size:0.82rem;">← Back to Provify</a>
 </div>
 
-<!-- NAV -->
-<nav>
-  <a href="https://provify.app" class="nav-logo">Provify<span>.</span></a>
-  <a href="https://provify.app/app.html" class="nav-cta">Start Your Portfolio →</a>
-</nav>
-
-<!-- PORTFOLIO -->
-<div class="portfolio" id="portfolio">
-
-  <!-- HEADER -->
-  <div class="portfolio-header">
-    <div class="portfolio-name" id="p-name">Dr. Abdullah Al Maghribi</div>
-    <div class="portfolio-role" id="p-role">Dental Intern</div>
-    <div class="portfolio-bio" id="p-bio"></div>
-    <div class="portfolio-meta">
-      <div class="portfolio-meta-item">
-        <span>📋</span>
-        <span><strong id="p-total">0</strong> cases</span>
-      </div>
-      <div class="portfolio-meta-item">
-        <span>⭐</span>
-        <span>Avg complexity <strong id="p-avg">—</strong>/10</span>
-      </div>
-      <div class="portfolio-meta-item" id="p-rating-wrap" style="display:none">
-        <span>🌟</span>
-        <span><strong id="p-rating">—</strong> patient rating</span>
-      </div>
-      <a href="https://provify.app/app.html" class="powered-badge" target="_blank">
-        Powered by Provify
-      </a>
-    </div>
-  </div>
-
-  <!-- CASES -->
-  <div class="cases-section">
-    <div class="section-label">Clinical Cases</div>
-    <div id="cases-container"></div>
-  </div>
-
+<div class="wrap">
+  <div id="content"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://latbebqtayfvgzgebxam.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_IdTc1xIm34-sfTebJBt4Sg_XX_6U11x';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Get username or user ID from URL
-const params = new URLSearchParams(window.location.search);
-const username = params.get('u') || '';
-const userId = params.get('id') || '';
+const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#60A5FA' };
+const specLabels = { endo:'Endo', restorative:'Resto', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho' };
+const specFull = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+const specIcons = { endo:'⚙', restorative:'◈', surgery:'✦', paeds:'◉', prostho:'◎' };
 
-const PHOTO_LABELS = {
-  'xr-preop': 'Pre-op X-Ray',
-  'xr-wl': 'Working Length',
-  'xr-mc': 'Master Cone',
-  'xr-obturation': 'Final Obturation',
-  'xr-postop': 'Post-op X-Ray',
-  'xr-gen-preop': 'Pre-op X-Ray',
-  'xr-gen-postop': 'Post-op X-Ray',
-  'cp-preop': 'Clinical Pre-op',
-  'cp-postop': 'Clinical Post-op',
-  'cp-intraoral': 'Intraoral',
-};
+function getRankLabel(score) {
+  if (score <= 3) return { label:'Routine', color:'#6B7280' };
+  if (score <= 5) return { label:'Moderate', color:'#F59E0B' };
+  if (score <= 7) return { label:'Complex', color:'#EF4444' };
+  return { label:'Advanced', color:'#7C6FFF' };
+}
 
-async function loadPortfolio() {
-  if (!username && !userId) {
-    showNotFound();
-    return;
-  }
+async function load() {
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('id');
+  const username = params.get('u');
 
-  let profile = null;
-  let resolvedUserId = userId;
+  if (!userId && !username) { showError(); return; }
 
-  // Try by username
-  if (username) {
-    const { data, error } = await sb
-      .from('profiles')
+  try {
+    // Get profile
+    let profileQuery = sb.from('profiles').select('*');
+    if (username) profileQuery = profileQuery.eq('username', username);
+    else profileQuery = profileQuery.eq('id', userId);
+
+    const { data: profile, error: pErr } = await profileQuery.single();
+    if (pErr || !profile) { showError(); return; }
+
+    // Get cases
+    const { data: cases, error: cErr } = await sb
+      .from('cases')
       .select('*')
-      .eq('username', username)
-      .single();
-    if (!error && data) { profile = data; resolvedUserId = data.id; }
+      .eq('user_id', profile.id)
+      .order('created_at', { ascending: true });
+
+    if (cErr) { showError(); return; }
+
+    render(profile, cases || []);
+  } catch(e) {
+    showError();
   }
+}
 
-  // Try by user ID
-  if (!profile && userId) {
-    const { data, error } = await sb
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    if (!error && data) { profile = data; resolvedUserId = data.id; }
-  }
-
-  // If still no profile but we have userId, create minimal profile
-  if (!profile && userId) {
-    profile = { id: userId, first_name: 'Dr.', last_name: '', role: 'dentist' };
-    resolvedUserId = userId;
-  }
-
-  if (!profile) {
-    showNotFound();
-    return;
-  }
-
-  // Load cases
-  const { data: cases, error: casesError } = await sb
-    .from('cases')
-    .select('*')
-    .eq('user_id', resolvedUserId)
-    .order('created_at', { ascending: false });
-
-  if (casesError) { showNotFound(); return; }
-
-  // Render profile
-  const fullName = `Dr. ${profile.first_name || ''} ${profile.last_name || ''}`.trim();
-  document.title = `${fullName} — Clinical Portfolio`;
-  document.getElementById('p-name').textContent = fullName;
-
-  const roleMap = {
-    student: 'Dental Student',
-    intern: 'Dental Intern',
-    resident: 'Resident',
-    general: 'General Dentist',
-    specialist: 'Specialist',
-  };
-  document.getElementById('p-role').textContent = roleMap[profile.role] || profile.role || 'Dentist';
-
-  if (profile.bio) {
-    document.getElementById('p-bio').textContent = profile.bio;
-  } else {
-    document.getElementById('p-bio').style.display = 'none';
-  }
-
-  const casesWithNarrative = cases.filter(c => c.narrative);
-  document.getElementById('p-total').textContent = casesWithNarrative.length || cases.length;
-
-  if (cases.length > 0) {
-    const avg = (cases.reduce((s, c) => s + (c.complexity_score || 0), 0) / cases.length).toFixed(1);
-    document.getElementById('p-avg').textContent = avg;
-  }
-
-  // Render cases — show cases with narrative first, then others
-  const sorted = [...casesWithNarrative, ...cases.filter(c => !c.narrative)];
-
-  const container = document.getElementById('cases-container');
-
-  if (sorted.length === 0) {
-    container.innerHTML = `
-      <div class="empty-portfolio">
-        <h2>No cases yet</h2>
-        <p>Cases logged on Provify will appear here.</p>
-      </div>
-    `;
-  } else {
-    container.innerHTML = sorted.map((c, i) => renderCaseCard(c, i, resolvedUserId)).join('');
-  }
-
-  // Hide loading NOW — don't wait for photos or reviews
+function render(profile, cases) {
   document.getElementById('loading').style.display = 'none';
-  document.getElementById('portfolio').style.display = 'block';
+  const content = document.getElementById('content');
+  content.style.display = 'block';
 
-  if (sorted.length > 0) {
-    // Load reviews for each case
-    sorted.forEach(c => loadCaseReviews(c.id));
+  const total = cases.length;
+  const drName = `Dr. ${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+  const initials = ((profile.first_name?.[0] || '') + (profile.last_name?.[0] || '')).toUpperCase() || 'DR';
+  const role = { student:'Dental Student', intern:'Intern', resident:'Resident', general:'General Dentist', specialist:'Specialist' }[profile.role] || profile.role || '';
 
-    // Load photos async — non-blocking, shows up as they arrive
-    sorted.forEach(c => loadCasePhotos(c.id, c.specialty, resolvedUserId));
+  // Stats
+  const avg = total > 0 ? (cases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : 0;
+  const highComp = cases.filter(c => (c.complexity_score||0) >= 7).length;
+  const withPhotos = cases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0).length;
+
+  // Specialty breakdown
+  const specCounts = {};
+  cases.forEach(c => { if(c.specialty) specCounts[c.specialty] = (specCounts[c.specialty]||0) + 1; });
+  const specList = Object.entries(specCounts).sort((a,b)=>b[1]-a[1]);
+  const dominant = specList[0];
+
+  // Growth story — first half avg vs second half avg
+  const firstHalf = cases.slice(0, Math.floor(total/2));
+  const secondHalf = cases.slice(Math.floor(total/2));
+  const avgFirst = firstHalf.length > 0 ? (firstHalf.reduce((s,c)=>s+(c.complexity_score||0),0)/firstHalf.length).toFixed(1) : 0;
+  const avgSecond = secondHalf.length > 0 ? (secondHalf.reduce((s,c)=>s+(c.complexity_score||0),0)/secondHalf.length).toFixed(1) : 0;
+  const growthDelta = (parseFloat(avgSecond) - parseFloat(avgFirst)).toFixed(1);
+  const isGrowing = parseFloat(growthDelta) > 0.3;
+
+  // Months active
+  const firstCase = cases[0] ? new Date(cases[0].created_at) : new Date();
+  const lastCase = cases[cases.length-1] ? new Date(cases[cases.length-1].created_at) : new Date();
+  const monthsActive = Math.max(1, Math.round((lastCase - firstCase) / (1000*60*60*24*30)));
+
+  // Best cases — highest complexity with photos first
+  const bestCases = [...cases]
+    .sort((a,b) => {
+      const aPhoto = a.photo_urls && Object.keys(a.photo_urls||{}).length > 0 ? 1 : 0;
+      const bPhoto = b.photo_urls && Object.keys(b.photo_urls||{}).length > 0 ? 1 : 0;
+      if (bPhoto !== aPhoto) return bPhoto - aPhoto;
+      return (b.complexity_score||0) - (a.complexity_score||0);
+    })
+    .slice(0, 6);
+
+  // Growth graph SVG
+  const graphCases = cases.slice(-20);
+  const scores = graphCases.map(c => c.complexity_score || 0);
+  const W = 700, H = 100, PAD = 10;
+  const xStep = scores.length > 1 ? (W - PAD*2) / (scores.length - 1) : 0;
+  const points = scores.map((s,i) => ({
+    x: PAD + i * xStep,
+    y: H - PAD - (s / 10) * (H - PAD*2)
+  }));
+  let path = points.length > 0 ? `M ${points[0].x} ${points[0].y}` : '';
+  for (let i = 1; i < points.length; i++) {
+    const mx = (points[i-1].x + points[i].x) / 2;
+    path += ` Q ${mx} ${points[i-1].y} ${points[i].x} ${points[i].y}`;
   }
+  const fillPath = path + (points.length > 0 ? ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z` : '');
+  const graphColor = isGrowing ? '#34D399' : '#7C6FFF';
 
-  // Load average patient rating
-  const { data: allReviews } = await sb
-    .from('reviews')
-    .select('rating, reviewer_type')
-    .in('case_id', cases.map(c => c.id))
-    .not('rating', 'is', null);
+  document.title = `${drName} · Clinical Portfolio`;
 
-  if (allReviews && allReviews.length > 0) {
-    const patientReviews = allReviews.filter(r => r.reviewer_type === 'patient');
-    if (patientReviews.length > 0) {
-      const avgRating = (patientReviews.reduce((s, r) => s + r.rating, 0) / patientReviews.length).toFixed(1);
-      document.getElementById('p-rating').textContent = `${avgRating}/5 (${patientReviews.length})`;
-      document.getElementById('p-rating-wrap').style.display = 'flex';
-    }
-  }
-}
-
-function renderCaseCard(c, index, userId) {
-  const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric' }[c.specialty] || c.specialty;
-  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  const delay = index * 0.08;
-
-  // Build detail items
-  const details = [];
-  if (c.complaint) details.push(['Chief Complaint', c.complaint]);
-  if (c.age_range) details.push(['Patient Age', c.age_range]);
-
-  if (c.specialty === 'endo') {
-    if (c.pulp_diagnosis) details.push(['Pulp Diagnosis', c.pulp_diagnosis]);
-    if (c.periapical_diagnosis) details.push(['Periapical Dx', c.periapical_diagnosis]);
-    if (c.case_type) details.push(['Case Type', c.case_type]);
-    if (c.canals) details.push(['Canals', c.canals]);
-    if (c.curvature) details.push(['Curvature', c.curvature]);
-    if (c.obturation) details.push(['Obturation', c.obturation]);
-    if (c.calcification === 'Yes') details.push(['Calcification', 'Present']);
-  } else if (c.specialty === 'restorative') {
-    if (c.cavity_class) details.push(['Cavity Class', c.cavity_class]);
-    if (c.surfaces) details.push(['Surfaces', c.surfaces]);
-    if (c.material) details.push(['Material', c.material]);
-  } else if (c.specialty === 'surgery') {
-    if (c.procedure) details.push(['Procedure', c.procedure]);
-    if (c.impaction && c.impaction !== 'N/A') details.push(['Impaction', c.impaction]);
-  } else if (c.specialty === 'paeds') {
-    if (c.cavity_class) details.push(['Dentition', c.cavity_class]);
-    if (c.procedure) details.push(['Procedure', c.procedure]);
-    if (c.material) details.push(['Material', c.material]);
-    if (c.pulp_diagnosis) details.push(['Pulp Status', c.pulp_diagnosis]);
-    if (c.isolation) details.push(['Behaviour Mgmt', c.isolation]);
-  }
-
-  if (c.post_op && c.post_op !== 'None') details.push(['Post-op', c.post_op]);
-
-  const detailsHTML = details.map(([label, value]) => `
-    <div class="detail-item">
-      <div class="detail-label">${label}</div>
-      <div class="detail-value">${value}</div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="case-card" style="animation-delay:${delay}s">
-      <div class="case-header">
-        <div class="case-header-left">
-          <div class="case-specialty-tag">${specLabel}</div>
-          <div class="case-tooth-title">Tooth ${c.tooth_number}</div>
-          <div class="case-date">${date}</div>
-        </div>
-        <div class="complexity-badge">
-          <div class="complexity-number">${c.complexity_score || '—'}</div>
-          <div class="complexity-label">Complexity</div>
-        </div>
-      </div>
-
-      ${c.narrative ? `
-      <div class="case-narrative">
-        <div class="narrative-text">${escapeHTML(c.narrative)}</div>
-      </div>
-      ` : ''}
-
-      <div class="case-photos" id="photos-section-${c.id}" style="display:none;">
-        <div class="photos-label">Radiographs & Clinical Photos</div>
-        <div class="photos-grid" id="photos-grid-${c.id}"></div>
-      </div>
-
-      ${details.length > 0 ? `
-      <div class="case-details">${detailsHTML}</div>
-      ` : ''}
-
-      <div class="case-reviews" id="reviews-${c.id}">
-        <!-- Reviews load here -->
+  content.innerHTML = `
+    <!-- Hero -->
+    <div class="hero">
+      <div class="avatar">${initials}</div>
+      <div class="dr-name">${drName}</div>
+      <div class="dr-meta">${role}${profile.primary_specialty ? ` · ${specFull[profile.primary_specialty] || profile.primary_specialty}` : ''}</div>
+      <div class="verified-pill">
+        <div class="dot"></div>
+        Verified on Provify
       </div>
     </div>
-  `;
-}
 
-async function loadCaseReviews(caseId) {
-  const { data: reviews } = await sb
-    .from('reviews')
-    .select('*')
-    .eq('case_id', caseId)
-    .not('rating', 'is', null)
-    .order('created_at', { ascending: false });
+    <!-- Positioning line -->
+    ${total >= 5 ? `
+    <div class="positioning">
+      <div class="positioning-line">
+        ${isGrowing
+          ? `Complexity grew <strong>+${growthDelta} points</strong> over ${monthsActive} month${monthsActive>1?'s':''}. Not luck. <strong>Documented growth.</strong>`
+          : `<strong>${total} verified cases.</strong> Every one timestamped. Every decision on record.`
+        }
+      </div>
+    </div>
+    ` : ''}
 
-  if (!reviews || reviews.length === 0) return;
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card" style="border-color:rgba(124,111,255,0.15);">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7C6FFF,transparent);"></div>
+        <div class="stat-number" style="color:#9B91FF;">${total}</div>
+        <div class="stat-label" style="color:rgba(155,145,255,0.5);">Cases</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(52,211,153,0.15);">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#34D399,transparent);"></div>
+        <div class="stat-number" style="color:#34D399;">${avg}</div>
+        <div class="stat-label" style="color:rgba(52,211,153,0.5);">Avg Complexity</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(239,68,68,0.15);">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#EF4444,transparent);"></div>
+        <div class="stat-number" style="color:#EF4444;">${highComp}</div>
+        <div class="stat-label" style="color:rgba(239,68,68,0.5);">Complex (7+)</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,158,11,0.15);">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#F59E0B,transparent);"></div>
+        <div class="stat-number" style="color:#F59E0B;">${monthsActive}</div>
+        <div class="stat-label" style="color:rgba(245,158,11,0.5);">Months Active</div>
+      </div>
+    </div>
 
-  const el = document.getElementById(`reviews-${caseId}`);
-  if (!el) return;
+    ${total >= 6 ? `
+    <!-- Growth curve -->
+    <div class="section" style="animation-delay:0.2s;">
+      <div class="section-title">Complexity Growth — Last ${graphCases.length} Cases</div>
+      <div style="position:relative;border-radius:12px;overflow:hidden;background:rgba(255,255,255,0.015);padding:8px 0;">
+        <svg width="100%" height="100" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;">
+          <defs>
+            <linearGradient id="gFill" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="${graphColor}" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="${graphColor}" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          ${[2,4,6,8].map(v => {
+            const y = H - PAD - (v/10)*(H-PAD*2);
+            return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <text x="${PAD-2}" y="${y+3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.15)" font-family="DM Sans">${v}</text>`;
+          }).join('')}
+          <path d="${fillPath}" fill="url(#gFill)"/>
+          <path d="${path}" fill="none" stroke="${graphColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          ${points.map((p,i) => i === points.length-1
+            ? `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${graphColor}" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
+               <circle cx="${p.x}" cy="${p.y}" r="8" fill="none" stroke="${graphColor}" stroke-width="1" opacity="0.3"/>`
+            : `<circle cx="${p.x}" cy="${p.y}" r="2.5" fill="${graphColor}" opacity="0.5"/>`
+          ).join('')}
+        </svg>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;">
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.4);line-height:1;">${avgFirst}</div>
+          <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;text-transform:uppercase;letter-spacing:0.1em;">Early avg</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:${graphColor};line-height:1;">${avgSecond}</div>
+          <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;text-transform:uppercase;letter-spacing:0.1em;">Recent avg</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:${isGrowing?'#34D399':'rgba(255,255,255,0.4)'};line-height:1;">${isGrowing?'+':''}${growthDelta}</div>
+          <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;text-transform:uppercase;letter-spacing:0.1em;">Growth</div>
+        </div>
+      </div>
+    </div>
+    ` : ''}
 
-  const stars = (n) => '★'.repeat(n) + '☆'.repeat(5-n);
-
-  el.innerHTML = `
-    <div style="padding:20px 24px; border-top:1px solid var(--white-faint);">
-      <div style="font-size:0.65rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; font-weight:500">Reviews</div>
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        ${reviews.map(r => `
-          <div style="background:var(--navy-3); border:1px solid var(--white-faint); border-radius:12px; padding:14px 16px;">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <div style="width:28px;height:28px;border-radius:50%;background:${r.reviewer_type === 'peer' ? 'rgba(124,111,255,0.2)' : 'rgba(245,158,11,0.15)'};display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;color:${r.reviewer_type === 'peer' ? 'var(--teal)' : '#F59E0B'};">${r.reviewer_type === 'peer' ? '👨‍⚕️' : '👤'}</div>
-                <div>
-                  <div style="font-size:0.8rem;color:var(--white);font-weight:500">${r.reviewer_name || 'Anonymous'}</div>
-                  ${r.reviewer_role ? `<div style="font-size:0.68rem;color:var(--gray)">${r.reviewer_role}</div>` : `<div style="font-size:0.68rem;color:var(--gray)">Patient</div>`}
-                </div>
-              </div>
-              <div style="font-size:0.9rem;color:#F59E0B;letter-spacing:2px">${stars(r.rating)}</div>
-            </div>
-            ${r.comment ? `<div style="font-size:0.82rem;color:var(--white-dim);line-height:1.6">${r.comment}</div>` : ''}
-            ${r.reviewer_type === 'peer' ? `<div style="margin-top:6px;display:inline-block;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);color:var(--teal);font-size:0.62rem;padding:2px 8px;border-radius:100px;font-weight:500">✓ Peer Verified</div>` : ''}
+    ${specList.length > 0 ? `
+    <!-- Specialty breakdown -->
+    <div class="section" style="animation-delay:0.25s;">
+      <div class="section-title">Clinical Specialties</div>
+      ${specList.map(([spec, count]) => {
+        const pct = Math.round(count/total*100);
+        const color = specColors[spec] || '#7C6FFF';
+        return `
+        <div class="spec-bar-row">
+          <div class="spec-name">${specLabels[spec] || spec}</div>
+          <div class="spec-bar-track">
+            <div class="spec-bar-fill" style="width:${pct}%;background:${color};box-shadow:0 0 8px ${color}40;"></div>
           </div>
-        `).join('')}
+          <div class="spec-count" style="color:${color};">${count}</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.2);width:28px;">${pct}%</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ` : ''}
+
+    ${bestCases.length > 0 ? `
+    <!-- Best cases -->
+    <div style="margin-bottom:14px;animation:fadeUp 0.6s ease 0.3s both;">
+      <div class="section-title" style="margin-bottom:12px;">Selected Cases</div>
+      <div class="cases-grid">
+        ${bestCases.map(c => {
+          const color = specColors[c.specialty] || '#7C6FFF';
+          const rank = getRankLabel(c.complexity_score||0);
+          const photos = c.photo_urls ? Object.values(c.photo_urls).filter(Boolean) : [];
+          const firstPhoto = photos[0] || null;
+          const date = new Date(c.created_at).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+          return `
+          <a href="https://provify.app/verify.html?id=${c.id}" target="_blank" class="case-card" style="border-color:rgba(255,255,255,0.07);">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${color},${color}40,transparent);"></div>
+            ${firstPhoto
+              ? `<img src="${firstPhoto}" class="case-photo" alt="Case photo" loading="lazy"/>`
+              : `<div class="case-photo-placeholder" style="background:${color}08;">${specIcons[c.specialty]||'🦷'}</div>`
+            }
+            <div class="case-info">
+              <div class="case-spec" style="color:${color};">${specFull[c.specialty]||c.specialty}</div>
+              <div class="case-title-text">Tooth ${c.tooth_number||'—'}</div>
+              ${c.narrative ? `<div class="case-narrative-preview">${c.narrative}</div>` : ''}
+              <div class="case-meta">
+                <span class="badge" style="background:${rank.color}15;color:${rank.color};">${rank.label}</span>
+                <span style="font-size:0.58rem;color:rgba(255,255,255,0.2);">${date}</span>
+              </div>
+            </div>
+          </a>`;
+        }).join('')}
       </div>
     </div>
-  `;
-}
+    ` : ''}
 
-// Smart async photo loader — probes quietly, only injects photos that exist
-function probeImage(url) {
-  return new Promise(resolve => {
-    const img = new Image();
-    const timeout = setTimeout(() => { img.src = ''; resolve(null); }, 3000);
-    img.onload  = () => { clearTimeout(timeout); resolve(url); };
-    img.onerror = () => { clearTimeout(timeout); resolve(null); };
-    img.src = url;
-  });
-}
-
-async function loadCasePhotos(caseId, specialty, userId) {
-  const photoTypes = specialty === 'endo'
-    ? ['xr-preop','xr-wl','xr-mc','xr-obturation','xr-postop','cp-preop','cp-postop','cp-intraoral']
-    : ['xr-gen-preop','xr-gen-postop','cp-preop','cp-postop','cp-intraoral'];
-
-  const found = [];
-
-  // Try each type — stop at first working extension
-  for (const type of photoTypes) {
-    const base = `${SUPABASE_URL}/storage/v1/object/public/case-images/${userId}/${caseId}/${type}`;
-    for (const ext of ['jpg','jpeg','png','webp']) {
-      const url = await probeImage(`${base}.${ext}`);
-      if (url) { found.push({ url, label: PHOTO_LABELS[type] || type }); break; }
-    }
-  }
-
-  if (found.length === 0) return;
-
-  const section = document.getElementById(`photos-section-${caseId}`);
-  const grid    = document.getElementById(`photos-grid-${caseId}`);
-  if (!section || !grid) return;
-
-  grid.innerHTML = found.map(p => `
-    <div class="photo-item">
-      <img src="${p.url}" alt="${p.label}" onclick="openLightbox('${p.url}', '${p.label}')" loading="lazy">
-      <div class="photo-item-label">${p.label}</div>
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <div class="footer-eyebrow">Built on Provify</div>
+      <div class="footer-headline">Experience isn't years.<br>It's cases.</div>
+      <div class="footer-sub">Every case ${drName} logged is verified, timestamped, and permanently on record. This is what standing out looks like.</div>
+      <a href="https://provify.app" class="cta-btn">Build Your Portfolio →</a>
+      <div class="provify-logo" style="margin-top:24px;">Provify<span>.</span></div>
     </div>
-  `).join('');
+  `;
 
-  section.style.display = 'block';
+  // Fix case card positioning
+  content.querySelectorAll('.case-card').forEach(el => el.style.position = 'relative');
 }
 
-function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function openLightbox(src, caption) {
-  document.getElementById('lightbox-img').src = src;
-  document.getElementById('lightbox-caption').textContent = caption;
-  document.getElementById('lightbox').classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('active');
-  document.body.style.overflow = '';
-}
-
-function showNotFound() {
+function showError() {
   document.getElementById('loading').style.display = 'none';
-  document.getElementById('not-found').style.display = 'flex';
+  document.getElementById('error').style.display = 'flex';
 }
 
-// Close lightbox on Escape
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeLightbox();
-});
-
-loadPortfolio();
+load();
 </script>
 </body>
 </html>
