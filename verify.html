@@ -482,14 +482,31 @@ async function loadCase() {
   if (!id) { showError(); return; }
 
   try {
-    // Fetch case
+    // Fetch case without join first
     const { data: c, error } = await sb
       .from('cases')
-      .select('*, profiles(first_name, last_name, role, primary_specialty)')
+      .select('*')
       .eq('id', id)
       .single();
 
-    if (error || !c) { showError(); return; }
+    if (error || !c) { 
+      console.error('Case fetch error:', error, 'id:', id);
+      showError(); 
+      return; 
+    }
+
+    // Fetch profile separately
+    let profile = null;
+    try {
+      const { data: p } = await sb
+        .from('profiles')
+        .select('first_name, last_name, role, primary_specialty')
+        .eq('id', c.user_id)
+        .single();
+      profile = p;
+    } catch(e) {}
+
+    c.profiles = profile;
 
     // Fetch photos
     let photos = [];
