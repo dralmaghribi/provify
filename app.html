@@ -4870,27 +4870,28 @@ function shareCase() {
   const c = allCases.find(x => x.id === caseId);
   if (!c) return;
 
-  const verifyUrl = `https://provify.app/verify.html?id=${c.id}`;
+  const reportUrl = `https://provify.app/verify.html?id=${c.id}`;
   const nickname = getCaseNickname(c.id);
   const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
   const spec = specLabels[c.specialty] || c.specialty;
   const title = nickname || `Tooth ${c.tooth_number} — ${spec}`;
-  const text = `${title}\nDocumented & verified on Provify.\n${verifyUrl}`;
+  const score = c.complexity_score || 0;
+  const text = `${title} · Complexity ${score}/10\nDocumented & verified on Provify.\n${reportUrl}`;
 
   if (navigator.share) {
-    navigator.share({ title, text, url: verifyUrl })
-      .catch(() => copyToClipboard(verifyUrl));
+    navigator.share({ title: `Case Report · ${title}`, text, url: reportUrl })
+      .catch(() => copyShareLink(reportUrl));
   } else {
-    copyToClipboard(verifyUrl);
+    copyShareLink(reportUrl);
   }
 }
 
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
+function copyShareLink(url) {
+  navigator.clipboard.writeText(url).then(() => {
     const btn = document.getElementById('share-case-btn');
     if (!btn) return;
     const orig = btn.innerHTML;
-    btn.innerHTML = '✓ Copied!';
+    btn.innerHTML = '✓ Link copied!';
     btn.style.background = 'rgba(52,211,153,0.2)';
     setTimeout(() => { btn.innerHTML = orig; btn.style.background = 'rgba(52,211,153,0.08)'; }, 2000);
   });

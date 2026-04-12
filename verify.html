@@ -3,415 +3,704 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Provify — Case Verification</title>
+<title>Case Report · Provify</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy:    #09090B;
-  --navy-2:  #0F0F12;
-  --teal:    #7C6FFF;
-  --white:   #FAFAFA;
-  --gray:    #6B7280;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--navy);
-  color: var(--white);
-  font-family: 'Inter', sans-serif;
-  font-weight: 300;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-body::before {
-  content: '';
-  position: fixed;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(124,111,255,0.06) 0%, transparent 65%);
-  top: -150px; right: -150px;
-  pointer-events: none;
-}
-.verify-box {
-  width: 100%;
-  max-width: 560px;
-  background: linear-gradient(145deg, #0F0F12, #141418);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-  animation: fadeUp 0.5s ease both;
-}
-@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.verify-header {
-  background: linear-gradient(135deg, rgba(124,111,255,0.12), rgba(124,111,255,0.04));
-  border-bottom: 1px solid rgba(124,111,255,0.2);
-  padding: 28px 32px;
-  position: relative;
-}
-.verify-header::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(124,111,255,0.8), transparent);
-}
-.verify-logo {
-  font-family: 'Instrument Serif', serif;
-  font-size: 1.3rem;
-  color: var(--white);
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
-}
-.verify-logo span { color: var(--teal); }
+  :root {
+    --navy: #080F1E;
+    --navy-2: #0C1424;
+    --teal: #34D399;
+    --purple: #7C6FFF;
+    --amber: #F59E0B;
+    --red: #EF4444;
+    --white: #F0F4FF;
+    --gray: rgba(240,244,255,0.4);
+  }
 
-.verify-status {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.status-icon {
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.status-icon.verified { background: rgba(124,111,255,0.15); border: 1px solid rgba(124,111,255,0.3); }
-.status-icon.not-found { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); }
-.status-icon.loading-icon { background: rgba(107,114,128,0.12); border: 1px solid rgba(107,114,128,0.2); }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-.status-title {
-  font-family: 'Instrument Serif', serif;
-  font-size: 1.3rem;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-.status-title.verified { color: var(--teal); }
-.status-title.not-found { color: #EF4444; }
-.status-sub {
-  font-size: 0.78rem;
-  color: var(--gray);
-  margin-top: 3px;
-}
+  /* Background atmosphere */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124,111,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(52,211,153,0.07) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-.verify-body { padding: 28px 32px; }
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
 
-.case-id-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(124,111,255,0.08);
-  border: 1px solid rgba(124,111,255,0.2);
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 0.75rem;
-  color: var(--teal);
-  font-family: monospace;
-  margin-bottom: 20px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
+  /* Loading state */
+  #loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    gap: 16px;
+  }
 
-.field-row {
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-.field-label {
-  font-size: 0.72rem;
-  color: var(--gray);
-  min-width: 130px;
-  padding-top: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.field-value {
-  font-size: 0.875rem;
-  color: var(--white);
-  flex: 1;
-  line-height: 1.5;
-}
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 2px solid rgba(255,255,255,0.06);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
 
-.ml-section {
-  margin-top: 20px;
-  padding: 16px;
-  background: linear-gradient(135deg, rgba(124,111,255,0.07), rgba(124,111,255,0.02));
-  border: 1px solid rgba(124,111,255,0.2);
-  border-radius: 12px;
-}
-.ml-title {
-  font-size: 0.65rem;
-  color: var(--teal);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.ml-field {
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  display: flex;
-  gap: 12px;
-}
-.ml-field:last-child { border-bottom: none; }
-.ml-label { font-size: 0.7rem; color: var(--gray); min-width: 120px; padding-top: 1px; }
-.ml-value { font-size: 0.82rem; color: var(--white); flex: 1; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-.timestamp-bar {
-  margin-top: 20px;
-  padding: 12px 14px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.timestamp-label { font-size: 0.7rem; color: var(--gray); }
-.timestamp-value { font-size: 0.78rem; color: var(--white); font-family: monospace; }
+  /* Error state */
+  #error {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    text-align: center;
+    gap: 12px;
+  }
 
-.verify-footer {
-  padding: 20px 32px;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.footer-note {
-  font-size: 0.72rem;
-  color: var(--gray);
-  line-height: 1.5;
-  max-width: 320px;
-}
-.footer-link {
-  font-size: 0.8rem;
-  color: var(--teal);
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-.footer-link:hover { opacity: 0.8; }
+  /* Main content */
+  #content { display: none; }
 
-.loading-state {
-  text-align: center;
-  padding: 40px;
-  color: var(--gray);
-}
-.spinner {
-  width: 32px; height: 32px;
-  border: 2px solid rgba(255,255,255,0.06);
-  border-top-color: var(--teal);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 16px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-@media (max-width: 600px) {
-  .verify-header, .verify-body, .verify-footer { padding: 20px; }
-  .field-label, .ml-label { min-width: 100px; }
-}
+  .fade-up {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* Header */
+  .report-header {
+    margin-bottom: 32px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .provify-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 100px;
+    padding: 6px 14px;
+    margin-bottom: 24px;
+  }
+
+  .provify-badge .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .provify-badge span {
+    font-size: 0.7rem;
+    color: var(--teal);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .case-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    color: var(--white);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .case-subtitle {
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+
+  /* Score ring card */
+  .score-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    animation: fadeUp 0.5s ease 0.1s both;
+  }
+
+  /* Verification badge */
+  .verify-badge {
+    background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.03));
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease 0.15s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .verify-badge::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  }
+
+  /* Narrative card */
+  .narrative-card {
+    background: rgba(124,111,255,0.05);
+    border: 1px solid rgba(124,111,255,0.15);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease 0.2s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .narrative-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, var(--purple), transparent);
+    border-radius: 20px 0 0 20px;
+  }
+
+  .narrative-label {
+    font-size: 0.58rem;
+    color: rgba(124,111,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .narrative-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.05rem;
+    color: rgba(240,244,255,0.85);
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* Photos */
+  .photos-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease 0.25s both;
+  }
+
+  .photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .photo-item {
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .photo-item:hover { transform: scale(1.02); }
+
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .photo-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 8px;
+    font-size: 0.55rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+  }
+
+  /* Clinical fields */
+  .fields-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease 0.3s both;
+  }
+
+  .field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    gap: 16px;
+  }
+
+  .field-row:last-child { border-bottom: none; }
+
+  .field-label {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .field-value {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.75);
+    text-align: right;
+  }
+
+  /* AI feedback */
+  .ai-card {
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease 0.35s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-strength {
+    background: rgba(52,211,153,0.05);
+    border: 1px solid rgba(52,211,153,0.15);
+  }
+
+  .ai-watch {
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(245,158,11,0.15);
+    margin-top: 8px;
+  }
+
+  /* Footer CTA */
+  .footer-cta {
+    margin-top: 48px;
+    text-align: center;
+    animation: fadeUp 0.5s ease 0.4s both;
+  }
+
+  .footer-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    margin-bottom: 32px;
+  }
+
+  .cta-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.4rem;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .cta-logo span { color: var(--teal); }
+
+  .cta-text {
+    font-size: 0.82rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+    line-height: 1.6;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--purple), var(--teal));
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 14px 32px;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 8px 32px rgba(124,111,255,0.3);
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(124,111,255,0.4);
+  }
+
+  /* Lightbox */
+  #lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #lightbox img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 12px;
+  }
+
+  #lightbox-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .section-label {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .spec-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
 </style>
 </head>
 <body>
 
-<div class="verify-box" id="verify-box">
-  <div class="verify-header">
-    <div class="verify-logo">Provify<span>.</span></div>
-    <div class="verify-status" id="status-area">
-      <div class="status-icon loading-icon">⏳</div>
-      <div>
-        <div class="status-title" style="color:var(--gray)">Verifying Record...</div>
-        <div class="status-sub">Checking case database</div>
-      </div>
-    </div>
+<div class="container">
+  <!-- Loading -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <div style="font-size:0.8rem;color:var(--gray);">Loading case report...</div>
   </div>
-  <div id="body-area">
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <div style="font-size:0.85rem;">Looking up case record...</div>
-    </div>
+
+  <!-- Error -->
+  <div id="error">
+    <div style="font-size:3rem;margin-bottom:8px;">🔍</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;margin-bottom:8px;">Case not found</div>
+    <div style="font-size:0.82rem;color:var(--gray);">This case may have been removed or the link is invalid.</div>
   </div>
+
+  <!-- Content -->
+  <div id="content"></div>
 </div>
 
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://latbebqtayfvgzgebxam.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_IdTc1xIm34-sfTebJBt4Sg_XX_6U11x';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhdGJlYnF0YXlmdmd6Z2VieGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1MDI5OTEsImV4cCI6MjA1OTA3ODk5MX0.YT2UWMhYZLKPDlcKFagAEPKyEhBG0hZaKfqVOlYA2ak';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const params = new URLSearchParams(window.location.search);
-const caseId = params.get('id') || '';
+const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8' };
+const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' };
+const photoLabels = {
+  'xr-preop':'Pre-op X-ray','xr-wl':'Working Length','xr-mc':'Master Cone',
+  'xr-obturation':'Obturation','xr-postop':'Post-op X-ray','xr-gen-preop':'Pre-op X-ray',
+  'xr-gen-postop':'Post-op X-ray','cp-preop':'Pre-op Photo','cp-postop':'Post-op Photo','cp-intraoral':'Intra-oral Photo'
+};
 
-const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry' };
-const roleLabel = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
-
-async function verify() {
-  if (!caseId) {
-    showNotFound('No case ID provided.');
-    return;
-  }
-
-  // Load case
-  const { data: c, error } = await sb
-    .from('cases')
-    .select('*')
-    .eq('id', caseId)
-    .single();
-
-  if (error || !c) {
-    showNotFound('Case record not found in database.');
-    return;
-  }
-
-  // Load clinician profile
-  const { data: profile } = await sb
-    .from('profiles')
-    .select('first_name, last_name, role, username')
-    .eq('id', c.user_id)
-    .single();
-
-  showVerified(c, profile);
+function getComplexityLabel(score) {
+  if (score <= 3) return { label: 'Routine', color: '#6B7280' };
+  if (score <= 5) return { label: 'Moderate', color: '#F59E0B' };
+  if (score <= 7) return { label: 'Complex', color: '#EF4444' };
+  return { label: 'Advanced', color: '#7C6FFF' };
 }
 
-function showNotFound(reason) {
-  document.getElementById('status-area').innerHTML = `
-    <div class="status-icon not-found">✗</div>
-    <div>
-      <div class="status-title not-found">Record Not Found</div>
-      <div class="status-sub">${reason}</div>
-    </div>`;
-  document.getElementById('body-area').innerHTML = `
-    <div class="verify-body">
-      <p style="font-size:0.875rem;color:var(--gray);line-height:1.7;">This case ID could not be verified. The record may have been deleted, or the link may be incorrect.</p>
-    </div>
-    <div class="verify-footer">
-      <div class="footer-note">Case verification is provided by Provify — provify.app</div>
-      <a href="https://provify.app" class="footer-link">Visit Provify →</a>
-    </div>`;
+async function loadCase() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  if (!id) { showError(); return; }
+
+  try {
+    // Fetch case
+    const { data: c, error } = await sb
+      .from('cases')
+      .select('*, profiles(first_name, last_name, role, primary_specialty)')
+      .eq('id', id)
+      .single();
+
+    if (error || !c) { showError(); return; }
+
+    // Fetch photos
+    let photos = [];
+    try {
+      const { data: files } = await sb.storage
+        .from('case-images')
+        .list(`${c.user_id}/${c.id}`);
+
+      if (files && files.length > 0) {
+        photos = files.map(f => {
+          const pid = f.name.split('.')[0];
+          const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(`${c.user_id}/${c.id}/${f.name}`);
+          return { pid, url: publicUrl, label: photoLabels[pid] || pid };
+        });
+      }
+    } catch(e) {}
+
+    renderCase(c, photos);
+  } catch(e) {
+    showError();
+  }
 }
 
-function showVerified(c, profile) {
-  const clinicianName = profile ? `Dr. ${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Unknown Clinician';
-  const clinicianRole = profile ? (roleLabel[profile.role] || profile.role || 'Dentist') : 'Dentist';
-  const spec = specLabel[c.specialty] || c.specialty || '—';
-  const date = new Date(c.created_at).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  const time = new Date(c.created_at).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-  const shortId = c.id?.substring(0,8).toUpperCase();
+function renderCase(c, photos) {
+  const color = specColors[c.specialty] || '#7C6FFF';
+  const specLabel = specLabels[c.specialty] || c.specialty;
+  const score = c.complexity_score || 0;
+  const rank = getComplexityLabel(score);
+  const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const circumference = 2 * Math.PI * 28;
+  const offset = circumference * (1 - score / 10);
 
-  // Parse medico-legal record
-  let personalNote = c.note || '';
-  let mlFields = [];
-  if (c.note && c.note.includes('|| ML_RECORD:')) {
-    const parts = c.note.split('|| ML_RECORD:');
-    personalNote = parts[0].trim();
-    const mlRaw = parts[1]?.trim() || '';
-    mlFields = mlRaw.split(' | ').map(f => {
-      const idx = f.indexOf(':');
-      return idx !== -1 ? [f.substring(0,idx).trim(), f.substring(idx+1).trim()] : null;
-    }).filter(Boolean);
-  }
+  const profile = c.profiles;
+  const drName = profile ? `Dr. ${profile.first_name} ${profile.last_name}` : 'Verified Clinician';
+  const role = profile?.role ? profile.role.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase()) : '';
 
-  // Update status
-  document.getElementById('status-area').innerHTML = `
-    <div class="status-icon verified">🛡</div>
-    <div>
-      <div class="status-title verified">Record Verified</div>
-      <div class="status-sub">This case exists in the Provify database and has not been altered</div>
-    </div>`;
+  // AI feedback
+  let aiStrength = null, aiWatch = null;
+  try {
+    const fb = c.ai_feedback ? JSON.parse(c.ai_feedback) : null;
+    aiStrength = fb?.strength || null;
+    aiWatch = fb?.watch || null;
+  } catch(e) {}
 
-  // Build fields
-  const caseFields = [
-    ['Clinician', clinicianName],
-    ['Role', clinicianRole],
-    ['Specialty', spec],
-    ['Tooth', `Tooth ${c.tooth_number}`],
-    ['Patient Age', c.age_range || '—'],
-    ['Chief Complaint', c.complaint || '—'],
-    ['Complexity Score', c.complexity_score ? `${c.complexity_score}/10` : '—'],
-  ];
+  // Build clinical fields
+  const fields = [];
+  if (c.tooth_number) fields.push(['Tooth', `Tooth ${c.tooth_number}`]);
+  if (c.age_range) fields.push(['Patient Age', c.age_range]);
+  if (c.chief_complaint) fields.push(['Chief Complaint', c.chief_complaint]);
+  if (c.pulp_diagnosis) fields.push(['Pulp Diagnosis', c.pulp_diagnosis]);
+  if (c.case_type) fields.push(['Case Type', c.case_type]);
+  if (c.num_canals) fields.push(['Number of Canals', c.num_canals]);
+  if (c.obturation_technique) fields.push(['Obturation', c.obturation_technique]);
+  if (c.procedure) fields.push(['Procedure', c.procedure]);
+  if (c.dentition) fields.push(['Dentition', c.dentition]);
+  if (c.restoration_type) fields.push(['Restoration', c.restoration_type]);
+  if (c.surfaces) fields.push(['Surfaces', c.surfaces]);
+  if (c.postop_note) fields.push(['Post-op', c.postop_note]);
 
-  if (c.specialty === 'endo') {
-    if (c.pulp_diagnosis)       caseFields.push(['Pulp Diagnosis', c.pulp_diagnosis]);
-    if (c.periapical_diagnosis) caseFields.push(['Periapical Dx', c.periapical_diagnosis]);
-    if (c.case_type)            caseFields.push(['Case Type', c.case_type]);
-    if (c.obturation)           caseFields.push(['Obturation', c.obturation]);
-  } else if (c.specialty === 'restorative') {
-    if (c.cavity_class) caseFields.push(['Cavity Class', c.cavity_class]);
-    if (c.material)     caseFields.push(['Material', c.material]);
-  } else if (c.specialty === 'surgery') {
-    if (c.procedure)  caseFields.push(['Procedure', c.procedure]);
-    if (c.anaesthesia)caseFields.push(['Anaesthesia', c.anaesthesia]);
-  }
-  if (c.post_op) caseFields.push(['Post-op', c.post_op]);
+  document.getElementById('loading').style.display = 'none';
+  const content = document.getElementById('content');
+  content.style.display = 'block';
 
-  const mlSectionHTML = mlFields.length > 0 ? `
-    <div class="ml-section">
-      <div class="ml-title">🛡 Medico-Legal Documentation</div>
-      ${mlFields.map(([label, value]) => `
-        <div class="ml-field">
-          <div class="ml-label">${label}</div>
-          <div class="ml-value">${value}</div>
-        </div>`).join('')}
-    </div>` : '';
-
-  const narrativeHTML = c.narrative ? `
-    <div style="margin-top:16px;padding:14px;background:rgba(124,111,255,0.05);border-left:3px solid rgba(124,111,255,0.4);border-radius:0 10px 10px 0;">
-      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Case Narrative</div>
-      <div style="font-size:0.875rem;color:rgba(250,250,250,0.75);line-height:1.75;font-style:italic;">"${c.narrative}"</div>
-    </div>` : '';
-
-  document.getElementById('body-area').innerHTML = `
-    <div class="verify-body">
-      <div class="case-id-badge">
-        🔑 CASE ID: ${shortId}···${c.id?.slice(-4).toUpperCase()}
+  content.innerHTML = `
+    <!-- Header -->
+    <div class="report-header">
+      <div class="provify-badge">
+        <div class="dot"></div>
+        <span>Verified Clinical Record</span>
       </div>
+      <div class="case-title">${c.tooth_number ? `Tooth ${c.tooth_number}` : specLabel}</div>
+      <div class="case-subtitle">${specLabel} · ${date}</div>
+    </div>
 
-      ${caseFields.map(([label, value]) => `
+    <!-- Score + clinician -->
+    <div class="score-card">
+      <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
+        <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg);">
+          <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="4"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="${color}" stroke-width="4"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="${offset}"
+            stroke-linecap="round"
+            style="filter:drop-shadow(0 0 8px ${color}80);transition:stroke-dashoffset 1s ease;"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:${color};line-height:1;">${score}</div>
+          <div style="font-size:0.45rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">/ 10</div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+          <span class="spec-badge" style="background:${color}18;color:${color};">${specLabel}</span>
+          <span class="spec-badge" style="background:${rank.color}18;color:${rank.color};">${rank.label}</span>
+        </div>
+        <div style="font-size:0.9rem;color:var(--white);font-weight:500;margin-bottom:2px;">${drName}</div>
+        <div style="font-size:0.72rem;color:var(--gray);">${role}</div>
+      </div>
+    </div>
+
+    <!-- Verification -->
+    <div class="verify-badge">
+      <div style="width:36px;height:36px;background:rgba(52,211,153,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      </div>
+      <div>
+        <div style="font-size:0.78rem;color:#34D399;font-weight:600;margin-bottom:2px;">Record Verified</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);">This case exists in the Provify database and has not been altered</div>
+      </div>
+      <div style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.15);font-family:monospace;text-align:right;">${c.id.substring(0,8).toUpperCase()}...</div>
+    </div>
+
+    ${c.narrative ? `
+    <!-- Narrative -->
+    <div class="narrative-card">
+      <div class="narrative-label">Case Narrative</div>
+      <div class="narrative-text">${c.narrative}</div>
+    </div>
+    ` : ''}
+
+    ${photos.length > 0 ? `
+    <!-- Photos -->
+    <div class="photos-card">
+      <div class="section-label" style="color:rgba(255,255,255,0.3);">📸 Clinical Photos & X-rays</div>
+      <div class="photos-grid">
+        ${photos.map(p => `
+          <div class="photo-item" onclick="openLightbox('${p.url}')">
+            <img src="${p.url}" alt="${p.label}" loading="lazy"/>
+            <div class="photo-label">${p.label}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    ${fields.length > 0 ? `
+    <!-- Clinical Fields -->
+    <div class="fields-card">
+      <div class="section-label" style="color:rgba(255,255,255,0.3);margin-bottom:8px;">Clinical Details</div>
+      ${fields.map(([label, value]) => `
         <div class="field-row">
           <div class="field-label">${label}</div>
           <div class="field-value">${value}</div>
-        </div>`).join('')}
-
-      ${narrativeHTML}
-      ${mlSectionHTML}
-
-      <div class="timestamp-bar">
-        <div>
-          <div class="timestamp-label">Record Created</div>
-          <div class="timestamp-value">${date} at ${time}</div>
         </div>
-        <div style="text-align:right;">
-          <div class="timestamp-label">Database</div>
-          <div class="timestamp-value">Provify · Supabase</div>
-        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    ${aiStrength ? `
+    <!-- AI Feedback -->
+    <div class="ai-card ai-strength">
+      <div class="section-label" style="color:rgba(52,211,153,0.6);margin-bottom:8px;">✦ Clinical Strength</div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.6;">${aiStrength}</div>
+    </div>
+    ` : ''}
+
+    ${aiWatch ? `
+    <div class="ai-card ai-watch" style="margin-top:0;">
+      <div class="section-label" style="color:rgba(245,158,11,0.6);margin-bottom:8px;">⚠ Watch Point</div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.6;">${aiWatch}</div>
+    </div>
+    ` : ''}
+
+    <!-- Timestamp -->
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px 18px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:3px;">Record Created</div>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);">${new Date(c.created_at).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} at ${new Date(c.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:3px;">Database</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);">Provify · Supabase</div>
       </div>
     </div>
 
-    <div class="verify-footer">
-      <div class="footer-note">
-        This record was logged by ${clinicianName} through Provify and is stored in an immutable timestamped database. This page confirms the record exists and has not been modified.
-      </div>
-      <a href="https://provify.app" class="footer-link">provify.app →</a>
-    </div>`;
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <div class="footer-divider"></div>
+      <div class="cta-logo">Provify<span>.</span></div>
+      <div class="cta-text">${drName} documents every case on Provify — building a verified clinical record that protects their career.</div>
+      <a href="https://provify.app" class="cta-btn">Start Your Free Trial →</a>
+      <div style="margin-top:16px;font-size:0.65rem;color:rgba(255,255,255,0.15);">Clinical case documentation for dental professionals</div>
+    </div>
+  `;
+
+  // Animate score ring after render
+  setTimeout(() => {
+    const ring = content.querySelector('circle:last-of-type');
+    if (ring) ring.style.strokeDashoffset = offset;
+  }, 100);
 }
 
-verify();
+function showError() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('error').style.display = 'flex';
+}
+
+function openLightbox(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+loadCase();
 </script>
 </body>
 </html>
