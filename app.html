@@ -1118,7 +1118,7 @@ body::after {
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
     <div style="font-size:2.5rem;margin-bottom:16px;">🛡</div>
     <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">You've reached the free limit.</div>
-    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:28px;">Your 14-day free trial has ended. Upgrade to Pro to keep logging cases, accessing your career intelligence, and protecting your clinical record.</div>
+    <div style="font-size:0.875rem;color:var(--gray);line-height:1.75;margin-bottom:28px;">Your 14-day free trial has ended. Upgrade to Pro to keep logging cases, accessing your career intelligence, and protecting your case record.</div>
     <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px;margin-bottom:24px;text-align:left;">
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>Unlimited cases</div>
@@ -1154,7 +1154,7 @@ body::after {
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
           <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
-          A timestamped clinical record — locked forever
+          A timestamped case record — locked forever
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
           <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
@@ -1738,15 +1738,15 @@ body::after {
       </button>
       <button class="nav-item" onclick="openVoiceLog()" id="nav-log">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-        <span style="display:flex;flex-direction:column;gap:1px;"><span>Log Case</span><span style="font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:400;">Voice · Manual · Quick</span></span>
+        Log Case
       </button>
       <button class="nav-item" onclick="showView('cases')" id="nav-cases">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span>
-        <span style="display:flex;flex-direction:column;gap:1px;"><span>My Cases</span><span style="font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:400;">Your clinical record</span></span>
+        My Cases
       </button>
       <button class="nav-item" onclick="showView('career')" id="nav-career">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-        <span style="display:flex;flex-direction:column;gap:1px;"><span>Career</span><span style="font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:400;">AI advice from your cases</span></span>
+        Career
       </button>
       <button class="nav-item" onclick="showView('profile')" id="nav-profile">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
@@ -1844,7 +1844,7 @@ body::after {
             <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;">
               <div style="flex:1;">
                 <div style="font-family:'Instrument Serif',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--white);letter-spacing:-0.04em;line-height:1.1;margin-bottom:10px;" id="dash-hero-title">Good morning,<br>Doctor.</div>
-                <div style="font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.7;max-width:300px;" id="dash-hero-body">Your clinical record starts with your first case.</div>
+                <div style="font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.7;max-width:300px;" id="dash-hero-body">Your case record starts with your first case.</div>
               </div>
 
               <!-- Elite complexity ring -->
@@ -2883,7 +2883,7 @@ body::after {
               <span style="margin-left:auto;font-size:0.65rem;color:var(--gray);text-transform:none;letter-spacing:0;font-weight:400;">Timestamped &amp; verifiable</span>
             </div>
             <div style="font-size:0.78rem;color:var(--gray);line-height:1.6;margin-bottom:16px;padding:10px 14px;background:rgba(124,111,255,0.04);border-radius:8px;border-left:3px solid rgba(124,111,255,0.3);">
-              This section creates a contemporaneous clinical record. Every entry is timestamped at the moment of submission and assigned a unique verifiable case ID.
+              This section creates a contemporaneous case record. Every entry is timestamped at the moment of submission and assigned a unique verifiable case ID.
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -3049,7 +3049,7 @@ body::after {
         <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
           <div style="flex:1;min-width:180px;position:relative;">
             <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:0.9rem;pointer-events:none;">🔍</span>
-            <input type="text" id="cases-search" placeholder="Search tooth, diagnosis, date..." oninput="filterCases()" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:9px 12px 9px 34px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
+            <input type="text" id="cases-search" placeholder="Search tooth, date, specialty..." oninput="filterCases()" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:9px 12px 9px 34px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <button onclick="setCasesFilter('all',this)" class="cases-filter-btn" style="background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">All</button>
@@ -10116,13 +10116,14 @@ function renderMonthlyObjectives() {
 
   const { month, objectives } = getMonthlyObjectives();
   const allDone = objectives.every(o => o.current >= o.target);
+  const doneCount = objectives.filter(o => o.current >= o.target).length;
 
   el.style.display = 'block';
   el.innerHTML = `
     <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:18px 20px;margin-bottom:16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
         <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">${month} Objectives</div>
-        ${allDone ? '<div style="font-size:0.62rem;color:#34D399;font-weight:600;">✓ All done</div>' : '<div style="font-size:0.62rem;color:rgba(255,255,255,0.2);">${objectives.filter(o=>o.current>=o.target).length}/${objectives.length} complete</div>'}
+        ${allDone ? '<div style="font-size:0.62rem;color:#34D399;font-weight:600;">✓ All done</div>' : '<div style="font-size:0.62rem;color:rgba(255,255,255,0.2);">' + doneCount + '/' + objectives.length + ' complete</div>'}
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         ${objectives.map(o => {
