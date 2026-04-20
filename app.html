@@ -1763,7 +1763,7 @@ body::after {
       <div style="height:1px;background:rgba(255,255,255,0.06);margin:12px 8px;" id="nav-divider"></div>
       <button class="nav-item" onclick="showView('progress')" id="nav-progress" style="opacity:0.7;">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-        Growth
+        AI Analysis
       </button>
       <button class="nav-item" onclick="showView('badges')" id="nav-badges" style="opacity:0.7;display:none;">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.56 13.38L7 22l5-3 5 3-1.56-8.62"/></svg></span>
@@ -1952,9 +1952,9 @@ body::after {
             </div>
 
             <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:16px;padding:16px 12px;text-align:center;">
-              <div style="font-size:1.4rem;margin-bottom:6px;">🦷</div>
-              <div style="font-size:0.65rem;font-weight:700;color:#9B91FF;margin-bottom:4px;">Earn Molars</div>
-              <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);line-height:1.4;">Level up with every case logged</div>
+              <div style="font-size:1.4rem;margin-bottom:6px;">🏆</div>
+              <div style="font-size:0.65rem;font-weight:700;color:#9B91FF;margin-bottom:4px;">Portfolio</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);line-height:1.4;">Verified proof of your clinical growth</div>
             </div>
 
             <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:16px;padding:16px 12px;text-align:center;">
@@ -1980,11 +1980,11 @@ body::after {
         <!-- INACTIVITY ALERT -->
         <div id="inactivity-alert" style="display:none;"></div>
 
-        <!-- MONTHLY OBJECTIVES -->
-        <div id="monthly-objectives" style="display:none;"></div>
-
         <!-- PORTFOLIO TEASER CARD -->
         <div id="portfolio-teaser-card" style="display:none;margin-bottom:16px;"></div>
+
+        <!-- MONTHLY OBJECTIVES -->
+        <div id="monthly-objectives" style="display:none;"></div>
 
         <!-- SKILL PROGRESS GRAPH -->
         <div id="skill-progress-card" style="display:none;margin-bottom:16px;"></div>
@@ -3080,46 +3080,8 @@ body::after {
       <!-- PROGRESS VIEW -->
       <div class="view" id="view-progress">
         <div class="page-header">
-          <div class="page-title">Clinical Growth Engine</div>
-          <div class="page-sub">Your personal clinical development report</div>
-        </div>
-
-        <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);">
-          <div class="stat-card">
-            <div class="stat-card-label">Endo Cases</div>
-            <div class="stat-card-value" id="prog-endo">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-label">Restorative</div>
-            <div class="stat-card-value" id="prog-resto">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-label">Surgery</div>
-            <div class="stat-card-value" id="prog-surg">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-label">Paediatric</div>
-            <div class="stat-card-value" id="prog-paeds">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-label">Avg Score</div>
-            <div class="stat-card-value" id="prog-avg">—</div>
-          </div>
-        </div>
-
-        <!-- LEVEL CARD -->
-        <div class="card">
-          <div class="card-title">Rank Progress</div>
-          <div style="display:flex; align-items:center; gap:16px; margin-bottom:14px;">
-            <div style="font-family:'Instrument Serif',serif; font-size:2.5rem; color:var(--teal); line-height:1" id="prog-level-display">1</div>
-            <div style="flex:1">
-              <div style="font-size:1rem; color:var(--white); font-weight:500; margin-bottom:2px" id="prog-level-name-display">Bronze</div>
-              <div style="font-size:0.8rem; color:var(--gray)" id="prog-level-next">Log 10 cases to reach Silver</div>
-            </div>
-          </div>
-          <div class="progress-bar-track">
-            <div class="progress-bar-fill" id="prog-level-bar" style="width:0%"></div>
-          </div>
+          <div class="page-title">AI Growth Analysis</div>
+          <div class="page-sub">Strengths, blind spots, and your next 30 days</div>
         </div>
 
         <!-- CLINICAL GROWTH ENGINE -->
@@ -5232,25 +5194,25 @@ function updateProgress() {
   const paeds = allCases.filter(c => c.specialty === 'paeds').length;
   const total = allCases.length;
 
-  document.getElementById('prog-endo').textContent  = endo;
-  document.getElementById('prog-resto').textContent = resto;
-  document.getElementById('prog-surg').textContent  = surg;
-  document.getElementById('prog-paeds').textContent = paeds;
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('prog-endo', endo);
+  setEl('prog-resto', resto);
+  setEl('prog-surg', surg);
+  setEl('prog-paeds', paeds);
 
   if (total > 0) {
     const avg = (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total).toFixed(1);
-    document.getElementById('prog-avg').textContent = avg;
+    setEl('prog-avg', avg);
   }
 
   const level = getLevel(total);
-  document.getElementById('prog-level-display').textContent     = level.level;
-  document.getElementById('prog-level-name-display').textContent = level.name;
+  setEl('prog-level-display', level.level);
+  setEl('prog-level-name-display', level.name);
 
   const xp = getXP(total);
-  document.getElementById('prog-level-bar').style.width = `${xp.pct}%`;
-  document.getElementById('prog-level-next').textContent = level.level >= 10
-    ? '🔱 Maximum level reached!'
-    : `${xp.toNext} more cases to reach ${LEVELS[level.level].name}`;
+  const barEl = document.getElementById('prog-level-bar');
+  if (barEl) barEl.style.width = `${xp.pct}%`;
+  setEl('prog-level-next', level.level >= 10 ? '🔱 Maximum level reached!' : `${xp.toNext} more cases to reach ${LEVELS[level.level].name}`);
 
   updateProgressInsights(endo, resto, surg, paeds, total);
 }
