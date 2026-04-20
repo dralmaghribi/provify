@@ -1817,143 +1817,190 @@ body::after {
         <style>
           @keyframes heroOrb1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-20px,15px) scale(1.1)}}
           @keyframes heroOrb2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(15px,-20px) scale(1.08)}}
-          @keyframes micPulseRing{0%{transform:scale(1);opacity:0.6}100%{transform:scale(2.2);opacity:0}}
-          @keyframes micBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-          @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-          @keyframes scoreCount{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
-          @keyframes statSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes micPulseRing{0%{transform:scale(1);opacity:0.5}100%{transform:scale(2.4);opacity:0}}
+          @keyframes micBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+          @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes statSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes shimmer{0%{opacity:0.4}50%{opacity:0.9}100%{opacity:0.4}}
           .stat-pill{animation:statSlide 0.5s ease both;}
-          .stat-pill:nth-child(1){animation-delay:0.1s}
-          .stat-pill:nth-child(2){animation-delay:0.2s}
-          .stat-pill:nth-child(3){animation-delay:0.3s}
-          .stat-pill:nth-child(4){animation-delay:0.4s}
-          .dash-section{animation:fadeUp 0.4s ease both;}
-          #voice-hero-btn:active{transform:scale(0.97) !important;}
+          .stat-pill:nth-child(1){animation-delay:0.08s}
+          .stat-pill:nth-child(2){animation-delay:0.16s}
+          .stat-pill:nth-child(3){animation-delay:0.24s}
+          .stat-pill:nth-child(4){animation-delay:0.32s}
+          .dash-section{animation:fadeUp 0.35s ease both;}
+          .dash-section:nth-child(2){animation-delay:0.06s}
+          .dash-section:nth-child(3){animation-delay:0.12s}
+          .dash-section:nth-child(4){animation-delay:0.18s}
+          .value-pill:hover{border-color:rgba(255,255,255,0.15)!important;background:rgba(255,255,255,0.05)!important;}
         </style>
 
+        <!-- ── COMPANION CARD ── -->
+        <div class="dash-section" style="margin-bottom:14px;">
+          <div id="voice-hero-btn" style="position:relative;border-radius:26px;overflow:hidden;box-shadow:0 12px 48px rgba(124,111,255,0.2);">
 
-        <!-- COMPANION CARD -->
-        <div class="dash-section" style="margin-bottom:16px;">
-          <div id="voice-hero-btn" style="position:relative;border-radius:28px;overflow:hidden;box-shadow:0 8px 40px rgba(124,111,255,0.18);">
+            <!-- BG layers -->
+            <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0D0B1E 0%,#080B16 100%);"></div>
+            <div style="position:absolute;top:-80px;right:-60px;width:320px;height:320px;background:radial-gradient(circle,rgba(124,111,255,0.2) 0%,transparent 65%);pointer-events:none;animation:heroOrb1 8s ease-in-out infinite;"></div>
+            <div style="position:absolute;bottom:-50px;left:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(52,211,153,0.08) 0%,transparent 65%);pointer-events:none;animation:heroOrb2 10s ease-in-out infinite;"></div>
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.7),rgba(52,211,153,0.3),transparent);"></div>
 
-            <!-- Background -->
-            <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0D0B1E 0%,#090C18 60%,#0A0E16 100%);"></div>
-            <div style="position:absolute;top:-100px;right:-80px;width:340px;height:340px;background:radial-gradient(circle,rgba(124,111,255,0.18) 0%,transparent 65%);pointer-events:none;animation:heroOrb1 8s ease-in-out infinite;"></div>
-            <div style="position:absolute;bottom:-60px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(52,211,153,0.07) 0%,transparent 65%);pointer-events:none;animation:heroOrb2 10s ease-in-out infinite;"></div>
-            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),rgba(52,211,153,0.3),transparent);"></div>
+            <div style="position:relative;z-index:1;padding:20px 20px 0;">
 
-            <!-- Top: companion identity -->
-            <div style="position:relative;z-index:1;padding:22px 22px 0;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div style="width:7px;height:7px;border-radius:50%;background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.8);animation:micBreath 2s ease-in-out infinite;"></div>
-                  <span style="font-size:0.58rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.16em;font-weight:600;">Provify is listening</span>
+              <!-- Row 1: status + rank -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:7px;">
+                  <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 7px rgba(52,211,153,0.9);animation:micBreath 2.2s ease-in-out infinite;"></div>
+                  <span style="font-size:0.56rem;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:0.16em;font-weight:600;">Ready</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.18);padding:4px 10px;border-radius:100px;"><span id="dash-rank-icon" style="font-size:0.75rem;">⚡</span><span id="dash-ring-label" style="font-size:0.58rem;font-weight:700;color:var(--teal);letter-spacing:0.04em;" id="dash-hero-label">—</span></div>
+                <div style="display:flex;align-items:center;gap:5px;background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.16);padding:4px 10px;border-radius:100px;">
+                  <span id="dash-rank-icon" style="font-size:0.7rem;">⚡</span>
+                  <span id="dash-ring-label" style="font-size:0.58rem;font-weight:700;color:var(--teal);letter-spacing:0.04em;">—</span>
+                </div>
               </div>
 
-              <!-- Companion message -->
-              <div style="margin-bottom:20px;">
-                <div style="font-family:'Instrument Serif',serif;font-size:1.55rem;color:white;letter-spacing:-0.03em;line-height:1.25;margin-bottom:8px;" id="dash-hero-title">Good morning,<br>Dr. Abdullah.</div>
-                <div style="font-size:0.78rem;color:rgba(255,255,255,0.38);line-height:1.65;max-width:280px;" id="dash-hero-body">Finish a case? Tell me everything. I'll handle the note, the record, and the proof.</div>
+              <!-- Row 2: greeting + body -->
+              <div style="margin-bottom:16px;">
+                <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:6px;" id="dash-hero-title">Good morning,<br>Doctor.</div>
+                <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);line-height:1.6;max-width:260px;" id="dash-hero-body">Finish a case? Just tell me. I'll write the note, lock the record, and protect you.</div>
               </div>
 
-              <!-- Mic trigger -->
-              <div onclick="openVoiceLog()" style="display:flex;align-items:center;gap:16px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.22);border-radius:18px;padding:14px 18px;cursor:pointer;transition:all 0.2s;margin-bottom:20px;"
-                onmouseover="this.style.background='rgba(124,111,255,0.16)';this.style.borderColor='rgba(124,111,255,0.4)'"
-                onmouseout="this.style.background='rgba(124,111,255,0.1)';this.style.borderColor='rgba(124,111,255,0.22)'">
-                <!-- Mic orb -->
-                <div style="flex-shrink:0;position:relative;width:48px;height:48px;">
-                  <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(124,111,255,0.5);animation:micPulseRing 2.4s ease-out infinite;"></div>
-                  <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(124,111,255,0.3);animation:micPulseRing 2.4s ease-out 0.8s infinite;"></div>
-                  <div style="position:absolute;inset:5px;border-radius:50%;background:linear-gradient(135deg,#7C6FFF,#5B50CC);box-shadow:0 0 20px rgba(124,111,255,0.6),inset 0 1px 0 rgba(255,255,255,0.2);animation:micBreath 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+              <!-- Row 3: mic trigger -->
+              <div onclick="openVoiceLog()" style="display:flex;align-items:center;gap:14px;background:rgba(124,111,255,0.11);border:1px solid rgba(124,111,255,0.24);border-radius:16px;padding:13px 16px;cursor:pointer;transition:all 0.18s;margin-bottom:18px;"
+                onmouseover="this.style.background='rgba(124,111,255,0.18)';this.style.borderColor='rgba(124,111,255,0.42)'"
+                onmouseout="this.style.background='rgba(124,111,255,0.11)';this.style.borderColor='rgba(124,111,255,0.24)'">
+                <div style="flex-shrink:0;position:relative;width:44px;height:44px;">
+                  <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(124,111,255,0.45);animation:micPulseRing 2.4s ease-out infinite;"></div>
+                  <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(124,111,255,0.25);animation:micPulseRing 2.4s ease-out 0.85s infinite;"></div>
+                  <div style="position:absolute;inset:5px;border-radius:50%;background:linear-gradient(135deg,#7C6FFF,#5548C8);box-shadow:0 0 22px rgba(124,111,255,0.65),inset 0 1px 0 rgba(255,255,255,0.18);animation:micBreath 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
                   </div>
                 </div>
                 <div style="flex:1;">
-                  <div style="font-size:0.92rem;color:rgba(255,255,255,0.9);font-weight:600;margin-bottom:2px;">Log a case with voice</div>
-                  <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);">Speak naturally · 60 seconds · done</div>
+                  <div style="font-size:0.9rem;color:rgba(255,255,255,0.92);font-weight:600;letter-spacing:-0.01em;margin-bottom:1px;">Speak your case</div>
+                  <div style="font-size:0.65rem;color:rgba(255,255,255,0.28);">60 seconds · AI does the rest</div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(124,111,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(124,111,255,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
+
             </div>
 
             <!-- Stats strip -->
             <div style="position:relative;z-index:1;border-top:1px solid rgba(255,255,255,0.05);display:grid;grid-template-columns:repeat(4,1fr);">
-              <div class="stat-pill" style="padding:12px 6px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-                <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--white);line-height:1;margin-bottom:2px;" id="micro-total">0</div>
-                <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;">Cases</div>
+              <div class="stat-pill" style="padding:11px 4px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+                <div style="font-family:'Instrument Serif',serif;font-size:1.35rem;color:var(--white);line-height:1;margin-bottom:2px;" id="micro-total">0</div>
+                <div style="font-size:0.42rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.1em;">Cases</div>
               </div>
-              <div class="stat-pill" style="padding:12px 6px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-                <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:#F59E0B;line-height:1;margin-bottom:2px;" id="micro-streak">0</div>
-                <div style="font-size:0.44rem;color:rgba(245,158,11,0.35);text-transform:uppercase;letter-spacing:0.1em;">This Week</div>
+              <div class="stat-pill" style="padding:11px 4px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+                <div style="font-family:'Instrument Serif',serif;font-size:1.35rem;color:#F59E0B;line-height:1;margin-bottom:2px;" id="micro-streak">0</div>
+                <div style="font-size:0.42rem;color:rgba(245,158,11,0.32);text-transform:uppercase;letter-spacing:0.1em;">This Week</div>
               </div>
-              <div class="stat-pill" style="padding:12px 6px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-                <div style="font-family:'Instrument Serif',serif;font-size:0.9rem;color:#C0C0C0;line-height:1;margin-bottom:2px;margin-top:4px;" id="micro-rank">—</div>
-                <div style="font-size:0.44rem;color:rgba(192,192,192,0.28);text-transform:uppercase;letter-spacing:0.1em;">Rank</div>
+              <div class="stat-pill" style="padding:11px 4px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+                <div style="font-family:'Instrument Serif',serif;font-size:0.88rem;color:#C0C0C0;line-height:1;margin-bottom:2px;margin-top:3px;" id="micro-rank">—</div>
+                <div style="font-size:0.42rem;color:rgba(192,192,192,0.25);text-transform:uppercase;letter-spacing:0.1em;">Rank</div>
               </div>
-              <div class="stat-pill" style="padding:12px 6px;text-align:center;">
-                <div style="font-family:'Instrument Serif',serif;font-size:0.9rem;color:var(--teal);line-height:1;margin-bottom:2px;margin-top:4px;" id="micro-specialty">—</div>
-                <div style="font-size:0.44rem;color:rgba(124,111,255,0.35);text-transform:uppercase;letter-spacing:0.1em;">Specialty</div>
+              <div class="stat-pill" style="padding:11px 4px;text-align:center;">
+                <div style="font-family:'Instrument Serif',serif;font-size:0.88rem;color:var(--teal);line-height:1;margin-bottom:2px;margin-top:3px;" id="micro-specialty">—</div>
+                <div style="font-size:0.42rem;color:rgba(124,111,255,0.32);text-transform:uppercase;letter-spacing:0.1em;">Specialty</div>
               </div>
             </div>
 
           </div>
         </div>
 
+        <!-- ── VALUE STRIP: what Provify actually does ── -->
+        <div class="dash-section" id="value-strip" style="display:none;margin-bottom:14px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+
+            <!-- Protection -->
+            <div onclick="navToShield()" class="value-pill" style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.14);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;">
+              <div style="font-size:1.3rem;margin-bottom:6px;">🛡️</div>
+              <div style="font-size:0.65rem;font-weight:700;color:rgba(239,68,68,0.85);margin-bottom:3px;">Protected</div>
+              <div style="font-size:0.56rem;color:rgba(255,255,255,0.22);line-height:1.45;" id="val-protection-text">0 cases on record</div>
+            </div>
+
+            <!-- Portfolio -->
+            <div onclick="viewMyPortfolio()" class="value-pill" style="background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.14);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;">
+              <div style="font-size:1.3rem;margin-bottom:6px;">🏆</div>
+              <div style="font-size:0.65rem;font-weight:700;color:rgba(124,111,255,0.85);margin-bottom:3px;">Portfolio</div>
+              <div style="font-size:0.56rem;color:rgba(255,255,255,0.22);line-height:1.45;" id="val-portfolio-text">Share your record</div>
+            </div>
+
+            <!-- Growth -->
+            <div onclick="showView('progress')" class="value-pill" style="background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.14);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;">
+              <div style="font-size:1.3rem;margin-bottom:6px;">📈</div>
+              <div style="font-size:0.65rem;font-weight:700;color:rgba(52,211,153,0.85);margin-bottom:3px;">Growth</div>
+              <div style="font-size:0.56rem;color:rgba(255,255,255,0.22);line-height:1.45;" id="val-growth-text">Track complexity</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── LAST CASE STRIP ── -->
+        <div class="dash-section" id="last-case-strip" style="display:none;margin-bottom:14px;"></div>
+
         <!-- PORTFOLIO TEASER -->
-        <div id="portfolio-teaser-card" style="display:none;margin-bottom:16px;"></div>
+        <div id="portfolio-teaser-card" style="display:none;margin-bottom:14px;"></div>
 
         <!-- MONTHLY OBJECTIVES -->
         <div id="monthly-objectives" style="display:none;"></div>
 
         <!-- SKILL PROGRESS GRAPH -->
-        <div id="skill-progress-card" style="display:none;margin-bottom:16px;"></div>
+        <div id="skill-progress-card" style="display:none;margin-bottom:14px;"></div>
 
         <!-- BEST WORK -->
         <div class="card dash-section" id="best-work-card" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <div class="card-title" style="margin:0">⭐ Best Work</div>
-            <div style="font-size:0.75rem;color:var(--gray)">Highest complexity</div>
+            <div style="font-size:0.72rem;color:var(--gray)">Highest complexity</div>
           </div>
-          <div id="best-work-list" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
+          <div id="best-work-list" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
         </div>
 
         <!-- REVIEWS -->
         <div class="card dash-section" id="dashboard-reviews-card" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <div class="card-title" style="margin:0">🌟 Your Reviews</div>
             <div id="dashboard-avg-rating" style="font-size:0.85rem;color:#F59E0B;font-weight:600"></div>
           </div>
           <div id="dashboard-reviews-list" style="display:flex;flex-direction:column;gap:10px;"></div>
         </div>
 
-        <!-- EMPTY STATE (0 cases) -->
+        <!-- EMPTY STATE -->
         <div id="welcome-card" style="display:none;margin-bottom:16px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;">
-            <div style="background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.12);border-radius:16px;padding:16px 12px;text-align:center;">
-              <div style="font-size:1.3rem;margin-bottom:6px;">🛡</div>
-              <div style="font-size:0.63rem;font-weight:700;color:#34D399;margin-bottom:4px;">Protected</div>
-              <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);line-height:1.4;">Every case timestamped</div>
-            </div>
-            <div style="background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.12);border-radius:16px;padding:16px 12px;text-align:center;">
-              <div style="font-size:1.3rem;margin-bottom:6px;">🏆</div>
-              <div style="font-size:0.63rem;font-weight:700;color:#9B91FF;margin-bottom:4px;">Portfolio</div>
-              <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);line-height:1.4;">Verified proof of growth</div>
-            </div>
-            <div style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.12);border-radius:16px;padding:16px 12px;text-align:center;">
-              <div style="font-size:1.3rem;margin-bottom:6px;">🧠</div>
-              <div style="font-size:0.63rem;font-weight:700;color:#F59E0B;margin-bottom:4px;">AI Analysis</div>
-              <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);line-height:1.4;">Unlocks at 3 cases</div>
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:20px;margin-bottom:10px;">
+            <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:14px;font-weight:600;">What Provify does for you</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:flex-start;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🛡️</div>
+                <div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:2px;">Medico-legal protection</div>
+                  <div style="font-size:0.66rem;color:rgba(255,255,255,0.3);line-height:1.5;">Every case is timestamped and tamper-proof. If a complaint comes, your record speaks for you.</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:10px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🏆</div>
+                <div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:2px;">Verified clinical portfolio</div>
+                  <div style="font-size:0.66rem;color:rgba(255,255,255,0.3);line-height:1.5;">A shareable link that proves your complexity growth to employers and universities.</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:10px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">📈</div>
+                <div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:2px;">Complexity growth tracking</div>
+                  <div style="font-size:0.66rem;color:rgba(255,255,255,0.3);line-height:1.5;">See if you're actually improving — or just staying comfortable. The data doesn't lie.</div>
+                </div>
+              </div>
             </div>
           </div>
-          <div style="text-align:center;margin-top:14px;">
-            <span onclick="showView('log')" style="font-size:0.72rem;color:rgba(124,111,255,0.45);cursor:pointer;text-decoration:underline;">Prefer typing? Use the manual form →</span>
+          <div style="text-align:center;">
+            <span onclick="showView('log')" style="font-size:0.7rem;color:rgba(124,111,255,0.4);cursor:pointer;text-decoration:underline;">Prefer typing? Use the manual form →</span>
           </div>
           <div id="career-teaser-card" style="display:none;"></div>
         </div>
 
       </div>
+
 
       <!-- LOG CASE VIEW -->
       <div class="view" id="view-log">
@@ -4398,6 +4445,8 @@ function updateDashboard() {
   renderInactivityAlert();
   renderSkillProgressGraph();
   renderPortfolioTeaserCard();
+  renderValueStrip();
+  renderLastCaseStrip();
 
   // ── PROGRESSIVE NAV DISCLOSURE ──
   // Show secondary nav items progressively as user logs more cases
@@ -9965,6 +10014,70 @@ function getMonthlyObjectives() {
   return { month, objectives };
 }
 
+
+// ─── VALUE STRIP ───
+function renderValueStrip() {
+  const strip = document.getElementById('value-strip');
+  if (!strip) return;
+  const total = allCases.length;
+  if (total === 0) { strip.style.display = 'none'; return; }
+  strip.style.display = 'block';
+
+  // Protection text
+  const protEl = document.getElementById('val-protection-text');
+  if (protEl) protEl.textContent = `${total} case${total !== 1 ? 's' : ''} on record`;
+
+  // Portfolio text
+  const portEl = document.getElementById('val-portfolio-text');
+  const avg = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '0';
+  if (portEl) portEl.textContent = `${avg} avg complexity`;
+
+  // Growth text
+  const grwEl = document.getElementById('val-growth-text');
+  if (grwEl) {
+    const recent = allCases.slice(-5);
+    const early = allCases.slice(0, 5);
+    if (allCases.length >= 6) {
+      const recentAvg = recent.reduce((s,c) => s + (c.complexity_score||0), 0) / recent.length;
+      const earlyAvg = early.reduce((s,c) => s + (c.complexity_score||0), 0) / early.length;
+      const diff = recentAvg - earlyAvg;
+      grwEl.textContent = diff >= 0 ? `+${diff.toFixed(1)} complexity growth` : `${diff.toFixed(1)} complexity shift`;
+    } else {
+      grwEl.textContent = 'Keep logging to see growth';
+    }
+  }
+}
+
+// ─── LAST CASE STRIP ───
+function renderLastCaseStrip() {
+  const strip = document.getElementById('last-case-strip');
+  if (!strip || allCases.length === 0) { if (strip) strip.style.display = 'none'; return; }
+
+  const last = allCases.sort((a,b) => new Date(b.created_at) - new Date(a.created_at))[0];
+  const specNames = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8' };
+  const spec = specNames[last.specialty] || last.specialty || 'General';
+  const col = specColors[last.specialty] || '#7C6FFF';
+  const tooth = last.tooth_number ? `Tooth ${last.tooth_number}` : 'Case';
+  const score = last.complexity_score ? `${last.complexity_score}/10` : '';
+  const daysAgo = last.created_at ? Math.floor((Date.now() - new Date(last.created_at)) / 86400000) : null;
+  const when = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : daysAgo !== null ? `${daysAgo}d ago` : '';
+
+  strip.style.display = 'block';
+  strip.innerHTML = `
+    <div onclick="openCaseModal(allCases.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0])" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:13px 16px;cursor:pointer;transition:all 0.18s;"
+      onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'"
+      onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'">
+      <div style="width:36px;height:36px;border-radius:10px;background:${col}18;border:1px solid ${col}30;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.62rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Last case ${when}</div>
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.85);font-weight:500;">${tooth} · <span style="color:${col}">${spec}</span>${score ? ` · ${score}` : ''}</div>
+      </div>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
+}
 
 function renderMonthlyObjectives() {
   const el = document.getElementById('monthly-objectives');
