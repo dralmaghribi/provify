@@ -1838,41 +1838,22 @@ body::after {
         </style>
 
         <!-- ═══ CLINICAL FOOTPRINT ═══ -->
-        <div id="clinical-footprint-card" style="margin-bottom:14px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:18px 16px 14px;position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.3),transparent);"></div>
+        <div id="clinical-footprint-card" style="margin-bottom:14px;background:linear-gradient(135deg,rgba(255,255,255,0.025),rgba(255,255,255,0.008));border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:16px 14px 10px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.35),transparent);"></div>
 
           <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <div>
-              <div style="font-size:0.56rem;color:rgba(124,111,255,0.6);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:2px;">Clinical Footprint</div>
-              <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);" id="cf-subtitle">Every tooth you've treated</div>
+              <div style="font-size:0.56rem;color:rgba(124,111,255,0.65);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:2px;">Clinical Footprint</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);" id="cf-subtitle">Log cases to build your footprint</div>
             </div>
-            <!-- Legend -->
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#7C6FFF;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Endo</span></div>
-              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Resto</span></div>
-              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#EF4444;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Surg</span></div>
-              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#34D399;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Paeds</span></div>
-            </div>
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.18);font-style:italic;">Your treated arch</div>
           </div>
 
           <!-- Arch SVG -->
           <div style="position:relative;">
-            <svg id="cf-arch-svg" viewBox="0 0 340 110" width="100%" style="display:block;overflow:visible;" xmlns="http://www.w3.org/2000/svg">
-              <!-- Upper arch label -->
-              <text x="4" y="22" font-size="7" fill="rgba(255,255,255,0.18)" font-family="Inter,sans-serif" font-weight="600" letter-spacing="0.5">U</text>
-              <!-- Lower arch label -->
-              <text x="4" y="95" font-size="7" fill="rgba(255,255,255,0.18)" font-family="Inter,sans-serif" font-weight="600" letter-spacing="0.5">L</text>
-              <!-- Midline -->
-              <line x1="170" y1="2" x2="170" y2="108" stroke="rgba(255,255,255,0.06)" stroke-width="0.8" stroke-dasharray="3 3"/>
-              <!-- Arch separator -->
-              <line x1="16" y1="56" x2="324" y2="56" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
-              <!-- Teeth rendered by JS -->
-              <g id="cf-upper-teeth"></g>
-              <g id="cf-lower-teeth"></g>
-            </svg>
-            <!-- Tooltip -->
-            <div id="cf-tooltip" style="display:none;position:absolute;background:rgba(10,8,20,0.95);border:1px solid rgba(124,111,255,0.3);border-radius:10px;padding:8px 12px;font-size:0.7rem;color:white;white-space:nowrap;z-index:100;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.5);"></div>
+            <svg id="cf-arch-svg" viewBox="0 0 320 110" width="100%" style="display:block;overflow:visible;" xmlns="http://www.w3.org/2000/svg"></svg>
+            <div id="cf-tooltip" style="display:none;position:absolute;background:rgba(8,6,18,0.96);border:1px solid rgba(124,111,255,0.25);border-radius:10px;padding:7px 11px;font-size:0.7rem;color:white;white-space:nowrap;z-index:100;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.6);backdrop-filter:blur(8px);"></div>
           </div>
         </div>
 
@@ -10004,129 +9985,248 @@ function getMonthlyObjectives() {
 
 // ─── CLINICAL FOOTPRINT ───
 function renderClinicalFootprint() {
-  const upperG = document.getElementById('cf-upper-teeth');
-  const lowerG = document.getElementById('cf-lower-teeth');
+  const svg = document.getElementById('cf-arch-svg');
   const subtitle = document.getElementById('cf-subtitle');
-  if (!upperG || !lowerG) return;
+  if (!svg) return;
 
-  // Build treated teeth map: toothNum -> {specialty, cases[]}
+  // Build treated map
   const treated = {};
   allCases.forEach(c => {
     const t = parseInt(c.tooth_number);
     if (!t) return;
-    if (!treated[t]) treated[t] = { specialty: c.specialty, cases: [] };
+    if (!treated[t]) treated[t] = { cases: [] };
     treated[t].cases.push(c);
-    // if multiple cases on same tooth, use most recent specialty
-    treated[t].specialty = c.specialty;
   });
 
   const treatedCount = Object.keys(treated).length;
   if (subtitle) {
     subtitle.textContent = treatedCount > 0
-      ? `${treatedCount} tooth${treatedCount !== 1 ? 'teeth' : ''} treated · tap to explore`
+      ? `${treatedCount} ${treatedCount === 1 ? 'tooth' : 'teeth'} treated · tap any to open case`
       : 'Log cases to build your clinical footprint';
   }
 
-  // Specialty colors
-  const specColor = {
-    endo:        { fill: '#7C6FFF', glow: 'rgba(124,111,255,0.5)', text: '#7C6FFF' },
-    restorative: { fill: '#F59E0B', glow: 'rgba(245,158,11,0.5)',  text: '#F59E0B' },
-    surgery:     { fill: '#EF4444', glow: 'rgba(239,68,68,0.5)',   text: '#EF4444' },
-    paeds:       { fill: '#34D399', glow: 'rgba(52,211,153,0.5)',  text: '#34D399' },
-    prostho:     { fill: '#38BDF8', glow: 'rgba(56,189,248,0.5)',  text: '#38BDF8' },
-  };
-  const defaultColor = { fill: 'rgba(255,255,255,0.15)', glow: 'none', text: 'rgba(255,255,255,0.3)' };
+  // ── Tooth shape paths (realistic crown anatomy) ──
+  // Each returns an SVG path string. Origin (0,0) = center-bottom of crown
+  // isUpper: roots point up, crowns down. isLower: roots point down, crowns up.
 
-  // FDI arch layout — x positions for each tooth in the SVG (340px wide, teeth from x=18)
-  // Upper: 18→17→16→15→14→13→12→11 | 21→22→23→24→25→26→27→28
-  // Lower: 48→47→46→45→44→43→42→41 | 31→32→33→34→35→36→37→38
-  const UPPER = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
-  const LOWER = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+  function molarPath(isUpper) {
+    // 4-cusp molar, wide crown, fissure cross
+    const cw = 13, ch = 12, r = 2.5;
+    const cy = isUpper ? -ch : 0;
+    return `M${-cw/2+r},${cy} Q${-cw/2},${cy} ${-cw/2},${cy+r}
+            L${-cw/2},${cy+ch-r} Q${-cw/2},${cy+ch} ${-cw/2+r},${cy+ch}
+            L${cw/2-r},${cy+ch} Q${cw/2},${cy+ch} ${cw/2},${cy+ch-r}
+            L${cw/2},${cy+r} Q${cw/2},${cy} ${cw/2-r},${cy}
+            Z`;
+  }
 
-  // Tooth widths by type for spacing
-  const toothW = { M:18, P:14, C:12, I:11 };
-  const TOOTH_TYPE_MAP = {
+  function molarFissure(isUpper) {
+    const cw = 13, ch = 12;
+    const cy = isUpper ? -ch : 0;
+    const mx = 0, my = cy + ch/2;
+    return `M${mx-3.5},${my} L${mx+3.5},${my} M${mx},${my-3} L${mx},${my+3}`;
+  }
+
+  function premolarPath(isUpper) {
+    const cw = 9, ch = 12, r = 2;
+    const cy = isUpper ? -ch : 0;
+    return `M${-cw/2+r},${cy} Q${-cw/2},${cy} ${-cw/2},${cy+r}
+            L${-cw/2},${cy+ch-r} Q${-cw/2},${cy+ch} ${-cw/2+r},${cy+ch}
+            L${cw/2-r},${cy+ch} Q${cw/2},${cy+ch} ${cw/2},${cy+ch-r}
+            L${cw/2},${cy+r} Q${cw/2},${cy} ${cw/2-r},${cy} Z`;
+  }
+
+  function premolarCusp(isUpper) {
+    // Two cusps separated by central groove
+    const ch = 12;
+    const cy = isUpper ? -ch : 0;
+    const midY = cy + ch * 0.45;
+    return `M-2.5,${midY} L2.5,${midY}`;
+  }
+
+  function caninePath(isUpper) {
+    const cw = 7.5, ch = 14;
+    const cy = isUpper ? -ch : 0;
+    if (isUpper) {
+      // Pointed tip at top
+      return `M0,${cy} L${cw/2},${cy+5} L${cw/2},${cy+ch-2} Q${cw/2},${cy+ch} ${cw/2-2},${cy+ch}
+              L${-cw/2+2},${cy+ch} Q${-cw/2},${cy+ch} ${-cw/2},${cy+ch-2} L${-cw/2},${cy+5} Z`;
+    } else {
+      return `M0,${cy+ch} L${cw/2},${cy+ch-5} L${cw/2},${cy+2} Q${cw/2},${cy} ${cw/2-2},${cy}
+              L${-cw/2+2},${cy} Q${-cw/2},${cy} ${-cw/2},${cy+2} L${-cw/2},${cy+ch-5} Z`;
+    }
+  }
+
+  function incisorPath(isUpper) {
+    const cw = 7, ch = 11, r = 1.5;
+    const cy = isUpper ? -ch : 0;
+    // Slightly trapezoidal — wider at incisal edge
+    if (isUpper) {
+      return `M${-cw/2-0.5},${cy+ch} L${cw/2+0.5},${cy+ch}
+              Q${cw/2+0.5},${cy+ch} ${cw/2},${cy+ch-r}
+              L${cw/2-0.5},${cy+r} Q${cw/2-0.5},${cy} ${cw/2-1.5},${cy}
+              L${-cw/2+1.5},${cy} Q${-cw/2+0.5},${cy} ${-cw/2+0.5},${cy+r}
+              L${-cw/2},${cy+ch-r} Q${-cw/2-0.5},${cy+ch} ${-cw/2-0.5},${cy+ch} Z`;
+    } else {
+      return `M${-cw/2-0.5},${cy} L${cw/2+0.5},${cy}
+              Q${cw/2+0.5},${cy} ${cw/2},${cy+r}
+              L${cw/2-0.5},${cy+ch-r} Q${cw/2-0.5},${cy+ch} ${cw/2-1.5},${cy+ch}
+              L${-cw/2+1.5},${cy+ch} Q${-cw/2+0.5},${cy+ch} ${-cw/2+0.5},${cy+ch-r}
+              L${-cw/2},${cy+r} Q${-cw/2-0.5},${cy} ${-cw/2-0.5},${cy} Z`;
+    }
+  }
+
+  // Tooth type lookup
+  const TTYPE = {
     18:'M',17:'M',16:'M',15:'P',14:'P',13:'C',12:'I',11:'I',
     21:'I',22:'I',23:'C',24:'P',25:'P',26:'M',27:'M',28:'M',
     48:'M',47:'M',46:'M',45:'P',44:'P',43:'C',42:'I',41:'I',
     31:'I',32:'I',33:'C',34:'P',35:'P',36:'M',37:'M',38:'M',
   };
 
-  function getW(t) { return (toothW[TOOTH_TYPE_MAP[t]] || 11) + 2; }
+  // Width for spacing
+  const TWIDTH = { M:15, P:11, C:9, I:9 };
+  function tw(t) { return TWIDTH[TTYPE[t]] || 9; }
 
-  // Calculate x positions
-  function calcPositions(teeth) {
-    const totalW = teeth.reduce((s,t) => s + getW(t), 0) + (teeth.length - 1) * 1.5;
-    const startX = (340 - totalW) / 2;
-    const pos = [];
-    let x = startX;
-    teeth.forEach((t, i) => {
-      const w = getW(t);
-      pos.push({ t, x: x + w/2, w });
-      x += w + 1.5;
+  // ── Curved arch positions ──
+  // Upper arch: parabolic curve, teeth along the curve
+  // SVG: 320 wide, upper arch center at y=54, lower at y=56
+  // Arch curves from back-left, up to midline, back-right
+
+  const UPPER = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+  const LOWER = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+
+  function archPositions(teeth, isUpper) {
+    // Place teeth along a parabolic arch
+    // Total span ~300px, center at x=160
+    // Arch depth: molars sit ~28px above/below incisors
+    const span = 296;
+    const depth = 22; // arch curvature depth
+    const startX = 10;
+    const totalW = teeth.reduce((s,t) => s + tw(t) + 2, 0) - 2;
+    const scale = span / totalW;
+
+    let cumW = 0;
+    return teeth.map(t => {
+      const w = tw(t);
+      const cx = cumW + w/2;
+      cumW += w + 2;
+      // normalize to -1..1
+      const norm = (cx / totalW) * 2 - 1;
+      // parabola: y offset = depth * (1 - norm^2)  -- 0 at edges, depth at center
+      const archOffset = depth * (1 - norm * norm);
+      const x = startX + cx * scale;
+      const yOffset = isUpper ? -archOffset : archOffset;
+      // rotation angle along arch tangent
+      const angle = -norm * 18; // tilt toward center
+      return { t, x, yBase: yOffset, angle };
     });
-    return pos;
   }
 
-  function renderArch(teeth, yCenter, isUpper, container) {
-    const positions = calcPositions(teeth);
-    let html = '';
-    positions.forEach(({ t, x, w }, idx) => {
+  function renderArch(teeth, isUpper, yBase) {
+    const positions = archPositions(teeth, isUpper);
+    let defs = `<filter id="cf-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="cf-glow-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>`;
+
+    let html = defs;
+    positions.forEach(({ t, x, yBase: yo, angle }, idx) => {
       const isTreated = !!treated[t];
-      const col = isTreated ? (specColor[treated[t].specialty] || defaultColor) : null;
-      const h = 18;
-      const ry = 3;
-      const rectY = isUpper ? yCenter - h + 2 : yCenter - 2;
-      const animDelay = idx * 0.03;
+      const y = yBase + yo;
+      const delay = idx * 0.04;
+      const type = TTYPE[t];
+
+      let crownPath, detailPath;
+      if (type === 'M') {
+        crownPath = molarPath(isUpper);
+        detailPath = molarFissure(isUpper);
+      } else if (type === 'P') {
+        crownPath = premolarPath(isUpper);
+        detailPath = premolarCusp(isUpper);
+      } else if (type === 'C') {
+        crownPath = caninePath(isUpper);
+        detailPath = null;
+      } else {
+        crownPath = incisorPath(isUpper);
+        detailPath = null;
+      }
+
+      const transform = `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${angle.toFixed(1)})`;
 
       if (isTreated) {
-        // Treated tooth — glowing, colored
-        const filterID = `glow-${t}`;
-        html += `
+        html += `<g transform="${transform}" class="cf-tooth treated"
+          style="animation:toothPop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${delay}s both;cursor:pointer;"
+          onclick="cfToothClick(${t},event)"
+          onmouseenter="cfToothHover(${t},event)"
+          onmouseleave="cfToothLeave()">
+          <!-- outer glow -->
+          <path d="${crownPath}" fill="rgba(255,255,255,0.18)" filter="url(#cf-glow)"/>
+          <!-- crown body -->
+          <path d="${crownPath}" fill="rgba(240,238,255,0.92)" stroke="rgba(255,255,255,0.6)" stroke-width="0.5"/>
+          <!-- enamel shine -->
+          ${detailPath ? `<path d="${detailPath}" fill="none" stroke="rgba(150,140,220,0.5)" stroke-width="0.7" stroke-linecap="round"/>` : ''}
+          <!-- incisal highlight -->
+          <path d="${crownPath}" fill="url(#cf-shine-${t})" opacity="0.3"/>
           <defs>
-            <filter id="${filterID}" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="2.5" result="blur"/>
-              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-            </filter>
+            <linearGradient id="cf-shine-${t}" x1="0" y1="${isUpper?'1':'0'}" x2="0" y2="${isUpper?'0':'1'}">
+              <stop offset="0%" stop-color="white" stop-opacity="0.6"/>
+              <stop offset="60%" stop-color="white" stop-opacity="0"/>
+            </linearGradient>
           </defs>
-          <g class="cf-tooth treated" data-tooth="${t}"
-            style="animation-delay:${animDelay}s"
-            onclick="cfToothClick(${t}, event)"
-            onmouseenter="cfToothHover(${t}, event)"
-            onmouseleave="cfToothLeave()">
-            <!-- Glow -->
-            <rect x="${x - w/2 - 1}" y="${rectY - 1}" width="${w + 2}" height="${h + 2}" rx="${ry + 1}"
-              fill="${col.fill}" opacity="0.25" filter="url(#${filterID})"/>
-            <!-- Body -->
-            <rect x="${x - w/2}" y="${rectY}" width="${w}" height="${h}" rx="${ry}"
-              fill="${col.fill}" opacity="0.85"/>
-            <!-- Shine -->
-            <rect x="${x - w/2 + 2}" y="${rectY + 2}" width="${w - 4}" height="4" rx="2"
-              fill="rgba(255,255,255,0.25)"/>
-            <!-- Tooth number -->
-            <text x="${x}" y="${rectY + h/2 + 2.5}" text-anchor="middle"
-              font-size="5.5" font-family="Inter,sans-serif" font-weight="700"
-              fill="rgba(255,255,255,0.9)">${t}</text>
-            <!-- Dot indicator -->
-            <circle cx="${x}" cy="${isUpper ? rectY - 4 : rectY + h + 4}" r="1.8" fill="${col.fill}" opacity="0.9"/>
-          </g>`;
+        </g>`;
       } else {
-        // Untreated — ghost
-        html += `
-          <g class="cf-tooth" data-tooth="${t}" style="opacity:0.22;">
-            <rect x="${x - w/2}" y="${rectY}" width="${w}" height="${h}" rx="${ry}"
-              fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
-            <text x="${x}" y="${rectY + h/2 + 2.5}" text-anchor="middle"
-              font-size="5" font-family="Inter,sans-serif"
-              fill="rgba(255,255,255,0.3)">${t}</text>
-          </g>`;
+        // Ghost tooth
+        html += `<g transform="${transform}" style="opacity:0.14;">
+          <path d="${crownPath}" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.7"/>
+        </g>`;
       }
     });
-    container.innerHTML = html;
+    return html;
   }
 
-  renderArch(UPPER, 28, true, upperG);
-  renderArch(LOWER, 82, false, lowerG);
+  // Upper arch at y=46, Lower arch at y=64
+  const upperHTML = renderArch(UPPER, true, 46);
+  const lowerHTML = renderArch(LOWER, false, 64);
+
+  // Clear and rebuild
+  svg.innerHTML = `
+    <defs>
+      <radialGradient id="cf-bg-grad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(124,111,255,0.04)"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Subtle arch background glow -->
+    <ellipse cx="160" cy="55" rx="140" ry="30" fill="url(#cf-bg-grad)"/>
+
+    <!-- Midline -->
+    <line x1="160" y1="4" x2="160" y2="106" stroke="rgba(255,255,255,0.05)" stroke-width="0.8" stroke-dasharray="2 3"/>
+
+    <!-- Arch separator -->
+    <line x1="20" y1="55" x2="300" y2="55" stroke="rgba(255,255,255,0.04)" stroke-width="0.6"/>
+
+    <!-- Upper arch curve guide (very subtle) -->
+    <path d="M12,46 Q80,24 160,20 Q240,24 308,46" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+
+    <!-- Lower arch curve guide -->
+    <path d="M12,64 Q80,86 160,90 Q240,86 308,64" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+
+    <!-- Teeth -->
+    <g id="cf-upper-render">${upperHTML}</g>
+    <g id="cf-lower-render">${lowerHTML}</g>
+
+    <!-- Quadrant labels -->
+    <text x="8" y="44" font-size="6" fill="rgba(255,255,255,0.15)" font-family="Inter,sans-serif">UR</text>
+    <text x="8" y="70" font-size="6" fill="rgba(255,255,255,0.15)" font-family="Inter,sans-serif">LR</text>
+    <text x="296" y="44" font-size="6" fill="rgba(255,255,255,0.15)" font-family="Inter,sans-serif" text-anchor="end">UL</text>
+    <text x="296" y="70" font-size="6" fill="rgba(255,255,255,0.15)" font-family="Inter,sans-serif" text-anchor="end">LL</text>
+  `;
 }
 
 function cfToothHover(toothNum, event) {
@@ -10135,43 +10235,44 @@ function cfToothHover(toothNum, event) {
   const treated = {};
   allCases.forEach(c => {
     const t = parseInt(c.tooth_number);
-    if (t && !treated[t]) treated[t] = { specialty: c.specialty, cases: [] };
-    if (t) treated[t].cases.push(c);
+    if (t) {
+      if (!treated[t]) treated[t] = { specialty: c.specialty, cases: [] };
+      treated[t].cases.push(c);
+      treated[t].specialty = c.specialty;
+    }
   });
   const data = treated[toothNum];
   if (!data) return;
-  const specNames = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+  const specNames = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
   const count = data.cases.length;
-  tooltip.innerHTML = `<div style="font-weight:700;margin-bottom:2px;">Tooth ${toothNum}</div><div style="color:rgba(255,255,255,0.5);font-size:0.65rem;">${specNames[data.specialty] || data.specialty} · ${count} case${count>1?'s':''}</div>`;
+  const specLabel = specNames[data.specialty] || data.specialty || 'General';
+  tooltip.innerHTML = `<div style="font-weight:700;font-size:0.72rem;margin-bottom:2px;">Tooth ${toothNum}</div><div style="color:rgba(255,255,255,0.45);font-size:0.63rem;">${specLabel} · ${count} case${count>1?'s':''} · tap to open</div>`;
   tooltip.style.display = 'block';
   tooltip.style.opacity = '1';
-  // Position near the tooth
   const card = document.getElementById('clinical-footprint-card');
-  const svg = document.getElementById('cf-arch-svg');
-  if (card && svg) {
-    const svgRect = svg.getBoundingClientRect();
+  if (card) {
     const cardRect = card.getBoundingClientRect();
     const relX = event.clientX - cardRect.left;
     const relY = event.clientY - cardRect.top;
-    tooltip.style.left = Math.min(relX - 20, cardRect.width - 140) + 'px';
-    tooltip.style.top = (relY - 52) + 'px';
+    const ttW = 160;
+    tooltip.style.left = Math.max(4, Math.min(relX - ttW/2, cardRect.width - ttW - 4)) + 'px';
+    tooltip.style.top = Math.max(4, relY - 56) + 'px';
   }
 }
 
 function cfToothLeave() {
-  const tooltip = document.getElementById('cf-tooltip');
-  if (tooltip) { tooltip.style.display = 'none'; }
+  const t = document.getElementById('cf-tooltip');
+  if (t) t.style.display = 'none';
 }
 
 function cfToothClick(toothNum, event) {
   cfToothLeave();
-  // Find most recent case for this tooth and open it
-  const casesForTooth = allCases.filter(c => parseInt(c.tooth_number) === toothNum);
-  if (casesForTooth.length > 0) {
-    const latest = casesForTooth.sort((a,b) => new Date(b.created_at) - new Date(a.created_at))[0];
-    openCaseModal(latest);
-  }
+  const casesForTooth = allCases
+    .filter(c => parseInt(c.tooth_number) === toothNum)
+    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  if (casesForTooth.length > 0) openCaseModal(casesForTooth[0]);
 }
+
 
 function renderMonthlyObjectives() {
   const el = document.getElementById('monthly-objectives');
