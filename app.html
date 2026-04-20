@@ -1822,17 +1822,59 @@ body::after {
           @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
           @keyframes scoreCount{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
           @keyframes statSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes toothPop{0%{transform:scale(0.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+          @keyframes toothGlow{0%,100%{opacity:0.7}50%{opacity:1}}
           .stat-pill{animation:statSlide 0.5s ease both;}
           .stat-pill:nth-child(1){animation-delay:0.1s}
           .stat-pill:nth-child(2){animation-delay:0.2s}
           .stat-pill:nth-child(3){animation-delay:0.3s}
           .stat-pill:nth-child(4){animation-delay:0.4s}
           .dash-section{animation:fadeUp 0.4s ease both;}
-          .dash-section:nth-child(2){animation-delay:0.05s}
-          .dash-section:nth-child(3){animation-delay:0.1s}
-          .dash-section:nth-child(4){animation-delay:0.15s}
           #voice-hero-btn:active{transform:scale(0.97) !important;}
+          .cf-tooth{cursor:pointer;transition:transform 0.15s;}
+          .cf-tooth:hover{transform:scale(1.3);}
+          .cf-tooth.treated{animation:toothPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;}
+          #cf-tooltip{pointer-events:none;transition:opacity 0.15s;}
         </style>
+
+        <!-- ═══ CLINICAL FOOTPRINT ═══ -->
+        <div id="clinical-footprint-card" style="margin-bottom:14px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:18px 16px 14px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.3),transparent);"></div>
+
+          <!-- Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div>
+              <div style="font-size:0.56rem;color:rgba(124,111,255,0.6);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:2px;">Clinical Footprint</div>
+              <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);" id="cf-subtitle">Every tooth you've treated</div>
+            </div>
+            <!-- Legend -->
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#7C6FFF;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Endo</span></div>
+              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Resto</span></div>
+              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#EF4444;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Surg</span></div>
+              <div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#34D399;"></div><span style="font-size:0.48rem;color:rgba(255,255,255,0.3);">Paeds</span></div>
+            </div>
+          </div>
+
+          <!-- Arch SVG -->
+          <div style="position:relative;">
+            <svg id="cf-arch-svg" viewBox="0 0 340 110" width="100%" style="display:block;overflow:visible;" xmlns="http://www.w3.org/2000/svg">
+              <!-- Upper arch label -->
+              <text x="4" y="22" font-size="7" fill="rgba(255,255,255,0.18)" font-family="Inter,sans-serif" font-weight="600" letter-spacing="0.5">U</text>
+              <!-- Lower arch label -->
+              <text x="4" y="95" font-size="7" fill="rgba(255,255,255,0.18)" font-family="Inter,sans-serif" font-weight="600" letter-spacing="0.5">L</text>
+              <!-- Midline -->
+              <line x1="170" y1="2" x2="170" y2="108" stroke="rgba(255,255,255,0.06)" stroke-width="0.8" stroke-dasharray="3 3"/>
+              <!-- Arch separator -->
+              <line x1="16" y1="56" x2="324" y2="56" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+              <!-- Teeth rendered by JS -->
+              <g id="cf-upper-teeth"></g>
+              <g id="cf-lower-teeth"></g>
+            </svg>
+            <!-- Tooltip -->
+            <div id="cf-tooltip" style="display:none;position:absolute;background:rgba(10,8,20,0.95);border:1px solid rgba(124,111,255,0.3);border-radius:10px;padding:8px 12px;font-size:0.7rem;color:white;white-space:nowrap;z-index:100;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.5);"></div>
+          </div>
+        </div>
 
         <!-- TOP BAR: greeting + rank -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:0 2px;">
@@ -1894,16 +1936,6 @@ body::after {
             </div>
           </div>
         </div>
-
-        <!-- SUPERIORITY STATEMENT -->
-        <div id="dash-superiority" style="display:none;margin-bottom:16px;">
-          <div style="padding:13px 18px;background:linear-gradient(135deg,rgba(52,211,153,0.07),rgba(52,211,153,0.02));border:1px solid rgba(52,211,153,0.16);border-radius:16px;">
-            <div style="font-size:0.77rem;color:rgba(52,211,153,0.82);line-height:1.7;" id="dash-superiority-text"></div>
-          </div>
-        </div>
-
-        <!-- INACTIVITY ALERT -->
-        <div id="inactivity-alert" style="display:none;"></div>
 
         <!-- PORTFOLIO TEASER -->
         <div id="portfolio-teaser-card" style="display:none;margin-bottom:16px;"></div>
@@ -4402,6 +4434,7 @@ function updateDashboard() {
   renderInactivityAlert();
   renderSkillProgressGraph();
   renderPortfolioTeaserCard();
+  renderClinicalFootprint();
 
   // ── PROGRESSIVE NAV DISCLOSURE ──
   // Show secondary nav items progressively as user logs more cases
@@ -9967,6 +10000,177 @@ function getMonthlyObjectives() {
   });
 
   return { month, objectives };
+}
+
+// ─── CLINICAL FOOTPRINT ───
+function renderClinicalFootprint() {
+  const upperG = document.getElementById('cf-upper-teeth');
+  const lowerG = document.getElementById('cf-lower-teeth');
+  const subtitle = document.getElementById('cf-subtitle');
+  if (!upperG || !lowerG) return;
+
+  // Build treated teeth map: toothNum -> {specialty, cases[]}
+  const treated = {};
+  allCases.forEach(c => {
+    const t = parseInt(c.tooth_number);
+    if (!t) return;
+    if (!treated[t]) treated[t] = { specialty: c.specialty, cases: [] };
+    treated[t].cases.push(c);
+    // if multiple cases on same tooth, use most recent specialty
+    treated[t].specialty = c.specialty;
+  });
+
+  const treatedCount = Object.keys(treated).length;
+  if (subtitle) {
+    subtitle.textContent = treatedCount > 0
+      ? `${treatedCount} tooth${treatedCount !== 1 ? 'teeth' : ''} treated · tap to explore`
+      : 'Log cases to build your clinical footprint';
+  }
+
+  // Specialty colors
+  const specColor = {
+    endo:        { fill: '#7C6FFF', glow: 'rgba(124,111,255,0.5)', text: '#7C6FFF' },
+    restorative: { fill: '#F59E0B', glow: 'rgba(245,158,11,0.5)',  text: '#F59E0B' },
+    surgery:     { fill: '#EF4444', glow: 'rgba(239,68,68,0.5)',   text: '#EF4444' },
+    paeds:       { fill: '#34D399', glow: 'rgba(52,211,153,0.5)',  text: '#34D399' },
+    prostho:     { fill: '#38BDF8', glow: 'rgba(56,189,248,0.5)',  text: '#38BDF8' },
+  };
+  const defaultColor = { fill: 'rgba(255,255,255,0.15)', glow: 'none', text: 'rgba(255,255,255,0.3)' };
+
+  // FDI arch layout — x positions for each tooth in the SVG (340px wide, teeth from x=18)
+  // Upper: 18→17→16→15→14→13→12→11 | 21→22→23→24→25→26→27→28
+  // Lower: 48→47→46→45→44→43→42→41 | 31→32→33→34→35→36→37→38
+  const UPPER = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+  const LOWER = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+
+  // Tooth widths by type for spacing
+  const toothW = { M:18, P:14, C:12, I:11 };
+  const TOOTH_TYPE_MAP = {
+    18:'M',17:'M',16:'M',15:'P',14:'P',13:'C',12:'I',11:'I',
+    21:'I',22:'I',23:'C',24:'P',25:'P',26:'M',27:'M',28:'M',
+    48:'M',47:'M',46:'M',45:'P',44:'P',43:'C',42:'I',41:'I',
+    31:'I',32:'I',33:'C',34:'P',35:'P',36:'M',37:'M',38:'M',
+  };
+
+  function getW(t) { return (toothW[TOOTH_TYPE_MAP[t]] || 11) + 2; }
+
+  // Calculate x positions
+  function calcPositions(teeth) {
+    const totalW = teeth.reduce((s,t) => s + getW(t), 0) + (teeth.length - 1) * 1.5;
+    const startX = (340 - totalW) / 2;
+    const pos = [];
+    let x = startX;
+    teeth.forEach((t, i) => {
+      const w = getW(t);
+      pos.push({ t, x: x + w/2, w });
+      x += w + 1.5;
+    });
+    return pos;
+  }
+
+  function renderArch(teeth, yCenter, isUpper, container) {
+    const positions = calcPositions(teeth);
+    let html = '';
+    positions.forEach(({ t, x, w }, idx) => {
+      const isTreated = !!treated[t];
+      const col = isTreated ? (specColor[treated[t].specialty] || defaultColor) : null;
+      const h = 18;
+      const ry = 3;
+      const rectY = isUpper ? yCenter - h + 2 : yCenter - 2;
+      const animDelay = idx * 0.03;
+
+      if (isTreated) {
+        // Treated tooth — glowing, colored
+        const filterID = `glow-${t}`;
+        html += `
+          <defs>
+            <filter id="${filterID}" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+          </defs>
+          <g class="cf-tooth treated" data-tooth="${t}"
+            style="animation-delay:${animDelay}s"
+            onclick="cfToothClick(${t}, event)"
+            onmouseenter="cfToothHover(${t}, event)"
+            onmouseleave="cfToothLeave()">
+            <!-- Glow -->
+            <rect x="${x - w/2 - 1}" y="${rectY - 1}" width="${w + 2}" height="${h + 2}" rx="${ry + 1}"
+              fill="${col.fill}" opacity="0.25" filter="url(#${filterID})"/>
+            <!-- Body -->
+            <rect x="${x - w/2}" y="${rectY}" width="${w}" height="${h}" rx="${ry}"
+              fill="${col.fill}" opacity="0.85"/>
+            <!-- Shine -->
+            <rect x="${x - w/2 + 2}" y="${rectY + 2}" width="${w - 4}" height="4" rx="2"
+              fill="rgba(255,255,255,0.25)"/>
+            <!-- Tooth number -->
+            <text x="${x}" y="${rectY + h/2 + 2.5}" text-anchor="middle"
+              font-size="5.5" font-family="Inter,sans-serif" font-weight="700"
+              fill="rgba(255,255,255,0.9)">${t}</text>
+            <!-- Dot indicator -->
+            <circle cx="${x}" cy="${isUpper ? rectY - 4 : rectY + h + 4}" r="1.8" fill="${col.fill}" opacity="0.9"/>
+          </g>`;
+      } else {
+        // Untreated — ghost
+        html += `
+          <g class="cf-tooth" data-tooth="${t}" style="opacity:0.22;">
+            <rect x="${x - w/2}" y="${rectY}" width="${w}" height="${h}" rx="${ry}"
+              fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
+            <text x="${x}" y="${rectY + h/2 + 2.5}" text-anchor="middle"
+              font-size="5" font-family="Inter,sans-serif"
+              fill="rgba(255,255,255,0.3)">${t}</text>
+          </g>`;
+      }
+    });
+    container.innerHTML = html;
+  }
+
+  renderArch(UPPER, 28, true, upperG);
+  renderArch(LOWER, 82, false, lowerG);
+}
+
+function cfToothHover(toothNum, event) {
+  const tooltip = document.getElementById('cf-tooltip');
+  if (!tooltip) return;
+  const treated = {};
+  allCases.forEach(c => {
+    const t = parseInt(c.tooth_number);
+    if (t && !treated[t]) treated[t] = { specialty: c.specialty, cases: [] };
+    if (t) treated[t].cases.push(c);
+  });
+  const data = treated[toothNum];
+  if (!data) return;
+  const specNames = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+  const count = data.cases.length;
+  tooltip.innerHTML = `<div style="font-weight:700;margin-bottom:2px;">Tooth ${toothNum}</div><div style="color:rgba(255,255,255,0.5);font-size:0.65rem;">${specNames[data.specialty] || data.specialty} · ${count} case${count>1?'s':''}</div>`;
+  tooltip.style.display = 'block';
+  tooltip.style.opacity = '1';
+  // Position near the tooth
+  const card = document.getElementById('clinical-footprint-card');
+  const svg = document.getElementById('cf-arch-svg');
+  if (card && svg) {
+    const svgRect = svg.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const relX = event.clientX - cardRect.left;
+    const relY = event.clientY - cardRect.top;
+    tooltip.style.left = Math.min(relX - 20, cardRect.width - 140) + 'px';
+    tooltip.style.top = (relY - 52) + 'px';
+  }
+}
+
+function cfToothLeave() {
+  const tooltip = document.getElementById('cf-tooltip');
+  if (tooltip) { tooltip.style.display = 'none'; }
+}
+
+function cfToothClick(toothNum, event) {
+  cfToothLeave();
+  // Find most recent case for this tooth and open it
+  const casesForTooth = allCases.filter(c => parseInt(c.tooth_number) === toothNum);
+  if (casesForTooth.length > 0) {
+    const latest = casesForTooth.sort((a,b) => new Date(b.created_at) - new Date(a.created_at))[0];
+    openCaseModal(latest);
+  }
 }
 
 function renderMonthlyObjectives() {
