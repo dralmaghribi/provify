@@ -617,7 +617,9 @@ body::after {
   /* Hide secondary nav items on mobile */
   #nav-progress { display: none; }
   #nav-badges { display: none; }
-  #nav-portfolio { display: none; }
+  #nav-portfolio { display: flex; opacity: 1; }
+  #nav-career { display: none; }
+  #nav-growth { display: none; }
 
   /* ── PAGE HEADER ── */
   .page-title { font-size: 1.6rem; letter-spacing: -0.03em; }
@@ -1752,16 +1754,16 @@ body::after {
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
         Profile
       </button>
+      <button class="nav-item" onclick="viewMyPortfolio()" id="nav-portfolio">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
+        Portfolio
+      </button>
 
       <!-- Secondary nav — desktop only -->
       <div style="height:1px;background:rgba(255,255,255,0.06);margin:12px 8px;" id="nav-divider"></div>
       <button class="nav-item" onclick="showView('progress')" id="nav-progress" style="opacity:0.7;">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
         Growth
-      </button>
-      <button class="nav-item" onclick="viewMyPortfolio()" id="nav-portfolio" style="opacity:0.7;">
-        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
-        Portfolio
       </button>
       <button class="nav-item" onclick="showView('badges')" id="nav-badges" style="opacity:0.7;display:none;">
         <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.56 13.38L7 22l5-3 5 3-1.56-8.62"/></svg></span>
@@ -1912,8 +1914,8 @@ body::after {
 
               <div class="stat-pill" style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:14px 8px;text-align:center;position:relative;overflow:hidden;">
                 <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
-                <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--teal);line-height:1;margin-bottom:4px;" id="micro-molars">0</div>
-                <div style="font-size:0.52rem;color:rgba(124,111,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">🦷 Molars</div>
+                <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--teal);line-height:1;margin-bottom:4px;" id="micro-specialty">—</div>
+                <div style="font-size:0.52rem;color:rgba(124,111,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">Top Specialty</div>
               </div>
 
             </div>
@@ -1980,6 +1982,9 @@ body::after {
 
         <!-- MONTHLY OBJECTIVES -->
         <div id="monthly-objectives" style="display:none;"></div>
+
+        <!-- PORTFOLIO TEASER CARD -->
+        <div id="portfolio-teaser-card" style="display:none;margin-bottom:16px;"></div>
 
         <!-- SKILL PROGRESS GRAPH -->
         <div id="skill-progress-card" style="display:none;margin-bottom:16px;"></div>
@@ -3272,9 +3277,13 @@ body::after {
           <div class="form-group" style="margin-bottom:16px">
             <label class="form-label">Clinic Days <span style="color:var(--gray);font-size:0.7rem">— Provify reminds you to log after every clinic session</span></label>
             <div style="display:flex;gap:6px;flex-wrap:wrap;" id="clinic-days-selector">
-              ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => `
-                <button type="button" onclick="toggleClinicDay('${d}',this)" id="clinic-day-${d}" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">${d}</button>
-              `).join('')}
+              <button type="button" onclick="toggleClinicDay('Mon',this)" id="clinic-day-Mon" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Mon</button>
+              <button type="button" onclick="toggleClinicDay('Tue',this)" id="clinic-day-Tue" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Tue</button>
+              <button type="button" onclick="toggleClinicDay('Wed',this)" id="clinic-day-Wed" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Wed</button>
+              <button type="button" onclick="toggleClinicDay('Thu',this)" id="clinic-day-Thu" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Thu</button>
+              <button type="button" onclick="toggleClinicDay('Fri',this)" id="clinic-day-Fri" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Fri</button>
+              <button type="button" onclick="toggleClinicDay('Sat',this)" id="clinic-day-Sat" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Sat</button>
+              <button type="button" onclick="toggleClinicDay('Sun',this)" id="clinic-day-Sun" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;">Sun</button>
             </div>
             <div style="font-size:0.68rem;color:rgba(124,111,255,0.5);margin-top:8px;">Provify sends a gentle reminder at 6pm on your clinic days.</div>
           </div>
@@ -4344,7 +4353,16 @@ function updateDashboard() {
   setMicro('micro-total', total);
   setMicro('micro-streak', streak);
   setMicro('micro-rank', total > 0 ? level.name : '—');
-  setMicro('micro-molars', total > 0 ? getTotalMolars(allCases) : 0);
+  // Top specialty stat
+  if (total > 0) {
+    const specCounts = {};
+    allCases.forEach(c => { const s = c.specialty || 'General'; specCounts[s] = (specCounts[s]||0)+1; });
+    const topSpec = Object.entries(specCounts).sort((a,b)=>b[1]-a[1])[0];
+    const shortNames = { Endodontics:'Endo', Restorative:'Resto', 'Oral Surgery':'Surgery', Paediatric:'Paeds', Prosthodontics:'Prostho' };
+    setMicro('micro-specialty', shortNames[topSpec[0]] || topSpec[0]);
+  } else {
+    setMicro('micro-specialty', '—');
+  }
 
   // Legacy stat IDs (kept for backward compat)
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -4465,6 +4483,7 @@ function updateDashboard() {
   renderMonthlyObjectives();
   renderInactivityAlert();
   renderSkillProgressGraph();
+  renderPortfolioTeaserCard();
 
   // ── PROGRESSIVE NAV DISCLOSURE ──
   // Show secondary nav items progressively as user logs more cases
@@ -9493,56 +9512,6 @@ function renderLiveCareerDashboard() {
     .cd-card:nth-child(4){animation-delay:0.2s}
   </style>
 
-  <!-- ROW 1: Clinician Score + Top Market -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-
-    <!-- CLINICIAN SCORE -->
-    <div class="cd-card" style="background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(124,111,255,0.04));border:1px solid rgba(124,111,255,0.25);border-radius:20px;padding:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#7C6FFF,transparent);"></div>
-      <div style="font-size:0.52rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:12px;">Clinician Score</div>
-      <div style="position:relative;width:120px;height:120px;">
-        <svg width="120" height="120" viewBox="0 0 120 120" style="transform:rotate(-90deg);">
-          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="8"/>
-          <circle cx="60" cy="60" r="52" fill="none" stroke="url(#scoreGrad)" stroke-width="8"
-            stroke-linecap="round"
-            stroke-dasharray="${circ}"
-            stroke-dashoffset="${circ - scoreDash}"
-            style="animation:scoreRingAnim 1.2s cubic-bezier(0.34,1.2,0.64,1) 0.3s both;"/>
-          <defs>
-            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#7C6FFF"/>
-              <stop offset="100%" stop-color="#34D399"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-          <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:white;line-height:1;letter-spacing:-0.04em;">${score}</div>
-          <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">/100</div>
-        </div>
-      </div>
-      <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:10px;line-height:1.3;">Grows with every<br>case you log</div>
-    </div>
-
-    <!-- TOP MARKET -->
-    <div class="cd-card" style="background:linear-gradient(135deg,rgba(52,211,153,0.1),rgba(52,211,153,0.03));border:1px solid rgba(52,211,153,0.2);border-radius:20px;padding:20px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#34D399,transparent);"></div>
-      <div style="font-size:0.52rem;color:rgba(52,211,153,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:8px;">Best Market For You</div>
-      <div style="font-size:2rem;margin-bottom:4px;">${flags[topCountry.name] || '🌍'}</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;margin-bottom:4px;letter-spacing:-0.02em;">${topCountry.name}</div>
-      <div style="font-size:0.65rem;color:rgba(52,211,153,0.6);margin-bottom:12px;">${topCountry.sal.taxFree ? '✦ Tax-free' : ''}</div>
-      <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:4px;">Monthly salary</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#34D399;letter-spacing:-0.02em;">${topSal.min.toLocaleString()}–${topSal.max.toLocaleString()} <span style="font-size:0.65rem;color:rgba(52,211,153,0.5);">${topSal.currency}</span></div>
-      <div style="margin-top:10px;">
-        <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-bottom:3px;">Your market match</div>
-        <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
-          <div style="height:100%;width:${topCountry.match}%;background:linear-gradient(90deg,#34D399,#7C6FFF);border-radius:100px;transition:width 1s ease;"></div>
-        </div>
-        <div style="font-size:0.6rem;color:#34D399;margin-top:3px;">${topCountry.match}% match</div>
-      </div>
-    </div>
-
-  </div>
-
   <!-- ROW 2: Salary by Country -->
   <div class="cd-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:10px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -9568,34 +9537,6 @@ function renderLiveCareerDashboard() {
     </div>
   </div>
 
-  <!-- ROW 3: Country Opportunity Map (visual cards) -->
-  <div class="cd-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:10px;">
-    <div style="font-size:0.55rem;color:rgba(96,165,250,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:14px;">🌍 Opportunity by Country — ${specLabel}</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-      ${Object.keys(specSalaries).map(country => {
-        const demand = specDemand[country] || 5;
-        const entry = CAREER_DATA.entry[spec]?.[country] || 5;
-        const match = getMarketMatch(country, spec);
-        const isTop = country === topCountry.name;
-        const heatColor = demand >= 8 ? '#34D399' : demand >= 6 ? '#F59E0B' : '#EF4444';
-        return `
-          <div style="background:${isTop ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.02)'};border:1px solid ${isTop ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.06)'};border-radius:14px;padding:12px 8px;text-align:center;position:relative;">
-            ${isTop ? '<div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:0.45rem;color:#34D399;background:rgba(52,211,153,0.15);padding:1px 6px;border-radius:0 0 6px 6px;font-weight:700;white-space:nowrap;">TOP</div>' : ''}
-            <div style="font-size:1.3rem;margin-bottom:4px;">${flags[country] || '🌍'}</div>
-            <div style="font-size:0.58rem;color:rgba(255,255,255,${isTop ? '0.8' : '0.4'});margin-bottom:6px;font-weight:${isTop ? '600' : '400'};">${country.replace('Saudi Arabia','KSA').replace('Australia','AUS').replace('Germany','DE')}</div>
-            <!-- Demand heat dot -->
-            <div style="width:8px;height:8px;border-radius:50%;background:${heatColor};margin:0 auto 4px;box-shadow:0 0 6px ${heatColor}50;"></div>
-            <div style="font-size:0.52rem;color:rgba(255,255,255,0.25);">Demand ${demand}/10</div>
-          </div>`;
-      }).join('')}
-    </div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
-      <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);">Demand:</div>
-      <div style="display:flex;align-items:center;gap:4px;"><div style="width:6px;height:6px;border-radius:50%;background:#34D399;"></div><span style="font-size:0.52rem;color:rgba(255,255,255,0.2);">High (8+)</span></div>
-      <div style="display:flex;align-items:center;gap:4px;"><div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;"></div><span style="font-size:0.52rem;color:rgba(255,255,255,0.2);">Medium</span></div>
-      <div style="display:flex;align-items:center;gap:4px;"><div style="width:6px;height:6px;border-radius:50%;background:#EF4444;"></div><span style="font-size:0.52rem;color:rgba(255,255,255,0.2);">Lower</span></div>
-    </div>
-  </div>
 
   </div>`;
 }
@@ -10174,6 +10115,29 @@ function renderInactivityAlert() {
         <div style="font-size:0.62rem;color:rgba(239,68,68,0.5);">Tap to log a case now →</div>
       </div>
       <div style="font-size:0.65rem;color:rgba(255,255,255,0.2);text-align:right;">Score<br><span style="font-size:1rem;color:rgba(239,68,68,0.6);font-weight:700;">${score}</span></div>
+    </div>`;
+}
+
+// ─── PORTFOLIO TEASER CARD ───
+function renderPortfolioTeaserCard() {
+  const el = document.getElementById('portfolio-teaser-card');
+  if (!el || allCases.length < 1) { if (el) el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const total = allCases.length;
+  const avgComplexity = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '0.0';
+  const username = currentProfile?.username || '';
+  el.innerHTML = `
+    <div onclick="viewMyPortfolio()" style="cursor:pointer;background:linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.25);border-radius:18px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:all 0.2s;position:relative;overflow:hidden;"
+      onmouseover="this.style.borderColor='rgba(124,111,255,0.45)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.06))'"
+      onmouseout="this.style.borderColor='rgba(124,111,255,0.25)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.03))'">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.5),transparent);"></div>
+      <div style="width:44px;height:44px;border-radius:14px;background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏆</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.7rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:3px;">Your Verified Portfolio</div>
+        <div style="font-size:0.88rem;color:rgba(255,255,255,0.9);font-weight:500;margin-bottom:2px;">${total} cases · ${avgComplexity} avg complexity</div>
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Tamper-proof. Shareable. Growing with every case.</div>
+      </div>
+      <div style="font-size:0.8rem;color:rgba(124,111,255,0.6);flex-shrink:0;">View →</div>
     </div>`;
 }
 
