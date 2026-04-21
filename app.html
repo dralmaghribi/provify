@@ -1110,6 +1110,79 @@ body::after {
   </div>
 </div>
 
+<!-- ✨ SMILE REVEAL MODAL -->
+<div id="smile-reveal-modal" style="display:none;position:fixed;inset:0;background:rgba(4,3,12,0.99);z-index:800;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeSmileReveal()">
+  <div style="background:linear-gradient(180deg,#0A0714 0%,#060510 100%);border:1px solid rgba(251,191,36,0.15);border-radius:28px 28px 0 0;width:100%;max-width:620px;max-height:96vh;overflow-y:auto;position:relative;">
+
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(251,191,36,0.8),rgba(251,146,60,0.4),transparent);"></div>
+
+    <div style="display:flex;justify-content:center;padding:12px 0 4px;">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.1);"></div>
+    </div>
+
+    <div style="padding:12px 20px 28px;">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <div style="font-size:0.6rem;color:rgba(251,191,36,0.65);text-transform:uppercase;letter-spacing:0.16em;font-weight:700;margin-bottom:3px;">✨ Smile Case · Verified</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;letter-spacing:-0.02em;" id="smile-reveal-proc">Veneers</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:2px;" id="smile-reveal-details"></div>
+        </div>
+        <button onclick="closeSmileReveal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:1.2rem;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+
+      <!-- BEFORE / AFTER REVEAL -->
+      <div id="smile-reveal-split" style="display:flex;gap:3px;border-radius:20px;overflow:hidden;margin-bottom:14px;background:#000;min-height:280px;">
+
+        <div id="smile-reveal-before-panel" style="flex:1;position:relative;">
+          <img id="smile-reveal-before-img" style="width:100%;height:100%;object-fit:cover;display:block;min-height:280px;" src="">
+          <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;">
+            <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
+          </div>
+        </div>
+
+        <div id="smile-reveal-after-panel" style="flex:1;position:relative;">
+          <img id="smile-reveal-after-img" style="width:100%;height:100%;object-fit:cover;display:block;min-height:280px;" src="">
+          <div style="position:absolute;top:12px;right:12px;background:rgba(251,191,36,0.85);border-radius:8px;padding:4px 10px;">
+            <div style="font-size:0.65rem;color:#000;font-weight:700;letter-spacing:0.08em;">AFTER ✨</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Case info strip -->
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.12);border-radius:14px;padding:12px 16px;margin-bottom:14px;">
+        <div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.7);font-weight:500;" id="smile-reveal-dr">Dr.</div>
+          <div style="font-size:0.62rem;color:rgba(255,255,255,0.25);margin-top:1px;" id="smile-reveal-date"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.8);"></div>
+          <div style="font-size:0.62rem;color:rgba(52,211,153,0.7);font-weight:600;">Verified on Provify</div>
+        </div>
+      </div>
+
+      <!-- Hidden canvas for export -->
+      <canvas id="smile-export-canvas" style="display:none;"></canvas>
+
+      <!-- Action buttons -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button onclick="renderSmileExportCanvas().then(downloadSmileCard)" style="width:100%;background:linear-gradient(135deg,#FBB424,#F97316);color:#000;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;padding:15px;border-radius:16px;border:none;cursor:pointer;box-shadow:0 8px 28px rgba(251,180,36,0.3);letter-spacing:-0.01em;">
+          ⬇️ Download Share Card (1080×1080)
+        </button>
+        <button onclick="shareSmileCase()" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:600;padding:13px;border-radius:14px;cursor:pointer;width:100%;">
+          📤 Share to Instagram / Stories
+        </button>
+        <button onclick="closeSmileReveal();showView('cases');" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);font-family:'Inter',sans-serif;font-size:0.82rem;padding:11px;border-radius:14px;cursor:pointer;border:none;width:100%;">
+          View My Cases
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- ─── CASE SIMULATION MODAL ─── -->
 <div id="sim-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:600;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeSimModal()">
   <div style="background:var(--navy-2);border:1px solid rgba(124,111,255,0.3);border-radius:20px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;">
@@ -1413,6 +1486,7 @@ body::after {
           <button onclick="setVLSpecialty('surgery',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Surgery</button>
           <button onclick="setVLSpecialty('paeds',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Paeds</button>
           <button onclick="setVLSpecialty('prostho',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Prostho</button>
+          <button onclick="setVLSpecialty('smile',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.06);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;">✨ Smile</button>
         </div>
       </div>
 
@@ -2257,6 +2331,18 @@ body::after {
               </span>
               Prosthodontics
             </button>
+            <button class="specialty-btn smile-spec-btn" onclick="selectSpecialty('smile', this)" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.05));border-color:rgba(251,191,36,0.25);">
+              <span class="spec-icon" style="background:rgba(251,191,36,0.12);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FBB424" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
+                  <path d="M8 13s1.5 3 4 3 4-3 4-3"/>
+                  <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span style="color:#FBB424;font-weight:700;">✨ Smile Case</span>
+              <span style="display:block;font-size:0.6rem;color:rgba(251,191,36,0.5);margin-top:2px;font-weight:400;">Veneers · Bonding · Makeovers</span>
+            </button>
           </div>
 
           <!-- PATIENT INFO -->
@@ -2849,6 +2935,210 @@ body::after {
             </div>
 
           </div><!-- end prostho-fields -->
+
+          <!-- ✨ SMILE CASE FIELDS -->
+          <div id="smile-fields" style="display:none">
+
+            <style>
+              .smile-upload-zone{border:2px dashed rgba(251,191,36,0.25);border-radius:18px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(251,191,36,0.03);}
+              .smile-upload-zone:hover{border-color:rgba(251,191,36,0.5);background:rgba(251,191,36,0.07);}
+              .smile-upload-zone.has-image{border-style:solid;border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.05);}
+              .smile-preview-img{width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:block;}
+              @keyframes smileGlow{0%,100%{box-shadow:0 0 20px rgba(251,191,36,0.15)}50%{box-shadow:0 0 40px rgba(251,191,36,0.3)}}
+            </style>
+
+            <!-- SMILE HERO HEADER -->
+            <div style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(251,146,60,0.05));border:1px solid rgba(251,191,36,0.2);border-radius:20px;padding:18px 20px;margin-bottom:20px;text-align:center;">
+              <div style="font-size:1.8rem;margin-bottom:8px;">✨</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:white;letter-spacing:-0.02em;margin-bottom:4px;">Smile Case</div>
+              <div style="font-size:0.72rem;color:rgba(251,191,36,0.6);line-height:1.5;">Upload your before & after. Provify generates a shareable reveal card and AI aesthetic analysis — the feature every cosmetic dentist has been waiting for.</div>
+            </div>
+
+            <!-- PROCEDURE TYPE -->
+            <div class="form-section">
+              <div class="form-section-title" style="color:#FBB424;">Procedure</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+                <button type="button" class="smile-proc-btn active-proc" onclick="setSmileProc('veneers',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(251,191,36,0.35);background:rgba(251,191,36,0.1);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
+                  💎 Veneers
+                </button>
+                <button type="button" class="smile-proc-btn" onclick="setSmileProc('bonding',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
+                  🎨 Composite Bonding
+                </button>
+                <button type="button" class="smile-proc-btn" onclick="setSmileProc('makeover',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
+                  ⭐ Full Smile Makeover
+                </button>
+                <button type="button" class="smile-proc-btn" onclick="setSmileProc('whitening',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
+                  ✨ Whitening
+                </button>
+                <button type="button" class="smile-proc-btn" onclick="setSmileProc('crowns',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
+                  👑 Ceramic Crowns
+                </button>
+                <button type="button" class="smile-proc-btn" onclick="setSmileProc('gingival',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
+                  🌿 Gingival Contouring
+                </button>
+              </div>
+              <input type="hidden" id="f-smile-proc" value="veneers">
+            </div>
+
+            <!-- DETAILS -->
+            <div class="form-section">
+              <div class="form-section-title" style="color:#FBB424;">Case Details</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Number of Units / Teeth</label>
+                  <select class="form-select" id="f-smile-units">
+                    <option value="">Select</option>
+                    <option>1</option><option>2</option><option>4</option>
+                    <option>6</option><option>8</option><option>10</option>
+                    <option>12+</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Shade Selected</label>
+                  <select class="form-select" id="f-smile-shade">
+                    <option value="">Select shade</option>
+                    <option>BL1 (Bleach Light)</option><option>BL2</option><option>BL3</option><option>BL4</option>
+                    <option>A1</option><option>A2</option><option>A3</option><option>A3.5</option><option>A4</option>
+                    <option>B1</option><option>B2</option><option>B3</option><option>B4</option>
+                    <option>C1</option><option>C2</option><option>C3</option><option>C4</option>
+                    <option>D2</option><option>D3</option><option>D4</option>
+                    <option>Custom / Lab matched</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Material</label>
+                  <select class="form-select" id="f-smile-material">
+                    <option value="">Select material</option>
+                    <option>E.max (Lithium Disilicate)</option>
+                    <option>Zirconia</option>
+                    <option>Composite Resin</option>
+                    <option>Feldspathic Porcelain</option>
+                    <option>PMMA (Temporary)</option>
+                    <option>Hybrid Ceramic</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Prep Type</label>
+                  <select class="form-select" id="f-smile-prep">
+                    <option value="">Select</option>
+                    <option>No Prep / Ultra-thin</option>
+                    <option>Minimal Prep</option>
+                    <option>Conventional Prep</option>
+                    <option>Full Coverage</option>
+                    <option>Not Applicable</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:8px;">
+                <label class="form-label">Digital Smile Design Used?</label>
+                <select class="form-select" id="f-smile-dsd">
+                  <option value="">Select</option>
+                  <option>Yes — DSD Protocol</option>
+                  <option>Yes — Software assisted</option>
+                  <option>No — Freehand design</option>
+                  <option>Mock-up only</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- THE HERO: BEFORE & AFTER UPLOAD -->
+            <div class="form-section">
+              <div class="form-section-title" style="color:#FBB424;">📸 Before & After — The Reveal</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-bottom:14px;line-height:1.5;">These photos generate your shareable smile reveal card. The more you upload, the more powerful your portfolio.</div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                <!-- BEFORE -->
+                <div>
+                  <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Before</div>
+                  <div class="smile-upload-zone" id="smile-before-zone" onclick="document.getElementById('smile-before-input').click()">
+                    <img id="smile-before-preview" class="smile-preview-img" style="display:none;">
+                    <div id="smile-before-placeholder">
+                      <div style="font-size:1.5rem;margin-bottom:6px;">📷</div>
+                      <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);">Tap to upload</div>
+                    </div>
+                  </div>
+                  <input type="file" id="smile-before-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('before',this)">
+                </div>
+
+                <!-- AFTER -->
+                <div>
+                  <div style="font-size:0.62rem;color:rgba(251,191,36,0.6);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">After ✨</div>
+                  <div class="smile-upload-zone" id="smile-after-zone" onclick="document.getElementById('smile-after-input').click()" style="border-color:rgba(251,191,36,0.3);">
+                    <img id="smile-after-preview" class="smile-preview-img" style="display:none;">
+                    <div id="smile-after-placeholder">
+                      <div style="font-size:1.5rem;margin-bottom:6px;">✨</div>
+                      <div style="font-size:0.72rem;color:rgba(251,191,36,0.4);">The result</div>
+                    </div>
+                  </div>
+                  <input type="file" id="smile-after-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('after',this)">
+                </div>
+              </div>
+
+              <!-- Preview of reveal card when both photos uploaded -->
+              <div id="smile-reveal-preview" style="display:none;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.2);border-radius:16px;padding:12px;text-align:center;">
+                <div style="font-size:0.62rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;">✨ Reveal card ready</div>
+                <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);">After logging, you'll get a shareable before/after card</div>
+              </div>
+
+              <!-- Additional angles -->
+              <div style="margin-top:12px;">
+                <div style="font-size:0.62rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Additional Photos (optional)</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                  <div class="smile-upload-zone" style="padding:12px;" onclick="document.getElementById('smile-extra1').click()">
+                    <img id="smile-extra1-preview" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:none;">
+                    <div id="smile-extra1-ph" style="font-size:1.1rem;">🦷</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:3px;">Side view</div>
+                    <input type="file" id="smile-extra1" accept="image/*" style="display:none" onchange="handleSmileExtra(1,this)">
+                  </div>
+                  <div class="smile-upload-zone" style="padding:12px;" onclick="document.getElementById('smile-extra2').click()">
+                    <img id="smile-extra2-preview" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:none;">
+                    <div id="smile-extra2-ph" style="font-size:1.1rem;">😊</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:3px;">Full face</div>
+                    <input type="file" id="smile-extra2" accept="image/*" style="display:none" onchange="handleSmileExtra(2,this)">
+                  </div>
+                  <div class="smile-upload-zone" style="padding:12px;" onclick="document.getElementById('smile-extra3').click()">
+                    <img id="smile-extra3-preview" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:none;">
+                    <div id="smile-extra3-ph" style="font-size:1.1rem;">🔬</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:3px;">Detail</div>
+                    <input type="file" id="smile-extra3" accept="image/*" style="display:none" onchange="handleSmileExtra(3,this)">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- OUTCOME -->
+            <div class="form-section">
+              <div class="form-section-title" style="color:#FBB424;">Result</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Patient Satisfaction</label>
+                  <select class="form-select" id="f-smile-satisfaction">
+                    <option value="">Select</option>
+                    <option>Extremely happy — loved it</option>
+                    <option>Happy — met expectations</option>
+                    <option>Satisfied — minor adjustments</option>
+                    <option>Needed significant revision</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Sessions Required</label>
+                  <select class="form-select" id="f-smile-sessions">
+                    <option value="">Select</option>
+                    <option>1 session</option><option>2 sessions</option>
+                    <option>3 sessions</option><option>4+ sessions</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:8px;">
+                <label class="form-label">Clinical Notes (optional)</label>
+                <textarea class="form-input" id="f-smile-notes" rows="3" placeholder="e.g. Patient requested minimal prep, shade matched to existing laterals, slight characterisation added for natural appearance..." style="resize:vertical;line-height:1.6;"></textarea>
+              </div>
+            </div>
+
+          </div><!-- end smile-fields -->
 
           <!-- Step 2 nav -->
           <div class="step-nav">
@@ -3909,6 +4199,7 @@ function selectSpecialty(spec, btn) {
   document.getElementById('surgery-fields').style.display     = spec === 'surgery'     ? 'block' : 'none';
   document.getElementById('paeds-fields').style.display       = spec === 'paeds'       ? 'block' : 'none';
   document.getElementById('prostho-fields').style.display     = spec === 'prostho'     ? 'block' : 'none';
+  document.getElementById('smile-fields').style.display       = spec === 'smile'       ? 'block' : 'none';
   updateXraySection(spec);
 
   // Switch age field
@@ -4150,6 +4441,18 @@ async function submitCase() {
       separated:        document.getElementById('f-prostho-complications').value,
       case_type:        document.getElementById('f-prostho-aesthetic').value,
     } : {}),
+    ...(selectedSpecialty === 'smile' ? {
+      procedure:         document.getElementById('f-smile-proc')?.value || 'Smile Case',
+      material:          document.getElementById('f-smile-material')?.value,
+      surfaces:          document.getElementById('f-smile-units')?.value,
+      cavity_class:      document.getElementById('f-smile-shade')?.value,
+      isolation:         document.getElementById('f-smile-prep')?.value,
+      case_type:         document.getElementById('f-smile-dsd')?.value,
+      obturation:        document.getElementById('f-smile-satisfaction')?.value,
+      calcification:     document.getElementById('f-smile-sessions')?.value,
+      narrative:         document.getElementById('f-smile-notes')?.value,
+      has_before_after:  !!(window._smileBeforeFile && window._smileAfterFile),
+    } : {}),
   };
 
   const { data, error } = await sb.from('cases').insert([caseData]).select();
@@ -4214,6 +4517,8 @@ async function submitCase() {
   // Show cinematic post-log experience for ALL cases
   showCelebration(caseData, complexity, null);
   showView('cases');
+  // For smile cases, show the reveal modal
+  maybeOpenSmileReveal(caseData);
 }
 
 async function generateAIReport(caseData, complexity) {
@@ -10549,6 +10854,227 @@ function renderSkillProgressGraph() {
     </div>` : ''}
 
   </div>`;
+}
+
+// ─── SMILE CASE ───
+window._smileBeforeFile = null;
+window._smileAfterFile = null;
+window._smileBeforeURL = null;
+window._smileAfterURL = null;
+
+function setSmileProc(proc, btn) {
+  document.getElementById('f-smile-proc').value = proc;
+  document.querySelectorAll('.smile-proc-btn').forEach(b => {
+    b.style.background = 'rgba(255,255,255,0.02)';
+    b.style.borderColor = 'rgba(255,255,255,0.07)';
+    b.style.color = 'rgba(255,255,255,0.5)';
+  });
+  btn.style.background = 'rgba(251,191,36,0.1)';
+  btn.style.borderColor = 'rgba(251,191,36,0.35)';
+  btn.style.color = '#FBB424';
+}
+
+function handleSmilePhoto(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  if (type === 'before') {
+    window._smileBeforeFile = file;
+    window._smileBeforeURL = url;
+    const preview = document.getElementById('smile-before-preview');
+    const ph = document.getElementById('smile-before-placeholder');
+    preview.src = url;
+    preview.style.display = 'block';
+    ph.style.display = 'none';
+    document.getElementById('smile-before-zone').classList.add('has-image');
+  } else {
+    window._smileAfterFile = file;
+    window._smileAfterURL = url;
+    const preview = document.getElementById('smile-after-preview');
+    const ph = document.getElementById('smile-after-placeholder');
+    preview.src = url;
+    preview.style.display = 'block';
+    ph.style.display = 'none';
+    document.getElementById('smile-after-zone').classList.add('has-image');
+  }
+  // Show reveal preview if both uploaded
+  if (window._smileBeforeURL && window._smileAfterURL) {
+    document.getElementById('smile-reveal-preview').style.display = 'block';
+  }
+}
+
+function handleSmileExtra(n, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const preview = document.getElementById(`smile-extra${n}-preview`);
+  const ph = document.getElementById(`smile-extra${n}-ph`);
+  if (preview) { preview.src = url; preview.style.display = 'block'; }
+  if (ph) ph.style.display = 'none';
+}
+
+function openSmileReveal(caseData) {
+  const beforeURL = window._smileBeforeURL;
+  const afterURL = window._smileAfterURL;
+  if (!beforeURL && !afterURL) return;
+
+  const proc = caseData.procedure || 'Smile Case';
+  const units = caseData.surfaces ? `${caseData.surfaces} units` : '';
+  const material = caseData.material || '';
+  const shade = caseData.cavity_class || '';
+  const drName = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Dr.';
+
+  const modal = document.getElementById('smile-reveal-modal');
+  if (!modal) return;
+
+  document.getElementById('smile-reveal-proc').textContent = proc;
+  document.getElementById('smile-reveal-details').textContent = [units, material, shade].filter(Boolean).join(' · ');
+  document.getElementById('smile-reveal-dr').textContent = drName;
+  document.getElementById('smile-reveal-date').textContent = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+
+  const beforeImg = document.getElementById('smile-reveal-before-img');
+  const afterImg = document.getElementById('smile-reveal-after-img');
+  if (beforeImg && beforeURL) beforeImg.src = beforeURL;
+  if (afterImg && afterURL) afterImg.src = afterURL;
+
+  // Show/hide panels
+  document.getElementById('smile-reveal-before-panel').style.display = beforeURL ? 'block' : 'none';
+  document.getElementById('smile-reveal-after-panel').style.display = afterURL ? 'block' : 'none';
+  document.getElementById('smile-reveal-split').style.display = (beforeURL && afterURL) ? 'flex' : 'block';
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSmileReveal() {
+  const modal = document.getElementById('smile-reveal-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function downloadSmileCard() {
+  const canvas = document.getElementById('smile-export-canvas');
+  if (!canvas) { showToast('Canvas not ready'); return; }
+  const link = document.createElement('a');
+  link.download = 'smile-case-provify.png';
+  link.href = canvas.toDataURL('image/png', 0.95);
+  link.click();
+}
+
+async function renderSmileExportCanvas() {
+  const canvas = document.getElementById('smile-export-canvas');
+  if (!canvas || !window._smileBeforeURL || !window._smileAfterURL) return;
+
+  const W = 1080, H = 1080;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const proc = document.getElementById('f-smile-proc')?.value || 'Smile Case';
+  const units = document.getElementById('f-smile-units')?.value || '';
+  const material = document.getElementById('f-smile-material')?.value || '';
+  const drName = currentProfile ? `Dr. ${currentProfile.first_name || ''} ${currentProfile.last_name || ''}`.trim() : 'Dr.';
+
+  // Dark background
+  ctx.fillStyle = '#08060F';
+  ctx.fillRect(0, 0, W, H);
+
+  // Load images
+  const loadImg = url => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.crossOrigin='anonymous'; i.src=url; });
+  const [before, after] = await Promise.all([loadImg(window._smileBeforeURL), loadImg(window._smileAfterURL)]);
+
+  // Draw before (left half)
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 80, W/2 - 2, H - 220);
+  ctx.clip();
+  const bAR = before.width / before.height;
+  const bH = (H - 220);
+  const bW = bH * bAR;
+  ctx.drawImage(before, 0 - (bW - W/2 + 2)/2, 80, bW, bH);
+  ctx.restore();
+
+  // Draw after (right half)
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(W/2 + 2, 80, W/2 - 2, H - 220);
+  ctx.clip();
+  const aAR = after.width / after.height;
+  const aH = (H - 220);
+  const aW = aAR * aH;
+  ctx.drawImage(after, W/2 + 2 - (aW - W/2 + 2)/2, 80, aW, aH);
+  ctx.restore();
+
+  // Dark overlay gradient for text areas
+  const topGrad = ctx.createLinearGradient(0, 0, 0, 120);
+  topGrad.addColorStop(0, 'rgba(8,6,15,0.95)');
+  topGrad.addColorStop(1, 'rgba(8,6,15,0)');
+  ctx.fillStyle = topGrad;
+  ctx.fillRect(0, 0, W, 120);
+
+  const botGrad = ctx.createLinearGradient(0, H - 180, 0, H);
+  botGrad.addColorStop(0, 'rgba(8,6,15,0)');
+  botGrad.addColorStop(1, 'rgba(8,6,15,0.98)');
+  ctx.fillStyle = botGrad;
+  ctx.fillRect(0, H - 180, W, 180);
+
+  // Divider line
+  ctx.fillStyle = 'rgba(251,191,36,0.6)';
+  ctx.fillRect(W/2 - 1, 80, 2, H - 220);
+
+  // BEFORE label
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = '500 28px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('BEFORE', W/4, 55);
+
+  // AFTER label with glow
+  ctx.fillStyle = '#FBB424';
+  ctx.font = '700 28px Inter, sans-serif';
+  ctx.fillText('AFTER ✨', 3*W/4, 55);
+
+  // Procedure title
+  ctx.fillStyle = 'white';
+  ctx.font = '700 52px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(proc.charAt(0).toUpperCase() + proc.slice(1), W/2, H - 110);
+
+  // Details
+  const details = [units, material].filter(Boolean).join(' · ');
+  ctx.fillStyle = 'rgba(251,191,36,0.8)';
+  ctx.font = '400 28px Inter, sans-serif';
+  ctx.fillText(details, W/2, H - 70);
+
+  // Doctor name
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '400 24px Inter, sans-serif';
+  ctx.fillText(drName, W/2 - 80, H - 35);
+
+  // Provify watermark
+  ctx.fillStyle = 'rgba(124,111,255,0.7)';
+  ctx.font = '600 24px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('Provify.', W - 30, H - 35);
+}
+
+function shareSmileCase() {
+  const canvas = document.getElementById('smile-export-canvas');
+  if (navigator.share && canvas.width > 0) {
+    canvas.toBlob(blob => {
+      const file = new File([blob], 'smile-case.png', { type: 'image/png' });
+      navigator.share({ files: [file], title: 'My Smile Case — Provify', text: 'Documented & verified on Provify.' })
+        .catch(() => downloadSmileCard());
+    });
+  } else {
+    renderSmileExportCanvas().then(downloadSmileCard);
+  }
+}
+
+// ─── SMILE CASE: trigger reveal after case saves ───
+function maybeOpenSmileReveal(caseData) {
+  if (caseData.specialty === 'smile' && (window._smileBeforeURL || window._smileAfterURL)) {
+    setTimeout(() => openSmileReveal(caseData), 800);
+  }
 }
 
 // ─── START ───
