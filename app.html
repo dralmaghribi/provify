@@ -4213,8 +4213,8 @@ async function submitCase() {
 
   // Show cinematic post-log experience for ALL cases
   showCelebration(caseData, complexity, null);
-  // Navigate to log view to show AI report inline too
   showView('cases');
+}
 
 async function generateAIReport(caseData, complexity) {
   const reportEl = document.getElementById('ai-report');
