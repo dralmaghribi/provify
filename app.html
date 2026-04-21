@@ -4472,7 +4472,7 @@ async function submitCase() {
     difficulty_rating: selectedRating,
     note: combinedNote || null,
     narrative: document.getElementById('f-narrative').value,
-    follow_up: document.getElementById('f-followup').value,
+    follow_up: document.getElementById('f-followup')?.value || null,
     post_op: document.getElementById('f-postop').value,
     created_at: new Date().toISOString(),
     // Specialty specific
@@ -4534,7 +4534,6 @@ async function submitCase() {
       obturation:        document.getElementById('f-smile-satisfaction')?.value || null,
       calcification:     document.getElementById('f-smile-sessions')?.value || null,
       narrative:         document.getElementById('f-smile-notes')?.value || null,
-      has_before_after:  !!(window._smileBeforeFile && window._smileAfterFile),
       anaesthesia:       null,
       impaction:         null,
       sutures:           null,
