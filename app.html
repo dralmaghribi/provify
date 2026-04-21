@@ -1746,6 +1746,34 @@ body::after {
 
     <!-- Shield CTA -->
     <div style="padding:20px 28px;">
+
+      <!-- SMILE PHOTO UPLOAD — shown only for smile cases -->
+      <div id="vr-smile-photos" style="display:none;margin-bottom:16px;">
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.04));border:1px solid rgba(251,191,36,0.2);border-radius:18px;padding:16px;">
+          <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:4px;">✨ Add Before & After Photos</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-bottom:14px;line-height:1.5;">Upload your transformation photos to generate a shareable reveal card.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div>
+              <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;text-align:center;">Before</div>
+              <div onclick="document.getElementById('vr-before-input').click()" id="vr-before-zone" style="border:2px dashed rgba(255,255,255,0.12);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);">
+                <img id="vr-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+                <div id="vr-before-ph"><div style="font-size:1.8rem;">📷</div><div style="font-size:0.62rem;color:rgba(255,255,255,0.2);margin-top:4px;">Tap to upload</div></div>
+              </div>
+              <input type="file" id="vr-before-input" accept="image/*" style="display:none" onchange="handleVRSmilePhoto('before',this)">
+            </div>
+            <div>
+              <div style="font-size:0.58rem;color:rgba(251,191,36,0.6);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px;text-align:center;">After ✨</div>
+              <div onclick="document.getElementById('vr-after-input').click()" id="vr-after-zone" style="border:2px dashed rgba(251,191,36,0.25);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(251,191,36,0.02);">
+                <img id="vr-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+                <div id="vr-after-ph"><div style="font-size:1.8rem;">✨</div><div style="font-size:0.62rem;color:rgba(251,191,36,0.35);margin-top:4px;">The result</div></div>
+              </div>
+              <input type="file" id="vr-after-input" accept="image/*" style="display:none" onchange="handleVRSmilePhoto('after',this)">
+            </div>
+          </div>
+          <button id="vr-reveal-btn" onclick="openVRSmileReveal()" style="display:none;width:100%;background:linear-gradient(135deg,#FBB424,#F97316);color:#000;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;padding:13px;border-radius:14px;border:none;cursor:pointer;">✨ Generate Reveal Card</button>
+        </div>
+      </div>
+
       <div style="background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(124,111,255,0.04));border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="showView('cases');closeVoiceResults();">
         <div style="font-size:1.3rem;flex-shrink:0;">⚖️</div>
         <div style="flex:1;">
@@ -4436,9 +4464,7 @@ async function submitCase() {
   const caseData = {
     user_id: currentUser.id,
     specialty: selectedSpecialty,
-    tooth_number: selectedSpecialty === 'smile'
-      ? (document.getElementById('f-smile-units')?.value || 'Full Smile')
-      : tooth,
+    tooth_number: selectedSpecialty === 'smile' ? null : (parseInt(tooth) || null),
     age_range: age,
     complaint,
     complexity_score: complexity,
@@ -4514,7 +4540,8 @@ async function submitCase() {
   const { data, error } = await sb.from('cases').insert([caseData]).select();
 
   if (error) {
-    showToast('Error saving case. Please try again.');
+    console.error('Save error:', error, 'CaseData:', JSON.stringify(caseData));
+    showToast('Error saving case: ' + (error.message || 'Unknown error'));
     btn.textContent = 'Log Case & Get AI Report →';
     btn.disabled = false;
     return;
@@ -7849,6 +7876,35 @@ function showPaywall() {
   document.getElementById('paywall-modal').style.display = 'flex';
 }
 
+function handleVRSmilePhoto(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  if (type === 'before') {
+    window._smileBeforeFile = file; window._smileBeforeURL = url;
+    const p = document.getElementById('vr-before-preview');
+    const ph = document.getElementById('vr-before-ph');
+    if (p) { p.src = url; p.style.display = 'block'; }
+    if (ph) ph.style.display = 'none';
+  } else {
+    window._smileAfterFile = file; window._smileAfterURL = url;
+    const p = document.getElementById('vr-after-preview');
+    const ph = document.getElementById('vr-after-ph');
+    if (p) { p.src = url; p.style.display = 'block'; }
+    if (ph) ph.style.display = 'none';
+  }
+  if (window._smileBeforeURL && window._smileAfterURL) {
+    const btn = document.getElementById('vr-reveal-btn');
+    if (btn) btn.style.display = 'block';
+  }
+}
+
+function openVRSmileReveal() {
+  closeVoiceResults();
+  const lastCase = allCases[0];
+  if (lastCase) openSmileReveal(lastCase);
+}
+
 function setSmileArch(arch, btn) {
   document.getElementById('f-smile-arch').value = arch;
   document.getElementById('f-tooth').value = arch;
@@ -7938,8 +7994,12 @@ async function showVoiceResults(caseData, complexity, caseId) {
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
+  // Show smile photo section for smile cases
+  const smileSection = document.getElementById('vr-smile-photos');
+  if (smileSection) smileSection.style.display = caseData.specialty === 'smile' ? 'block' : 'none';
+
   // Set title and score
-  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' }[caseData.specialty] || caseData.specialty;
+  const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case ✨' }[caseData.specialty] || caseData.specialty;
   const titleEl = document.getElementById('vr-title');
   if (titleEl) titleEl.textContent = `Tooth ${caseData.tooth_number} — ${specLabel}`;
 
