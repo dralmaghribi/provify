@@ -3162,6 +3162,7 @@ body::after {
           </div>
 
           <!-- X-RAYS (hidden for smile) -->
+          <div id="step3-clinical-content">
           <div class="form-section">
             <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
             <div id="xray-endo">
@@ -3342,9 +3343,11 @@ body::after {
             </div>
           </div>
 
+          </div><!-- end step3-clinical-content -->
+
           <!-- Step 3 back button -->
           <div style="margin-bottom:12px;">
-            <button class="step-btn-back" onclick="goToLogStep(2)">← Back to Clinical Details</button>
+            <button class="step-btn-back" id="step3-back-btn" onclick="goToLogStep(selectedSpecialty==='smile'?1:2)">← Back</button>
           </div>
 
           <button class="btn btn-primary" onclick="submitCase()" id="submit-case-btn">
@@ -7826,18 +7829,12 @@ function goToLogStep(step) {
   currentLogStep = step;
 
   // Show/hide smile photo section in step 3
-  const smilePhotoStep = document.getElementById('smile-photo-step');
-  const xraySection = document.querySelector('#log-step-3 .form-section');
   if (step === 3) {
     const isSmile = selectedSpecialty === 'smile';
+    const smilePhotoStep = document.getElementById('smile-photo-step');
+    const clinicalContent = document.getElementById('step3-clinical-content');
     if (smilePhotoStep) smilePhotoStep.style.display = isSmile ? 'block' : 'none';
-    // Hide x-ray/photo sections for smile
-    const step3 = document.getElementById('log-step-3');
-    if (step3) {
-      step3.querySelectorAll('.form-section').forEach(s => {
-        s.style.display = isSmile ? 'none' : '';
-      });
-    }
+    if (clinicalContent) clinicalContent.style.display = isSmile ? 'none' : 'block';
   }
 
   // Update panels
