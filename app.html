@@ -3044,70 +3044,7 @@ body::after {
               </div>
             </div>
 
-            <!-- THE HERO: BEFORE & AFTER UPLOAD -->
-            <div class="form-section">
-              <div class="form-section-title" style="color:#FBB424;">📸 Before & After — The Reveal</div>
-              <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-bottom:14px;line-height:1.5;">These photos generate your shareable smile reveal card. The more you upload, the more powerful your portfolio.</div>
 
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                <!-- BEFORE -->
-                <div>
-                  <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Before</div>
-                  <div class="smile-upload-zone" id="smile-before-zone" onclick="document.getElementById('smile-before-input').click()">
-                    <img id="smile-before-preview" class="smile-preview-img" style="display:none;">
-                    <div id="smile-before-placeholder">
-                      <div style="font-size:1.5rem;margin-bottom:6px;">📷</div>
-                      <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);">Tap to upload</div>
-                    </div>
-                  </div>
-                  <input type="file" id="smile-before-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('before',this)">
-                </div>
-
-                <!-- AFTER -->
-                <div>
-                  <div style="font-size:0.62rem;color:rgba(251,191,36,0.6);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">After ✨</div>
-                  <div class="smile-upload-zone" id="smile-after-zone" onclick="document.getElementById('smile-after-input').click()" style="border-color:rgba(251,191,36,0.3);">
-                    <img id="smile-after-preview" class="smile-preview-img" style="display:none;">
-                    <div id="smile-after-placeholder">
-                      <div style="font-size:1.5rem;margin-bottom:6px;">✨</div>
-                      <div style="font-size:0.72rem;color:rgba(251,191,36,0.4);">The result</div>
-                    </div>
-                  </div>
-                  <input type="file" id="smile-after-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('after',this)">
-                </div>
-              </div>
-
-              <!-- Preview of reveal card when both photos uploaded -->
-              <div id="smile-reveal-preview" style="display:none;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.2);border-radius:16px;padding:12px;text-align:center;">
-                <div style="font-size:0.62rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;">✨ Reveal card ready</div>
-                <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);">After logging, you'll get a shareable before/after card</div>
-              </div>
-
-              <!-- Additional angles -->
-              <div style="margin-top:12px;">
-                <div style="font-size:0.62rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Additional Photos (optional)</div>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-                  <div class="smile-upload-zone" style="padding:12px;" onclick="document.getElementById('smile-extra1').click()">
-                    <img id="smile-extra1-preview" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:none;">
-                    <div id="smile-extra1-ph" style="font-size:1.1rem;">🦷</div>
-                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:3px;">Side view</div>
-                    <input type="file" id="smile-extra1" accept="image/*" style="display:none" onchange="handleSmileExtra(1,this)">
-                  </div>
-                  <div class="smile-upload-zone" style="padding:12px;" onclick="document.getElementById('smile-extra2').click()">
-                    <img id="smile-extra2-preview" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:none;">
-                    <div id="smile-extra2-ph" style="font-size:1.1rem;">😊</div>
-                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:3px;">Full face</div>
-                    <input type="file" id="smile-extra2" accept="image/*" style="display:none" onchange="handleSmileExtra(2,this)">
-                  </div>
-                  <div class="smile-upload-zone" style="padding:12px;" onclick="document.getElementById('smile-extra3').click()">
-                    <img id="smile-extra3-preview" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:none;">
-                    <div id="smile-extra3-ph" style="font-size:1.1rem;">🔬</div>
-                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:3px;">Detail</div>
-                    <input type="file" id="smile-extra3" accept="image/*" style="display:none" onchange="handleSmileExtra(3,this)">
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <!-- OUTCOME -->
             <div class="form-section">
@@ -3151,7 +3088,80 @@ body::after {
           <!-- ═══ STEP 3 — RECORD & PHOTOS ═══ -->
           <div class="log-step-panel" id="log-step-3">
 
-          <!-- X-RAYS -->
+          <!-- SMILE PHOTO SECTION — only shown for smile specialty -->
+          <div id="smile-photo-step" style="display:none;">
+            <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.04));border:1px solid rgba(251,191,36,0.18);border-radius:20px;padding:18px;margin-bottom:20px;">
+              <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:4px;">✨ Smile Case · Before & After</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;margin-bottom:4px;">Upload your transformation photos</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);line-height:1.5;">These generate your shareable reveal card — the most powerful thing in your portfolio.</div>
+            </div>
+
+            <!-- BEFORE & AFTER SIDE BY SIDE -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+              <!-- BEFORE -->
+              <div>
+                <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;text-align:center;">Before</div>
+                <div id="smile-before-zone" onclick="document.getElementById('smile-before-input').click()" style="border:2px dashed rgba(255,255,255,0.12);border-radius:16px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);"
+                  onmouseover="this.style.borderColor='rgba(255,255,255,0.25)'"
+                  onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
+                  <img id="smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;border-radius:14px;">
+                  <div id="smile-before-placeholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                    <div style="font-size:2rem;">📷</div>
+                    <div style="font-size:0.65rem;color:rgba(255,255,255,0.25);">Tap to upload</div>
+                  </div>
+                </div>
+                <input type="file" id="smile-before-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('before',this)">
+              </div>
+
+              <!-- AFTER -->
+              <div>
+                <div style="font-size:0.6rem;color:rgba(251,191,36,0.65);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px;text-align:center;">After ✨</div>
+                <div id="smile-after-zone" onclick="document.getElementById('smile-after-input').click()" style="border:2px dashed rgba(251,191,36,0.25);border-radius:16px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;overflow:hidden;position:relative;background:rgba(251,191,36,0.03);"
+                  onmouseover="this.style.borderColor='rgba(251,191,36,0.5)'"
+                  onmouseout="this.style.borderColor='rgba(251,191,36,0.25)'">
+                  <img id="smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;border-radius:14px;">
+                  <div id="smile-after-placeholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                    <div style="font-size:2rem;">✨</div>
+                    <div style="font-size:0.65rem;color:rgba(251,191,36,0.4);">The result</div>
+                  </div>
+                </div>
+                <input type="file" id="smile-after-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('after',this)">
+              </div>
+            </div>
+
+            <!-- Reveal preview banner -->
+            <div id="smile-reveal-preview" style="display:none;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.22);border-radius:14px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+              <div style="font-size:1.2rem;">🎉</div>
+              <div>
+                <div style="font-size:0.75rem;color:#FBB424;font-weight:600;">Reveal card ready</div>
+                <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);">After logging you'll get a shareable before/after card</div>
+              </div>
+            </div>
+
+            <!-- Additional photos -->
+            <div style="margin-bottom:16px;">
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Additional angles (optional)</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                <div onclick="document.getElementById('smile-extra1').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
+                  <img id="smile-extra1-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+                  <div id="smile-extra1-ph"><div style="font-size:1.3rem;">🦷</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.2);margin-top:3px;">Side</div></div>
+                  <input type="file" id="smile-extra1" accept="image/*" style="display:none" onchange="handleSmileExtra(1,this)">
+                </div>
+                <div onclick="document.getElementById('smile-extra2').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
+                  <img id="smile-extra2-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+                  <div id="smile-extra2-ph"><div style="font-size:1.3rem;">😊</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.2);margin-top:3px;">Full face</div></div>
+                  <input type="file" id="smile-extra2" accept="image/*" style="display:none" onchange="handleSmileExtra(2,this)">
+                </div>
+                <div onclick="document.getElementById('smile-extra3').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
+                  <img id="smile-extra3-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+                  <div id="smile-extra3-ph"><div style="font-size:1.3rem;">🔬</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.2);margin-top:3px;">Detail</div></div>
+                  <input type="file" id="smile-extra3" accept="image/*" style="display:none" onchange="handleSmileExtra(3,this)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- X-RAYS (hidden for smile) -->
           <div class="form-section">
             <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
             <div id="xray-endo">
@@ -4637,7 +4647,18 @@ Child cooperation: ${c.surfaces}
 Space maintainer: ${c.impaction}
 Post-op: ${c.post_op}
 Complexity score: ${complexity}/10`;
-  } else {
+  } else if (spec === 'smile') {
+    details = `
+Specialty: Aesthetic Dentistry / Smile Design
+Procedure: ${c.procedure || 'Smile Case'}
+Units treated: ${c.surfaces || 'not specified'}
+Shade: ${c.cavity_class || 'not specified'}
+Material: ${c.material || 'not specified'}
+Prep type: ${c.isolation || 'not specified'}
+Digital Smile Design: ${c.case_type || 'not specified'}
+Patient satisfaction: ${c.obturation || 'not specified'}
+Before/after documented: ${c.has_before_after ? 'Yes' : 'No'}`;
+    } else {
     details = `
 Specialty: Oral Surgery
 Tooth: ${c.tooth_number}, Procedure: ${c.procedure}
@@ -4646,6 +4667,19 @@ Sutures: ${c.sutures}, Post-op: ${c.post_op}
 Complexity score: ${complexity}/10`;
   }
 
+  if (spec === 'smile') {
+    return `You are a renowned aesthetic dentist and smile design specialist reviewing a case logged on Provify.
+
+Case details:
+${details}
+
+Respond ONLY with a JSON object (no markdown, no preamble) with exactly these keys:
+- "strength": One sentence celebrating the aesthetic achievement — be specific about shade, material, or technique. Make the dentist feel proud.
+- "watch": One specific aesthetic refinement tip for next time (gingival contouring, emergence profile, shade characterisation etc)
+- "tip": One advanced aesthetic pearl specific to this case
+
+Tone: warm, celebratory, expert. This dentist just created a smile transformation.`;
+  }
   return `You are a senior dental specialist reviewing a case logged by a dentist on Provify, a clinical case intelligence platform. 
 
 Case details:
@@ -7773,6 +7807,12 @@ function showPaywall() {
 let currentLogStep = 1;
 
 function goToLogStep(step) {
+  // For smile specialty: skip step 2, go straight from 1 to 3
+  if (selectedSpecialty === 'smile') {
+    if (step === 2 && currentLogStep === 1) step = 3;
+    if (step === 2 && currentLogStep === 3) step = 1;
+  }
+
   // Validate step 1 before going to step 2
   if (step === 2 && currentLogStep === 1) {
     const tooth = document.getElementById('f-tooth')?.value;
@@ -7784,6 +7824,21 @@ function goToLogStep(step) {
   }
 
   currentLogStep = step;
+
+  // Show/hide smile photo section in step 3
+  const smilePhotoStep = document.getElementById('smile-photo-step');
+  const xraySection = document.querySelector('#log-step-3 .form-section');
+  if (step === 3) {
+    const isSmile = selectedSpecialty === 'smile';
+    if (smilePhotoStep) smilePhotoStep.style.display = isSmile ? 'block' : 'none';
+    // Hide x-ray/photo sections for smile
+    const step3 = document.getElementById('log-step-3');
+    if (step3) {
+      step3.querySelectorAll('.form-section').forEach(s => {
+        s.style.display = isSmile ? 'none' : '';
+      });
+    }
+  }
 
   // Update panels
   [1,2,3].forEach(s => {
@@ -7807,7 +7862,10 @@ function goToLogStep(step) {
   });
 
   // Update subtitle
-  const subs = ['', 'Step 1 of 3 — The essentials', 'Step 2 of 3 — Clinical details', 'Step 3 of 3 — Record & photos'];
+  const isSmile = selectedSpecialty === 'smile';
+  const subs = isSmile
+    ? ['', 'Step 1 of 2 — Case details', '', 'Step 2 of 2 — Before & After photos']
+    : ['', 'Step 1 of 3 — The essentials', 'Step 2 of 3 — Clinical details', 'Step 3 of 3 — Record & photos'];
   const subEl = document.getElementById('log-step-sub');
   if (subEl) subEl.textContent = subs[step] || '';
 
