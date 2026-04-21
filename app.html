@@ -925,151 +925,188 @@ body::after {
 </div>
 
 <!-- CASE DETAIL MODAL -->
-<div id="case-detail-modal" style="display:none; position:fixed; inset:0; background:rgba(8,15,30,0.95); z-index:500; align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this)closeCaseDetail()">
-  <div style="background:var(--navy-2); border:1px solid var(--white-faint); border-radius:20px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
-    
-    <!-- Modal Header -->
-    <div style="padding:24px 28px 16px; border-bottom:1px solid var(--white-faint); display:flex; align-items:flex-start; justify-content:space-between; gap:16px; position:sticky; top:0; background:var(--navy-2); z-index:10;">
-      <div>
-        <div style="font-family:'Instrument Serif',serif; font-size:1.4rem; color:var(--white); letter-spacing:-0.02em" id="modal-title">Case Detail</div>
-        <div style="font-size:0.8rem; color:var(--gray); margin-top:4px" id="modal-date"></div>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button onclick="toggleCaseEdit()" id="edit-case-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='var(--gray)'">
-          ✏️ Edit
-        </button>
-        <button onclick="shareCase()" id="share-case-btn" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);color:#34D399;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:5px;" onmouseover="this.style.background='rgba(52,211,153,0.15)'" onmouseout="this.style.background='rgba(52,211,153,0.08)'">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          Share
-        </button>
-        <div style="text-align:center; background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:10px; padding:8px 14px;position:relative;">
-          <div style="position:relative;width:48px;height:48px;margin:0 auto;">
-            <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg);">
-              <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
-              <circle cx="24" cy="24" r="20" fill="none" stroke="var(--teal)" stroke-width="3"
-                id="modal-score-ring"
-                stroke-dasharray="${2 * Math.PI * 20}"
-                stroke-dashoffset="${2 * Math.PI * 20}"
-                stroke-linecap="round"/>
-            </svg>
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-              <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--teal);line-height:1" id="modal-score">—</div>
-            </div>
+<div id="case-detail-modal" style="display:none;position:fixed;inset:0;background:rgba(5,8,18,0.97);z-index:500;align-items:flex-end;justify-content:center;padding:0;" onclick="if(event.target===this)closeCaseDetail()">
+  <div style="background:#0D0B1E;border:1px solid rgba(255,255,255,0.07);border-radius:28px 28px 0 0;width:100%;max-width:620px;max-height:94vh;overflow-y:auto;position:relative;padding-bottom:env(safe-area-inset-bottom,0);">
+
+    <!-- Drag handle -->
+    <div style="display:flex;justify-content:center;padding:12px 0 4px;">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.1);"></div>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:12px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;background:#0D0B1E;z-index:10;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.8);flex-shrink:0;"></div>
+            <div style="font-size:0.58rem;color:rgba(52,211,153,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;">Protected · Verified</div>
           </div>
-          <div style="font-size:0.6rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.08em;margin-top:2px">score</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;letter-spacing:-0.02em;line-height:1.1;" id="modal-title">Case Detail</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:2px;" id="modal-date"></div>
         </div>
-        <button onclick="closeCaseDetail()" style="background:none; border:none; color:var(--gray); font-size:1.5rem; cursor:pointer; padding:4px; line-height:1; transition:color 0.2s" onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--gray)'">×</button>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <!-- Complexity ring -->
+          <div style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.18);border-radius:14px;padding:8px 12px;text-align:center;">
+            <div style="position:relative;width:44px;height:44px;margin:0 auto;">
+              <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
+                <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
+                <circle cx="22" cy="22" r="18" fill="none" stroke="#7C6FFF" stroke-width="3" id="modal-score-ring" stroke-dasharray="113" stroke-dashoffset="113" stroke-linecap="round" style="transition:stroke-dashoffset 0.8s ease;"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:var(--teal);line-height:1;" id="modal-score">—</div>
+              </div>
+            </div>
+            <div style="font-size:0.42rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;">score</div>
+          </div>
+          <button onclick="closeCaseDetail()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:1.2rem;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">×</button>
+        </div>
       </div>
     </div>
 
-    <!-- EDIT MODE PANEL -->
-    <div id="case-edit-panel" style="display:none;padding:20px 28px;border-bottom:1px solid rgba(124,111,255,0.15);background:linear-gradient(135deg,rgba(124,111,255,0.05),rgba(124,111,255,0.02));">
-      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:14px;">✏️ Edit Case</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="edit-fields-grid"></div>
-      <div style="margin-top:12px;">
-        <label style="font-size:0.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:6px;">Case Narrative</label>
-        <textarea id="edit-narrative" rows="3" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:10px 14px;border-radius:10px;outline:none;resize:vertical;line-height:1.6;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'"></textarea>
-      </div>
+    <!-- EDIT PANEL -->
+    <div id="case-edit-panel" style="display:none;padding:16px 20px;border-bottom:1px solid rgba(124,111,255,0.12);background:linear-gradient(135deg,rgba(124,111,255,0.05),rgba(124,111,255,0.02));">
+      <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">✏️ Edit Case</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="edit-fields-grid"></div>
       <div style="margin-top:10px;">
-        <label style="font-size:0.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:6px;">Private Nickname <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;">— only you can see this</span></label>
-        <input type="text" id="edit-nickname" placeholder='e.g. "Referred from Dr. Ahmed" or "Anxious patient"' style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;padding:10px 14px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
+        <label style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:5px;">Case Narrative</label>
+        <textarea id="edit-narrative" rows="3" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:10px 12px;border-radius:10px;outline:none;resize:vertical;line-height:1.6;transition:border-color 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'"></textarea>
       </div>
-      <div style="display:flex;gap:10px;margin-top:14px;">
-        <button onclick="saveCaseEdit()" id="save-edit-btn" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:600;padding:11px;border-radius:10px;border:none;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(124,111,255,0.3);">Save Changes</button>
-        <button onclick="toggleCaseEdit()" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.875rem;padding:11px 20px;border-radius:10px;cursor:pointer;transition:all 0.2s;">Cancel</button>
+      <div style="margin-top:8px;">
+        <label style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:5px;">Private Nickname</label>
+        <input type="text" id="edit-nickname" placeholder="Only you can see this" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:10px 12px;border-radius:10px;outline:none;transition:border-color 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button onclick="saveCaseEdit()" id="save-edit-btn" style="flex:1;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;padding:10px;border-radius:10px;border:none;cursor:pointer;">Save</button>
+        <button onclick="toggleCaseEdit()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.85rem;padding:10px 16px;border-radius:10px;cursor:pointer;">Cancel</button>
       </div>
     </div>
 
     <!-- Narrative -->
-    <div id="modal-narrative-section" style="padding:20px 28px; border-bottom:1px solid var(--white-faint); display:none;">
-      <div style="font-size:0.65rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px">Case Narrative</div>
-      <div style="font-size:0.95rem; color:var(--white-dim); line-height:1.8; font-style:italic; padding-left:16px; border-left:2px solid var(--teal)" id="modal-narrative"></div>
+    <div id="modal-narrative-section" style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:none;">
+      <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;font-weight:600;">Case Narrative</div>
+      <div style="font-size:0.9rem;color:var(--white-dim);line-height:1.8;font-style:italic;padding-left:14px;border-left:2px solid var(--teal);" id="modal-narrative"></div>
     </div>
 
-    <!-- Photos & X-rays -->
-    <div id="modal-photos" style="display:none;padding:0 28px;"></div>
+    <!-- Photos -->
+    <div id="modal-photos" style="display:none;padding:0 20px;"></div>
 
     <!-- Fields -->
-    <div style="padding:8px 28px 20px" id="modal-fields"></div>
+    <div style="padding:8px 20px 16px;" id="modal-fields"></div>
 
-    <!-- Generate Note -->
-    <div style="padding:0 28px 28px">
-      <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
-        <button onclick="showPatientReviewQR()" style="flex:1; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); color:#F59E0B; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; padding:10px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
-          ⭐ Patient Review QR
+    <!-- ── ACTION BUTTONS — THE FEATURES ── -->
+    <div style="padding:0 20px 24px;display:flex;flex-direction:column;gap:8px;">
+
+      <!-- TOP ROW: Edit + Share -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;">
+        <button onclick="toggleCaseEdit()" id="edit-case-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.55);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.55)'">
+          ✏️ Edit Case
         </button>
-        <button onclick="showPeerReviewForm()" style="flex:1; background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; padding:10px; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+        <button onclick="shareCase()" id="share-case-btn" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);color:#34D399;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.background='rgba(52,211,153,0.14)'" onmouseout="this.style.background='rgba(52,211,153,0.07)'">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share Case
+        </button>
+      </div>
+
+      <!-- CLINICAL NOTE — HERO FEATURE -->
+      <div style="background:linear-gradient(135deg,rgba(52,211,153,0.08),rgba(52,211,153,0.03));border:1px solid rgba(52,211,153,0.2);border-radius:16px;overflow:hidden;">
+        <button onclick="generateClinicalNote()" id="gen-note-btn" style="width:100%;background:none;border:none;color:white;font-family:'Inter',sans-serif;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.18s;" onmouseover="this.parentElement.style.borderColor='rgba(52,211,153,0.4)'" onmouseout="this.parentElement.style.borderColor='rgba(52,211,153,0.2)'">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">📋</div>
+          <div style="flex:1;text-align:left;">
+            <div style="font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.92);margin-bottom:1px;">Clinical Note</div>
+            <div style="font-size:0.63rem;color:rgba(52,211,153,0.6);">Ready to paste into any system · one tap</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div id="clinical-note-output" style="display:none;border-top:1px solid rgba(52,211,153,0.12);padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:0.58rem;color:rgba(52,211,153,0.7);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;">📋 Clinical Note — Ready to Copy</div>
+            <button onclick="copyNote()" style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:#34D399;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:600;padding:5px 12px;border-radius:8px;border:none;cursor:pointer;">Copy</button>
+          </div>
+          <div id="clinical-note-text" style="font-size:0.78rem;color:rgba(255,255,255,0.65);line-height:1.75;white-space:pre-wrap;"></div>
+        </div>
+      </div>
+
+      <!-- SHIELD — PROTECTION FEATURE -->
+      <div style="background:linear-gradient(135deg,rgba(239,68,68,0.07),rgba(239,68,68,0.02));border:1px solid rgba(239,68,68,0.18);border-radius:16px;overflow:hidden;">
+        <button onclick="openShield()" style="width:100%;background:none;border:none;color:white;font-family:'Inter',sans-serif;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.18s;" onmouseover="this.parentElement.style.borderColor='rgba(239,68,68,0.38)'" onmouseout="this.parentElement.style.borderColor='rgba(239,68,68,0.18)'">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">🛡️</div>
+          <div style="flex:1;text-align:left;">
+            <div style="font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.92);margin-bottom:1px;">Provify Shield</div>
+            <div style="font-size:0.63rem;color:rgba(239,68,68,0.6);">Generate complaint response letter · uses this case as evidence</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(239,68,68,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div id="shield-output" style="display:none;border-top:1px solid rgba(239,68,68,0.12);padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:0.58rem;color:rgba(239,68,68,0.7);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;">⚖️ Complaint Response Letter</div>
+            <button onclick="copyShieldLetter()" id="shield-copy-btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:#FCA5A5;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:600;padding:5px 12px;border-radius:8px;border:none;cursor:pointer;">Copy</button>
+          </div>
+          <div id="shield-loading" style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.35);font-size:0.78rem;">
+            <div style="width:14px;height:14px;border:2px solid rgba(239,68,68,0.2);border-top-color:#EF4444;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
+            Building your defence letter...
+          </div>
+          <div id="shield-letter-text" style="display:none;font-size:0.78rem;color:rgba(255,255,255,0.65);line-height:1.85;white-space:pre-wrap;"></div>
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(239,68,68,0.08);font-size:0.6rem;color:rgba(255,255,255,0.18);">AI-generated from your documented record. Review with a legal professional before submission.</div>
+        </div>
+      </div>
+
+      <!-- VERIFICATION RECORD -->
+      <button onclick="openCaseVerification()" style="width:100%;background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.15);color:rgba(255,255,255,0.6);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;padding:12px 16px;border-radius:14px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.borderColor='rgba(124,111,255,0.35)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(124,111,255,0.15)';this.style.color='rgba(255,255,255,0.6)'">
+        <span style="font-size:1rem;">🔗</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:0.82rem;font-weight:500;">Verification Link</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:1px;">Tamper-proof public record · share with anyone</div>
+        </div>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(124,111,255,0.4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <!-- SIMULATION -->
+      <button onclick="openSimulation()" style="width:100%;background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.15);color:rgba(255,255,255,0.6);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;padding:12px 16px;border-radius:14px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.borderColor='rgba(245,158,11,0.35)';this.style.color='#F59E0B'" onmouseout="this.style.borderColor='rgba(245,158,11,0.15)';this.style.color='rgba(255,255,255,0.6)'">
+        <span style="font-size:1rem;">⚡</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:0.82rem;font-weight:500;">Simulate a Harder Version</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:1px;">Test your clinical reasoning on this case</div>
+        </div>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(245,158,11,0.4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <!-- REVIEWS ROW -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button onclick="showPatientReviewQR()" style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.14);color:rgba(245,158,11,0.7);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='rgba(245,158,11,0.05)'">
+          ⭐ Patient Review
+        </button>
+        <button onclick="showPeerReviewForm()" style="background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.14);color:rgba(124,111,255,0.7);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,111,255,0.1)'" onmouseout="this.style.background='rgba(124,111,255,0.05)'">
           👨‍⚕️ Peer Review
         </button>
       </div>
 
-      <!-- QR CODE SECTION -->
-      <div id="patient-qr-section" style="display:none; background:var(--navy-3); border:1px solid rgba(245,158,11,0.2); border-radius:12px; padding:20px; margin-bottom:12px; text-align:center;">
-        <div style="font-size:0.7rem; color:#F59E0B; text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:4px">Patient Review QR Code</div>
-        <div style="font-size:0.78rem; color:var(--g); margin-bottom:16px">Show this to your patient — they scan and leave a review</div>
-        <div id="qr-canvas" style="display:flex; justify-content:center; margin-bottom:14px;"></div>
-        <div id="qr-link" style="font-size:0.72rem; color:var(--g); word-break:break-all; margin-bottom:12px;"></div>
-        <div style="display:flex; gap:8px; justify-content:center;">
-          <button onclick="copyReviewLink()" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; padding:8px 16px; border-radius:8px; border:none; cursor:pointer;">Copy Link</button>
-          <button onclick="downloadQR()" style="background:none; border:1px solid var(--wf2); color:var(--g2); font-family:'Inter',sans-serif; font-size:0.8rem; padding:8px 16px; border-radius:8px; cursor:pointer;">Download QR</button>
+      <!-- QR SECTION -->
+      <div id="patient-qr-section" style="display:none;background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.18);border-radius:14px;padding:18px;text-align:center;">
+        <div style="font-size:0.65rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:3px;">Patient Review QR</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-bottom:14px;">Show to your patient — they scan and leave a review</div>
+        <div id="qr-canvas" style="display:flex;justify-content:center;margin-bottom:12px;"></div>
+        <div id="qr-link" style="font-size:0.68rem;color:rgba(255,255,255,0.3);word-break:break-all;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button onclick="copyReviewLink()" style="background:#F59E0B;color:#09090B;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;">Copy Link</button>
+          <button onclick="downloadQR()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.78rem;padding:7px 14px;border-radius:8px;cursor:pointer;">Download QR</button>
         </div>
       </div>
 
-      <!-- PEER REVIEW FORM -->
-      <div id="peer-review-section" style="display:none; background:var(--navy-3); border:1px solid var(--teal-mid); border-radius:12px; padding:20px; margin-bottom:12px;">
-        <div style="font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:12px">Leave a Peer Review</div>
-        <div style="display:flex; gap:6px; margin-bottom:12px;" id="peer-stars">
-          <button onclick="setPeerRating(1)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
-          <button onclick="setPeerRating(2)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
-          <button onclick="setPeerRating(3)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
-          <button onclick="setPeerRating(4)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
-          <button onclick="setPeerRating(5)" class="peer-star" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--wf2);background:var(--navy-2);cursor:pointer;font-size:1.1rem;transition:all 0.2s;">⭐</button>
+      <!-- PEER REVIEW -->
+      <div id="peer-review-section" style="display:none;background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.18);border-radius:14px;padding:18px;">
+        <div style="font-size:0.65rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:500;margin-bottom:10px;">Leave a Peer Review</div>
+        <div style="display:flex;gap:5px;margin-bottom:10px;" id="peer-stars">
+          <button onclick="setPeerRating(1)" class="peer-star" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:pointer;font-size:1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(2)" class="peer-star" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:pointer;font-size:1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(3)" class="peer-star" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:pointer;font-size:1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(4)" class="peer-star" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:pointer;font-size:1rem;transition:all 0.2s;">⭐</button>
+          <button onclick="setPeerRating(5)" class="peer-star" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:pointer;font-size:1rem;transition:all 0.2s;">⭐</button>
         </div>
-        <textarea id="peer-comment" placeholder="Share your clinical perspective on this case..." style="width:100%;background:var(--navy-2);border:1px solid var(--wf2);color:var(--w);font-family:'Inter',sans-serif;font-size:0.85rem;padding:10px 12px;border-radius:8px;outline:none;resize:vertical;min-height:80px;margin-bottom:10px;line-height:1.6;"></textarea>
-        <button onclick="submitPeerReview()" id="peer-submit-btn" style="width:100%;background:var(--teal);color:var(--navy);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;padding:10px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;">Submit Peer Review</button>
+        <textarea id="peer-comment" placeholder="Share your clinical perspective..." style="width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:white;font-family:'Inter',sans-serif;font-size:0.82rem;padding:10px 12px;border-radius:10px;outline:none;resize:vertical;min-height:70px;margin-bottom:8px;line-height:1.6;box-sizing:border-box;"></textarea>
+        <button onclick="submitPeerReview()" id="peer-submit-btn" style="width:100%;background:var(--teal);color:var(--navy);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;padding:10px;border-radius:10px;border:none;cursor:pointer;">Submit Review</button>
       </div>
 
-      <button onclick="generateClinicalNote()" id="gen-note-btn" style="width:100%;background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:500;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;">
-        📋 Generate Clinical Note
-      </button>
-      <div id="clinical-note-output" style="display:none;margin-top:12px;background:var(--navy-3);border:1px solid var(--white-faint);border-radius:10px;padding:16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:0.65rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:500">Clinical Note — Ready to Copy</div>
-          <button onclick="copyNote()" style="background:var(--teal);color:var(--navy);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:6px;border:none;cursor:pointer;">Copy</button>
-        </div>
-        <div id="clinical-note-text" style="font-size:0.82rem;color:var(--white-dim);line-height:1.7;white-space:pre-wrap;"></div>
-      </div>
-
-      <!-- SIMULATION BUTTON -->
-      <button onclick="openSimulation()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,rgba(124,111,255,0.12),rgba(155,145,255,0.06));border:1px solid rgba(124,111,255,0.3);color:var(--white);font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:500;padding:12px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--white)'">
-        <span>⚡</span> Simulate a Harder Version — Test Your Reasoning
-      </button>
-
-      <!-- SHIELD — Complaint Response -->
-      <button onclick="openShield()" style="width:100%;margin-top:8px;background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(239,68,68,0.03));border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;padding:11px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
-        ⚖️ Provify Shield — Generate Complaint Response
-      </button>
-
-      <!-- SHIELD OUTPUT -->
-      <div id="shield-output" style="display:none;margin-top:12px;background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(239,68,68,0.02));border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:18px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div style="font-size:0.62rem;color:#FCA5A5;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">⚖️ Complaint Response Letter</div>
-          <button onclick="copyShieldLetter()" id="shield-copy-btn" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#FCA5A5;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:6px 12px;border-radius:8px;border:none;cursor:pointer;">Copy Letter</button>
-        </div>
-        <div id="shield-loading" style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.4);font-size:0.8rem;">
-          <div style="width:16px;height:16px;border:2px solid rgba(239,68,68,0.2);border-top-color:#EF4444;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
-          Generating your defence letter...
-        </div>
-        <div id="shield-letter-text" style="display:none;font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.9;white-space:pre-wrap;"></div>
-        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(239,68,68,0.1);font-size:0.65rem;color:rgba(255,255,255,0.25);">This letter is AI-generated from your documented case record. Review with a legal professional before submitting to regulatory bodies.</div>
-      </div>
-
-      <!-- VERIFY BUTTON -->
-      <button onclick="openCaseVerification()" style="width:100%;margin-top:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.borderColor='rgba(124,111,255,0.25)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='var(--gray)'">
-        🛡 View Verification Record
-      </button>
     </div>
-
   </div>
 </div>
 
@@ -1511,8 +1548,8 @@ body::after {
           <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
           <circle cx="28" cy="28" r="22" fill="none" stroke="url(#vrRingGrad)" stroke-width="4"
             id="vr-ring" stroke-linecap="round"
-            stroke-dasharray="${2 * Math.PI * 22}"
-            stroke-dashoffset="${2 * Math.PI * 22}"/>
+            stroke-dasharray="138"
+            stroke-dashoffset="138"/>
           <defs>
             <linearGradient id="vrRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#7C6FFF"/>
@@ -1837,16 +1874,12 @@ body::after {
         <!-- ── COMPANION CARD ── -->
         <div class="dash-section" style="margin-bottom:14px;">
           <div id="voice-hero-btn" style="position:relative;border-radius:26px;overflow:hidden;box-shadow:0 12px 48px rgba(124,111,255,0.2);">
-
-            <!-- BG layers -->
             <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0D0B1E 0%,#080B16 100%);"></div>
             <div style="position:absolute;top:-80px;right:-60px;width:320px;height:320px;background:radial-gradient(circle,rgba(124,111,255,0.2) 0%,transparent 65%);pointer-events:none;animation:heroOrb1 8s ease-in-out infinite;"></div>
             <div style="position:absolute;bottom:-50px;left:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(52,211,153,0.08) 0%,transparent 65%);pointer-events:none;animation:heroOrb2 10s ease-in-out infinite;"></div>
             <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.7),rgba(52,211,153,0.3),transparent);"></div>
 
             <div style="position:relative;z-index:1;padding:20px 20px 0;">
-
-              <!-- Row 1: status + rank -->
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:7px;">
                   <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 7px rgba(52,211,153,0.9);animation:micBreath 2.2s ease-in-out infinite;"></div>
@@ -1858,13 +1891,11 @@ body::after {
                 </div>
               </div>
 
-              <!-- Row 2: greeting + body -->
               <div style="margin-bottom:16px;">
                 <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:6px;" id="dash-hero-title">Good morning,<br>Doctor.</div>
                 <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);line-height:1.6;max-width:260px;" id="dash-hero-body">Finish a case? Just tell me. I'll write the note, lock the record, and protect you.</div>
               </div>
 
-              <!-- Row 3: mic trigger -->
               <div onclick="openVoiceLog()" style="display:flex;align-items:center;gap:14px;background:rgba(124,111,255,0.11);border:1px solid rgba(124,111,255,0.24);border-radius:16px;padding:13px 16px;cursor:pointer;transition:all 0.18s;margin-bottom:18px;"
                 onmouseover="this.style.background='rgba(124,111,255,0.18)';this.style.borderColor='rgba(124,111,255,0.42)'"
                 onmouseout="this.style.background='rgba(124,111,255,0.11)';this.style.borderColor='rgba(124,111,255,0.24)'">
@@ -1881,10 +1912,8 @@ body::after {
                 </div>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(124,111,255,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-
             </div>
 
-            <!-- Stats strip -->
             <div style="position:relative;z-index:1;border-top:1px solid rgba(255,255,255,0.05);display:grid;grid-template-columns:repeat(4,1fr);">
               <div class="stat-pill" style="padding:11px 4px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
                 <div style="font-family:'Instrument Serif',serif;font-size:1.35rem;color:var(--white);line-height:1;margin-bottom:2px;" id="micro-total">0</div>
@@ -1903,33 +1932,35 @@ body::after {
                 <div style="font-size:0.42rem;color:rgba(124,111,255,0.32);text-transform:uppercase;letter-spacing:0.1em;">Specialty</div>
               </div>
             </div>
-
           </div>
         </div>
 
-        <!-- ── VALUE STRIP: what Provify actually does ── -->
-        <div class="dash-section" id="value-strip" style="display:none;margin-bottom:14px;">
+        <!-- ── WHAT PROVIFY DOES — always visible, always selling ── -->
+        <div class="dash-section" style="margin-bottom:14px;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
 
-            <!-- Protection -->
-            <div onclick="navToShield()" class="value-pill" style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.14);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;">
-              <div style="font-size:1.3rem;margin-bottom:6px;">🛡️</div>
-              <div style="font-size:0.65rem;font-weight:700;color:rgba(239,68,68,0.85);margin-bottom:3px;">Protected</div>
-              <div style="font-size:0.56rem;color:rgba(255,255,255,0.22);line-height:1.45;" id="val-protection-text">0 cases on record</div>
+            <div onclick="navToShield()" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;"
+              onmouseover="this.style.borderColor='rgba(239,68,68,0.35)'"
+              onmouseout="this.style.borderColor='rgba(239,68,68,0.15)'">
+              <div style="font-size:1.4rem;margin-bottom:6px;">🛡️</div>
+              <div style="font-size:0.62rem;font-weight:700;color:rgba(239,68,68,0.85);margin-bottom:3px;letter-spacing:-0.01em;">Shield</div>
+              <div style="font-size:0.54rem;color:rgba(255,255,255,0.2);line-height:1.4;">Complaint letter<br>in 60 seconds</div>
             </div>
 
-            <!-- Portfolio -->
-            <div onclick="viewMyPortfolio()" class="value-pill" style="background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.14);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;">
-              <div style="font-size:1.3rem;margin-bottom:6px;">🏆</div>
-              <div style="font-size:0.65rem;font-weight:700;color:rgba(124,111,255,0.85);margin-bottom:3px;">Portfolio</div>
-              <div style="font-size:0.56rem;color:rgba(255,255,255,0.22);line-height:1.45;" id="val-portfolio-text">Share your record</div>
+            <div onclick="viewMyPortfolio()" style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;"
+              onmouseover="this.style.borderColor='rgba(124,111,255,0.35)'"
+              onmouseout="this.style.borderColor='rgba(124,111,255,0.15)'">
+              <div style="font-size:1.4rem;margin-bottom:6px;">🏆</div>
+              <div style="font-size:0.62rem;font-weight:700;color:rgba(124,111,255,0.85);margin-bottom:3px;letter-spacing:-0.01em;">Portfolio</div>
+              <div style="font-size:0.54rem;color:rgba(255,255,255,0.2);line-height:1.4;" id="val-portfolio-text">Verified &amp; shareable</div>
             </div>
 
-            <!-- Growth -->
-            <div onclick="showView('progress')" class="value-pill" style="background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.14);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;">
-              <div style="font-size:1.3rem;margin-bottom:6px;">📈</div>
-              <div style="font-size:0.65rem;font-weight:700;color:rgba(52,211,153,0.85);margin-bottom:3px;">Growth</div>
-              <div style="font-size:0.56rem;color:rgba(255,255,255,0.22);line-height:1.45;" id="val-growth-text">Track complexity</div>
+            <div onclick="showView('progress')" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;"
+              onmouseover="this.style.borderColor='rgba(52,211,153,0.35)'"
+              onmouseout="this.style.borderColor='rgba(52,211,153,0.15)'">
+              <div style="font-size:1.4rem;margin-bottom:6px;">🧠</div>
+              <div style="font-size:0.62rem;font-weight:700;color:rgba(52,211,153,0.85);margin-bottom:3px;letter-spacing:-0.01em;">AI Analysis</div>
+              <div style="font-size:0.54rem;color:rgba(255,255,255,0.2);line-height:1.4;" id="val-growth-text">Your clinical growth</div>
             </div>
 
           </div>
@@ -1967,28 +1998,28 @@ body::after {
 
         <!-- EMPTY STATE -->
         <div id="welcome-card" style="display:none;margin-bottom:16px;">
-          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:20px;margin-bottom:10px;">
-            <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:14px;font-weight:600;">What Provify does for you</div>
-            <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:22px;padding:22px;margin-bottom:10px;">
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:16px;font-weight:600;">Three reasons Provify is worth it</div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="width:32px;height:32px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🛡️</div>
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🛡️</div>
                 <div>
-                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:2px;">Medico-legal protection</div>
-                  <div style="font-size:0.66rem;color:rgba(255,255,255,0.3);line-height:1.5;">Every case is timestamped and tamper-proof. If a complaint comes, your record speaks for you.</div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.88);font-weight:600;margin-bottom:3px;">If a patient ever complains</div>
+                  <div style="font-size:0.65rem;color:rgba(255,255,255,0.28);line-height:1.55;">Every case you log is timestamped and tamper-proof. One tap generates a professional complaint response letter. Most dentists have nothing.</div>
                 </div>
               </div>
               <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="width:32px;height:32px;border-radius:10px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🏆</div>
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🏆</div>
                 <div>
-                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:2px;">Verified clinical portfolio</div>
-                  <div style="font-size:0.66rem;color:rgba(255,255,255,0.3);line-height:1.5;">A shareable link that proves your complexity growth to employers and universities.</div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.88);font-weight:600;margin-bottom:3px;">When you apply for anything</div>
+                  <div style="font-size:0.65rem;color:rgba(255,255,255,0.28);line-height:1.55;">Send a verified portfolio link showing your complexity growth over time. Employers and universities have never seen anything like it.</div>
                 </div>
               </div>
               <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="width:32px;height:32px;border-radius:10px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">📈</div>
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🧠</div>
                 <div>
-                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:2px;">Complexity growth tracking</div>
-                  <div style="font-size:0.66rem;color:rgba(255,255,255,0.3);line-height:1.5;">See if you're actually improving — or just staying comfortable. The data doesn't lie.</div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.88);font-weight:600;margin-bottom:3px;">After every single case</div>
+                  <div style="font-size:0.65rem;color:rgba(255,255,255,0.28);line-height:1.55;">AI tells you exactly what you did well, what to watch next time, and a clinical pearl specific to your case. A mentor in your pocket.</div>
                 </div>
               </div>
             </div>
@@ -4758,7 +4789,7 @@ async function openCaseDetail(id) {
   // Animate ring
   const ring = document.getElementById('modal-score-ring');
   if (ring && c.complexity_score) {
-    const r = 20, circumference = 2 * Math.PI * r;
+    const r = 18, circumference = 2 * Math.PI * r;
     const offset = circumference * (1 - c.complexity_score / 10);
     ring.style.transition = 'none';
     ring.setAttribute('stroke-dashoffset', circumference);
