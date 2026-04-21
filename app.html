@@ -1180,44 +1180,128 @@ body::after {
 </div>
 
 <!-- ─── FIRST CASE CELEBRATION ─── -->
-<div id="celebration-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.97);z-index:700;align-items:center;justify-content:center;padding:20px;" onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';">
-  <div style="background:linear-gradient(145deg,#0F0F12,#141418);border:1px solid rgba(124,111,255,0.3);border-radius:28px;width:100%;max-width:480px;padding:40px 36px;text-align:center;position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
-    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),rgba(52,211,153,0.5),transparent);"></div>
-    <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(52,211,153,0.08),transparent 70%);pointer-events:none;"></div>
+<div id="celebration-modal" style="display:none;position:fixed;inset:0;background:rgba(4,3,12,0.98);z-index:700;align-items:flex-end;justify-content:center;" onclick="closeCelebration()">
 
-    <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(52,211,153,0.1));border:1px solid rgba(124,111,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">🛡</div>
+  <style>
+    @keyframes celebIn{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shieldPop{0%{transform:scale(0.3);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+    @keyframes reportFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes countUp{from{opacity:0;transform:scale(0.6)}to{opacity:1;transform:scale(1)}}
+    @keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgba(52,211,153,0.2)}50%{box-shadow:0 0 40px rgba(52,211,153,0.4)}}
+    .cel-row{animation:reportFadeIn 0.4s ease both;}
+    .cel-row:nth-child(1){animation-delay:0.3s}
+    .cel-row:nth-child(2){animation-delay:0.45s}
+    .cel-row:nth-child(3){animation-delay:0.6s}
+    .cel-row:nth-child(4){animation-delay:0.75s}
+  </style>
 
-    <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:10px;line-height:1.2;">Your record exists.<br>Most dentists don't have one.</div>
-    <div style="font-size:0.875rem;color:rgba(255,255,255,0.45);line-height:1.8;margin-bottom:28px;">This case is now timestamped, verified, and protected. If anyone ever questions what you did today — this is your proof. Permanent. Immutable. Yours.</div>
+  <div style="background:linear-gradient(180deg,#0A0814 0%,#080612 100%);border:1px solid rgba(255,255,255,0.07);border-radius:28px 28px 0 0;width:100%;max-width:620px;max-height:96vh;overflow-y:auto;position:relative;padding-bottom:env(safe-area-inset-bottom,20px);animation:celebIn 0.5s cubic-bezier(0.34,1.28,0.64,1) both;" onclick="event.stopPropagation()">
 
-    <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:14px;padding:16px 18px;margin-bottom:24px;text-align:left;">
-      <div style="font-size:0.62rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px;">What you just built</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
-          <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
-          A timestamped case record — locked forever
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
-          <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
-          A verification link — shareable with anyone
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
-          <div style="width:6px;height:6px;background:#34D399;border-radius:50%;flex-shrink:0;"></div>
-          AI feedback from a senior specialist — instantly
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);">
-          <div style="width:6px;height:6px;background:#7C6FFF;border-radius:50%;flex-shrink:0;"></div>
-          The beginning of a career portfolio — that grows with every case
-        </div>
-      </div>
+    <!-- Top shimmer -->
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.6),rgba(124,111,255,0.4),transparent);"></div>
+
+    <!-- Drag handle -->
+    <div style="display:flex;justify-content:center;padding:12px 0 6px;">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.1);"></div>
     </div>
 
-    <button onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';showView('cases');" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;padding:14px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">
-      View My Record →
-    </button>
-    <button onclick="document.getElementById('celebration-modal').style.display='none';document.body.style.overflow='';" style="background:none;border:none;color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;cursor:pointer;padding:8px;">
-      Keep logging
-    </button>
+    <div style="padding:8px 22px 28px;">
+
+      <!-- PROTECTED STAMP -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;animation:celebIn 0.4s ease both;">
+        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(52,211,153,0.05));border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;animation:shieldPop 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;animation:glowPulse 2s ease-in-out infinite;">🛡️</div>
+        <div>
+          <div style="font-size:0.58rem;color:rgba(52,211,153,0.7);text-transform:uppercase;letter-spacing:0.16em;font-weight:700;margin-bottom:3px;">Case Protected</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.35rem;color:white;letter-spacing:-0.02em;line-height:1.15;" id="cel-case-title">Tooth — · Logged</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.28);margin-top:2px;">Timestamped · Verified · Permanent</div>
+        </div>
+      </div>
+
+      <!-- AI REPORT — THE HERO -->
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;overflow:hidden;margin-bottom:14px;">
+
+        <!-- Report header -->
+        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.15);display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🧠</div>
+            <div>
+              <div style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.85);">AI Case Intelligence</div>
+              <div style="font-size:0.58rem;color:rgba(124,111,255,0.55);">From a senior specialist perspective</div>
+            </div>
+          </div>
+          <!-- Complexity score -->
+          <div style="text-align:center;">
+            <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#7C6FFF;line-height:1;" id="cel-score">—</div>
+            <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;">/10</div>
+          </div>
+        </div>
+
+        <!-- Loading state -->
+        <div id="cel-report-loading" style="padding:20px 16px;display:flex;align-items:center;gap:10px;">
+          <div style="width:5px;height:5px;border-radius:50%;background:#7C6FFF;animation:micBreath 0.8s ease-in-out infinite;"></div>
+          <div style="width:5px;height:5px;border-radius:50%;background:#7C6FFF;animation:micBreath 0.8s ease-in-out 0.2s infinite;"></div>
+          <div style="width:5px;height:5px;border-radius:50%;background:#7C6FFF;animation:micBreath 0.8s ease-in-out 0.4s infinite;"></div>
+          <span style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-left:4px;" id="cel-loading-msg">Analysing your case...</span>
+        </div>
+
+        <!-- Report content (filled by JS) -->
+        <div id="cel-report-content" style="display:none;padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;">
+
+          <div class="cel-row" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:14px;padding:13px 14px;">
+            <div style="font-size:0.56rem;color:rgba(52,211,153,0.7);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;">✦ What You Did Well</div>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,0.75);line-height:1.65;" id="cel-strength">—</div>
+          </div>
+
+          <div class="cel-row" style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:14px;padding:13px 14px;">
+            <div style="font-size:0.56rem;color:rgba(245,158,11,0.7);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;">⚡ Watch Next Time</div>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,0.75);line-height:1.65;" id="cel-watch">—</div>
+          </div>
+
+          <div class="cel-row" style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:13px 14px;">
+            <div style="font-size:0.56rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;">💡 Clinical Pearl</div>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,0.75);line-height:1.65;" id="cel-tip">—</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CLINICAL NOTE READY -->
+      <div class="cel-row" id="cel-note-section" style="display:none;background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.14);border-radius:16px;padding:13px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">📋</div>
+        <div style="flex:1;">
+          <div style="font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.88);margin-bottom:1px;">Clinical note ready</div>
+          <div style="font-size:0.62rem;color:rgba(52,211,153,0.55);">Formatted · ready to paste into any system</div>
+        </div>
+        <button onclick="copyCelebrationNote()" style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:#34D399;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:700;padding:7px 14px;border-radius:10px;border:none;cursor:pointer;flex-shrink:0;white-space:nowrap;">Copy Note</button>
+      </div>
+
+      <!-- CASE STATS ROW -->
+      <div class="cel-row" id="cel-stats-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;">
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:12px 8px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;line-height:1;margin-bottom:2px;" id="cel-total">—</div>
+          <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;">Total Cases</div>
+        </div>
+        <div style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.14);border-radius:14px;padding:12px 8px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#9B91FF;line-height:1;margin-bottom:2px;margin-top:3px;" id="cel-rank">—</div>
+          <div style="font-size:0.44rem;color:rgba(124,111,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">Rank</div>
+        </div>
+        <div style="background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.12);border-radius:14px;padding:12px 8px;text-align:center;">
+          <div style="font-size:0.58rem;color:rgba(52,211,153,0.7);line-height:1.3;margin-top:4px;" id="cel-protected">Protected</div>
+          <div style="font-size:0.44rem;color:rgba(52,211,153,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Status</div>
+        </div>
+      </div>
+
+      <!-- CTA BUTTONS -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button onclick="closeCelebration();openCelebrationCase();" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;padding:15px;border-radius:16px;border:none;cursor:pointer;box-shadow:0 8px 28px rgba(124,111,255,0.35);letter-spacing:-0.01em;">
+          View Full Case & Shield →
+        </button>
+        <button onclick="closeCelebration();showView('dashboard');" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.85rem;padding:12px;border-radius:14px;cursor:pointer;border:none;width:100%;">
+          Back to Dashboard
+        </button>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -4127,12 +4211,10 @@ async function submitCase() {
   const isFirstCase = allCases.length === 1;
   resetForm();
 
-  if (isFirstCase) {
-    showFirstCaseCelebration();
-  } else {
-    showToast('Case logged! ✓ AI report + clinical note ready below.');
-  }
-}
+  // Show cinematic post-log experience for ALL cases
+  showCelebration(caseData, complexity, null);
+  // Navigate to log view to show AI report inline too
+  showView('cases');
 
 async function generateAIReport(caseData, complexity) {
   const reportEl = document.getElementById('ai-report');
@@ -4178,6 +4260,15 @@ async function generateAIReport(caseData, complexity) {
       </div>
       ${parsed.tip ? `<div class="insight-box insight-strength"><div class="insight-label">💡 Clinical Tip</div>${parsed.tip}</div>` : ''}
     `;
+
+    // Push AI data to celebration modal if it's open
+    if (window._celebrationResolve) {
+      window._celebrationResolve({ ...parsed, complexity });
+      window._celebrationResolve = null;
+    }
+    // Update complexity in celebration
+    const celScore = document.getElementById('cel-score');
+    if (celScore) celScore.textContent = complexity;
 
   } catch (e) {
     insightsEl.innerHTML = `
@@ -8547,10 +8638,120 @@ async function submitQuickLog() {
   showToast('✓ Case logged! Open it from My Cases to add full details.');
 }
 
-function showFirstCaseCelebration() {
-  document.getElementById('celebration-modal').style.display = 'flex';
+// ─── CELEBRATION / POST-LOG EXPERIENCE ───
+let _celebrationCaseId = null;
+
+function showCelebration(caseData, complexity, aiData) {
+  const specNames = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+  const spec = specNames[caseData.specialty] || caseData.specialty || '';
+  const tooth = caseData.tooth_number ? `Tooth ${caseData.tooth_number}` : 'Case';
+
+  // Populate header
+  const titleEl = document.getElementById('cel-case-title');
+  if (titleEl) titleEl.textContent = `${tooth} · ${spec}`;
+
+  // Complexity score
+  const scoreEl = document.getElementById('cel-score');
+  if (scoreEl) scoreEl.textContent = complexity || '—';
+
+  // Stats
+  const total = allCases.length;
+  const level = getLevel(total);
+  const totalEl = document.getElementById('cel-total');
+  const rankEl = document.getElementById('cel-rank');
+  const protEl = document.getElementById('cel-protected');
+  if (totalEl) totalEl.textContent = total;
+  if (rankEl) rankEl.textContent = level.name;
+  if (protEl) protEl.textContent = `${total} case${total !== 1 ? 's' : ''}`;
+
+  // Store case for "View Full Case" button
+  const latestCase = allCases[0];
+  _celebrationCaseId = latestCase?.id;
+
+  // Show modal immediately with loading state
+  const modal = document.getElementById('celebration-modal');
+  modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+
+  const loadingEl = document.getElementById('cel-report-loading');
+  const contentEl = document.getElementById('cel-report-content');
+  const noteSection = document.getElementById('cel-note-section');
+  if (loadingEl) loadingEl.style.display = 'flex';
+  if (contentEl) contentEl.style.display = 'none';
+  if (noteSection) noteSection.style.display = 'none';
+
+  // Cycle loading messages
+  const msgs = [
+    `Analysing tooth ${caseData.tooth_number}...`,
+    'Reading your clinical decisions...',
+    'Consulting specialist knowledge...',
+    'Preparing your report...'
+  ];
+  let msgIdx = 0;
+  const msgEl = document.getElementById('cel-loading-msg');
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % msgs.length;
+    if (msgEl) msgEl.textContent = msgs[msgIdx];
+  }, 1200);
+
+  // Once AI data arrives, populate
+  if (aiData) {
+    clearInterval(msgInterval);
+    populateCelebrationReport(aiData, noteSection, loadingEl, contentEl);
+  } else {
+    // Wait for AI data via event
+    window._celebrationResolve = (data) => {
+      clearInterval(msgInterval);
+      populateCelebrationReport(data, noteSection, loadingEl, contentEl);
+    };
+  }
 }
+
+function populateCelebrationReport(aiData, noteSection, loadingEl, contentEl) {
+  const strengthEl = document.getElementById('cel-strength');
+  const watchEl = document.getElementById('cel-watch');
+  const tipEl = document.getElementById('cel-tip');
+
+  if (strengthEl) strengthEl.textContent = aiData.strength || 'Good clinical execution on this case.';
+  if (watchEl) watchEl.textContent = aiData.watch || 'Continue refining your approach.';
+  if (tipEl) tipEl.textContent = aiData.tip || '';
+
+  if (loadingEl) loadingEl.style.display = 'none';
+  if (contentEl) { contentEl.style.display = 'flex'; contentEl.style.flexDirection = 'column'; }
+  if (noteSection) noteSection.style.display = 'flex';
+}
+
+function showFirstCaseCelebration() {
+  // Legacy - show modal without AI data (will load when generateAIReport resolves)
+  showCelebration({ tooth_number: '—', specialty: '' }, '—', null);
+}
+
+function closeCelebration() {
+  const modal = document.getElementById('celebration-modal');
+  if (modal) { modal.style.display = 'none'; }
+  document.body.style.overflow = '';
+}
+
+function openCelebrationCase() {
+  if (_celebrationCaseId) {
+    const c = allCases.find(x => x.id === _celebrationCaseId);
+    if (c) { showView('cases'); openCaseModal(c); }
+  } else {
+    showView('cases');
+  }
+}
+
+function copyCelebrationNote() {
+  const noteText = document.getElementById('clinical-note-text')?.textContent;
+  const autoNoteText = document.getElementById('auto-note-text')?.textContent;
+  const text = noteText || autoNoteText || '';
+  if (text) {
+    navigator.clipboard.writeText(text).then(() => showToast('✓ Clinical note copied'));
+  } else {
+    showToast('Note not ready yet — check the case in My Cases');
+  }
+}
+
 
 // ─── ONBOARDING ───
 let obSelectedRole = '';
