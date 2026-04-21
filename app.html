@@ -2370,12 +2370,12 @@ body::after {
                 </select>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Select Tooth</label>
+            <div class="form-group" id="tooth-selector-group">
+              <label class="form-label" id="tooth-selector-label">Select Tooth</label>
               <div id="chart-mode-badge" style="display:none;margin-bottom:8px;background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:8px;padding:6px 12px;font-size:0.72rem;color:var(--teal);display:inline-flex;align-items:center;gap:6px;">
                 🧒 Showing primary dentition (FDI 51–85)
               </div>
-              <div class="tooth-chart">
+              <div class="tooth-chart" id="tooth-chart-wrap">
                 <div class="arch-label">Upper Arch</div>
                 <div class="arch-container" id="upper-arch"></div>
                 <div class="arch-divider"></div>
@@ -2384,6 +2384,16 @@ body::after {
               </div>
               <div id="selected-tooth-display" style="margin-top:8px; font-size:0.85rem; color:var(--teal); display:none;">
                 Selected: <span id="selected-tooth-text"></span>
+              </div>
+              <!-- SMILE ARCH SELECTOR — shown only for smile specialty -->
+              <div id="smile-arch-selector" style="display:none;margin-top:4px;">
+                <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:10px;">Which teeth are being treated?</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <button type="button" onclick="setSmileArch('upper',this)" style="padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Upper Arch</button>
+                  <button type="button" onclick="setSmileArch('lower',this)" style="padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Lower Arch</button>
+                  <button type="button" onclick="setSmileArch('both',this)" class="smile-arch-active" style="padding:11px;border-radius:12px;border:1px solid rgba(251,191,36,0.35);background:rgba(251,191,36,0.1);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;">Full Mouth ✨</button>
+                  <button type="button" onclick="setSmileArch('anterior',this)" style="padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Anterior Only</button>
+                </div>
               </div>
               <input type="hidden" id="f-tooth">
             </div>
@@ -4214,17 +4224,31 @@ function selectSpecialty(spec, btn) {
   document.getElementById('prostho-fields').style.display     = spec === 'prostho'     ? 'block' : 'none';
   document.getElementById('smile-fields').style.display       = spec === 'smile'       ? 'block' : 'none';
 
-  // Update next button for smile
-  const nextBtn = document.getElementById('step1-next-btn');
-  if (nextBtn) {
-    nextBtn.textContent = spec === 'smile' ? 'Next — Before & After Photos →' : 'Next — Clinical Details →';
+  // For smile: show arch selector, hide single tooth chart
+  const toothChartWrap = document.getElementById('tooth-chart-wrap');
+  const smileArchSelector = document.getElementById('smile-arch-selector');
+  const toothLabel = document.getElementById('tooth-selector-label');
+  const selectedToothDisplay = document.getElementById('selected-tooth-display');
+  const chartBadge = document.getElementById('chart-mode-badge');
+
+  if (spec === 'smile') {
+    if (toothChartWrap) toothChartWrap.style.display = 'none';
+    if (chartBadge) chartBadge.style.display = 'none';
+    if (selectedToothDisplay) selectedToothDisplay.style.display = 'none';
+    if (smileArchSelector) smileArchSelector.style.display = 'block';
+    if (toothLabel) toothLabel.textContent = 'Teeth Treated';
+    document.getElementById('f-tooth').value = 'both';
+    document.getElementById('f-complaint').value = document.getElementById('f-complaint').value || 'Aesthetic improvement';
+  } else {
+    if (toothChartWrap) toothChartWrap.style.display = '';
+    if (smileArchSelector) smileArchSelector.style.display = 'none';
+    if (toothLabel) toothLabel.textContent = 'Select Tooth';
+    document.getElementById('f-tooth').value = '';
   }
 
-  // For smile: tooth is optional, hide the requirement indicator
-  const toothSection = document.getElementById('selected-tooth-display');
-  if (spec === 'smile') {
-    document.getElementById('f-tooth').value = document.getElementById('f-tooth').value || 'smile';
-  }
+  // Update next button label
+  const nextBtn = document.getElementById('step1-next-btn');
+  if (nextBtn) nextBtn.textContent = spec === 'smile' ? 'Next — Before & After Photos →' : 'Next — Clinical Details →';
   updateXraySection(spec);
 
   // Switch age field
@@ -4375,8 +4399,13 @@ async function submitCase() {
   const age = document.getElementById('f-age').value;
   const complaint = document.getElementById('f-complaint').value;
 
-  if (!tooth || !age || !complaint) {
+  // For smile cases, tooth is optional
+  if (selectedSpecialty !== 'smile' && (!tooth || !age || !complaint)) {
     showToast('Please select a tooth and fill in patient information first.');
+    return;
+  }
+  if (selectedSpecialty === 'smile' && !age) {
+    showToast('Please select patient age.');
     return;
   }
 
@@ -4407,7 +4436,9 @@ async function submitCase() {
   const caseData = {
     user_id: currentUser.id,
     specialty: selectedSpecialty,
-    tooth_number: tooth,
+    tooth_number: selectedSpecialty === 'smile'
+      ? (document.getElementById('f-smile-units')?.value || 'Full Smile')
+      : tooth,
     age_range: age,
     complaint,
     complexity_score: complexity,
@@ -7816,6 +7847,21 @@ function checkProStatus() {
 
 function showPaywall() {
   document.getElementById('paywall-modal').style.display = 'flex';
+}
+
+function setSmileArch(arch, btn) {
+  document.getElementById('f-smile-arch').value = arch;
+  document.getElementById('f-tooth').value = arch;
+  document.querySelectorAll('#smile-arch-selector button').forEach(b => {
+    b.style.background = 'rgba(255,255,255,0.02)';
+    b.style.borderColor = 'rgba(255,255,255,0.08)';
+    b.style.color = 'rgba(255,255,255,0.5)';
+    b.style.fontWeight = '400';
+  });
+  btn.style.background = 'rgba(251,191,36,0.1)';
+  btn.style.borderColor = 'rgba(251,191,36,0.35)';
+  btn.style.color = '#FBB424';
+  btn.style.fontWeight = '600';
 }
 
 // ─── LOG FORM STEPS ───
