@@ -2423,6 +2423,7 @@ body::after {
                   <button type="button" onclick="setSmileArch('anterior',this)" style="padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Anterior Only</button>
                 </div>
               </div>
+              <input type="hidden" id="f-smile-arch" value="both">
               <input type="hidden" id="f-tooth">
             </div>
           </div><!-- end patient info form-section -->
@@ -4525,15 +4526,20 @@ async function submitCase() {
     } : {}),
     ...(selectedSpecialty === 'smile' ? {
       procedure:         document.getElementById('f-smile-proc')?.value || 'Smile Case',
-      material:          document.getElementById('f-smile-material')?.value,
-      surfaces:          document.getElementById('f-smile-units')?.value,
-      cavity_class:      document.getElementById('f-smile-shade')?.value,
-      isolation:         document.getElementById('f-smile-prep')?.value,
-      case_type:         document.getElementById('f-smile-dsd')?.value,
-      obturation:        document.getElementById('f-smile-satisfaction')?.value,
-      calcification:     document.getElementById('f-smile-sessions')?.value,
-      narrative:         document.getElementById('f-smile-notes')?.value,
+      material:          document.getElementById('f-smile-material')?.value || null,
+      surfaces:          document.getElementById('f-smile-units')?.value || null,
+      cavity_class:      document.getElementById('f-smile-shade')?.value || null,
+      isolation:         document.getElementById('f-smile-prep')?.value || null,
+      case_type:         document.getElementById('f-smile-dsd')?.value || null,
+      obturation:        document.getElementById('f-smile-satisfaction')?.value || null,
+      calcification:     document.getElementById('f-smile-sessions')?.value || null,
+      narrative:         document.getElementById('f-smile-notes')?.value || null,
       has_before_after:  !!(window._smileBeforeFile && window._smileAfterFile),
+      anaesthesia:       null,
+      impaction:         null,
+      sutures:           null,
+      post_op:           null,
+      separated:         null,
     } : {}),
   };
 
