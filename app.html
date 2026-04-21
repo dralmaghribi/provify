@@ -2391,7 +2391,7 @@ body::after {
 
           <!-- Step 1 next button -->
           <div class="step-nav">
-            <button class="step-btn-next" onclick="goToLogStep(2)">Next — Clinical Details →</button>
+            <button class="step-btn-next" onclick="goToLogStep(2)" id="step1-next-btn">Next — Clinical Details →</button>
           </div>
 
           </div><!-- end log-step-1 -->
@@ -4213,6 +4213,18 @@ function selectSpecialty(spec, btn) {
   document.getElementById('paeds-fields').style.display       = spec === 'paeds'       ? 'block' : 'none';
   document.getElementById('prostho-fields').style.display     = spec === 'prostho'     ? 'block' : 'none';
   document.getElementById('smile-fields').style.display       = spec === 'smile'       ? 'block' : 'none';
+
+  // Update next button for smile
+  const nextBtn = document.getElementById('step1-next-btn');
+  if (nextBtn) {
+    nextBtn.textContent = spec === 'smile' ? 'Next — Before & After Photos →' : 'Next — Clinical Details →';
+  }
+
+  // For smile: tooth is optional, hide the requirement indicator
+  const toothSection = document.getElementById('selected-tooth-display');
+  if (spec === 'smile') {
+    document.getElementById('f-tooth').value = document.getElementById('f-tooth').value || 'smile';
+  }
   updateXraySection(spec);
 
   // Switch age field
@@ -7816,14 +7828,19 @@ function goToLogStep(step) {
     if (step === 2 && currentLogStep === 3) step = 1;
   }
 
-  // Validate step 1 before going to step 2
-  if (step === 2 && currentLogStep === 1) {
+  // Validate step 1 before going to step 2 (skip for smile)
+  if (step === 2 && currentLogStep === 1 && selectedSpecialty !== 'smile') {
     const tooth = document.getElementById('f-tooth')?.value;
     const age = document.getElementById('f-age')?.value || document.getElementById('f-age-text')?.value;
     const complaint = document.getElementById('f-complaint')?.value;
     if (!tooth) { showToast('Please select a tooth first.'); return; }
     if (!age) { showToast('Please select patient age.'); return; }
     if (!complaint) { showToast('Please select chief complaint.'); return; }
+  }
+  // For smile going to step 3 directly, just check age
+  if (step === 3 && currentLogStep === 1 && selectedSpecialty === 'smile') {
+    const age = document.getElementById('f-age')?.value || document.getElementById('f-age-text')?.value;
+    if (!age) { showToast('Please select patient age.'); return; }
   }
 
   currentLogStep = step;
