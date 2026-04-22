@@ -1809,32 +1809,6 @@ body::after {
     <div style="padding:20px 28px;">
 
       <!-- SMILE PHOTO UPLOAD — shown only for smile cases -->
-      <div id="vr-smile-photos" style="display:none;margin-bottom:16px;">
-        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.04));border:1px solid rgba(251,191,36,0.2);border-radius:18px;padding:16px;">
-          <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:4px;">✨ Add Before & After Photos</div>
-          <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-bottom:14px;line-height:1.5;">Upload your transformation photos to generate a shareable reveal card.</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-            <div>
-              <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;text-align:center;">Before</div>
-              <div onclick="document.getElementById('vr-before-input').click()" id="vr-before-zone" style="border:2px dashed rgba(255,255,255,0.12);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);">
-                <img id="vr-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
-                <div id="vr-before-ph"><div style="font-size:1.8rem;">📷</div><div style="font-size:0.62rem;color:rgba(255,255,255,0.2);margin-top:4px;">Tap to upload</div></div>
-              </div>
-              <input type="file" id="vr-before-input" accept="image/*" style="display:none" onchange="handleVRSmilePhoto('before',this)">
-            </div>
-            <div>
-              <div style="font-size:0.58rem;color:rgba(251,191,36,0.6);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px;text-align:center;">After ✨</div>
-              <div onclick="document.getElementById('vr-after-input').click()" id="vr-after-zone" style="border:2px dashed rgba(251,191,36,0.25);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(251,191,36,0.02);">
-                <img id="vr-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
-                <div id="vr-after-ph"><div style="font-size:1.8rem;">✨</div><div style="font-size:0.62rem;color:rgba(251,191,36,0.35);margin-top:4px;">The result</div></div>
-              </div>
-              <input type="file" id="vr-after-input" accept="image/*" style="display:none" onchange="handleVRSmilePhoto('after',this)">
-            </div>
-          </div>
-          <button id="vr-reveal-btn" onclick="openVRSmileReveal()" style="display:none;width:100%;background:linear-gradient(135deg,#FBB424,#F97316);color:#000;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;padding:13px;border-radius:14px;border:none;cursor:pointer;">✨ Generate Reveal Card</button>
-        </div>
-      </div>
-
       <div style="background:linear-gradient(135deg,rgba(239,68,68,0.06),rgba(124,111,255,0.04));border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="showView('cases');closeVoiceResults();">
         <div style="font-size:1.3rem;flex-shrink:0;">⚖️</div>
         <div style="flex:1;">
@@ -8091,9 +8065,7 @@ async function showVoiceResults(caseData, complexity, caseId) {
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
-  // Show smile photo section for smile cases
-  const smileSection = document.getElementById('vr-smile-photos');
-  if (smileSection) smileSection.style.display = caseData.specialty === 'smile' ? 'block' : 'none';
+  // Show smile photo section for smile cases — handled in photos screen now
 
   // Set title and score
   const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case ✨' }[caseData.specialty] || caseData.specialty;
@@ -8253,6 +8225,9 @@ function openVoiceLog() {
   // Reset smile photos
   window._smileBeforeFile = null; window._smileBeforeURL = null;
   window._smileAfterFile = null; window._smileAfterURL = null;
+  ['vl-smile-before','vl-smile-after','vl-smile-extra1','vl-smile-extra2','vl-smile-extra3'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   ['vl-smile-before-preview','vl-smile-after-preview','vl-extra1-preview','vl-extra2-preview','vl-extra3-preview'].forEach(id => {
     const el = document.getElementById(id); if (el) { el.src=''; el.style.display='none'; }
   });
@@ -11267,6 +11242,12 @@ function openSmileReveal(caseData) {
 function closeSmileReveal() {
   const modal = document.getElementById('smile-reveal-modal');
   if (modal) modal.style.display = 'none';
+  // Also close voice log if open
+  const vl = document.getElementById('voice-log-modal');
+  if (vl) vl.style.display = 'none';
+  // Also close celebration if open
+  const cel = document.getElementById('celebration-modal');
+  if (cel) cel.style.display = 'none';
   document.body.style.overflow = '';
 }
 
