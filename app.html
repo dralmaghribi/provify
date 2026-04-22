@@ -1600,64 +1600,96 @@ body::after {
       <!-- Smart photo guidance — injected dynamically -->
       <div id="vl-photo-guidance" style="margin-bottom:24px;"></div>
 
-      <!-- X-rays -->
-      <div style="margin-bottom:20px;">
-        <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">X-Rays</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-1')" id="vl-slot-xr-1">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">X-ray 1</div>
-            <img class="vl-slot-img" id="vl-img-xr-1" style="display:none;">
-            <input type="file" id="vl-xr-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-1','vl-slot-xr-1','vl-img-xr-1')">
+      <!-- SMILE BEFORE/AFTER — shown only for smile specialty -->
+      <div id="vl-smile-photo-section" style="display:none;">
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.04));border:1px solid rgba(251,191,36,0.18);border-radius:18px;padding:16px;margin-bottom:16px;">
+          <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:3px;">✨ Smile Case · Before & After</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);line-height:1.5;">Upload your transformation photos to generate a shareable reveal card.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;text-align:center;">Before</div>
+            <div onclick="document.getElementById('vl-smile-before').click()" id="vl-smile-before-zone" style="border:2px dashed rgba(255,255,255,0.12);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);">
+              <img id="vl-smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <div id="vl-smile-before-ph"><div style="font-size:2rem;">📷</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:4px;">Tap to upload</div></div>
+            </div>
+            <input type="file" id="vl-smile-before" accept="image/*" style="display:none" onchange="handleVLSmileBefore(this)">
           </div>
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-2')" id="vl-slot-xr-2">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">X-ray 2</div>
-            <img class="vl-slot-img" id="vl-img-xr-2" style="display:none;">
-            <input type="file" id="vl-xr-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-2','vl-slot-xr-2','vl-img-xr-2')">
+          <div>
+            <div style="font-size:0.58rem;color:rgba(251,191,36,0.6);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px;text-align:center;">After ✨</div>
+            <div onclick="document.getElementById('vl-smile-after').click()" id="vl-smile-after-zone" style="border:2px dashed rgba(251,191,36,0.25);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(251,191,36,0.02);">
+              <img id="vl-smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <div id="vl-smile-after-ph"><div style="font-size:2rem;">✨</div><div style="font-size:0.65rem;color:rgba(251,191,36,0.35);margin-top:4px;">The result</div></div>
+            </div>
+            <input type="file" id="vl-smile-after" accept="image/*" style="display:none" onchange="handleVLSmileAfter(this)">
           </div>
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-3')" id="vl-slot-xr-3">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">X-ray 3</div>
-            <img class="vl-slot-img" id="vl-img-xr-3" style="display:none;">
-            <input type="file" id="vl-xr-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-3','vl-slot-xr-3','vl-img-xr-3')">
-          </div>
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-4')" id="vl-slot-xr-4">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">X-ray 4</div>
-            <img class="vl-slot-img" id="vl-img-xr-4" style="display:none;">
-            <input type="file" id="vl-xr-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-4','vl-slot-xr-4','vl-img-xr-4')">
-          </div>
+        </div>
+        <div id="vl-smile-reveal-ready" style="display:none;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+          <span>🎉</span>
+          <div style="font-size:0.72rem;color:#FBB424;font-weight:600;">Reveal card ready — generated after saving</div>
         </div>
       </div>
 
-      <!-- Clinical Photos -->
-      <div style="margin-bottom:24px;">
-        <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">Clinical Photos</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-1')" id="vl-slot-cp-1">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">Photo 1</div>
-            <img class="vl-slot-img" id="vl-img-cp-1" style="display:none;">
-            <input type="file" id="vl-cp-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-1','vl-slot-cp-1','vl-img-cp-1')">
+      <!-- CLINICAL X-RAYS + PHOTOS — hidden for smile -->
+      <div id="vl-clinical-photo-section">
+        <!-- X-rays -->
+        <div style="margin-bottom:20px;">
+          <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">X-Rays</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-1')" id="vl-slot-xr-1">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">X-ray 1</div>
+              <img class="vl-slot-img" id="vl-img-xr-1" style="display:none;">
+              <input type="file" id="vl-xr-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-1','vl-slot-xr-1','vl-img-xr-1')">
+            </div>
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-2')" id="vl-slot-xr-2">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">X-ray 2</div>
+              <img class="vl-slot-img" id="vl-img-xr-2" style="display:none;">
+              <input type="file" id="vl-xr-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-2','vl-slot-xr-2','vl-img-xr-2')">
+            </div>
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-3')" id="vl-slot-xr-3">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">X-ray 3</div>
+              <img class="vl-slot-img" id="vl-img-xr-3" style="display:none;">
+              <input type="file" id="vl-xr-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-3','vl-slot-xr-3','vl-img-xr-3')">
+            </div>
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-4')" id="vl-slot-xr-4">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">X-ray 4</div>
+              <img class="vl-slot-img" id="vl-img-xr-4" style="display:none;">
+              <input type="file" id="vl-xr-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-4','vl-slot-xr-4','vl-img-xr-4')">
+            </div>
           </div>
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-2')" id="vl-slot-cp-2">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">Photo 2</div>
-            <img class="vl-slot-img" id="vl-img-cp-2" style="display:none;">
-            <input type="file" id="vl-cp-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-2','vl-slot-cp-2','vl-img-cp-2')">
-          </div>
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-3')" id="vl-slot-cp-3">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">Photo 3</div>
-            <img class="vl-slot-img" id="vl-img-cp-3" style="display:none;">
-            <input type="file" id="vl-cp-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-3','vl-slot-cp-3','vl-img-cp-3')">
-          </div>
-          <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-4')" id="vl-slot-cp-4">
-            <div class="vl-slot-icon">📷</div>
-            <div class="vl-slot-label">Photo 4</div>
-            <img class="vl-slot-img" id="vl-img-cp-4" style="display:none;">
-            <input type="file" id="vl-cp-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-4','vl-slot-cp-4','vl-img-cp-4')">
+        </div>
+        <!-- Clinical Photos -->
+        <div style="margin-bottom:24px;">
+          <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;">Clinical Photos</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-1')" id="vl-slot-cp-1">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">Photo 1</div>
+              <img class="vl-slot-img" id="vl-img-cp-1" style="display:none;">
+              <input type="file" id="vl-cp-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-1','vl-slot-cp-1','vl-img-cp-1')">
+            </div>
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-2')" id="vl-slot-cp-2">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">Photo 2</div>
+              <img class="vl-slot-img" id="vl-img-cp-2" style="display:none;">
+              <input type="file" id="vl-cp-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-2','vl-slot-cp-2','vl-img-cp-2')">
+            </div>
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-3')" id="vl-slot-cp-3">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">Photo 3</div>
+              <img class="vl-slot-img" id="vl-img-cp-3" style="display:none;">
+              <input type="file" id="vl-cp-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-3','vl-slot-cp-3','vl-img-cp-3')">
+            </div>
+            <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-4')" id="vl-slot-cp-4">
+              <div class="vl-slot-icon">📷</div>
+              <div class="vl-slot-label">Photo 4</div>
+              <img class="vl-slot-img" id="vl-img-cp-4" style="display:none;">
+              <input type="file" id="vl-cp-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-4','vl-slot-cp-4','vl-img-cp-4')">
+            </div>
           </div>
         </div>
       </div>
@@ -7881,6 +7913,28 @@ function showPaywall() {
   document.getElementById('paywall-modal').style.display = 'flex';
 }
 
+function handleVLSmileBefore(input) {
+  const file = input.files[0]; if (!file) return;
+  const url = URL.createObjectURL(file);
+  window._smileBeforeFile = file; window._smileBeforeURL = url;
+  const p = document.getElementById('vl-smile-before-preview');
+  const ph = document.getElementById('vl-smile-before-ph');
+  if (p) { p.src = url; p.style.display = 'block'; }
+  if (ph) ph.style.display = 'none';
+  if (window._smileAfterURL) { const r = document.getElementById('vl-smile-reveal-ready'); if (r) r.style.display = 'flex'; }
+}
+
+function handleVLSmileAfter(input) {
+  const file = input.files[0]; if (!file) return;
+  const url = URL.createObjectURL(file);
+  window._smileAfterFile = file; window._smileAfterURL = url;
+  const p = document.getElementById('vl-smile-after-preview');
+  const ph = document.getElementById('vl-smile-after-ph');
+  if (p) { p.src = url; p.style.display = 'block'; }
+  if (ph) ph.style.display = 'none';
+  if (window._smileBeforeURL) { const r = document.getElementById('vl-smile-reveal-ready'); if (r) r.style.display = 'flex'; }
+}
+
 function handleVRSmilePhoto(type, input) {
   const file = input.files[0];
   if (!file) return;
@@ -8006,7 +8060,15 @@ async function showVoiceResults(caseData, complexity, caseId) {
   // Set title and score
   const specLabel = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case ✨' }[caseData.specialty] || caseData.specialty;
   const titleEl = document.getElementById('vr-title');
-  if (titleEl) titleEl.textContent = `Tooth ${caseData.tooth_number} — ${specLabel}`;
+  if (titleEl) titleEl.textContent = caseData.specialty === 'smile' ? `Smile Case ✨ — Saved` : `Tooth ${caseData.tooth_number} — ${specLabel}`;
+
+  // Auto-trigger reveal modal for smile if photos uploaded
+  if (caseData.specialty === 'smile' && (window._smileBeforeURL || window._smileAfterURL)) {
+    setTimeout(() => {
+      closeVoiceResults();
+      openSmileReveal(caseData);
+    }, 2500);
+  }
 
   const scoreEl = document.getElementById('vr-score');
   const barEl = document.getElementById('vr-bar');
@@ -8168,6 +8230,16 @@ function showVLScreen(screen) {
     const el = document.getElementById(`vl-screen-${s}`);
     if (el) el.style.display = s === screen ? 'block' : 'none';
   });
+  // When showing photos screen, toggle smile vs clinical sections
+  if (screen === 'photos') {
+    const isSmile = vlSpecialty === 'smile';
+    const smileSection = document.getElementById('vl-smile-photo-section');
+    const clinicalSection = document.getElementById('vl-clinical-photo-section');
+    const guidance = document.getElementById('vl-photo-guidance');
+    if (smileSection) smileSection.style.display = isSmile ? 'block' : 'none';
+    if (clinicalSection) clinicalSection.style.display = isSmile ? 'none' : 'block';
+    if (guidance && isSmile) guidance.style.display = 'none';
+  }
 }
 
 function setVLSpecialty(spec, btn) {
