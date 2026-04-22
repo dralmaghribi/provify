@@ -1111,7 +1111,7 @@ body::after {
 </div>
 
 <!-- ✨ SMILE REVEAL MODAL -->
-<div id="smile-reveal-modal" style="display:none;position:fixed;inset:0;background:rgba(4,3,12,0.99);z-index:800;align-items:flex-end;justify-content:center;" onclick="if(event.target===this){closeSmileReveal();showView('cases');}">
+<div id="smile-reveal-modal" style="display:none;position:fixed;inset:0;background:rgba(4,3,12,0.99);z-index:800;align-items:flex-end;justify-content:center;" onclick="if(event.target===this){closeSmileReveal();openLatestSmileCase();}">
   <div style="background:linear-gradient(180deg,#0A0714 0%,#060510 100%);border:1px solid rgba(251,191,36,0.15);border-radius:28px 28px 0 0;width:100%;max-width:620px;max-height:96vh;overflow-y:auto;position:relative;">
 
     <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(251,191,36,0.8),rgba(251,146,60,0.4),transparent);"></div>
@@ -1129,7 +1129,7 @@ body::after {
           <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;letter-spacing:-0.02em;" id="smile-reveal-proc">Veneers</div>
           <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:2px;" id="smile-reveal-details"></div>
         </div>
-        <button onclick="closeSmileReveal();showView('cases');" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:1.2rem;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+        <button onclick="closeSmileReveal();openLatestSmileCase();" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:1.2rem;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
 
       <!-- BEFORE / AFTER REVEAL -->
@@ -11237,6 +11237,16 @@ function openSmileReveal(caseData) {
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+}
+
+function openLatestSmileCase() {
+  const latest = allCases.find(c => c.specialty === 'smile') || allCases[0];
+  if (latest) {
+    showView('cases');
+    setTimeout(() => openCaseModal(latest), 100);
+  } else {
+    showView('cases');
+  }
 }
 
 function closeSmileReveal() {
