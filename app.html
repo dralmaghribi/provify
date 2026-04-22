@@ -1111,7 +1111,7 @@ body::after {
 </div>
 
 <!-- ✨ SMILE REVEAL MODAL -->
-<div id="smile-reveal-modal" style="display:none;position:fixed;inset:0;background:rgba(4,3,12,0.99);z-index:800;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeSmileReveal()">
+<div id="smile-reveal-modal" style="display:none;position:fixed;inset:0;background:rgba(4,3,12,0.99);z-index:800;align-items:flex-end;justify-content:center;" onclick="if(event.target===this){closeSmileReveal();showView('cases');}">
   <div style="background:linear-gradient(180deg,#0A0714 0%,#060510 100%);border:1px solid rgba(251,191,36,0.15);border-radius:28px 28px 0 0;width:100%;max-width:620px;max-height:96vh;overflow-y:auto;position:relative;">
 
     <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(251,191,36,0.8),rgba(251,146,60,0.4),transparent);"></div>
@@ -1129,7 +1129,7 @@ body::after {
           <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;letter-spacing:-0.02em;" id="smile-reveal-proc">Veneers</div>
           <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:2px;" id="smile-reveal-details"></div>
         </div>
-        <button onclick="closeSmileReveal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:1.2rem;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+        <button onclick="closeSmileReveal();showView('cases');" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:1.2rem;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
 
       <!-- BEFORE / AFTER REVEAL -->
@@ -1602,13 +1602,15 @@ body::after {
 
       <!-- SMILE BEFORE/AFTER — shown only for smile specialty -->
       <div id="vl-smile-photo-section" style="display:none;">
-        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.04));border:1px solid rgba(251,191,36,0.18);border-radius:18px;padding:16px;margin-bottom:16px;">
-          <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:3px;">✨ Smile Case · Before & After</div>
-          <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);line-height:1.5;">Upload your transformation photos to generate a shareable reveal card.</div>
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.04));border:1px solid rgba(251,191,36,0.18);border-radius:18px;padding:14px 16px;margin-bottom:16px;">
+          <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:2px;">✨ Smile Case · Before & After</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Upload your transformation photos to generate a shareable reveal card.</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+
+        <!-- Main before/after -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
-            <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;text-align:center;">Before</div>
+            <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;text-align:center;">Before Smile</div>
             <div onclick="document.getElementById('vl-smile-before').click()" id="vl-smile-before-zone" style="border:2px dashed rgba(255,255,255,0.12);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);">
               <img id="vl-smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
               <div id="vl-smile-before-ph"><div style="font-size:2rem;">📷</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:4px;">Tap to upload</div></div>
@@ -1616,7 +1618,7 @@ body::after {
             <input type="file" id="vl-smile-before" accept="image/*" style="display:none" onchange="handleVLSmileBefore(this)">
           </div>
           <div>
-            <div style="font-size:0.58rem;color:rgba(251,191,36,0.6);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px;text-align:center;">After ✨</div>
+            <div style="font-size:0.62rem;color:rgba(251,191,36,0.65);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px;text-align:center;">After Smile ✨</div>
             <div onclick="document.getElementById('vl-smile-after').click()" id="vl-smile-after-zone" style="border:2px dashed rgba(251,191,36,0.25);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(251,191,36,0.02);">
               <img id="vl-smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
               <div id="vl-smile-after-ph"><div style="font-size:2rem;">✨</div><div style="font-size:0.65rem;color:rgba(251,191,36,0.35);margin-top:4px;">The result</div></div>
@@ -1624,7 +1626,34 @@ body::after {
             <input type="file" id="vl-smile-after" accept="image/*" style="display:none" onchange="handleVLSmileAfter(this)">
           </div>
         </div>
-        <div id="vl-smile-reveal-ready" style="display:none;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+
+        <!-- Add more photos -->
+        <div id="vl-smile-extras" style="display:none;margin-bottom:10px;">
+          <div style="font-size:0.58rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Additional angles</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+            <div onclick="document.getElementById('vl-smile-extra1').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
+              <img id="vl-extra1-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <div id="vl-extra1-ph"><div style="font-size:1.2rem;">🦷</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Side</div></div>
+              <input type="file" id="vl-smile-extra1" accept="image/*" style="display:none" onchange="handleVLSmileExtra(1,this)">
+            </div>
+            <div onclick="document.getElementById('vl-smile-extra2').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
+              <img id="vl-extra2-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <div id="vl-extra2-ph"><div style="font-size:1.2rem;">😊</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Full face</div></div>
+              <input type="file" id="vl-smile-extra2" accept="image/*" style="display:none" onchange="handleVLSmileExtra(2,this)">
+            </div>
+            <div onclick="document.getElementById('vl-smile-extra3').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
+              <img id="vl-extra3-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <div id="vl-extra3-ph"><div style="font-size:1.2rem;">🔬</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Detail</div></div>
+              <input type="file" id="vl-smile-extra3" accept="image/*" style="display:none" onchange="handleVLSmileExtra(3,this)">
+            </div>
+          </div>
+        </div>
+
+        <button onclick="document.getElementById('vl-smile-extras').style.display='block';this.style.display='none';" id="vl-add-more-btn" style="width:100%;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-family:'Inter',sans-serif;font-size:0.75rem;padding:10px;border-radius:12px;cursor:pointer;margin-bottom:10px;">
+          + Add more photos (side view, full face, detail)
+        </button>
+
+        <div id="vl-smile-reveal-ready" style="display:none;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
           <span>🎉</span>
           <div style="font-size:0.72rem;color:#FBB424;font-weight:600;">Reveal card ready — generated after saving</div>
         </div>
@@ -7935,6 +7964,15 @@ function handleVLSmileAfter(input) {
   if (window._smileBeforeURL) { const r = document.getElementById('vl-smile-reveal-ready'); if (r) r.style.display = 'flex'; }
 }
 
+function handleVLSmileExtra(n, input) {
+  const file = input.files[0]; if (!file) return;
+  const url = URL.createObjectURL(file);
+  const p = document.getElementById(`vl-extra${n}-preview`);
+  const ph = document.getElementById(`vl-extra${n}-ph`);
+  if (p) { p.src = url; p.style.display = 'block'; }
+  if (ph) ph.style.display = 'none';
+}
+
 function handleVRSmilePhoto(type, input) {
   const file = input.files[0];
   if (!file) return;
@@ -8212,9 +8250,23 @@ function openVoiceLog() {
   document.getElementById('voice-log-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
   showVLScreen('coach');
+  // Reset smile photos
+  window._smileBeforeFile = null; window._smileBeforeURL = null;
+  window._smileAfterFile = null; window._smileAfterURL = null;
+  ['vl-smile-before-preview','vl-smile-after-preview','vl-extra1-preview','vl-extra2-preview','vl-extra3-preview'].forEach(id => {
+    const el = document.getElementById(id); if (el) { el.src=''; el.style.display='none'; }
+  });
+  ['vl-smile-before-ph','vl-smile-after-ph','vl-extra1-ph','vl-extra2-ph','vl-extra3-ph'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display='';
+  });
+  const revReady = document.getElementById('vl-smile-reveal-ready');
+  if (revReady) revReady.style.display = 'none';
+  const extrasDiv = document.getElementById('vl-smile-extras');
+  if (extrasDiv) extrasDiv.style.display = 'none';
+  const addMoreBtn = document.getElementById('vl-add-more-btn');
+  if (addMoreBtn) addMoreBtn.style.display = '';
   // Default specialty to last used
   const lastSpec = selectedSpecialty || 'endo';
-  const btn = document.querySelector(`#vl-spec-row .vl-spec-btn`);
   setVLSpecialty(lastSpec, null);
 }
 
