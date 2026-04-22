@@ -8143,6 +8143,7 @@ const VL_EXAMPLES = {
   surgery: '"Tooth 48, surgical extraction, full bony impaction, inferior alveolar nerve block, flap raised, bone removed, resorbable sutures, no complications, age 22"',
   paeds: '"Upper right primary molar, tooth 55, pulpotomy and stainless steel crown, child age 6, moderate cooperation, tell-show-do technique, no sedation needed"',
   prostho: '"Tooth 26, zirconia crown, chamfer preparation, digital scan with intraoral scanner, temporary for two weeks, resin cement bonding, excellent aesthetic result, age 45"',
+  smile: '"Full mouth veneer case, 10 units upper arch, E.max lithium disilicate, BL2 shade, minimal prep, digital smile design used, patient extremely happy, 2 sessions, age 34"',
 };
 
 function openVoiceLog() {
@@ -8178,19 +8179,20 @@ function setVLSpecialty(spec, btn) {
     b.style.fontWeight = '400';
   });
   if (btn) {
-    btn.style.background = 'rgba(124,111,255,0.15)';
-    btn.style.borderColor = 'rgba(124,111,255,0.4)';
-    btn.style.color = 'var(--teal)';
+    const isSmile = spec === 'smile';
+    btn.style.background = isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(124,111,255,0.15)';
+    btn.style.borderColor = isSmile ? 'rgba(251,191,36,0.4)' : 'rgba(124,111,255,0.4)';
+    btn.style.color = isSmile ? '#FBB424' : 'var(--teal)';
     btn.style.fontWeight = '600';
   } else {
-    // Find and highlight the right button
     const buttons = document.querySelectorAll('.vl-spec-btn');
-    const specMap = ['endo','restorative','surgery','paeds','prostho'];
+    const specMap = ['endo','restorative','surgery','paeds','prostho','smile'];
     const idx = specMap.indexOf(spec);
     if (idx >= 0 && buttons[idx]) {
-      buttons[idx].style.background = 'rgba(124,111,255,0.15)';
-      buttons[idx].style.borderColor = 'rgba(124,111,255,0.4)';
-      buttons[idx].style.color = 'var(--teal)';
+      const isSmile = spec === 'smile';
+      buttons[idx].style.background = isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(124,111,255,0.15)';
+      buttons[idx].style.borderColor = isSmile ? 'rgba(251,191,36,0.4)' : 'rgba(124,111,255,0.4)';
+      buttons[idx].style.color = isSmile ? '#FBB424' : 'var(--teal)';
       buttons[idx].style.fontWeight = '600';
     }
   }
@@ -8412,7 +8414,7 @@ async function processVoiceTranscript(transcript) {
     if (el) el.textContent = processingMsgs[msgIdx];
   }, 1500);
 
-  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics' }[vlSpecialty] || vlSpecialty;
+  const specLabel = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', smile:'Aesthetic Dentistry / Smile Design' }[vlSpecialty] || vlSpecialty;
 
   const prompt = `You are a dental clinical record AI. A dentist just spoke the following description of a case they performed. Your job is to:
 1. Correct any speech recognition errors using dental terminology knowledge ("tooth two six" → "tooth 26", "candles" → "canals", "warm vertical" stays as "warm vertical", etc.)
@@ -8424,9 +8426,9 @@ Raw transcript: "${transcript}"
 Respond ONLY with a valid JSON object. No markdown. No explanation. Extract these fields:
 {
   "corrected_transcript": "the corrected version of what they said",
-  "tooth_number": "FDI tooth number as a number e.g. 36, or null",
+  "tooth_number": ${vlSpecialty === 'smile' ? 'null' : '"FDI tooth number as a number e.g. 36, or null"'},
   "age_range": "one of: 10-20, 20-30, 30-40, 40-50, 50+ — or null",
-  "complaint": "one of: Pain, Swelling, Sensitivity, Routine, Trauma, Other — or null",
+  "complaint": "${vlSpecialty === 'smile' ? 'Aesthetic improvement' : 'one of: Pain, Swelling, Sensitivity, Routine, Trauma, Other — or null'}",
   "specialty": "${vlSpecialty}",
   ${vlSpecialty === 'endo' ? `
   "pulp_diagnosis": "one of: Normal, Reversible Pulpitis, Irreversible Pulpitis, Pulp Necrosis, Previously Treated — or null",
@@ -8458,7 +8460,16 @@ Respond ONLY with a valid JSON object. No markdown. No explanation. Extract thes
   "material": "material e.g. Zirconia (monolithic), e.max (lithium disilicate), PFM, PMMA — or null",
   "cavity_class": "stage e.g. Fit & Cementation / Bonding, Impression / Digital scan, Complete — Single visit — or null",
   "surfaces": "units e.g. 1 unit, 2-3 units, Full arch — or null"` : ''}
-  "post_op": "post-op symptoms if mentioned — or null",
+  ${vlSpecialty === 'smile' ? `
+  "procedure": "one of: Veneers, Composite Bonding, Full Smile Makeover, Whitening, Ceramic Crowns, Gingival Contouring — or null",
+  "surfaces": "number of units e.g. 6, 10, 12+ — or null",
+  "cavity_class": "shade e.g. BL1, BL2, A1, A2, B1 — or null",
+  "material": "one of: E.max (Lithium Disilicate), Zirconia, Composite Resin, Feldspathic Porcelain, PMMA, Hybrid Ceramic — or null",
+  "isolation": "one of: No Prep / Ultra-thin, Minimal Prep, Conventional Prep, Full Coverage, Not Applicable — or null",
+  "case_type": "one of: Yes — DSD Protocol, Yes — Software assisted, No — Freehand design, Mock-up only — or null",
+  "obturation": "one of: Extremely happy — loved it, Happy — met expectations, Satisfied — minor adjustments — or null",
+  "calcification": "number of sessions as text e.g. 1 session, 2 sessions — or null"` : ''}
+  "post_op": ${vlSpecialty === 'smile' ? 'null' : '"post-op symptoms if mentioned — or null"'},
   "narrative": "a 1-2 sentence clinical summary in professional language based on what was said"
 }`;
 
