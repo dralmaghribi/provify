@@ -8834,9 +8834,14 @@ async function submitVoiceCase() {
   checkAndAnimateMolars(data[0]);
 
   // Upload voice log photos if any
-  if (Object.keys(vlPhotoFiles).length > 0) {
+  const allVLPhotos = { ...vlPhotoFiles };
+  // Add smile before/after if present
+  if (window._smileBeforeFile) allVLPhotos['smile-before'] = window._smileBeforeFile;
+  if (window._smileAfterFile) allVLPhotos['smile-after'] = window._smileAfterFile;
+
+  if (Object.keys(allVLPhotos).length > 0) {
     const photoUrls = {};
-    for (const [id, file] of Object.entries(vlPhotoFiles)) {
+    for (const [id, file] of Object.entries(allVLPhotos)) {
       try {
         const ext = file.name.split('.').pop();
         const path = `${currentUser.id}/${data[0].id}/${id}.${ext}`;
