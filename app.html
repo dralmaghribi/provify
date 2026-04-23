@@ -2094,44 +2094,57 @@ body::after {
 
         <!-- ── COMPANION CARD ── -->
         <div class="dash-section" style="margin-bottom:14px;">
-          <div id="voice-hero-btn" style="position:relative;border-radius:26px;overflow:hidden;box-shadow:0 12px 48px rgba(124,111,255,0.2);">
-            <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0D0B1E 0%,#080B16 100%);"></div>
-            <div style="position:absolute;top:-80px;right:-60px;width:320px;height:320px;background:radial-gradient(circle,rgba(124,111,255,0.2) 0%,transparent 65%);pointer-events:none;animation:heroOrb1 8s ease-in-out infinite;"></div>
-            <div style="position:absolute;bottom:-50px;left:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(52,211,153,0.08) 0%,transparent 65%);pointer-events:none;animation:heroOrb2 10s ease-in-out infinite;"></div>
-            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.7),rgba(52,211,153,0.3),transparent);"></div>
+          <div id="voice-hero-btn" style="position:relative;border-radius:26px;overflow:hidden;box-shadow:0 20px 60px rgba(124,111,255,0.25),0 0 0 1px rgba(124,111,255,0.12);">
+            <!-- Background -->
+            <div style="position:absolute;inset:0;background:linear-gradient(145deg,#0D0A20 0%,#080610 100%);"></div>
+            <!-- Orbs -->
+            <div style="position:absolute;top:-60px;right:-40px;width:280px;height:280px;background:radial-gradient(circle,rgba(124,111,255,0.25) 0%,transparent 65%);pointer-events:none;animation:heroOrb1 8s ease-in-out infinite;"></div>
+            <div style="position:absolute;bottom:-40px;left:-20px;width:200px;height:200px;background:radial-gradient(circle,rgba(52,211,153,0.1) 0%,transparent 65%);pointer-events:none;animation:heroOrb2 10s ease-in-out infinite;"></div>
+            <!-- Top shimmer line -->
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.9),rgba(52,211,153,0.4),transparent);"></div>
 
-            <div style="position:relative;z-index:1;padding:20px 20px 0;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-                <div style="display:flex;align-items:center;gap:7px;">
-                  <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 7px rgba(52,211,153,0.9);animation:micBreath 2.2s ease-in-out infinite;"></div>
-                  <span style="font-size:0.56rem;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:0.16em;font-weight:600;">Ready</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:5px;background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.16);padding:4px 10px;border-radius:100px;">
-                  <span id="dash-rank-icon" style="font-size:0.7rem;">⚡</span>
-                  <span id="dash-ring-label" style="font-size:0.58rem;font-weight:700;color:var(--teal);letter-spacing:0.04em;">—</span>
+            <!-- Header row -->
+            <div style="position:relative;z-index:1;padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:7px;height:7px;border-radius:50%;background:#34D399;box-shadow:0 0 10px rgba(52,211,153,1);animation:micBreath 2s ease-in-out infinite;"></div>
+                <span style="font-size:0.56rem;color:rgba(52,211,153,0.6);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;">Listening</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);padding:4px 12px;border-radius:100px;">
+                <span id="dash-rank-icon" style="font-size:0.7rem;">⚡</span>
+                <span id="dash-ring-label" style="font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.04em;">—</span>
+              </div>
+            </div>
+
+            <!-- MAIN CTA — the hero -->
+            <div onclick="openVoiceLog()" style="position:relative;z-index:1;margin:16px 16px 0;cursor:pointer;" id="voice-cta-area">
+
+              <!-- Mic orb — MASSIVE and central -->
+              <div style="display:flex;justify-content:center;margin-bottom:20px;position:relative;">
+                <!-- Outer pulse rings -->
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px;height:140px;border-radius:50%;border:1px solid rgba(124,111,255,0.2);animation:micPulseRing 2.4s ease-out infinite;"></div>
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:110px;height:110px;border-radius:50%;border:1px solid rgba(124,111,255,0.3);animation:micPulseRing 2.4s ease-out 0.6s infinite;"></div>
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:82px;height:82px;border-radius:50%;border:1px solid rgba(124,111,255,0.4);animation:micPulseRing 2.4s ease-out 1.2s infinite;"></div>
+
+                <!-- Core orb -->
+                <div style="position:relative;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7C6FFF,#5548C8);box-shadow:0 0 40px rgba(124,111,255,0.7),0 0 80px rgba(124,111,255,0.3),inset 0 1px 0 rgba(255,255,255,0.25);animation:micBreath 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;margin-top:36px;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="white" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
                 </div>
               </div>
 
-              <div style="margin-bottom:16px;">
-                <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1.2;margin-bottom:6px;" id="dash-hero-title">Good morning,<br>Doctor.</div>
-                <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);line-height:1.6;max-width:260px;" id="dash-hero-body">Finish a case? Just tell me. I'll write the note, lock the record, and protect you.</div>
-              </div>
-
-              <div onclick="openVoiceLog()" style="display:flex;align-items:center;gap:14px;background:rgba(124,111,255,0.11);border:1px solid rgba(124,111,255,0.24);border-radius:16px;padding:13px 16px;cursor:pointer;transition:all 0.18s;margin-bottom:18px;"
-                onmouseover="this.style.background='rgba(124,111,255,0.18)';this.style.borderColor='rgba(124,111,255,0.42)'"
-                onmouseout="this.style.background='rgba(124,111,255,0.11)';this.style.borderColor='rgba(124,111,255,0.24)'">
-                <div style="flex-shrink:0;position:relative;width:44px;height:44px;">
-                  <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(124,111,255,0.45);animation:micPulseRing 2.4s ease-out infinite;"></div>
-                  <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(124,111,255,0.25);animation:micPulseRing 2.4s ease-out 0.85s infinite;"></div>
-                  <div style="position:absolute;inset:5px;border-radius:50%;background:linear-gradient(135deg,#7C6FFF,#5548C8);box-shadow:0 0 22px rgba(124,111,255,0.65),inset 0 1px 0 rgba(255,255,255,0.18);animation:micBreath 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
-                  </div>
+              <!-- Text below orb -->
+              <div style="text-align:center;padding-bottom:20px;">
+                <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;letter-spacing:-0.03em;line-height:1.1;margin-bottom:8px;" id="dash-hero-title">Speak your case.</div>
+                <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-bottom:16px;" id="dash-hero-body">60 seconds · AI writes the note · case protected forever</div>
+                <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.35);padding:10px 24px;border-radius:100px;transition:all 0.2s;"
+                  onmouseover="this.style.background='rgba(124,111,255,0.25)';this.style.borderColor='rgba(124,111,255,0.55)'"
+                  onmouseout="this.style.background='rgba(124,111,255,0.15)';this.style.borderColor='rgba(124,111,255,0.35)'">
+                  <span style="font-size:0.82rem;color:rgba(255,255,255,0.9);font-weight:600;letter-spacing:-0.01em;">Start Speaking</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(124,111,255,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
-                <div style="flex:1;">
-                  <div style="font-size:0.9rem;color:rgba(255,255,255,0.92);font-weight:600;letter-spacing:-0.01em;margin-bottom:1px;">Speak your case</div>
-                  <div style="font-size:0.65rem;color:rgba(255,255,255,0.28);">60 seconds · AI does the rest</div>
-                </div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(124,111,255,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
             </div>
 
@@ -2160,28 +2173,44 @@ body::after {
         <div class="dash-section" style="margin-bottom:14px;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
 
-            <div onclick="navToShield()" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;"
-              onmouseover="this.style.borderColor='rgba(239,68,68,0.35)'"
-              onmouseout="this.style.borderColor='rgba(239,68,68,0.15)'">
-              <div style="font-size:1.4rem;margin-bottom:6px;">🛡️</div>
-              <div style="font-size:0.62rem;font-weight:700;color:rgba(239,68,68,0.85);margin-bottom:3px;letter-spacing:-0.01em;">Shield</div>
-              <div style="font-size:0.54rem;color:rgba(255,255,255,0.2);line-height:1.4;">Complaint letter<br>in 60 seconds</div>
+            <div onclick="navToShield()" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.14);border-radius:18px;padding:16px 10px 14px;text-align:center;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.borderColor='rgba(239,68,68,0.38)';this.style.background='rgba(239,68,68,0.1)'"
+              onmouseout="this.style.borderColor='rgba(239,68,68,0.14)';this.style.background='rgba(239,68,68,0.06)'">
+              <div style="width:38px;height:38px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(239,68,68,0.9)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/>
+                  <polyline points="9 12 11 14 15 10"/>
+                </svg>
+              </div>
+              <div style="font-size:0.65rem;font-weight:700;color:rgba(239,68,68,0.9);margin-bottom:3px;letter-spacing:-0.01em;">Shield</div>
+              <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);line-height:1.45;">Complaint letter<br>in 60 seconds</div>
             </div>
 
-            <div onclick="viewMyPortfolio()" style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;"
-              onmouseover="this.style.borderColor='rgba(124,111,255,0.35)'"
-              onmouseout="this.style.borderColor='rgba(124,111,255,0.15)'">
-              <div style="font-size:1.4rem;margin-bottom:6px;">🏆</div>
-              <div style="font-size:0.62rem;font-weight:700;color:rgba(124,111,255,0.85);margin-bottom:3px;letter-spacing:-0.01em;">Portfolio</div>
-              <div style="font-size:0.54rem;color:rgba(255,255,255,0.2);line-height:1.4;" id="val-portfolio-text">Verified &amp; shareable</div>
+            <div onclick="viewMyPortfolio()" style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.14);border-radius:18px;padding:16px 10px 14px;text-align:center;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.borderColor='rgba(124,111,255,0.38)';this.style.background='rgba(124,111,255,0.1)'"
+              onmouseout="this.style.borderColor='rgba(124,111,255,0.14)';this.style.background='rgba(124,111,255,0.06)'">
+              <div style="width:38px;height:38px;border-radius:12px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(155,145,255,0.9)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                  <line x1="6" y1="8" x2="10" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/>
+                </svg>
+              </div>
+              <div style="font-size:0.65rem;font-weight:700;color:rgba(155,145,255,0.9);margin-bottom:3px;letter-spacing:-0.01em;">Portfolio</div>
+              <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);line-height:1.45;" id="val-portfolio-text">Verified &amp; shareable</div>
             </div>
 
-            <div onclick="showView('progress')" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.18s;"
-              onmouseover="this.style.borderColor='rgba(52,211,153,0.35)'"
-              onmouseout="this.style.borderColor='rgba(52,211,153,0.15)'">
-              <div style="font-size:1.4rem;margin-bottom:6px;">🧠</div>
-              <div style="font-size:0.62rem;font-weight:700;color:rgba(52,211,153,0.85);margin-bottom:3px;letter-spacing:-0.01em;">AI Analysis</div>
-              <div style="font-size:0.54rem;color:rgba(255,255,255,0.2);line-height:1.4;" id="val-growth-text">Your clinical growth</div>
+            <div onclick="showView('progress')" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.14);border-radius:18px;padding:16px 10px 14px;text-align:center;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.borderColor='rgba(52,211,153,0.38)';this.style.background='rgba(52,211,153,0.1)'"
+              onmouseout="this.style.borderColor='rgba(52,211,153,0.14)';this.style.background='rgba(52,211,153,0.06)'">
+              <div style="width:38px;height:38px;border-radius:12px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,0.9)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </div>
+              <div style="font-size:0.65rem;font-weight:700;color:rgba(52,211,153,0.9);margin-bottom:3px;letter-spacing:-0.01em;">AI Analysis</div>
+              <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);line-height:1.45;" id="val-growth-text">Your clinical growth</div>
             </div>
 
           </div>
@@ -3548,7 +3577,6 @@ body::after {
             <button onclick="setCasesFilter('surgery',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Surgery</button>
             <button onclick="setCasesFilter('paeds',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Paeds</button>
             <button onclick="setCasesFilter('prostho',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Prostho</button>
-            <button onclick="setCasesFilter('smile',this)" class="cases-filter-btn" style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">✨ Smile</button>
           </div>
           <select id="cases-sort" onchange="filterCases()" style="background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.8rem;padding:8px 12px;border-radius:10px;outline:none;cursor:pointer;">
             <option value="newest">Newest First</option>
@@ -4032,23 +4060,6 @@ async function uploadAllPhotos(caseId) {
         urls[id] = publicUrl;
       }
     } catch(e) { console.log('Photo upload error:', e); }
-  }
-  // Upload smile before/after if present
-  const smileFiles = [
-    ['smile-before', window._smileBeforeFile],
-    ['smile-after', window._smileAfterFile],
-  ];
-  for (const [id, file] of smileFiles) {
-    if (!file) continue;
-    try {
-      const ext = file.name.split('.').pop();
-      const path = `${currentUser.id}/${caseId}/${id}.${ext}`;
-      const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
-      if (!error) {
-        const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
-        urls[id] = publicUrl;
-      }
-    } catch(e) { console.log('Smile photo upload error:', e); }
   }
   return urls;
 }
@@ -5128,54 +5139,54 @@ function getSmartCaseLabel(c) {
 
 function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const isSmile = c.specialty === 'smile';
-  const specColors = { endo: '#7C6FFF', restorative: '#F59E0B', surgery: '#EF4444', paeds: '#34D399', prostho: '#38BDF8', smile: '#FBB424' };
+  const specShort = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Oral Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
+  const specColors = { endo: '#7C6FFF', restorative: '#F59E0B', surgery: '#EF4444', paeds: '#34D399', prostho: '#38BDF8' };
   const color = specColors[c.specialty] || '#7C6FFF';
   const rank = getComplexityRank(c.complexity_score || 0);
   const nickname = getCaseNickname(c.id);
   const smartLabel = getSmartCaseLabel(c);
   const score = c.complexity_score || 0;
+  const circumference = 2 * Math.PI * 16;
+  const offset = circumference * (1 - score / 10);
+
+  // Get first photo if exists
   const photos = c.photo_urls ? Object.values(c.photo_urls).filter(Boolean) : [];
   const firstPhoto = photos[0] || null;
-  const smileBeforeURL = c.photo_urls?.['smile-before'] || null;
-  const smileAfterURL = c.photo_urls?.['smile-after'] || null;
+
+  // AI feedback strength if available
   let aiStrength = null;
-  try { const fb = c.ai_feedback ? JSON.parse(c.ai_feedback) : null; aiStrength = fb?.strength || null; } catch(e) {}
-  const caseTitle = isSmile ? (c.procedure || 'Smile Case') : (nickname || `Tooth ${c.tooth_number || '—'}`);
-  const smileUnits = c.surfaces ? `${c.surfaces} units` : '';
-  const smileHasBefore = isSmile && (smileBeforeURL || smileAfterURL);
+  try {
+    const fb = c.ai_feedback ? JSON.parse(c.ai_feedback) : null;
+    aiStrength = fb?.strength || null;
+  } catch(e) {}
 
   return `
     <div class="case-item" data-spec="${c.specialty}" id="case-row-${c.id}" style="
-      background:${isSmile ? 'linear-gradient(145deg,rgba(251,191,36,0.05),rgba(251,146,60,0.02))' : 'linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))'};
-      border:1px solid ${isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.08)'};
-      border-radius:20px;margin-bottom:10px;position:relative;overflow:hidden;
-      transition:all 0.25s cubic-bezier(0.4,0,0.2,1);cursor:pointer;"
+      background:linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015));
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px;margin-bottom:10px;
+      position:relative;overflow:hidden;
+      transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+      cursor:pointer;
+    "
     onmouseover="this.style.borderColor='${color}50';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px ${color}15'"
-    onmouseout="this.style.borderColor='${isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.08)'}';this.style.transform='none';this.style.boxShadow='none'"
+    onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.transform='none';this.style.boxShadow='none'"
     onclick="openCaseDetail('${c.id}')">
 
+      <!-- Top color line -->
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${color},${color}40,transparent);"></div>
 
-      ${smileHasBefore ? `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;overflow:hidden;height:110px;position:relative;margin-top:2px;">
-        <div style="background:#000;overflow:hidden;position:relative;">
-          ${smileBeforeURL ? `<img src="${smileBeforeURL}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">` : '<div style="height:100%;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">📷</div>'}
-          <div style="position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,0.7);border-radius:4px;padding:2px 6px;font-size:0.48rem;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
-        </div>
-        <div style="background:#000;overflow:hidden;position:relative;">
-          ${smileAfterURL ? `<img src="${smileAfterURL}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">` : '<div style="height:100%;background:rgba(251,191,36,0.03);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">✨</div>'}
-          <div style="position:absolute;bottom:5px;right:6px;background:rgba(251,191,36,0.9);border-radius:4px;padding:2px 6px;font-size:0.48rem;color:#000;font-weight:700;letter-spacing:0.08em;">AFTER ✨</div>
-        </div>
-      </div>` : ''}
-
-      <div style="padding:${smileHasBefore ? '10px' : '14px'} 16px 14px;">
+      <!-- Content -->
+      <div style="padding:14px 16px;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
 
-          ${!isSmile ? (firstPhoto ? `
+          ${firstPhoto ? `
+          <!-- Square thumbnail -->
           <div style="width:56px;height:56px;flex-shrink:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
             <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy"/>
-          </div>` : `
+          </div>
+          ` : `
+          <!-- Score ring — only shown when no photo -->
           <div style="position:relative;width:44px;height:44px;flex-shrink:0;">
             <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
               <circle cx="22" cy="22" r="16" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
@@ -5186,30 +5197,39 @@ function caseItemHTML(c, showDelete = false) {
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
               <span style="font-size:0.72rem;font-weight:700;color:${color};font-family:'Inter',sans-serif;">${score || '—'}</span>
             </div>
-          </div>`) : ''}
+          </div>
+          `}
 
+          <!-- Main info -->
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
               <div style="flex:1;min-width:0;">
-                <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${caseTitle}</div>
-                ${smartLabel && !isSmile ? `<div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${smartLabel}</div>` : ''}
-                ${isSmile && c.cavity_class ? `<div style="font-size:0.68rem;color:rgba(251,191,36,0.5);margin-bottom:4px;">Shade ${c.cavity_class}${c.material ? ' · ' + c.material.split(' ')[0] : ''}</div>` : ''}
+                <!-- Title -->
+                <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                  ${nickname ? `${nickname}` : `Tooth ${c.tooth_number || '—'}`}
+                </div>
+                <!-- Smart label -->
+                ${smartLabel ? `<div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${smartLabel}</div>` : ''}
+                <!-- Meta row -->
                 <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-                  <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${isSmile ? '✨ Smile' : c.specialty === 'restorative' ? 'Resto' : c.specialty === 'surgery' ? 'Surgery' : c.specialty === 'paeds' ? 'Paeds' : c.specialty === 'prostho' ? 'Prostho' : 'Endo'}</span>
-                  ${smileUnits ? `<span style="font-size:0.55rem;color:rgba(251,191,36,0.6);background:rgba(251,191,36,0.08);padding:2px 7px;border-radius:100px;">${smileUnits}</span>` : ''}
-                  ${!isSmile && firstPhoto ? `<span style="font-size:0.55rem;font-weight:700;color:${color};background:${color}15;padding:2px 7px;border-radius:100px;">${score}/10</span>` : ''}
+                  <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${c.specialty === 'restorative' ? 'Resto' : c.specialty === 'surgery' ? 'Surgery' : c.specialty === 'paeds' ? 'Paeds' : c.specialty === 'prostho' ? 'Prostho' : 'Endo'}</span>
+                  ${firstPhoto ? `<span style="font-size:0.55rem;font-weight:700;color:${color};background:${color}15;padding:2px 7px;border-radius:100px;">${score}/10</span>` : ''}
                   <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
-                  ${!isSmile ? `<span style="font-size:0.58rem;color:${rank.color};background:${rank.color}15;padding:2px 7px;border-radius:100px;font-weight:600;">${rank.label}</span>` : ''}
+                  <span style="font-size:0.58rem;color:${rank.color};background:${rank.color}15;padding:2px 7px;border-radius:100px;font-weight:600;">${rank.label}</span>
+                  ${photos.length > 1 ? `<span style="font-size:0.55rem;color:rgba(255,255,255,0.2);">+${photos.length-1} photos</span>` : ''}
                 </div>
                 ${aiStrength ? `<div style="margin-top:5px;font-size:0.65rem;color:rgba(52,211,153,0.55);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">✦ ${aiStrength}</div>` : ''}
               </div>
+
+              <!-- Right actions -->
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
-                ${!isSmile ? `<button onclick="event.stopPropagation();promptNickname('${c.id}')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);font-size:0.58rem;padding:3px 8px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.borderColor='${color}50';this.style.color='${color}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.25)'">${nickname ? '✏' : '+ Name'}</button>` : ''}
+                <button onclick="event.stopPropagation();promptNickname('${c.id}')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);font-size:0.58rem;padding:3px 8px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.borderColor='${color}50';this.style.color='${color}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.25)'">${nickname ? '✏' : '+ Name'}</button>
                 ${showDelete ? `<button onclick="event.stopPropagation();deleteCase('${c.id}')" style="background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:0.8rem;padding:2px;transition:color 0.2s;" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='rgba(255,255,255,0.15)'">✕</button>` : ''}
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -10923,31 +10943,44 @@ function renderMonthlyObjectives() {
   if (!el || allCases.length < 3) return;
 
   const { month, objectives } = getMonthlyObjectives();
-  const allDone = objectives.every(o => o.current >= o.target);
   const doneCount = objectives.filter(o => o.current >= o.target).length;
+  const allDone = doneCount === objectives.length;
 
   el.style.display = 'block';
   el.innerHTML = `
-    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:18px 20px;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">${month} Objectives</div>
-        ${allDone ? '<div style="font-size:0.62rem;color:#34D399;font-weight:600;">✓ All done</div>' : '<div style="font-size:0.62rem;color:rgba(255,255,255,0.2);">' + doneCount + '/' + objectives.length + ' complete</div>'}
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:18px 20px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:2px;">${month} Objectives</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">${doneCount} of ${objectives.length} complete</div>
+        </div>
+        ${allDone
+          ? `<div style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:100px;padding:4px 12px;font-size:0.62rem;color:#34D399;font-weight:700;letter-spacing:0.04em;">All done ✦</div>`
+          : `<div style="display:flex;gap:4px;">${objectives.map(o => `<div style="width:6px;height:6px;border-radius:50%;background:${o.current>=o.target ? o.color : 'rgba(255,255,255,0.08)'};${o.current>=o.target ? `box-shadow:0 0 6px ${o.color}80;` : ''}transition:all 0.3s;"></div>`).join('')}</div>`
+        }
       </div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        ${objectives.map(o => {
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${objectives.map((o, i) => {
           const pct = Math.min(Math.round(o.current/o.target*100), 100);
           const done = o.current >= o.target;
           return `
-            <div>
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <span style="font-size:0.8rem;">${o.icon}</span>
-                  <span style="font-size:0.72rem;color:${done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)'};${done ? 'text-decoration:line-through;' : ''}">${o.label}</span>
+            <div style="position:relative;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:${done ? o.color+'20' : 'rgba(255,255,255,0.04)'};border:1px solid ${done ? o.color+'40' : 'rgba(255,255,255,0.06)'};display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.3s;">${o.icon}</div>
+                  <span style="font-size:0.75rem;color:${done ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.7)'};font-weight:${done ? '400' : '500'};transition:all 0.3s;${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.15);' : ''}">${o.label}</span>
                 </div>
-                <span style="font-size:0.65rem;color:${done ? '#34D399' : o.color};font-weight:600;">${done ? '✓' : `${o.current}/${o.target}`}</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:0.65rem;color:${done ? '#34D399' : o.color};font-weight:600;min-width:32px;text-align:right;">${done ? '' : `${o.current}/${o.target}`}</span>
+                  ${done ? `
+                  <div style="width:18px;height:18px;border-radius:50%;background:${o.color};display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px ${o.color}60;">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2 6 5 9 10 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>` : ''}
+                </div>
               </div>
-              <div style="height:4px;background:rgba(255,255,255,0.04);border-radius:100px;overflow:hidden;">
-                <div style="height:100%;width:${pct}%;background:${done ? '#34D399' : o.color};border-radius:100px;transition:width 0.8s ease;${done ? '' : `box-shadow:0 0 8px ${o.color}40;`}"></div>
+              <!-- Progress track -->
+              <div style="height:3px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;">
+                <div style="height:100%;width:${pct}%;background:${done ? `linear-gradient(90deg,${o.color},${o.color}cc)` : o.color};border-radius:100px;transition:width 1s cubic-bezier(0.4,0,0.2,1);${done ? '' : `box-shadow:0 0 8px ${o.color}50;`}"></div>
               </div>
             </div>`;
         }).join('')}
