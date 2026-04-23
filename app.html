@@ -3548,6 +3548,7 @@ body::after {
             <button onclick="setCasesFilter('surgery',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Surgery</button>
             <button onclick="setCasesFilter('paeds',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Paeds</button>
             <button onclick="setCasesFilter('prostho',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Prostho</button>
+            <button onclick="setCasesFilter('smile',this)" class="cases-filter-btn" style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">✨ Smile</button>
           </div>
           <select id="cases-sort" onchange="filterCases()" style="background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.8rem;padding:8px 12px;border-radius:10px;outline:none;cursor:pointer;">
             <option value="newest">Newest First</option>
@@ -4031,6 +4032,23 @@ async function uploadAllPhotos(caseId) {
         urls[id] = publicUrl;
       }
     } catch(e) { console.log('Photo upload error:', e); }
+  }
+  // Upload smile before/after if present
+  const smileFiles = [
+    ['smile-before', window._smileBeforeFile],
+    ['smile-after', window._smileAfterFile],
+  ];
+  for (const [id, file] of smileFiles) {
+    if (!file) continue;
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `${currentUser.id}/${caseId}/${id}.${ext}`;
+      const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
+      if (!error) {
+        const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
+        urls[id] = publicUrl;
+      }
+    } catch(e) { console.log('Smile photo upload error:', e); }
   }
   return urls;
 }
@@ -5110,54 +5128,54 @@ function getSmartCaseLabel(c) {
 
 function caseItemHTML(c, showDelete = false) {
   const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const specShort = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Oral Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
-  const specColors = { endo: '#7C6FFF', restorative: '#F59E0B', surgery: '#EF4444', paeds: '#34D399', prostho: '#38BDF8' };
+  const isSmile = c.specialty === 'smile';
+  const specColors = { endo: '#7C6FFF', restorative: '#F59E0B', surgery: '#EF4444', paeds: '#34D399', prostho: '#38BDF8', smile: '#FBB424' };
   const color = specColors[c.specialty] || '#7C6FFF';
   const rank = getComplexityRank(c.complexity_score || 0);
   const nickname = getCaseNickname(c.id);
   const smartLabel = getSmartCaseLabel(c);
   const score = c.complexity_score || 0;
-  const circumference = 2 * Math.PI * 16;
-  const offset = circumference * (1 - score / 10);
-
-  // Get first photo if exists
   const photos = c.photo_urls ? Object.values(c.photo_urls).filter(Boolean) : [];
   const firstPhoto = photos[0] || null;
-
-  // AI feedback strength if available
+  const smileBeforeURL = c.photo_urls?.['smile-before'] || null;
+  const smileAfterURL = c.photo_urls?.['smile-after'] || null;
   let aiStrength = null;
-  try {
-    const fb = c.ai_feedback ? JSON.parse(c.ai_feedback) : null;
-    aiStrength = fb?.strength || null;
-  } catch(e) {}
+  try { const fb = c.ai_feedback ? JSON.parse(c.ai_feedback) : null; aiStrength = fb?.strength || null; } catch(e) {}
+  const caseTitle = isSmile ? (c.procedure || 'Smile Case') : (nickname || `Tooth ${c.tooth_number || '—'}`);
+  const smileUnits = c.surfaces ? `${c.surfaces} units` : '';
+  const smileHasBefore = isSmile && (smileBeforeURL || smileAfterURL);
 
   return `
     <div class="case-item" data-spec="${c.specialty}" id="case-row-${c.id}" style="
-      background:linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015));
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:20px;margin-bottom:10px;
-      position:relative;overflow:hidden;
-      transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
-      cursor:pointer;
-    "
+      background:${isSmile ? 'linear-gradient(145deg,rgba(251,191,36,0.05),rgba(251,146,60,0.02))' : 'linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))'};
+      border:1px solid ${isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.08)'};
+      border-radius:20px;margin-bottom:10px;position:relative;overflow:hidden;
+      transition:all 0.25s cubic-bezier(0.4,0,0.2,1);cursor:pointer;"
     onmouseover="this.style.borderColor='${color}50';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px ${color}15'"
-    onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.transform='none';this.style.boxShadow='none'"
+    onmouseout="this.style.borderColor='${isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.08)'}';this.style.transform='none';this.style.boxShadow='none'"
     onclick="openCaseDetail('${c.id}')">
 
-      <!-- Top color line -->
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${color},${color}40,transparent);"></div>
 
-      <!-- Content -->
-      <div style="padding:14px 16px;">
+      ${smileHasBefore ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;overflow:hidden;height:110px;position:relative;margin-top:2px;">
+        <div style="background:#000;overflow:hidden;position:relative;">
+          ${smileBeforeURL ? `<img src="${smileBeforeURL}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">` : '<div style="height:100%;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">📷</div>'}
+          <div style="position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,0.7);border-radius:4px;padding:2px 6px;font-size:0.48rem;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
+        </div>
+        <div style="background:#000;overflow:hidden;position:relative;">
+          ${smileAfterURL ? `<img src="${smileAfterURL}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">` : '<div style="height:100%;background:rgba(251,191,36,0.03);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">✨</div>'}
+          <div style="position:absolute;bottom:5px;right:6px;background:rgba(251,191,36,0.9);border-radius:4px;padding:2px 6px;font-size:0.48rem;color:#000;font-weight:700;letter-spacing:0.08em;">AFTER ✨</div>
+        </div>
+      </div>` : ''}
+
+      <div style="padding:${smileHasBefore ? '10px' : '14px'} 16px 14px;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
 
-          ${firstPhoto ? `
-          <!-- Square thumbnail -->
+          ${!isSmile ? (firstPhoto ? `
           <div style="width:56px;height:56px;flex-shrink:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
             <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy"/>
-          </div>
-          ` : `
-          <!-- Score ring — only shown when no photo -->
+          </div>` : `
           <div style="position:relative;width:44px;height:44px;flex-shrink:0;">
             <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
               <circle cx="22" cy="22" r="16" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
@@ -5168,39 +5186,30 @@ function caseItemHTML(c, showDelete = false) {
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
               <span style="font-size:0.72rem;font-weight:700;color:${color};font-family:'Inter',sans-serif;">${score || '—'}</span>
             </div>
-          </div>
-          `}
+          </div>`) : ''}
 
-          <!-- Main info -->
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
               <div style="flex:1;min-width:0;">
-                <!-- Title -->
-                <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                  ${nickname ? `${nickname}` : `Tooth ${c.tooth_number || '—'}`}
-                </div>
-                <!-- Smart label -->
-                ${smartLabel ? `<div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${smartLabel}</div>` : ''}
-                <!-- Meta row -->
+                <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${caseTitle}</div>
+                ${smartLabel && !isSmile ? `<div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${smartLabel}</div>` : ''}
+                ${isSmile && c.cavity_class ? `<div style="font-size:0.68rem;color:rgba(251,191,36,0.5);margin-bottom:4px;">Shade ${c.cavity_class}${c.material ? ' · ' + c.material.split(' ')[0] : ''}</div>` : ''}
                 <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-                  <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${c.specialty === 'restorative' ? 'Resto' : c.specialty === 'surgery' ? 'Surgery' : c.specialty === 'paeds' ? 'Paeds' : c.specialty === 'prostho' ? 'Prostho' : 'Endo'}</span>
-                  ${firstPhoto ? `<span style="font-size:0.55rem;font-weight:700;color:${color};background:${color}15;padding:2px 7px;border-radius:100px;">${score}/10</span>` : ''}
+                  <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${isSmile ? '✨ Smile' : c.specialty === 'restorative' ? 'Resto' : c.specialty === 'surgery' ? 'Surgery' : c.specialty === 'paeds' ? 'Paeds' : c.specialty === 'prostho' ? 'Prostho' : 'Endo'}</span>
+                  ${smileUnits ? `<span style="font-size:0.55rem;color:rgba(251,191,36,0.6);background:rgba(251,191,36,0.08);padding:2px 7px;border-radius:100px;">${smileUnits}</span>` : ''}
+                  ${!isSmile && firstPhoto ? `<span style="font-size:0.55rem;font-weight:700;color:${color};background:${color}15;padding:2px 7px;border-radius:100px;">${score}/10</span>` : ''}
                   <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
-                  <span style="font-size:0.58rem;color:${rank.color};background:${rank.color}15;padding:2px 7px;border-radius:100px;font-weight:600;">${rank.label}</span>
-                  ${photos.length > 1 ? `<span style="font-size:0.55rem;color:rgba(255,255,255,0.2);">+${photos.length-1} photos</span>` : ''}
+                  ${!isSmile ? `<span style="font-size:0.58rem;color:${rank.color};background:${rank.color}15;padding:2px 7px;border-radius:100px;font-weight:600;">${rank.label}</span>` : ''}
                 </div>
                 ${aiStrength ? `<div style="margin-top:5px;font-size:0.65rem;color:rgba(52,211,153,0.55);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">✦ ${aiStrength}</div>` : ''}
               </div>
-
-              <!-- Right actions -->
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
-                <button onclick="event.stopPropagation();promptNickname('${c.id}')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);font-size:0.58rem;padding:3px 8px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.borderColor='${color}50';this.style.color='${color}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.25)'">${nickname ? '✏' : '+ Name'}</button>
+                ${!isSmile ? `<button onclick="event.stopPropagation();promptNickname('${c.id}')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);font-size:0.58rem;padding:3px 8px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.borderColor='${color}50';this.style.color='${color}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.25)'">${nickname ? '✏' : '+ Name'}</button>` : ''}
                 ${showDelete ? `<button onclick="event.stopPropagation();deleteCase('${c.id}')" style="background:none;border:none;color:rgba(255,255,255,0.15);cursor:pointer;font-size:0.8rem;padding:2px;transition:color 0.2s;" onmouseover="this.style.color='#FF4444'" onmouseout="this.style.color='rgba(255,255,255,0.15)'">✕</button>` : ''}
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
