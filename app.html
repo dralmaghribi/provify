@@ -8881,32 +8881,51 @@ function toggleVLEdit() {
   const fieldsEl = document.getElementById('vl-extracted-fields');
 
   if (editMode.style.display === 'none') {
-    // Build edit fields
     const editFieldsEl = document.getElementById('vl-edit-fields');
-    const editableFields = [
-      { key: 'tooth_number', label: 'Tooth Number' },
-      { key: 'age_range', label: 'Age Range' },
-      { key: 'complaint', label: 'Chief Complaint' },
-      { key: 'pulp_diagnosis', label: 'Pulp Diagnosis' },
-      { key: 'periapical_diagnosis', label: 'Periapical Diagnosis' },
-      { key: 'case_type', label: 'Case Type' },
-      { key: 'canals', label: 'Number of Canals' },
-      { key: 'curvature', label: 'Curvature' },
-      { key: 'irrigation', label: 'Irrigation' },
-      { key: 'obturation', label: 'Obturation' },
-      { key: 'procedure', label: 'Procedure' },
-      { key: 'material', label: 'Material' },
-      { key: 'post_op', label: 'Post-op Symptoms' },
-    ].filter(f => vlExtractedData[f.key]);
+    const isSmile = vlSpecialty === 'smile';
 
-    editFieldsEl.innerHTML = editableFields.map(f => `
+    // For smile: show smile-specific fields. For others: show clinical fields.
+    const editableFields = isSmile ? [
+      { key: 'procedure', label: 'Procedure Type', placeholder: 'e.g. Veneers, Composite Bonding' },
+      { key: 'surfaces', label: 'Units / Teeth', placeholder: 'e.g. 6, 10, 12+' },
+      { key: 'cavity_class', label: 'Shade', placeholder: 'e.g. BL2, A1, A2' },
+      { key: 'material', label: 'Material', placeholder: 'e.g. E.max, Zirconia, Composite' },
+      { key: 'isolation', label: 'Prep Type', placeholder: 'e.g. No Prep, Minimal Prep' },
+      { key: 'age_range', label: 'Age Range', placeholder: 'e.g. 20-30, 30-40' },
+      { key: 'obturation', label: 'Patient Satisfaction', placeholder: 'e.g. Extremely happy' },
+      { key: 'narrative', label: 'Clinical Notes', placeholder: 'Any additional notes...' },
+    ] : [
+      { key: 'tooth_number', label: 'Tooth Number', placeholder: 'e.g. 36' },
+      { key: 'age_range', label: 'Age Range', placeholder: 'e.g. 20-30' },
+      { key: 'complaint', label: 'Chief Complaint', placeholder: 'e.g. Pain, Routine' },
+      { key: 'pulp_diagnosis', label: 'Pulp Diagnosis', placeholder: '' },
+      { key: 'periapical_diagnosis', label: 'Periapical Diagnosis', placeholder: '' },
+      { key: 'case_type', label: 'Case Type', placeholder: '' },
+      { key: 'canals', label: 'Number of Canals', placeholder: 'e.g. 3' },
+      { key: 'curvature', label: 'Curvature', placeholder: '' },
+      { key: 'irrigation', label: 'Irrigation', placeholder: '' },
+      { key: 'obturation', label: 'Obturation', placeholder: '' },
+      { key: 'procedure', label: 'Procedure', placeholder: '' },
+      { key: 'material', label: 'Material', placeholder: '' },
+      { key: 'post_op', label: 'Post-op Symptoms', placeholder: '' },
+    ].filter(f => vlExtractedData[f.key]); // only show populated fields for clinical
+
+    // For smile always show all fields; for clinical only show populated ones
+    const fieldsToShow = isSmile ? editableFields : editableFields;
+
+    editFieldsEl.innerHTML = fieldsToShow.map(f => `
       <div>
         <label style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">${f.label}</label>
         <input type="text" id="vl-edit-${f.key}" value="${vlExtractedData[f.key] || ''}"
-          style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--white);font-family:'Inter',sans-serif;font-size:0.82rem;padding:9px 12px;border-radius:8px;outline:none;transition:border-color 0.2s;"
+          placeholder="${f.placeholder || ''}"
+          style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--white);font-family:'Inter',sans-serif;font-size:0.82rem;padding:9px 12px;border-radius:8px;outline:none;transition:border-color 0.2s;box-sizing:border-box;"
           onfocus="this.style.borderColor='rgba(124,111,255,0.4)'"
           onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
       </div>`).join('');
+
+    if (fieldsToShow.length === 0) {
+      editFieldsEl.innerHTML = `<div style="font-size:0.78rem;color:rgba(255,255,255,0.3);text-align:center;padding:8px 0;">No fields were extracted. You can still log this case — it will save what you described.</div>`;
+    }
 
     editMode.style.display = 'block';
     if (fieldsEl) fieldsEl.style.display = 'none';
@@ -8917,7 +8936,11 @@ function toggleVLEdit() {
 }
 
 function applyVLEdits() {
-  const editableKeys = ['tooth_number','age_range','complaint','pulp_diagnosis','periapical_diagnosis','case_type','canals','curvature','irrigation','obturation','procedure','material','post_op'];
+  const editableKeys = [
+    'tooth_number','age_range','complaint','pulp_diagnosis','periapical_diagnosis',
+    'case_type','canals','curvature','irrigation','obturation','procedure','material',
+    'post_op','surfaces','cavity_class','isolation','narrative'
+  ];
   editableKeys.forEach(key => {
     const input = document.getElementById(`vl-edit-${key}`);
     if (input) vlExtractedData[key] = input.value.trim() || null;
