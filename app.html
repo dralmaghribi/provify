@@ -11319,7 +11319,7 @@ function openLatestSmileCase() {
   const latest = allCases.find(c => c.specialty === 'smile') || allCases[0];
   if (latest) {
     showView('cases');
-    setTimeout(() => openCaseModal(latest), 100);
+    setTimeout(() => openCaseDetail(latest.id), 150);
   } else {
     showView('cases');
   }
