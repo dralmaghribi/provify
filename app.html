@@ -945,18 +945,10 @@ body::after {
           <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:2px;" id="modal-date"></div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-          <!-- Complexity ring -->
-          <div style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.18);border-radius:14px;padding:8px 12px;text-align:center;">
-            <div style="position:relative;width:44px;height:44px;margin:0 auto;">
-              <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#7C6FFF" stroke-width="3" id="modal-score-ring" stroke-dasharray="113" stroke-dashoffset="113" stroke-linecap="round" style="transition:stroke-dashoffset 0.8s ease;"/>
-              </svg>
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:var(--teal);line-height:1;" id="modal-score">—</div>
-              </div>
-            </div>
-            <div style="font-size:0.42rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;">score</div>
+          <!-- Rank badge (replaces score ring) -->
+          <div id="modal-rank-badge" style="background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.18);border-radius:14px;padding:10px 14px;text-align:center;">
+            <div style="font-size:1.4rem;line-height:1;margin-bottom:4px;" id="modal-rank-icon">⚡</div>
+            <div style="font-size:0.6rem;font-weight:700;color:var(--teal);letter-spacing:0.04em;" id="modal-score">—</div>
           </div>
           <button onclick="closeCaseDetail()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:1.2rem;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">×</button>
         </div>
@@ -1305,7 +1297,7 @@ body::after {
           <!-- Complexity score -->
           <div style="text-align:center;">
             <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:#7C6FFF;line-height:1;" id="cel-score">—</div>
-            <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;">/10</div>
+            <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;">rank</div>
           </div>
         </div>
 
@@ -2131,8 +2123,7 @@ body::after {
 
               <!-- Text below orb -->
               <div style="text-align:center;padding-bottom:20px;">
-                <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;letter-spacing:-0.03em;line-height:1.1;margin-bottom:6px;" id="dash-hero-title">Speak your case.</div>
-                <div style="font-size:0.62rem;color:rgba(124,111,255,0.5);text-transform:uppercase;letter-spacing:0.18em;font-weight:600;margin-bottom:10px;">Every case. Protected. Forever.</div>
+                <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;letter-spacing:-0.03em;line-height:1.1;margin-bottom:8px;" id="dash-hero-title">Speak your case.</div>
                 <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-bottom:16px;" id="dash-hero-body">60 seconds · AI writes the note · case protected forever</div>
                 <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.35);padding:10px 24px;border-radius:100px;transition:all 0.2s;"
                   onmouseover="this.style.background='rgba(124,111,255,0.25)';this.style.borderColor='rgba(124,111,255,0.55)'"
@@ -4718,9 +4709,14 @@ async function generateAIReport(caseData, complexity) {
       window._celebrationResolve({ ...parsed, complexity });
       window._celebrationResolve = null;
     }
-    // Update complexity in celebration
+    // Update rank in celebration (no raw score)
     const celScore = document.getElementById('cel-score');
-    if (celScore) celScore.textContent = complexity;
+    if (celScore) {
+      const celRank = getComplexityRank(parseInt(complexity) || 0);
+      celScore.textContent = celRank.rank || '—';
+      celScore.style.color = celRank.color || '#7C6FFF';
+      celScore.style.fontSize = '1rem';
+    }
 
   } catch (e) {
     insightsEl.innerHTML = `
@@ -5217,14 +5213,9 @@ function caseItemHTML(c, showDelete = false) {
             <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy"/>
           </div>` : `
           <div style="position:relative;width:44px;height:44px;flex-shrink:0;">
-            <svg width="44" height="44" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
-              <circle cx="22" cy="22" r="16" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="3"/>
-              <circle cx="22" cy="22" r="16" fill="none" stroke="${color}" stroke-width="3"
-                stroke-dasharray="${2*Math.PI*16}" stroke-dashoffset="${2*Math.PI*16*(1-score/10)}"
-                stroke-linecap="round" style="filter:drop-shadow(0 0 4px ${color}60);"/>
-            </svg>
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-              <span style="font-size:0.72rem;font-weight:700;color:${color};font-family:'Inter',sans-serif;">${score || '—'}</span>
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+              <div style="font-size:1rem;margin-bottom:2px;">${rank.emoji || '⚡'}</div>
+              <div style="font-size:0.5rem;font-weight:700;color:${color};letter-spacing:0.04em;">${rank.rank}</div>
             </div>
           </div>`) : ''}
 
@@ -5240,7 +5231,7 @@ function caseItemHTML(c, showDelete = false) {
                 <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
                   <span style="font-size:0.55rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.1em;background:${color}15;padding:2px 7px;border-radius:100px;">${isSmile ? '✨ Smile' : c.specialty === 'restorative' ? 'Resto' : c.specialty === 'surgery' ? 'Surgery' : c.specialty === 'paeds' ? 'Paeds' : c.specialty === 'prostho' ? 'Prostho' : 'Endo'}</span>
                   ${smileUnits ? `<span style="font-size:0.55rem;color:rgba(251,191,36,0.6);background:rgba(251,191,36,0.08);padding:2px 7px;border-radius:100px;">${smileUnits}</span>` : ''}
-                  ${!isSmile && firstPhoto ? `<span style="font-size:0.55rem;font-weight:700;color:${color};background:${color}15;padding:2px 7px;border-radius:100px;">${score}/10</span>` : ''}
+                  
                   <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
                   ${!isSmile ? `<span style="font-size:0.58rem;color:${rank.color};background:${rank.color}15;padding:2px 7px;border-radius:100px;font-weight:600;">${rank.label}</span>` : ''}
                 </div>
@@ -5380,10 +5371,20 @@ async function openCaseDetail(id) {
   const modal = document.getElementById('case-detail-modal');
   document.getElementById('modal-title').textContent = `Tooth ${c.tooth_number} — ${specLabel}`;
   document.getElementById('modal-date').textContent = date;
-  document.getElementById('modal-score').textContent = c.complexity_score || '—';
+  // Show rank instead of raw score
+  const modalRank = getComplexityRank(c.complexity_score || 0);
+  const modalScoreEl = document.getElementById('modal-score');
+  const modalRankIcon = document.getElementById('modal-rank-icon');
+  if (modalScoreEl) modalScoreEl.textContent = modalRank.rank || '—';
+  if (modalRankIcon) modalRankIcon.textContent = modalRank.emoji || '⚡';
+  const modalBadge = document.getElementById('modal-rank-badge');
+  if (modalBadge) {
+    modalBadge.style.borderColor = (modalRank.color||'#7C6FFF') + '40';
+    modalBadge.style.background = (modalRank.color||'#7C6FFF') + '12';
+  }
   // Animate ring
-  const ring = document.getElementById('modal-score-ring');
-  if (ring && c.complexity_score) {
+  // Ring animation removed — showing rank instead
+  if (false && c.complexity_score) {
     const r = 18, circumference = 2 * Math.PI * r;
     const offset = circumference * (1 - c.complexity_score / 10);
     ring.style.transition = 'none';
@@ -5926,95 +5927,45 @@ async function loadBestWork() {
   if (top.length === 0) { card.style.display = 'none'; return; }
   card.style.display = 'block';
 
-  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
-  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
+  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' };
+  const photoTypes = {
+    endo:        ['xr-postop','xr-obturation','xr-preop','xr-mc','xr-wl','cp-postop','cp-preop'],
+    restorative: ['xr-gen-postop','xr-gen-preop','cp-postop','cp-preop','cp-intraoral'],
+    surgery:     ['xr-gen-postop','xr-gen-preop','cp-postop','cp-preop','cp-intraoral'],
+  };
 
-  // Rebuild the card header
-  card.querySelector('.card-title') && (card.querySelector('.card-title').style.display = 'none');
-
-  card.innerHTML = `
-    <div style="position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);padding:20px 22px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.4),transparent);"></div>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <div>
-          <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Best Work</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;">Your highest complexity cases</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;">
-          <span style="font-size:1rem;">🏆</span>
-          <span style="font-size:0.62rem;color:rgba(245,158,11,0.6);font-weight:600;">Top ${top.length}</span>
-        </div>
-      </div>
-
-      <div style="display:flex;flex-direction:column;gap:10px;" id="bw-items-new"></div>
-    </div>`;
-
-  const container = document.getElementById('bw-items-new');
-  if (!container) return;
-
-  // Render each case as a horizontal trophy card
-  top.forEach((c, idx) => {
+  // Render cards immediately with tooth-number placeholder
+  list.innerHTML = top.map(c => {
     const rank = getComplexityRank(c.complexity_score || 0);
     const spec = specLabels[c.specialty] || c.specialty;
-    const col = specColors[c.specialty] || '#7C6FFF';
-    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    const isSmile = c.specialty === 'smile';
-    const fdiLabel = !isSmile && c.tooth_number ? toothQuadrant(c.tooth_number) : null;
-    const title = isSmile ? (c.procedure || 'Smile Case') : (fdiLabel ? `${fdiLabel} · Tooth ${c.tooth_number}` : `Tooth ${c.tooth_number || '—'}`);
-    const medals = ['🥇','🥈','🥉'];
-
-    const item = document.createElement('div');
-    item.onclick = () => openCaseDetail(c.id);
-    item.style.cssText = `
-      display:flex;align-items:center;gap:14px;
-      background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);
-      border-radius:16px;padding:14px 16px;cursor:pointer;
-      transition:all 0.22s;position:relative;overflow:hidden;`;
-    item.onmouseover = () => { item.style.borderColor = col + '50'; item.style.background = 'rgba(255,255,255,0.04)'; };
-    item.onmouseout = () => { item.style.borderColor = 'rgba(255,255,255,0.07)'; item.style.background = 'rgba(255,255,255,0.025)'; };
-
-    item.innerHTML = `
-      <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:linear-gradient(180deg,${col},${col}50);border-radius:3px 0 0 3px;"></div>
-      <!-- Medal -->
-      <div style="font-size:1.4rem;flex-shrink:0;margin-left:4px;">${medals[idx]}</div>
-      <!-- Photo/placeholder -->
-      <div id="bw-new-photo-${c.id}" style="width:52px;height:52px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,${col}20,${col}08);border:1px solid ${col}25;display:flex;align-items:center;justify-content:center;">
-        <span style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:${col}40;">${c.tooth_number || '✨'}</span>
-      </div>
-      <!-- Info -->
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span style="font-size:0.58rem;font-weight:700;color:${col};background:${col}15;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.08em;">${isSmile ? '✨ Smile' : spec.split(' ')[0]}</span>
-          <span style="font-size:0.6rem;color:rgba(255,255,255,0.25);">${date}</span>
-          <span style="font-size:0.6rem;color:${rank.color};font-weight:600;">${rank.rank}</span>
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    return `
+      <div onclick="openCaseDetail('${c.id}')" id="bw-card-${c.id}" style="flex-shrink:0;width:200px;background:var(--navy-3);border:1px solid var(--white-faint);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal-mid)'" onmouseout="this.style.borderColor='var(--white-faint)'">
+        <div style="width:200px;height:130px;background:linear-gradient(135deg,var(--navy-2),rgba(124,111,255,0.08));position:relative;overflow:hidden;" id="bw-photo-${c.id}">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="font-family:'Instrument Serif',serif;font-size:3.5rem;color:rgba(124,111,255,0.12);line-height:1">${c.tooth_number}</div>
+          </div>
+          <div style="position:absolute;top:8px;right:8px;background:rgba(9,9,11,0.85);border:1px solid ${rank.border};border-radius:8px;padding:3px 8px;font-size:0.7rem;font-weight:700;color:${rank.color}">${c.complexity_score}/10</div>
         </div>
-      </div>
-      <!-- Score -->
-      <div style="text-align:center;flex-shrink:0;">
-        <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:${col};line-height:1;letter-spacing:-0.04em;">${c.complexity_score}</div>
-        <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;">/10</div>
+        <div style="padding:12px;">
+          <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">${spec}</div>
+          <div style="font-size:0.92rem;color:var(--white);font-weight:500;margin-bottom:3px">Tooth ${c.tooth_number}</div>
+          <div style="font-size:0.7rem;color:var(--gray)">${date} · <span style="color:${rank.color}">${rank.rank}</span></div>
+        </div>
       </div>`;
+  }).join('');
 
-    container.appendChild(item);
-
-    // Try to load photo async
-    if (c.photo_urls) {
-      const photoEntries = Object.entries(c.photo_urls).filter(([k,v]) => v && !k.includes('extra'));
-      if (photoEntries.length > 0) {
-        const [pid, url] = photoEntries[0];
-        const photoDiv = document.getElementById(`bw-new-photo-${c.id}`);
-        if (photoDiv && url) {
-          const img = new Image();
-          img.onload = () => {
-            photoDiv.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
-          };
-          img.src = url;
-        }
-      }
+  // Async photo injection — try each type until one loads
+  for (const c of top) {
+    const types = photoTypes[c.specialty] || photoTypes.surgery;
+    const base = `https://latbebqtayfvgzgebxam.supabase.co/storage/v1/object/public/case-images/${currentUser.id}/${c.id}`;
+    const container = document.getElementById(`bw-photo-${c.id}`);
+    if (!container) continue;
+    for (const type of types) {
+      const found = await tryLoadBestWorkPhoto(`${base}/${type}`, container);
+      if (found) break;
     }
-  });
+  }
 }
 
 function tryLoadBestWorkPhoto(baseUrl, container) {
@@ -8246,7 +8197,7 @@ async function showVoiceResults(caseData, complexity, caseId) {
   }
 
   if (barEl) setTimeout(() => { barEl.style.width = `${complexity * 10}%`; }, 200);
-  if (specLabelEl) specLabelEl.textContent = `Complexity ${complexity}/10 · ${specLabel}`;
+  if (specLabelEl) { const vRank = getComplexityRank(parseInt(complexity)||0); specLabelEl.textContent = `${vRank.rank} · ${specLabel}`; }
 
   // Personalised protection line
   const firstName = currentProfile?.first_name || 'Doctor';
@@ -11064,7 +11015,8 @@ function renderLastCaseStrip() {
   const spec = specNames[last.specialty] || last.specialty || 'General';
   const col = specColors[last.specialty] || '#7C6FFF';
   const tooth = last.tooth_number ? `Tooth ${last.tooth_number}` : 'Case';
-  const score = last.complexity_score ? `${last.complexity_score}/10` : '';
+  const rank = getComplexityRank(last.complexity_score || 0);
+  const score = last.complexity_score ? rank.rank : '';
   const daysAgo = last.created_at ? Math.floor((Date.now() - new Date(last.created_at)) / 86400000) : null;
   const when = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : daysAgo !== null ? `${daysAgo}d ago` : '';
 
@@ -11094,95 +11046,114 @@ function renderMonthlyObjectives() {
 
   el.style.display = 'block';
   el.innerHTML = `
-    <div style="position:relative;border-radius:22px;overflow:hidden;margin-bottom:16px;">
-      <!-- Background -->
-      <div style="position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));"></div>
-      <div style="position:absolute;inset:0;border:1px solid rgba(255,255,255,0.07);border-radius:22px;pointer-events:none;"></div>
-      ${allDone ? `<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.6),transparent);"></div>` : ''}
-
-      <div style="position:relative;padding:20px 22px;">
-        <!-- Header -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;">
-          <div>
-            <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">${month}</div>
-            <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;line-height:1.1;">
-              ${allDone ? 'All objectives complete.' : `${doneCount} of ${objectives.length} complete`}
-            </div>
-          </div>
-          ${allDone
-            ? `<div style="background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(52,211,153,0.05));border:1px solid rgba(52,211,153,0.3);border-radius:100px;padding:6px 14px;display:flex;align-items:center;gap:6px;">
-                <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.8);"></div>
-                <span style="font-size:0.62rem;color:#34D399;font-weight:700;letter-spacing:0.04em;">Done</span>
-               </div>`
-            : `<div style="display:flex;gap:5px;padding-top:4px;">
-                ${objectives.map(o => `<div style="width:28px;height:3px;border-radius:100px;background:${o.current>=o.target ? o.color : 'rgba(255,255,255,0.08)'};${o.current>=o.target ? `box-shadow:0 0 6px ${o.color}60;` : ''}transition:all 0.4s;"></div>`).join('')}
-               </div>`
-          }
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:18px 20px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:2px;">${month} Objectives</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">${doneCount} of ${objectives.length} complete</div>
         </div>
-
-        <!-- Objectives -->
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          ${objectives.map((o, i) => {
-            const pct = Math.min(Math.round(o.current/o.target*100), 100);
-            const done = o.current >= o.target;
-            const remaining = o.target - o.current;
-            return `
-              <div style="position:relative;">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                  <!-- Icon tile -->
-                  <div style="width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.9rem;
-                    background:${done ? `linear-gradient(135deg,${o.color}25,${o.color}10)` : 'rgba(255,255,255,0.04)'};
-                    border:1px solid ${done ? o.color+'40' : 'rgba(255,255,255,0.07)'};
-                    transition:all 0.4s;
-                    ${done ? `box-shadow:0 0 12px ${o.color}20;` : ''}">${o.icon}</div>
-
-                  <!-- Label + counter -->
-                  <div style="flex:1;min-width:0;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                      <span style="font-size:0.78rem;font-weight:500;
-                        color:${done ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.75)'};
-                        ${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.12);' : ''}
-                        transition:all 0.3s;">${o.label}</span>
-                      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                        ${done
-                          ? `<div style="width:20px;height:20px;border-radius:50%;background:${o.color};display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px ${o.color}50;">
-                              <svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                             </div>`
-                          : `<span style="font-size:0.7rem;font-weight:700;color:${o.color};font-variant-numeric:tabular-nums;">${o.current}<span style="color:rgba(255,255,255,0.2);font-weight:400;">/${o.target}</span></span>`
-                        }
-                      </div>
-                    </div>
-                  </div>
+        ${allDone
+          ? `<div style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:100px;padding:4px 12px;font-size:0.62rem;color:#34D399;font-weight:700;letter-spacing:0.04em;">All done ✦</div>`
+          : `<div style="display:flex;gap:4px;">${objectives.map(o => `<div style="width:6px;height:6px;border-radius:50%;background:${o.current>=o.target ? o.color : 'rgba(255,255,255,0.08)'};${o.current>=o.target ? `box-shadow:0 0 6px ${o.color}80;` : ''}transition:all 0.3s;"></div>`).join('')}</div>`
+        }
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${objectives.map((o, i) => {
+          const pct = Math.min(Math.round(o.current/o.target*100), 100);
+          const done = o.current >= o.target;
+          return `
+            <div style="position:relative;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:${done ? o.color+'20' : 'rgba(255,255,255,0.04)'};border:1px solid ${done ? o.color+'40' : 'rgba(255,255,255,0.06)'};display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.3s;">${o.icon}</div>
+                  <span style="font-size:0.75rem;color:${done ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.7)'};font-weight:${done ? '400' : '500'};transition:all 0.3s;${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.15);' : ''}">${o.label}</span>
                 </div>
-
-                <!-- Progress track -->
-                <div style="margin-left:44px;height:2px;background:rgba(255,255,255,0.04);border-radius:100px;overflow:hidden;">
-                  <div style="height:100%;width:${pct}%;
-                    background:${done
-                      ? `linear-gradient(90deg,${o.color},${o.color}cc)`
-                      : `linear-gradient(90deg,${o.color}80,${o.color})`};
-                    border-radius:100px;
-                    transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
-                    ${!done && pct > 0 ? `box-shadow:0 0 6px ${o.color}60;` : ''}"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:0.65rem;color:${done ? '#34D399' : o.color};font-weight:600;min-width:32px;text-align:right;">${done ? '' : `${o.current}/${o.target}`}</span>
+                  ${done ? `
+                  <div style="width:18px;height:18px;border-radius:50%;background:${o.color};display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px ${o.color}60;">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2 6 5 9 10 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>` : ''}
                 </div>
-              </div>`;
-          }).join('')}
-        </div>
+              </div>
+              <!-- Progress track -->
+              <div style="height:3px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;">
+                <div style="height:100%;width:${pct}%;background:${done ? `linear-gradient(90deg,${o.color},${o.color}cc)` : o.color};border-radius:100px;transition:width 1s cubic-bezier(0.4,0,0.2,1);${done ? '' : `box-shadow:0 0 8px ${o.color}50;`}"></div>
+              </div>
+            </div>`;
+        }).join('')}
       </div>
     </div>`;
 }
 
+// ─── INACTIVITY TRACKER ───
+function renderInactivityAlert() {
+  const el = document.getElementById('inactivity-alert');
+  if (!el || allCases.length === 0) return;
 
+  const lastCase = allCases[0]; // already sorted newest first
+  if (!lastCase?.created_at) return;
+
+  const daysSince = Math.floor((new Date() - new Date(lastCase.created_at)) / (1000*60*60*24));
+
+  if (daysSince < 5) { el.style.display = 'none'; return; }
+
+  el.style.display = 'block';
+
+  const score = getClinicianScore();
+  const msg = daysSince >= 14
+    ? `You haven't logged in ${daysSince} days. Your clinical record is stagnating.`
+    : `${daysSince} days since your last case. Keep your record alive.`;
+
+  el.innerHTML = `
+    <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openVoiceLog()">
+      <div style="font-size:1.2rem;flex-shrink:0;">${daysSince >= 14 ? '⚠️' : '🔔'}</div>
+      <div style="flex:1;">
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:2px;">${msg}</div>
+        <div style="font-size:0.62rem;color:rgba(239,68,68,0.5);">Tap to log a case now →</div>
+      </div>
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.2);text-align:right;">Score<br><span style="font-size:1rem;color:rgba(239,68,68,0.6);font-weight:700;">${score}</span></div>
+    </div>`;
+}
+
+// ─── PORTFOLIO TEASER CARD ───
+function renderPortfolioTeaserCard() {
+  const el = document.getElementById('portfolio-teaser-card');
+  if (!el || allCases.length < 1) { if (el) el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const total = allCases.length;
+  const avgComplexity = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '0.0';
+  const username = currentProfile?.username || '';
+  el.innerHTML = `
+    <div onclick="viewMyPortfolio()" style="cursor:pointer;background:linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.25);border-radius:18px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:all 0.2s;position:relative;overflow:hidden;"
+      onmouseover="this.style.borderColor='rgba(124,111,255,0.45)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.06))'"
+      onmouseout="this.style.borderColor='rgba(124,111,255,0.25)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.03))'">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.5),transparent);"></div>
+      <div style="width:44px;height:44px;border-radius:14px;background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏆</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.7rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:3px;">Your Verified Portfolio</div>
+        <div style="font-size:0.88rem;color:rgba(255,255,255,0.9);font-weight:500;margin-bottom:2px;">${total} cases · ${avgComplexity} avg complexity</div>
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Tamper-proof. Shareable. Growing with every case.</div>
+      </div>
+      <div style="font-size:0.8rem;color:rgba(124,111,255,0.6);flex-shrink:0;">View →</div>
+    </div>`;
+}
+
+// ─── SKILL PROGRESS GRAPH ───
 function renderSkillProgressGraph() {
   const el = document.getElementById('skill-progress-card');
   if (!el || allCases.length < 3) { if (el) el.style.display = 'none'; return; }
   el.style.display = 'block';
 
+  // Sort cases oldest to newest
   const sorted = [...allCases].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+
+  // Get last 20 cases max
   const cases = sorted.slice(-20);
   const scores = cases.map(c => c.complexity_score || 0);
   const total = cases.length;
 
+  // Calculate trend
   const firstHalf = scores.slice(0, Math.floor(total/2));
   const secondHalf = scores.slice(Math.floor(total/2));
   const avgFirst = firstHalf.reduce((a,b) => a+b, 0) / firstHalf.length;
@@ -11190,82 +11161,132 @@ function renderSkillProgressGraph() {
   const trend = avgSecond - avgFirst;
   const isImproving = trend > 0.3;
   const isPlateauing = Math.abs(trend) <= 0.3;
+  const isDeclining = trend < -0.3;
+
+  // Trend message
+  const trendMsg = isImproving
+    ? `Your complexity is rising. Not guessing — proven.`
+    : isPlateauing
+    ? `You've been consistent. Push for harder cases to grow.`
+    : `Your recent cases are simpler. Seek more complexity.`;
 
   const trendColor = isImproving ? '#34D399' : isPlateauing ? '#F59E0B' : '#EF4444';
-  const improvement = avgSecond - avgFirst;
-  const improvSign = improvement >= 0 ? '+' : '';
+  const trendIcon = isImproving ? '📈' : isPlateauing ? '➡️' : '📉';
 
-  const W = 600, H = 120, PAD = 20;
+  // Graph dimensions
+  const W = 320, H = 80, PAD = 8;
+  const maxScore = 10;
+  const minScore = 0;
   const xStep = (W - PAD*2) / Math.max(total - 1, 1);
+
+  // Generate SVG path
   const points = scores.map((s, i) => ({
     x: PAD + i * xStep,
-    y: H - PAD - (s / 10) * (H - PAD*2)
+    y: H - PAD - ((s - minScore) / (maxScore - minScore)) * (H - PAD*2)
   }));
 
+  // Smooth path using quadratic bezier
   let path = `M ${points[0].x} ${points[0].y}`;
   for (let i = 1; i < points.length; i++) {
-    const prev = points[i-1], curr = points[i];
+    const prev = points[i-1];
+    const curr = points[i];
     const mx = (prev.x + curr.x) / 2;
     path += ` Q ${mx} ${prev.y} ${curr.x} ${curr.y}`;
   }
+
+  // Fill path
   const fillPath = path + ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z`;
 
-  const uid = Math.random().toString(36).slice(2,6);
+  // Specialty breakdown for last 10 cases
+  const recent10 = sorted.slice(-10);
+  const specCounts = {};
+  recent10.forEach(c => { specCounts[c.specialty] = (specCounts[c.specialty]||0) + 1; });
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#60A5FA' };
+  const specLabels = { endo:'Endo', restorative:'Resto', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho' };
+
+  // AI praise aggregation from case notes
+  const allStrengths = allCases
+    .filter(c => c.ai_feedback)
+    .map(c => { try { return JSON.parse(c.ai_feedback)?.strength; } catch(e) { return null; } })
+    .filter(Boolean)
+    .slice(-5);
+
+  // Current avg vs early avg
+  const currentAvg = avgSecond.toFixed(1);
+  const earlyAvg = avgFirst.toFixed(1);
+  const improvement = (avgSecond - avgFirst).toFixed(1);
+
   el.innerHTML = `
-    <div style="position:relative;border-radius:22px;overflow:hidden;margin-bottom:16px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);">
-      <div style="position:absolute;bottom:-20px;right:30px;width:160px;height:80px;background:radial-gradient(circle,${trendColor}18 0%,transparent 70%);pointer-events:none;"></div>
-      <div style="padding:20px 22px 0;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;">
-          <div>
-            <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Complexity Growth</div>
-            <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);max-width:220px;line-height:1.5;">
-              ${isImproving ? "Your cases are getting harder. That's the point." : isPlateauing ? "Consistent. Push for harder cases." : "Seek more complex cases."}
-            </div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-family:'Instrument Serif',serif;font-size:2.8rem;color:${trendColor};line-height:0.9;letter-spacing:-0.04em;">${improvSign}${Math.abs(improvement).toFixed(1)}</div>
-            <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">avg change</div>
-          </div>
-        </div>
-        <div style="position:relative;border-radius:14px 14px 0 0;overflow:hidden;background:rgba(0,0,0,0.2);padding:8px 0 0;">
-          <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;">
-            <defs>
-              <linearGradient id="sg${uid}" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="${trendColor}" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="${trendColor}" stop-opacity="0.02"/>
-              </linearGradient>
-            </defs>
-            ${[3,6,9].map(v => {
-              const y = H - PAD - (v/10)*(H-PAD*2);
-              return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4,6"/>`;
-            }).join('')}
-            <path d="${fillPath}" fill="url(#sg${uid})"/>
-            <path d="${path}" fill="none" stroke="${trendColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
-            <path d="${path}" fill="none" stroke="${trendColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            ${points.map((p, i) => {
-              const isLast = i === points.length - 1;
-              if (isLast) return `<circle cx="${p.x}" cy="${p.y}" r="6" fill="${trendColor}" opacity="0.15"/><circle cx="${p.x}" cy="${p.y}" r="4" fill="${trendColor}" stroke="rgba(0,0,0,0.6)" stroke-width="1.5"/><circle cx="${p.x}" cy="${p.y}" r="9" fill="none" stroke="${trendColor}" stroke-width="1" opacity="0.3"/>`;
-              return `<circle cx="${p.x}" cy="${p.y}" r="${scores[i]>=7?'3':'2'}" fill="${trendColor}" opacity="${scores[i]>=7?'0.8':'0.3'}"/>`;
-            }).join('')}
-          </svg>
-          <div style="position:absolute;bottom:6px;right:10px;font-size:0.52rem;color:rgba(255,255,255,0.15);">last ${total} cases</div>
-        </div>
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">Skill Progress</div>
+        <div style="font-size:0.68rem;color:${trendColor};margin-top:3px;font-weight:500;">${trendIcon} ${trendMsg}</div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:rgba(0,0,0,0.2);">
-        <div style="padding:12px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:rgba(255,255,255,0.3);line-height:1;">${avgFirst.toFixed(1)}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Early</div>
-        </div>
-        <div style="padding:12px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);border-left:1px solid rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${trendColor};line-height:1;">${avgSecond.toFixed(1)}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Now</div>
-        </div>
-        <div style="padding:12px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;line-height:1;">${allCases.length}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Cases</div>
-        </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:${trendColor};line-height:1;">${isImproving ? '+'+improvement : improvement}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);">complexity change</div>
       </div>
-    </div>`;
+    </div>
+
+    <!-- Graph -->
+    <div style="position:relative;margin-bottom:16px;background:rgba(255,255,255,0.02);border-radius:12px;overflow:hidden;padding:4px 0;">
+      <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;">
+        <defs>
+          <linearGradient id="graphGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="${trendColor}" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="${trendColor}" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        ${[2,4,6,8].map(v => {
+          const y = H - PAD - ((v-minScore)/(maxScore-minScore))*(H-PAD*2);
+          return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <text x="${PAD-2}" y="${y+3}" text-anchor="end" font-size="7" fill="rgba(255,255,255,0.15)" font-family="Inter">${v}</text>`;
+        }).join('')}
+        <!-- Fill -->
+        <path d="${fillPath}" fill="url(#graphGrad)"/>
+        <!-- Line -->
+        <path d="${path}" fill="none" stroke="${trendColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Dots -->
+        ${points.map((p, i) => {
+          const isLast = i === points.length - 1;
+          return isLast
+            ? `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${trendColor}" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
+               <circle cx="${p.x}" cy="${p.y}" r="7" fill="none" stroke="${trendColor}" stroke-width="1" opacity="0.4"/>`
+            : `<circle cx="${p.x}" cy="${p.y}" r="2.5" fill="${trendColor}" opacity="0.6"/>`;
+        }).join('')}
+      </svg>
+      <!-- Latest score label -->
+      <div style="position:absolute;bottom:6px;right:8px;font-size:0.58rem;color:rgba(255,255,255,0.2);">last ${total} cases</div>
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:${allStrengths.length ? '16px' : '0'};">
+      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.5);line-height:1;">${earlyAvg}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;">early avg</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:${trendColor};line-height:1;">${currentAvg}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;">current avg</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:white;line-height:1;">${allCases.length}</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:2px;">total cases</div>
+      </div>
+    </div>
+
+    ${allStrengths.length ? `
+    <!-- AI praise aggregation -->
+    <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:12px;">
+      <div style="font-size:0.52rem;color:rgba(52,211,153,0.5);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:8px;">What your cases say about you</div>
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);line-height:1.6;font-style:italic;">"${allStrengths[allStrengths.length-1]}"</div>
+    </div>` : ''}
+
+  </div>`;
 }
 
 // ─── SMILE CASE ───
