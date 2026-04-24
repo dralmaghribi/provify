@@ -1367,10 +1367,10 @@ body::after {
       <!-- CTA BUTTONS -->
       <div style="display:flex;flex-direction:column;gap:8px;">
         <button onclick="closeCelebration();openCelebrationCase();" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:700;padding:15px;border-radius:16px;border:none;cursor:pointer;box-shadow:0 8px 28px rgba(124,111,255,0.35);letter-spacing:-0.01em;">
-          View Full Case & Shield →
+          View AI Report & Clinical Notes →
         </button>
-        <button onclick="closeCelebration();showView('dashboard');" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.85rem;padding:12px;border-radius:14px;cursor:pointer;border:none;width:100%;">
-          Back to Dashboard
+        <button onclick="closeCelebration();showView('cases');" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.85rem;padding:12px;border-radius:14px;cursor:pointer;border:none;width:100%;">
+          View My Cases
         </button>
       </div>
 
@@ -9454,10 +9454,12 @@ function closeCelebration() {
 
 function openCelebrationCase() {
   if (_celebrationCaseId) {
-    const c = allCases.find(x => x.id === _celebrationCaseId);
-    if (c) { showView('cases'); openCaseModal(c); }
-  } else {
     showView('cases');
+    setTimeout(() => openCaseDetail(_celebrationCaseId), 150);
+  } else {
+    const latest = allCases[0];
+    if (latest) { showView('cases'); setTimeout(() => openCaseDetail(latest.id), 150); }
+    else showView('cases');
   }
 }
 
@@ -11017,7 +11019,7 @@ function renderLastCaseStrip() {
 
   strip.style.display = 'block';
   strip.innerHTML = `
-    <div onclick="openCaseModal(allCases.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0])" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:13px 16px;cursor:pointer;transition:all 0.18s;"
+    <div onclick="openCaseDetail(allCases.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0]?.id)" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:13px 16px;cursor:pointer;transition:all 0.18s;"
       onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'"
       onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'">
       <div style="width:36px;height:36px;border-radius:10px;background:${col}18;border:1px solid ${col}30;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
