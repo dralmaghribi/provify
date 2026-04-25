@@ -3640,36 +3640,33 @@ body::after {
         </div>
       </div>
 
-      <!-- PORTFOLIO VIEW -->
+      <!-- PORTFOLIO VIEW — IN-APP -->
       <div class="view" id="view-portfolio">
-        <div class="page-header">
-          <div class="page-title">Generate Portfolio</div>
-          <div class="page-sub">Select cases to include in your professional PDF portfolio</div>
+
+        <!-- PROFILE HEADER -->
+        <div id="port-profile-header" style="margin-bottom:20px;"></div>
+
+        <!-- STATS ROW -->
+        <div id="port-stats-row" style="margin-bottom:16px;"></div>
+
+        <!-- SPECIALTY BREAKDOWN -->
+        <div id="port-specialty-card" style="margin-bottom:16px;"></div>
+
+        <!-- SHARE + PDF ACTIONS -->
+        <div id="port-actions" style="margin-bottom:20px;"></div>
+
+        <!-- CASES SECTION HEADER -->
+        <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">All Cases</div>
+          <div style="display:flex;gap:6px;" id="port-filter-pills"></div>
         </div>
 
-        <div class="card" style="margin-bottom:20px">
-          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
-            <div>
-              <div style="font-size:0.9rem; color:var(--white); font-weight:500; margin-bottom:4px">Portfolio Settings</div>
-              <div style="font-size:0.8rem; color:var(--gray)"><span id="portfolio-selected-count">0</span> cases selected</div>
-            </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-              <button class="btn-ghost" style="padding:8px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--white-dim)" onclick="selectAllCases()">Select All</button>
-              <button class="btn-ghost" style="padding:8px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; background:var(--white-faint); border:1px solid var(--white-faint); color:var(--white-dim)" onclick="deselectAllCases()">Deselect All</button>
-              <button onclick="generatePortfolioPDF()" id="generate-pdf-btn" style="background:var(--teal); color:var(--navy); font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem; padding:10px 24px; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s;">
-                📄 Generate PDF
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- CASES GRID -->
+        <div id="port-cases-grid" style="display:flex;flex-direction:column;gap:10px;margin-bottom:40px;"></div>
 
-        <div id="portfolio-cases-list">
-          <div class="empty-state">
-            <div class="empty-icon">📋</div>
-            <div class="empty-title">No cases yet</div>
-            <div class="empty-sub">Log cases first to generate a portfolio.</div>
-          </div>
-        </div>
+        <!-- hidden — kept for PDF export compat -->
+        <div id="portfolio-cases-list" style="display:none;"></div>
+        <span id="portfolio-selected-count" style="display:none;">0</span>
       </div>
 
       <!-- CAREER ASSISTANT VIEW -->
@@ -4250,10 +4247,6 @@ function applyRoleBasedUI() {
     if (sub) sub.textContent = isSenior ? 'Clinical record' : 'Your clinical portfolio';
   }
 
-  // ── PORTFOLIO PAGE TITLE ──
-  const portfolioTitle = document.querySelector('#view-portfolio .page-title');
-  if (portfolioTitle) portfolioTitle.textContent = isSenior ? 'Clinical Record' : 'Generate Portfolio';
-
   // ── DASHBOARD HERO LABEL ──
   const heroLabel = document.getElementById('dash-hero-label');
   if (heroLabel && isSenior) heroLabel.textContent = 'PROVIFY · PRACTICE RECORD';
@@ -4295,6 +4288,7 @@ function showView(view) {
   if (view === 'cases') { renderAllCases(); renderHeatmap(); renderSpecialtyChart(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
+  if (view === 'portfolio') renderInAppPortfolio();
   if (view === 'portfolio') renderPortfolioCases();
   if (view === 'profile') loadProfileForm();
   if (view === 'career') { renderCareerGPS(); renderLiveCareerDashboard(); }
@@ -6229,6 +6223,225 @@ function showToast(msg) {
 
 // ─── PORTFOLIO ───
 let selectedCaseIds = new Set();
+let portActiveFilter = 'all';
+
+function renderInAppPortfolio() {
+  if (!currentProfile || allCases.length === 0) {
+    const grid = document.getElementById('port-cases-grid');
+    if (grid) grid.innerHTML = `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.25);">
+      <div style="font-size:3rem;margin-bottom:16px;opacity:0.4;">📋</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.4);margin-bottom:8px;">No cases yet</div>
+      <div style="font-size:0.8rem;">Log your first case to build your portfolio.</div>
+    </div>`;
+    return;
+  }
+
+  const total = allCases.length;
+  const rank = getComplexityRank(total);
+  const firstName = currentProfile.first_name || '';
+  const lastName = currentProfile.last_name || '';
+  const fullName = `Dr. ${firstName} ${lastName}`.trim();
+  const roleLabels = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
+  const role = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
+  const specLabels2 = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', perio:'Periodontics', ortho:'Orthodontics', general:'General Dentistry' };
+  const specName = specLabels2[currentProfile.primary_specialty] || '';
+  const avg = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
+  const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
+  const specKeys = ['endo','restorative','surgery','paeds','prostho','smile'];
+  const specCount = new Set(allCases.filter(c => specKeys.includes(c.specialty)).map(c => c.specialty)).size;
+
+  // PROFILE HEADER
+  const header = document.getElementById('port-profile-header');
+  if (header) {
+    const avatarLetters = (firstName[0]||'D') + (lastName[0]||'R');
+    header.innerHTML = `
+      <div style="position:relative;border-radius:24px;overflow:hidden;background:linear-gradient(145deg,rgba(124,111,255,0.08),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.18);padding:28px 24px;">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${rank.color}60,transparent);"></div>
+        <div style="position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,${rank.color}12,transparent 70%);pointer-events:none;"></div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,${rank.color}30,${rank.color}10);border:2px solid ${rank.color}40;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;color:${rank.color};flex-shrink:0;">${avatarLetters}</div>
+          <div style="flex:1;">
+            <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.02em;line-height:1.1;margin-bottom:4px;">${fullName}</div>
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);">${role}${specName ? ' · ' + specName : ''}</div>
+            ${currentProfile.bio ? `<div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:6px;line-height:1.5;font-style:italic;">${currentProfile.bio}</div>` : ''}
+          </div>
+          <div style="text-align:center;flex-shrink:0;">
+            <div style="font-size:1.8rem;margin-bottom:2px;">${rank.emoji}</div>
+            <div style="font-size:0.68rem;font-weight:700;color:${rank.color};">${rank.rank}</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.9);"></div>
+          <span style="font-size:0.6rem;color:rgba(52,211,153,0.7);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Verified on Provify</span>
+        </div>
+      </div>`;
+  }
+
+  // STATS ROW
+  const statsRow = document.getElementById('port-stats-row');
+  if (statsRow) {
+    statsRow.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+        ${[
+          { val: total, label: 'Cases', color: 'rgba(255,255,255,0.8)' },
+          { val: avg, label: 'Avg Score', color: '#F59E0B' },
+          { val: highComp, label: 'Complex 7+', color: '#EF4444' },
+          { val: specCount, label: 'Specialties', color: '#34D399' },
+        ].map(s => `
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px 10px;text-align:center;">
+            <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:${s.color};line-height:1;letter-spacing:-0.02em;">${s.val}</div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">${s.label}</div>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  // SPECIALTY BREAKDOWN
+  const specCard = document.getElementById('port-specialty-card');
+  if (specCard) {
+    const specDef = [
+      { key:'endo', label:'Endo', color:'#7C6FFF' },
+      { key:'restorative', label:'Resto', color:'#F59E0B' },
+      { key:'surgery', label:'Surgery', color:'#EF4444' },
+      { key:'paeds', label:'Paeds', color:'#34D399' },
+      { key:'prostho', label:'Prostho', color:'#38BDF8' },
+      { key:'smile', label:'Smile', color:'#FBB424' },
+    ].map(s => ({ ...s, count: allCases.filter(c => c.specialty === s.key).length }))
+     .filter(s => s.count > 0).sort((a,b) => b.count - a.count);
+
+    specCard.innerHTML = `
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px 20px;">
+        <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:14px;">Clinical Specialties</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${specDef.map(s => {
+            const pct = Math.round(s.count / total * 100);
+            return `<div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:48px;font-size:0.68rem;color:rgba(255,255,255,0.4);text-align:right;flex-shrink:0;">${s.label}</div>
+              <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);border-radius:100px;overflow:hidden;">
+                <div style="height:100%;width:${pct}%;background:${s.color};border-radius:100px;box-shadow:0 0 8px ${s.color}50;"></div>
+              </div>
+              <div style="width:24px;font-size:0.68rem;color:${s.color};font-weight:700;text-align:right;">${s.count}</div>
+              <div style="width:28px;font-size:0.58rem;color:rgba(255,255,255,0.2);">${pct}%</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  // ACTIONS
+  const actions = document.getElementById('port-actions');
+  if (actions) {
+    actions.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button onclick="copyPortfolioLinkInApp()" style="background:linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.08));border:1px solid rgba(124,111,255,0.3);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;padding:13px;border-radius:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"
+          onmouseover="this.style.background='rgba(124,111,255,0.22)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.08))'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Share Link
+        </button>
+        <button onclick="selectAllCases();generatePortfolioPDF()" id="generate-pdf-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;padding:13px;border-radius:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"
+          onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.6)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export PDF
+        </button>
+      </div>`;
+  }
+
+  // FILTER PILLS
+  const filterPills = document.getElementById('port-filter-pills');
+  const availableFilters = [
+    { key:'all', label:'All' },
+    { key:'endo', label:'Endo' },
+    { key:'restorative', label:'Resto' },
+    { key:'surgery', label:'Surgery' },
+    { key:'paeds', label:'Paeds' },
+    { key:'prostho', label:'Prostho' },
+    { key:'smile', label:'✨ Smile' },
+  ].filter(s => s.key === 'all' || allCases.some(c => c.specialty === s.key));
+
+  if (filterPills) {
+    filterPills.innerHTML = availableFilters.map(s => `
+      <button onclick="setPortFilter('${s.key}')" style="
+        padding:5px 12px;border-radius:100px;border:1px solid ${portActiveFilter===s.key ? 'rgba(124,111,255,0.5)' : 'rgba(255,255,255,0.08)'};
+        background:${portActiveFilter===s.key ? 'rgba(124,111,255,0.15)' : 'rgba(255,255,255,0.03)'};
+        color:${portActiveFilter===s.key ? '#9B91FF' : 'rgba(255,255,255,0.35)'};
+        font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:${portActiveFilter===s.key?'700':'400'};
+        cursor:pointer;transition:all 0.15s;white-space:nowrap;">${s.label}</button>`).join('');
+  }
+
+  renderPortCasesGrid();
+}
+
+function setPortFilter(key) {
+  portActiveFilter = key;
+  renderInAppPortfolio();
+}
+
+function copyPortfolioLinkInApp() {
+  if (!currentUser) return;
+  const url = currentProfile?.username
+    ? `https://provify.app/portfolio.html?u=${currentProfile.username}`
+    : `https://provify.app/portfolio.html?id=${currentUser.id}`;
+  navigator.clipboard.writeText(url).then(() => showToast('Portfolio link copied ✓'));
+}
+
+function renderPortCasesGrid() {
+  const grid = document.getElementById('port-cases-grid');
+  if (!grid) return;
+
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
+  const specLabelMap = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
+
+  const filtered = portActiveFilter === 'all' ? allCases : allCases.filter(c => c.specialty === portActiveFilter);
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.2);font-size:0.85rem;">No cases in this specialty yet.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => {
+    const isSmile = c.specialty === 'smile';
+    const col = specColors[c.specialty] || '#7C6FFF';
+    const specLabel = specLabelMap[c.specialty] || c.specialty;
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const title = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '-'}`;
+    const smileBefore = c.photo_urls?.['smile-before'];
+    const smileAfter = c.photo_urls?.['smile-after'];
+    const firstPhoto = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
+
+    return `
+      <div onclick="openCaseDetail('${c.id}')" style="
+        background:${isSmile ? 'linear-gradient(145deg,rgba(251,191,36,0.05),rgba(251,146,60,0.02))' : 'rgba(255,255,255,0.025)'};
+        border:1px solid ${isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.07)'};
+        border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.2s;position:relative;"
+        onmouseover="this.style.borderColor='${col}50';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px ${col}12'"
+        onmouseout="this.style.borderColor='${isSmile?'rgba(251,191,36,0.15)':'rgba(255,255,255,0.07)'}';this.style.transform='none';this.style.boxShadow='none'">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${col},${col}30,transparent);"></div>
+        ${isSmile && (smileBefore || smileAfter) ? `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;height:100px;overflow:hidden;background:#000;">
+            <div style="overflow:hidden;position:relative;">
+              ${smileBefore ? `<img src="${smileBefore}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : '<div style="height:100%;background:rgba(255,255,255,0.02);"></div>'}
+              <div style="position:absolute;bottom:4px;left:5px;background:rgba(0,0,0,0.7);border-radius:3px;padding:1px 5px;font-size:0.44rem;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
+            </div>
+            <div style="overflow:hidden;position:relative;">
+              ${smileAfter ? `<img src="${smileAfter}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : '<div style="height:100%;background:rgba(251,191,36,0.03);"></div>'}
+              <div style="position:absolute;bottom:4px;right:5px;background:rgba(251,191,36,0.9);border-radius:3px;padding:1px 5px;font-size:0.44rem;color:#000;font-weight:700;letter-spacing:0.06em;">AFTER ✨</div>
+            </div>
+          </div>` : firstPhoto ? `
+          <div style="height:80px;overflow:hidden;background:#000;">
+            <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+          </div>` : ''}
+        <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:0.85rem;color:white;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:0.55rem;font-weight:700;color:${col};background:${col}18;padding:2px 7px;border-radius:100px;text-transform:uppercase;">${isSmile ? '✨ Smile' : specLabel}</span>
+              <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
+            </div>
+          </div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>`;
+  }).join('');
+}
 
 function renderPortfolioCases() {
   const el = document.getElementById('portfolio-cases-list');
@@ -8003,9 +8216,7 @@ function copyPortfolioLink() {
 
 // ─── VIEW PORTFOLIO ───
 function viewMyPortfolio() {
-  if (!currentUser) return;
-  const url = `https://provify.app/portfolio.html?id=${currentUser.id}`;
-  window.open(url, '_blank');
+  showView('portfolio');
 }
 
 // Close modal on Escape
