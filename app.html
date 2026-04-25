@@ -6280,16 +6280,23 @@ function renderInAppPortfolio() {
   // STATS ROW
   const statsRow = document.getElementById('port-stats-row');
   if (statsRow) {
+    const now2 = new Date();
+    const startDate = allCases.length ? new Date(Math.min(...allCases.map(c => new Date(c.created_at)))) : now2;
+    const monthsActive = Math.max(1, Math.round((now2 - startDate) / (1000*60*60*24*30)));
+    const thisMonth = allCases.filter(c => {
+      const d = new Date(c.created_at);
+      return d.getMonth() === now2.getMonth() && d.getFullYear() === now2.getFullYear();
+    }).length;
     statsRow.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
         ${[
           { val: total, label: 'Cases', color: 'rgba(255,255,255,0.8)' },
-          { val: avg, label: 'Avg Score', color: '#F59E0B' },
-          { val: highComp, label: 'Complex 7+', color: '#EF4444' },
-          { val: specCount, label: 'Specialties', color: '#34D399' },
+          { val: rank.rank, label: 'Rank', color: rank.color },
+          { val: thisMonth, label: 'This Month', color: '#7C6FFF' },
+          { val: monthsActive, label: 'Months Active', color: '#34D399' },
         ].map(s => `
           <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px 10px;text-align:center;">
-            <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:${s.color};line-height:1;letter-spacing:-0.02em;">${s.val}</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:${typeof s.val === 'string' ? '1.1' : '1.6'}rem;color:${s.color};line-height:1;letter-spacing:-0.02em;">${s.val}</div>
             <div style="font-size:0.45rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">${s.label}</div>
           </div>`).join('')}
       </div>`;
@@ -6808,25 +6815,28 @@ async function generatePortfolioPDF() {
     // ══════════════════════════════════════
     for (let i = 0; i < selectedCases.length; i++) {
       const c = selectedCases[i];
-      btn.textContent = `⏳ Building case ${i + 1} of ${selectedCases.length}...`;
+      btn.innerHTML = `⏳ ${i + 1} / ${selectedCases.length}`;
 
-      const photoTypes = c.specialty === 'endo'
-        ? ['xr-preop','xr-wl','xr-mc','xr-obturation','xr-postop','cp-preop','cp-postop','cp-intraoral']
-        : c.specialty === 'paeds'
-        ? ['xr-gen-preop','xr-gen-postop','cp-preop','cp-postop','cp-intraoral']
-        : ['xr-gen-preop','xr-gen-postop','cp-preop','cp-postop','cp-intraoral'];
-
+      // Use photo_urls already loaded in memory — no network requests
       const photoLabels = {
         'xr-preop':'Pre-op Radiograph', 'xr-wl':'Working Length', 'xr-mc':'Master Cone',
         'xr-obturation':'Final Obturation', 'xr-postop':'Post-op Radiograph',
         'xr-gen-preop':'Pre-op Radiograph', 'xr-gen-postop':'Post-op Radiograph',
         'cp-preop':'Clinical — Pre-op', 'cp-postop':'Clinical — Post-op', 'cp-intraoral':'Intraoral View',
+        'smile-before':'Before', 'smile-after':'After',
       };
 
+      // Convert URLs already in photo_urls to base64 (with timeout)
       const photos = {};
-      await Promise.all(photoTypes.map(async (type) => {
-        photos[type] = await fetchPhoto(c.id, type);
-      }));
+      if (c.photo_urls && typeof c.photo_urls === 'object') {
+        await Promise.all(
+          Object.entries(c.photo_urls)
+            .filter(([,url]) => url)
+            .map(async ([type, url]) => {
+              photos[type] = await fetchImageBase64(url);
+            })
+        );
+      }
 
       doc.addPage();
       doc.setFillColor(...WHITE);
@@ -6837,8 +6847,9 @@ async function generatePortfolioPDF() {
 
       // Case title bar
       const sc = specColor[c.specialty] || VIOLET;
-      const sl = specLabel[c.specialty] || c.specialty;
+      const sl = specLabel[c.specialty] || (c.specialty === 'smile' ? 'Smile Case' : c.specialty);
       const caseDate = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+      const caseTitle = c.specialty === 'smile' ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
 
       doc.setFillColor(...sc.map(v => Math.min(255, v + 200 > 255 ? v : v + 200))); // very light tint
       doc.setFillColor(sc[0], sc[1], sc[2], 0.08); // won't work in jsPDF — use manual light version
@@ -6856,7 +6867,7 @@ async function generatePortfolioPDF() {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(13);
       doc.setTextColor(...BLACK);
-      doc.text(`Tooth ${c.tooth_number}`, ML + 6, 31);
+      doc.text(caseTitle, ML + 6, 31);
 
       // Date + score on right
       doc.setFont('helvetica', 'normal');
@@ -7024,7 +7035,7 @@ async function generatePortfolioPDF() {
       }
 
       // ── Photos ──
-      const availPhotos = photoTypes.filter(t => photos[t]);
+      const availPhotos = Object.keys(photos).filter(t => photos[t]);
       if (availPhotos.length > 0 && y < pageH - 55) {
         y += 2;
         sectionLabel('Radiographs & Clinical Photography', y + 4, MID);
@@ -7159,11 +7170,11 @@ async function generatePortfolioPDF() {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...DARK);
-    doc.text(name, ML, sy + 10);
+    doc.text(name, ML, sumY + 10);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...MID);
-    doc.text(roleLabel, ML, sy + 5);
+    doc.text(roleLabel, ML, sumY + 16);
 
     // Save
     const filename = `${name.replace(/\s+/g,'_')}_Clinical_Portfolio_${new Date().getFullYear()}.pdf`;
@@ -7175,7 +7186,7 @@ async function generatePortfolioPDF() {
     showToast('Error generating PDF. Please try again.');
   }
 
-  btn.textContent = '📄 Generate PDF';
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export PDF`;
   btn.disabled = false;
 }
 // ─── AUTO CLINICAL NOTE (runs after every case submission) ───
