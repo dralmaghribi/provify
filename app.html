@@ -988,6 +988,17 @@ body::after {
     <!-- ── ACTION BUTTONS — THE FEATURES ── -->
     <div style="padding:0 20px 24px;display:flex;flex-direction:column;gap:8px;">
 
+      <!-- Pin to Proudest -->
+      <button onclick="togglePinCase(currentModalCase?.id)" id="pin-case-btn" style="width:100%;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.15);color:rgba(251,191,36,0.7);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;padding:12px 16px;border-radius:14px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:10px;margin-bottom:8px;"
+        onmouseover="this.style.borderColor='rgba(251,191,36,0.35)';this.style.background='rgba(251,191,36,0.1)'"
+        onmouseout="this.style.borderColor='rgba(251,191,36,0.15)';this.style.background='rgba(251,191,36,0.05)'">
+        <span style="font-size:1rem;">✦</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:0.82rem;font-weight:500;" id="pin-btn-label">Pin to Proudest Cases</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:1px;">Shows on your dashboard</div>
+        </div>
+      </button>
+
       <!-- TOP ROW: Edit + Share -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;">
         <button onclick="toggleCaseEdit()" id="edit-case-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.55);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.55)'">
@@ -5267,6 +5278,7 @@ async function openCaseDetail(id) {
   const c = allCases.find(x => x.id === id);
   if (!c) return;
   currentModalCase = c;
+  updatePinButton(c.id);
 
   // Reset note output
   const output = document.getElementById('clinical-note-output');
@@ -5917,45 +5929,50 @@ function updateProgressInsights(endo, resto, surg, paeds, total) {
 // ─── BEST WORK (smart photo detection) ───
 async function loadBestWork() {
   const card = document.getElementById('best-work-card');
-  const list = document.getElementById('best-work-list');
-  if (!card || !list) return;
+  if (!card) return;
 
-  const top = [...allCases]
-    .filter(c => c.complexity_score > 0)
-    .sort((a, b) => (b.complexity_score || 0) - (a.complexity_score || 0))
-    .slice(0, 3);
+  // Get pinned cases from localStorage
+  const pinnedIds = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
+  const pinnedCases = pinnedIds.map(id => allCases.find(c => c.id === id)).filter(Boolean);
 
-  if (top.length === 0) { card.style.display = 'none'; return; }
   card.style.display = 'block';
 
-  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
   const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
-  const medals = ['🥇','🥈','🥉'];
+  const specLabels = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
 
   card.innerHTML = `
-    <div style="position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);padding:20px 22px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent);"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <div>
-          <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Best Work</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;">Your highest complexity cases</div>
+    <div style="position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(251,191,36,0.4),transparent);"></div>
+      <div style="padding:20px 22px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${pinnedCases.length > 0 ? '20px' : '16px'};">
+          <div>
+            <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Proudest Cases</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;">Cases you're proud of</div>
+          </div>
+          <div style="font-size:1.3rem;">✦</div>
         </div>
-        <div style="font-size:1.4rem;">🏆</div>
+        ${pinnedCases.length === 0 ? `
+          <div style="text-align:center;padding:24px 0;">
+            <div style="font-size:2rem;margin-bottom:10px;opacity:0.4;">📌</div>
+            <div style="font-size:0.82rem;color:rgba(255,255,255,0.35);margin-bottom:4px;">No cases pinned yet</div>
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.18);line-height:1.6;">Open any case and tap<br><span style="color:rgba(251,191,36,0.5);font-weight:600;">✦ Pin to Proudest</span> to add it here</div>
+          </div>` : `
+          <div style="display:flex;flex-direction:column;gap:10px;" id="pinned-cases-list"></div>`}
       </div>
-      <div style="display:flex;flex-direction:column;gap:10px;" id="bw-trophy-list"></div>
     </div>`;
 
-  const container = document.getElementById('bw-trophy-list');
+  if (pinnedCases.length === 0) return;
+
+  const container = document.getElementById('pinned-cases-list');
   if (!container) return;
 
-  top.forEach((c, idx) => {
-    const rankData = getComplexityRank(c.complexity_score || 0);
+  pinnedCases.forEach((c, idx) => {
     const col = specColors[c.specialty] || '#7C6FFF';
-    const spec = specLabels[c.specialty] || c.specialty;
     const isSmile = c.specialty === 'smile';
     const fdiLabel = !isSmile && c.tooth_number ? toothQuadrant(c.tooth_number) : null;
     const title = isSmile ? (c.procedure || 'Smile Case') : (fdiLabel ? `${fdiLabel} · T${c.tooth_number}` : `Tooth ${c.tooth_number || '—'}`);
     const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const rankData = getComplexityRank(c.complexity_score || 0);
 
     const item = document.createElement('div');
     item.onclick = () => openCaseDetail(c.id);
@@ -5965,34 +5982,33 @@ async function loadBestWork() {
 
     item.innerHTML = `
       <div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:linear-gradient(180deg,${col},${col}50);border-radius:3px 0 0 3px;"></div>
-      <div style="font-size:1.5rem;flex-shrink:0;margin-left:4px;">${medals[idx]}</div>
-      <div id="bw-photo-new-${c.id}" style="width:52px;height:52px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,${col}20,${col}08);border:1px solid ${col}25;display:flex;align-items:center;justify-content:center;">
-        <span style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:${col}50;">${isSmile ? '✨' : (c.tooth_number || '?')}</span>
+      <div style="font-size:0.9rem;margin-left:4px;color:rgba(251,191,36,0.7);">✦</div>
+      <div id="pinned-photo-${c.id}" style="width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,${col}20,${col}08);border:1px solid ${col}25;display:flex;align-items:center;justify-content:center;">
+        <span style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:${col}50;">${isSmile ? '✨' : (c.tooth_number || '?')}</span>
       </div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:0.88rem;color:white;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span style="font-size:0.55rem;font-weight:700;color:${col};background:${col}18;padding:2px 8px;border-radius:100px;text-transform:uppercase;">${isSmile ? '✨ Smile' : spec.split(' ')[0]}</span>
+        <div style="font-size:0.85rem;color:white;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:0.55rem;font-weight:700;color:${col};background:${col}18;padding:2px 8px;border-radius:100px;text-transform:uppercase;">${isSmile ? '✨ Smile' : (c.specialty||'').charAt(0).toUpperCase()+(c.specialty||'').slice(1)}</span>
           <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
         </div>
       </div>
       <div style="text-align:center;flex-shrink:0;">
-        <div style="font-size:1rem;margin-bottom:2px;">${rankData.emoji || '⚡'}</div>
-        <div style="font-size:0.62rem;font-weight:700;color:${rankData.color||col};">${rankData.rank}</div>
+        <div style="font-size:1rem;">${rankData.emoji||'⚡'}</div>
+        <div style="font-size:0.55rem;color:${rankData.color||col};font-weight:700;">${rankData.rank}</div>
       </div>`;
 
     container.appendChild(item);
 
-    // Load photo async
     if (c.photo_urls) {
       const photoUrl = Object.entries(c.photo_urls).find(([k,v]) => v && !k.includes('extra'))?.[1];
       if (photoUrl) {
-        const photoDiv = document.getElementById(`bw-photo-new-${c.id}`);
-        if (photoDiv) {
-          const img = new Image();
-          img.onload = () => { photoDiv.innerHTML = `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;display:block;">`; };
-          img.src = photoUrl;
-        }
+        const img = new Image();
+        img.onload = () => {
+          const pd = document.getElementById(`pinned-photo-${c.id}`);
+          if (pd) pd.innerHTML = `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+        };
+        img.src = photoUrl;
       }
     }
   });
@@ -11159,108 +11175,179 @@ function renderPortfolioTeaserCard() {
   if (!el || allCases.length < 1) { if (el) el.style.display = 'none'; return; }
   el.style.display = 'block';
   const total = allCases.length;
-  const avgComplexity = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '0.0';
-  const username = currentProfile?.username || '';
+
+  // Build cumulative monthly data
+  const sorted = [...allCases].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  const monthMap = {};
+  sorted.forEach(c => {
+    const d = new Date(c.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    monthMap[key] = (monthMap[key] || 0) + 1;
+  });
+  const months = Object.keys(monthMap).sort().slice(-8);
+  let cumulative = 0;
+  const monthlyData = [];
+  // Get running total before our window
+  const windowStart = months[0];
+  sorted.forEach(c => {
+    const d = new Date(c.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if (key < windowStart) cumulative++;
+  });
+  months.forEach(m => {
+    cumulative += monthMap[m];
+    monthlyData.push(cumulative);
+  });
+
+  const maxVal = Math.max(...monthlyData, 1);
+  const W = 400, H = 60, PAD = 10;
+  const points = monthlyData.map((v, i) => ({
+    x: PAD + (i / Math.max(monthlyData.length-1,1)) * (W - PAD*2),
+    y: H - PAD - (v / maxVal) * (H - PAD*2)
+  }));
+  let path = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const mx = (points[i-1].x + points[i].x) / 2;
+    path += ` Q ${mx} ${points[i-1].y} ${points[i].x} ${points[i].y}`;
+  }
+  const fillPath = path + ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z`;
+
   el.innerHTML = `
-    <div onclick="viewMyPortfolio()" style="cursor:pointer;background:linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.25);border-radius:18px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:all 0.2s;position:relative;overflow:hidden;"
-      onmouseover="this.style.borderColor='rgba(124,111,255,0.45)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.06))'"
-      onmouseout="this.style.borderColor='rgba(124,111,255,0.25)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.1),rgba(124,111,255,0.03))'">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.5),transparent);"></div>
-      <div style="width:44px;height:44px;border-radius:14px;background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏆</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:0.7rem;color:rgba(124,111,255,0.7);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:3px;">Your Verified Portfolio</div>
-        <div style="font-size:0.88rem;color:rgba(255,255,255,0.9);font-weight:500;margin-bottom:2px;">${total} cases · ${avgComplexity} avg complexity</div>
-        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Tamper-proof. Shareable. Growing with every case.</div>
+    <div onclick="viewMyPortfolio()" style="cursor:pointer;position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.2);transition:all 0.22s;"
+      onmouseover="this.style.borderColor='rgba(124,111,255,0.45)';this.style.background='linear-gradient(145deg,rgba(124,111,255,0.13),rgba(124,111,255,0.05))'"
+      onmouseout="this.style.borderColor='rgba(124,111,255,0.2)';this.style.background='linear-gradient(145deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03))'">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
+
+      <div style="padding:18px 20px 14px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
+          <div>
+            <div style="font-size:0.5rem;color:rgba(124,111,255,0.5);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Verified Portfolio</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1;">${total} <span style="font-size:1rem;color:rgba(255,255,255,0.4);">cases</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);padding:6px 12px;border-radius:100px;">
+            <div style="width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.9);"></div>
+            <span style="font-size:0.6rem;color:rgba(255,255,255,0.6);font-weight:600;">Tamper-proof</span>
+          </div>
+        </div>
+
+        <!-- Mini cumulative chart -->
+        <div style="border-radius:12px;overflow:hidden;background:rgba(0,0,0,0.2);margin-bottom:14px;">
+          <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;">
+            <defs>
+              <linearGradient id="portGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#7C6FFF" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#7C6FFF" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <path d="${fillPath}" fill="url(#portGrad)"/>
+            <path d="${path}" fill="none" stroke="#7C6FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="${points[points.length-1].x}" cy="${points[points.length-1].y}" r="4" fill="#7C6FFF" stroke="rgba(0,0,0,0.6)" stroke-width="1.5"/>
+            <circle cx="${points[points.length-1].x}" cy="${points[points.length-1].y}" r="8" fill="none" stroke="#7C6FFF" stroke-width="1" opacity="0.3"/>
+          </svg>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Shareable · Verified · Growing</div>
+          <div style="font-size:0.75rem;color:rgba(124,111,255,0.7);font-weight:600;">View Portfolio →</div>
+        </div>
       </div>
-      <div style="font-size:0.8rem;color:rgba(124,111,255,0.6);flex-shrink:0;">View →</div>
     </div>`;
+
 }
 
 // ─── SKILL PROGRESS GRAPH ───
 function renderSkillProgressGraph() {
   const el = document.getElementById('skill-progress-card');
-  if (!el || allCases.length < 3) { if (el) el.style.display = 'none'; return; }
+  if (!el || allCases.length < 2) { if (el) el.style.display = 'none'; return; }
   el.style.display = 'block';
 
-  const sorted = [...allCases].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-  const cases = sorted.slice(-20);
-  const scores = cases.map(c => c.complexity_score || 0);
-  const total = cases.length;
-
-  const firstHalf = scores.slice(0, Math.floor(total/2));
-  const secondHalf = scores.slice(Math.floor(total/2));
-  const avgFirst = firstHalf.reduce((a,b) => a+b, 0) / firstHalf.length;
-  const avgSecond = secondHalf.reduce((a,b) => a+b, 0) / secondHalf.length;
-  const trend = avgSecond - avgFirst;
-  const isImproving = trend > 0.3;
-  const isPlateauing = Math.abs(trend) <= 0.3;
-
-  const trendColor = isImproving ? '#34D399' : isPlateauing ? '#F59E0B' : '#EF4444';
-  const improvement = avgSecond - avgFirst;
-  const improvSign = improvement >= 0 ? '+' : '';
-
-  const W = 600, H = 110, PAD = 20;
-  const xStep = (W - PAD*2) / Math.max(total - 1, 1);
-  const points = scores.map((s, i) => ({
-    x: PAD + i * xStep,
-    y: H - PAD - (s / 10) * (H - PAD*2)
-  }));
-
-  let path = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 1; i < points.length; i++) {
-    const prev = points[i-1], curr = points[i];
-    const mx = (prev.x + curr.x) / 2;
-    path += ` Q ${mx} ${prev.y} ${curr.x} ${curr.y}`;
+  // Group cases by week for last 12 weeks
+  const now = new Date();
+  const weeks = [];
+  for (let i = 11; i >= 0; i--) {
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - (i * 7) - weekStart.getDay());
+    weekStart.setHours(0,0,0,0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const count = allCases.filter(c => {
+      const d = new Date(c.created_at);
+      return d >= weekStart && d < weekEnd;
+    }).length;
+    weeks.push({ label: weekStart.toLocaleDateString('en-GB', { day:'numeric', month:'short' }), count, weekStart });
   }
-  const fillPath = path + ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z`;
-  const uid = Math.random().toString(36).slice(2,6);
+
+  const maxCount = Math.max(...weeks.map(w => w.count), 1);
+  const totalThisMonth = allCases.filter(c => {
+    const d = new Date(c.created_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const totalLastMonth = allCases.filter(c => {
+    const d = new Date(c.created_at);
+    const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
+  }).length;
+  const trend = totalThisMonth - totalLastMonth;
+  const trendSign = trend >= 0 ? '+' : '';
+  const trendColor = trend > 0 ? '#34D399' : trend === 0 ? '#F59E0B' : '#EF4444';
 
   el.innerHTML = `
     <div style="position:relative;border-radius:22px;overflow:hidden;margin-bottom:16px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);">
-      <div style="position:absolute;bottom:-20px;right:30px;width:160px;height:80px;background:radial-gradient(circle,${trendColor}18 0%,transparent 70%);pointer-events:none;"></div>
-      <div style="padding:20px 22px 0;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+      <div style="position:absolute;top:-30px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(124,111,255,0.12) 0%,transparent 70%);pointer-events:none;"></div>
+
+      <div style="padding:20px 22px 16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;">
           <div>
-            <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Complexity Growth</div>
-            <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);max-width:220px;line-height:1.5;">${isImproving ? "Cases getting harder. That's the point." : isPlateauing ? "Consistent. Push for harder cases." : "Seek more complex cases."}</div>
+            <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Cases Logged</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;line-height:1.2;">Last 12 weeks</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-family:'Instrument Serif',serif;font-size:2.8rem;color:${trendColor};line-height:0.9;letter-spacing:-0.04em;">${improvSign}${Math.abs(improvement).toFixed(1)}</div>
-            <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">avg change</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:2.6rem;color:white;line-height:0.9;letter-spacing:-0.04em;">${totalThisMonth}</div>
+            <div style="font-size:0.6rem;color:${trendColor};font-weight:600;margin-top:4px;">${trendSign}${trend} vs last month</div>
           </div>
         </div>
-        <div style="position:relative;border-radius:14px 14px 0 0;overflow:hidden;background:rgba(0,0,0,0.2);">
-          <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;">
-            <defs>
-              <linearGradient id="sg${uid}" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="${trendColor}" stop-opacity="0.4"/>
-                <stop offset="100%" stop-color="${trendColor}" stop-opacity="0.02"/>
-              </linearGradient>
-            </defs>
-            ${[3,6,9].map(v => { const y = H-PAD-(v/10)*(H-PAD*2); return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4,6"/>`; }).join('')}
-            <path d="${fillPath}" fill="url(#sg${uid})"/>
-            <path d="${path}" fill="none" stroke="${trendColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            ${points.map((p,i) => {
-              const isLast = i === points.length-1;
-              if (isLast) return `<circle cx="${p.x}" cy="${p.y}" r="6" fill="${trendColor}" opacity="0.2"/><circle cx="${p.x}" cy="${p.y}" r="4" fill="${trendColor}" stroke="rgba(0,0,0,0.6)" stroke-width="1.5"/><circle cx="${p.x}" cy="${p.y}" r="9" fill="none" stroke="${trendColor}" stroke-width="1" opacity="0.3"/>`;
-              return `<circle cx="${p.x}" cy="${p.y}" r="${scores[i]>=7?'3':'1.8'}" fill="${trendColor}" opacity="${scores[i]>=7?'0.9':'0.3'}"/>`;
-            }).join('')}
-          </svg>
-          <div style="position:absolute;bottom:6px;right:10px;font-size:0.52rem;color:rgba(255,255,255,0.15);">last ${total} cases</div>
+
+        <!-- Bar chart -->
+        <div style="display:flex;align-items:flex-end;gap:4px;height:80px;padding-bottom:2px;">
+          ${weeks.map((w, i) => {
+            const isCurrentWeek = i === weeks.length - 1;
+            const heightPct = w.count === 0 ? 4 : Math.max(8, Math.round((w.count / maxCount) * 100));
+            const barColor = isCurrentWeek ? '#7C6FFF' : w.count > 0 ? 'rgba(124,111,255,0.35)' : 'rgba(255,255,255,0.05)';
+            return `
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="font-size:0.55rem;color:${isCurrentWeek ? '#7C6FFF' : 'rgba(255,255,255,0.2)'};font-weight:${isCurrentWeek ? '700' : '400'};min-height:14px;">
+                  ${w.count > 0 ? w.count : ''}
+                </div>
+                <div style="width:100%;border-radius:4px 4px 2px 2px;background:${barColor};transition:height 0.8s cubic-bezier(0.4,0,0.2,1);
+                  height:${heightPct}%;
+                  ${isCurrentWeek ? 'box-shadow:0 0 12px rgba(124,111,255,0.5);' : ''}
+                  ${w.count === 0 ? 'height:3px;border-radius:2px;' : ''}"></div>
+              </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Week labels — show only every 3rd -->
+        <div style="display:flex;gap:4px;margin-top:6px;">
+          ${weeks.map((w, i) => `
+            <div style="flex:1;text-align:center;font-size:0.42rem;color:${i === weeks.length-1 ? 'rgba(124,111,255,0.6)' : 'rgba(255,255,255,0.12)'};">
+              ${i % 3 === 0 || i === weeks.length-1 ? w.label.split(' ')[0] : ''}
+            </div>`).join('')}
         </div>
       </div>
+
+      <!-- Stats strip -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.04);">
-        <div style="padding:14px;text-align:center;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(255,255,255,0.3);line-height:1;">${avgFirst.toFixed(1)}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Early</div>
+        <div style="padding:12px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;line-height:1;">${allCases.length}</div>
+          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Total</div>
         </div>
-        <div style="padding:14px;text-align:center;border-left:1px solid rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:${trendColor};line-height:1;">${avgSecond.toFixed(1)}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Now</div>
+        <div style="padding:12px;text-align:center;border-left:1px solid rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.04);">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:#7C6FFF;line-height:1;">${totalThisMonth}</div>
+          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">This Month</div>
         </div>
-        <div style="padding:14px;text-align:center;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:white;line-height:1;">${allCases.length}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Cases</div>
+        <div style="padding:12px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${trendColor};line-height:1;">${trendSign}${trend}</div>
+          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">vs Last</div>
         </div>
       </div>
     </div>`;
@@ -11375,6 +11462,36 @@ async function openSmileRevealFromCase(caseId) {
   } catch(e) {}
 
   openSmileReveal(c);
+}
+
+function togglePinCase(caseId) {
+  if (!caseId) return;
+  const pinned = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
+  const idx = pinned.indexOf(caseId);
+  if (idx === -1) {
+    pinned.unshift(caseId);
+    showToast('✦ Added to Proudest Cases');
+  } else {
+    pinned.splice(idx, 1);
+    showToast('Removed from Proudest Cases');
+  }
+  // Cap at 5 pinned cases
+  const capped = pinned.slice(0, 5);
+  localStorage.setItem('provify_pinned_cases', JSON.stringify(capped));
+  updatePinButton(caseId);
+  loadBestWork();
+}
+
+function updatePinButton(caseId) {
+  const pinned = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
+  const isPinned = pinned.includes(caseId);
+  const btn = document.getElementById('pin-case-btn');
+  const label = document.getElementById('pin-btn-label');
+  if (!btn || !label) return;
+  label.textContent = isPinned ? 'Unpin from Proudest Cases' : 'Pin to Proudest Cases';
+  btn.style.borderColor = isPinned ? 'rgba(251,191,36,0.4)' : 'rgba(251,191,36,0.15)';
+  btn.style.background = isPinned ? 'rgba(251,191,36,0.1)' : 'rgba(251,191,36,0.05)';
+  btn.style.color = isPinned ? '#FBB424' : 'rgba(251,191,36,0.7)';
 }
 
 function openLatestSmileCase() {
