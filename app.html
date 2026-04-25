@@ -3662,7 +3662,7 @@ body::after {
         </div>
 
         <!-- CASES GRID -->
-        <div id="port-cases-grid" style="display:flex;flex-direction:column;gap:10px;margin-bottom:40px;"></div>
+        <div id="port-cases-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:40px;"></div>
 
         <!-- hidden — kept for PDF export compat -->
         <div id="portfolio-cases-list" style="display:none;"></div>
@@ -6394,57 +6394,72 @@ function renderPortCasesGrid() {
   const grid = document.getElementById('port-cases-grid');
   if (!grid) return;
 
-  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
-  const specLabelMap = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#60A5FA', smile:'#FBB424' };
+  const specFull = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
+  const specIcons = { endo:'⚙', restorative:'◈', surgery:'✦', paeds:'◉', prostho:'◎', smile:'✨' };
 
   const filtered = portActiveFilter === 'all' ? allCases : allCases.filter(c => c.specialty === portActiveFilter);
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.2);font-size:0.85rem;">No cases in this specialty yet.</div>`;
+    grid.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.2);font-size:0.85rem;grid-column:1/-1;">No cases in this specialty yet.</div>`;
     return;
   }
 
   grid.innerHTML = filtered.map(c => {
     const isSmile = c.specialty === 'smile';
     const col = specColors[c.specialty] || '#7C6FFF';
-    const specLabel = specLabelMap[c.specialty] || c.specialty;
-    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    const title = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '-'}`;
+    const specLabel = specFull[c.specialty] || c.specialty;
+    const icon = specIcons[c.specialty] || '🦷';
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { month:'short', year:'numeric' });
+    const title = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
+    const narrative = c.narrative ? c.narrative.replace(/\*\*(.*?)\*\*/g,'$1').replace(/#{1,6}\s*/g,'') : '';
+
+    // Photo logic
     const smileBefore = c.photo_urls?.['smile-before'];
     const smileAfter = c.photo_urls?.['smile-after'];
-    const firstPhoto = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
+    const allPhotos = c.photo_urls ? Object.values(c.photo_urls).filter(Boolean) : [];
+    const firstPhoto = isSmile ? (smileAfter || smileBefore) : (allPhotos[0] || null);
+
+    // Photo area
+    let photoHTML = '';
+    if (isSmile && (smileBefore || smileAfter)) {
+      photoHTML = `
+        <div style="position:relative;width:100%;aspect-ratio:4/3;background:#000;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;height:100%;gap:1px;">
+            <div style="overflow:hidden;position:relative;">
+              ${smileBefore ? `<img src="${smileBefore}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : `<div style="height:100%;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.2;">📷</div>`}
+              <div style="position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,0.75);border-radius:4px;padding:2px 6px;font-size:0.44rem;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:0.1em;">BEFORE</div>
+            </div>
+            <div style="overflow:hidden;position:relative;">
+              ${smileAfter ? `<img src="${smileAfter}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : `<div style="height:100%;background:rgba(251,191,36,0.04);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.2;">✨</div>`}
+              <div style="position:absolute;bottom:5px;right:6px;background:rgba(251,191,36,0.92);border-radius:4px;padding:2px 6px;font-size:0.44rem;color:#000;font-weight:700;letter-spacing:0.08em;">AFTER ✨</div>
+            </div>
+          </div>
+        </div>`;
+    } else if (firstPhoto) {
+      photoHTML = `<img src="${firstPhoto}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;" loading="lazy">`;
+    } else {
+      photoHTML = `<div style="width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:2.2rem;background:${col}08;color:${col}40;">${icon}</div>`;
+    }
 
     return `
       <div onclick="openCaseDetail('${c.id}')" style="
-        background:${isSmile ? 'linear-gradient(145deg,rgba(251,191,36,0.05),rgba(251,146,60,0.02))' : 'rgba(255,255,255,0.025)'};
-        border:1px solid ${isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.07)'};
-        border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.2s;position:relative;"
-        onmouseover="this.style.borderColor='${col}50';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px ${col}12'"
-        onmouseout="this.style.borderColor='${isSmile?'rgba(251,191,36,0.15)':'rgba(255,255,255,0.07)'}';this.style.transform='none';this.style.boxShadow='none'">
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${col},${col}30,transparent);"></div>
-        ${isSmile && (smileBefore || smileAfter) ? `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;height:100px;overflow:hidden;background:#000;">
-            <div style="overflow:hidden;position:relative;">
-              ${smileBefore ? `<img src="${smileBefore}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : '<div style="height:100%;background:rgba(255,255,255,0.02);"></div>'}
-              <div style="position:absolute;bottom:4px;left:5px;background:rgba(0,0,0,0.7);border-radius:3px;padding:1px 5px;font-size:0.44rem;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
-            </div>
-            <div style="overflow:hidden;position:relative;">
-              ${smileAfter ? `<img src="${smileAfter}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : '<div style="height:100%;background:rgba(251,191,36,0.03);"></div>'}
-              <div style="position:absolute;bottom:4px;right:5px;background:rgba(251,191,36,0.9);border-radius:3px;padding:1px 5px;font-size:0.44rem;color:#000;font-weight:700;letter-spacing:0.06em;">AFTER ✨</div>
-            </div>
-          </div>` : firstPhoto ? `
-          <div style="height:80px;overflow:hidden;background:#000;">
-            <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
-          </div>` : ''}
-        <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:0.85rem;color:white;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:0.55rem;font-weight:700;color:${col};background:${col}18;padding:2px 7px;border-radius:100px;text-transform:uppercase;">${isSmile ? '✨ Smile' : specLabel}</span>
-              <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
-            </div>
+        background:rgba(255,255,255,0.02);
+        border:1px solid rgba(255,255,255,0.07);
+        border-radius:16px;overflow:hidden;cursor:pointer;
+        transition:all 0.25s;position:relative;"
+        onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 36px rgba(124,111,255,0.12)'"
+        onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='none';this.style.boxShadow='none'">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${col},${col}40,transparent);z-index:1;"></div>
+        ${photoHTML}
+        <div style="padding:12px 14px;">
+          <div style="font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:${col};margin-bottom:4px;">${isSmile ? '✨ Smile Case' : specLabel}</div>
+          <div style="font-size:0.85rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
+          ${narrative ? `<div style="font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px;">${narrative}</div>` : ''}
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:0.58rem;font-weight:700;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.08em;background:${col}18;color:${col};">${specLabel}</span>
+            <span style="font-size:0.58rem;color:rgba(255,255,255,0.2);">${date}</span>
           </div>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>`;
   }).join('');
