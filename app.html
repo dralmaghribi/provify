@@ -5952,12 +5952,12 @@ async function loadBestWork() {
           <div style="font-size:1.3rem;">✦</div>
         </div>
         ${pinnedCases.length === 0 ? `
-          <div style="text-align:center;padding:24px 0;">
+          <div style="text-align:center;padding:24px 0;" id="pinned-empty-state">
             <div style="font-size:2rem;margin-bottom:10px;opacity:0.4;">📌</div>
             <div style="font-size:0.82rem;color:rgba(255,255,255,0.35);margin-bottom:4px;">No cases pinned yet</div>
-            <div style="font-size:0.7rem;color:rgba(255,255,255,0.18);line-height:1.6;">Open any case and tap<br><span style="color:rgba(251,191,36,0.5);font-weight:600;">✦ Pin to Proudest</span> to add it here</div>
-          </div>` : `
-          <div style="display:flex;flex-direction:column;gap:10px;" id="pinned-cases-list"></div>`}
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.18);line-height:1.6;">Open any case → tap <span style="color:rgba(251,191,36,0.6);font-weight:600;">✦ Pin to Proudest Cases</span></div>
+          </div>` : ''}
+        <div style="display:flex;flex-direction:column;gap:10px;" id="pinned-cases-list"></div>
       </div>
     </div>`;
 
@@ -11213,44 +11213,19 @@ function renderPortfolioTeaserCard() {
   const fillPath = path + ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z`;
 
   el.innerHTML = `
-    <div onclick="viewMyPortfolio()" style="cursor:pointer;position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.2);transition:all 0.22s;"
-      onmouseover="this.style.borderColor='rgba(124,111,255,0.45)';this.style.background='linear-gradient(145deg,rgba(124,111,255,0.13),rgba(124,111,255,0.05))'"
-      onmouseout="this.style.borderColor='rgba(124,111,255,0.2)';this.style.background='linear-gradient(145deg,rgba(124,111,255,0.08),rgba(124,111,255,0.03))'">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),transparent);"></div>
-
-      <div style="padding:18px 20px 14px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
-          <div>
-            <div style="font-size:0.5rem;color:rgba(124,111,255,0.5);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Verified Portfolio</div>
-            <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.03em;line-height:1;">${total} <span style="font-size:1rem;color:rgba(255,255,255,0.4);">cases</span></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);padding:6px 12px;border-radius:100px;">
-            <div style="width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.9);"></div>
-            <span style="font-size:0.6rem;color:rgba(255,255,255,0.6);font-weight:600;">Tamper-proof</span>
-          </div>
+    <div onclick="viewMyPortfolio()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.18);border-radius:16px;padding:14px 18px;transition:all 0.2s;"
+      onmouseover="this.style.borderColor='rgba(124,111,255,0.4)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.13),rgba(124,111,255,0.06))'"
+      onmouseout="this.style.borderColor='rgba(124,111,255,0.18)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.03))'">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.9);"></div>
         </div>
-
-        <!-- Mini cumulative chart -->
-        <div style="border-radius:12px;overflow:hidden;background:rgba(0,0,0,0.2);margin-bottom:14px;">
-          <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;">
-            <defs>
-              <linearGradient id="portGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#7C6FFF" stop-opacity="0.4"/>
-                <stop offset="100%" stop-color="#7C6FFF" stop-opacity="0.02"/>
-              </linearGradient>
-            </defs>
-            <path d="${fillPath}" fill="url(#portGrad)"/>
-            <path d="${path}" fill="none" stroke="#7C6FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="${points[points.length-1].x}" cy="${points[points.length-1].y}" r="4" fill="#7C6FFF" stroke="rgba(0,0,0,0.6)" stroke-width="1.5"/>
-            <circle cx="${points[points.length-1].x}" cy="${points[points.length-1].y}" r="8" fill="none" stroke="#7C6FFF" stroke-width="1" opacity="0.3"/>
-          </svg>
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Shareable · Verified · Growing</div>
-          <div style="font-size:0.75rem;color:rgba(124,111,255,0.7);font-weight:600;">View Portfolio →</div>
+        <div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">Verified Portfolio · ${total} cases</div>
+          <div style="font-size:0.62rem;color:rgba(124,111,255,0.5);">Shareable · Tamper-proof</div>
         </div>
       </div>
+      <div style="font-size:0.72rem;color:rgba(124,111,255,0.6);font-weight:600;">View →</div>
     </div>`;
 
 }
@@ -11291,63 +11266,26 @@ function renderSkillProgressGraph() {
   const trendSign = trend >= 0 ? '+' : '';
   const trendColor = trend > 0 ? '#34D399' : trend === 0 ? '#F59E0B' : '#EF4444';
 
+  const avg = allCases.length > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / allCases.length).toFixed(1) : '—';
+
   el.innerHTML = `
-    <div style="position:relative;border-radius:22px;overflow:hidden;margin-bottom:16px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);">
-      <div style="position:absolute;top:-30px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(124,111,255,0.12) 0%,transparent 70%);pointer-events:none;"></div>
-
-      <div style="padding:20px 22px 16px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;">
-          <div>
-            <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Cases Logged</div>
-            <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;line-height:1.2;">Last 12 weeks</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-family:'Instrument Serif',serif;font-size:2.6rem;color:white;line-height:0.9;letter-spacing:-0.04em;">${totalThisMonth}</div>
-            <div style="font-size:0.6rem;color:${trendColor};font-weight:600;margin-top:4px;">${trendSign}${trend} vs last month</div>
-          </div>
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);">
+        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;line-height:1;letter-spacing:-0.02em;">${allCases.length}</div>
+          <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">Total</div>
         </div>
-
-        <!-- Bar chart -->
-        <div style="display:flex;align-items:flex-end;gap:4px;height:80px;padding-bottom:2px;">
-          ${weeks.map((w, i) => {
-            const isCurrentWeek = i === weeks.length - 1;
-            const heightPct = w.count === 0 ? 4 : Math.max(8, Math.round((w.count / maxCount) * 100));
-            const barColor = isCurrentWeek ? '#7C6FFF' : w.count > 0 ? 'rgba(124,111,255,0.35)' : 'rgba(255,255,255,0.05)';
-            return `
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="font-size:0.55rem;color:${isCurrentWeek ? '#7C6FFF' : 'rgba(255,255,255,0.2)'};font-weight:${isCurrentWeek ? '700' : '400'};min-height:14px;">
-                  ${w.count > 0 ? w.count : ''}
-                </div>
-                <div style="width:100%;border-radius:4px 4px 2px 2px;background:${barColor};transition:height 0.8s cubic-bezier(0.4,0,0.2,1);
-                  height:${heightPct}%;
-                  ${isCurrentWeek ? 'box-shadow:0 0 12px rgba(124,111,255,0.5);' : ''}
-                  ${w.count === 0 ? 'height:3px;border-radius:2px;' : ''}"></div>
-              </div>`;
-          }).join('')}
+        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#7C6FFF;line-height:1;letter-spacing:-0.02em;">${totalThisMonth}</div>
+          <div style="font-size:0.48rem;color:rgba(124,111,255,0.3);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">This Month</div>
         </div>
-
-        <!-- Week labels — show only every 3rd -->
-        <div style="display:flex;gap:4px;margin-top:6px;">
-          ${weeks.map((w, i) => `
-            <div style="flex:1;text-align:center;font-size:0.42rem;color:${i === weeks.length-1 ? 'rgba(124,111,255,0.6)' : 'rgba(255,255,255,0.12)'};">
-              ${i % 3 === 0 || i === weeks.length-1 ? w.label.split(' ')[0] : ''}
-            </div>`).join('')}
+        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:${trendColor};line-height:1;letter-spacing:-0.02em;">${trendSign}${trend}</div>
+          <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">vs Last</div>
         </div>
-      </div>
-
-      <!-- Stats strip -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.04);">
-        <div style="padding:12px;text-align:center;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;line-height:1;">${allCases.length}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Total</div>
-        </div>
-        <div style="padding:12px;text-align:center;border-left:1px solid rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:#7C6FFF;line-height:1;">${totalThisMonth}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">This Month</div>
-        </div>
-        <div style="padding:12px;text-align:center;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${trendColor};line-height:1;">${trendSign}${trend}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">vs Last</div>
+        <div style="padding:16px 12px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#F59E0B;line-height:1;letter-spacing:-0.02em;">${avg}</div>
+          <div style="font-size:0.48rem;color:rgba(245,158,11,0.3);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">Avg Score</div>
         </div>
       </div>
     </div>`;
