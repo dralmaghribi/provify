@@ -2226,6 +2226,9 @@ body::after {
         <!-- SKILL PROGRESS GRAPH -->
         <div id="skill-progress-card" style="display:none;margin-bottom:14px;"></div>
 
+        <!-- RANK PROGRESSION -->
+        <div id="rank-progression-card" style="margin-bottom:14px;"></div>
+
         <!-- BEST WORK -->
         <div class="card dash-section" id="best-work-card" style="display:none">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -4724,7 +4727,7 @@ async function generateAIReport(caseData, complexity) {
     // Update rank in celebration (no raw score)
     const celScore = document.getElementById('cel-score');
     if (celScore) {
-      const celRank = getComplexityRank(parseInt(complexity) || 0);
+      const celRank = getComplexityRank(allCases.length);
       celScore.textContent = celRank.rank || '—';
       celScore.style.color = celRank.color || '#7C6FFF';
       celScore.style.fontSize = '1rem';
@@ -4847,7 +4850,7 @@ function updateDashboard() {
   const avg = total > 0 ? (allCases.reduce((s, c) => s + (c.complexity_score || 0), 0) / total) : 0;
   const level = getLevel(total);
   const xp = getXP(total);
-  const rank = getComplexityRank(avg);
+  const rank = getComplexityRank(total);
   const protected_count = allCases.filter(c => c.note && c.note.includes('|| ML_RECORD:')).length;
   const streak = calculateStreak();
 
@@ -5053,6 +5056,7 @@ function updateDashboard() {
   renderPortfolioTeaserCard();
   renderValueStrip();
   renderLastCaseStrip();
+  renderRankProgression();
 
   // ── PROGRESSIVE NAV DISCLOSURE ──
   // Show secondary nav items progressively as user logs more cases
@@ -5174,7 +5178,7 @@ function caseItemHTML(c, showDelete = false) {
   const isSmile = c.specialty === 'smile';
   const specColors = { endo: '#7C6FFF', restorative: '#F59E0B', surgery: '#EF4444', paeds: '#34D399', prostho: '#38BDF8', smile: '#FBB424' };
   const color = specColors[c.specialty] || '#7C6FFF';
-  const rank = getComplexityRank(c.complexity_score || 0);
+  const rank = getComplexityRank(allCases.length);
   const nickname = getCaseNickname(c.id);
   const smartLabel = getSmartCaseLabel(c);
   const score = c.complexity_score || 0;
@@ -5385,7 +5389,7 @@ async function openCaseDetail(id) {
   document.getElementById('modal-title').textContent = `Tooth ${c.tooth_number} — ${specLabel}`;
   document.getElementById('modal-date').textContent = date;
   // Show rank instead of raw score
-  const modalRank = getComplexityRank(c.complexity_score || 0);
+  const modalRank = getComplexityRank(allCases.length);
   const modalScoreEl = document.getElementById('modal-score');
   const modalRankIcon = document.getElementById('modal-rank-icon');
   if (modalScoreEl) modalScoreEl.textContent = modalRank.rank || '—';
@@ -5712,16 +5716,17 @@ function getMolarsForCase(complexityScore) {
 }
 
 const COMPLEXITY_RANKS = [
-  { min: 0,   max: 3,   rank: 'Bronze',   label: 'Routine',  color: '#CD7F32', bg: 'rgba(205,127,50,0.1)',  border: 'rgba(205,127,50,0.3)'  },
-  { min: 3,   max: 5,   rank: 'Silver',   label: 'Moderate', color: '#C0C0C0', bg: 'rgba(192,192,192,0.1)', border: 'rgba(192,192,192,0.3)' },
-  { min: 5,   max: 7,   rank: 'Gold',     label: 'Complex',  color: '#FFD700', bg: 'rgba(255,215,0,0.1)',   border: 'rgba(255,215,0,0.3)'   },
-  { min: 7,   max: 9,   rank: 'Platinum', label: 'Advanced', color: '#E5E4E2', bg: 'rgba(229,228,226,0.1)', border: 'rgba(229,228,226,0.3)' },
-  { min: 9,   max: 11,  rank: 'Elite',    label: 'Elite',    color: '#7C6FFF', bg: 'rgba(124,111,255,0.1)', border: 'rgba(124,111,255,0.3)' },
+  { min: 0,   max: 9,   rank: 'Bronze',   emoji: '🥉', label: 'Getting started',     color: '#CD7F32', bg: 'rgba(205,127,50,0.1)',  border: 'rgba(205,127,50,0.3)'  },
+  { min: 10,  max: 24,  rank: 'Silver',   emoji: '🥈', label: 'Building momentum',   color: '#C0C0C0', bg: 'rgba(192,192,192,0.1)', border: 'rgba(192,192,192,0.3)' },
+  { min: 25,  max: 49,  rank: 'Gold',     emoji: '🥇', label: 'Proving your worth',  color: '#FFD700', bg: 'rgba(255,215,0,0.1)',   border: 'rgba(255,215,0,0.3)'   },
+  { min: 50,  max: 99,  rank: 'Platinum', emoji: '💿', label: 'Above the rest',      color: '#E5E4E2', bg: 'rgba(229,228,226,0.1)', border: 'rgba(229,228,226,0.3)' },
+  { min: 100, max: 199, rank: 'Diamond',  emoji: '💎', label: 'Forged under pressure',color: '#B9F2FF', bg: 'rgba(185,242,255,0.1)', border: 'rgba(185,242,255,0.3)' },
+  { min: 200, max: 9999,rank: 'Apex',     emoji: '🔱', label: 'The pinnacle.',        color: '#7C6FFF', bg: 'rgba(124,111,255,0.1)', border: 'rgba(124,111,255,0.3)' },
 ];
 
-function getComplexityRank(score) {
+function getComplexityRank(total) {
   for (let i = COMPLEXITY_RANKS.length - 1; i >= 0; i--) {
-    if (score >= COMPLEXITY_RANKS[i].min) return COMPLEXITY_RANKS[i];
+    if (total >= COMPLEXITY_RANKS[i].min) return COMPLEXITY_RANKS[i];
   }
   return COMPLEXITY_RANKS[0];
 }
@@ -5972,7 +5977,7 @@ async function loadBestWork() {
     const fdiLabel = !isSmile && c.tooth_number ? toothQuadrant(c.tooth_number) : null;
     const title = isSmile ? (c.procedure || 'Smile Case') : (fdiLabel ? `${fdiLabel} · T${c.tooth_number}` : `Tooth ${c.tooth_number || '—'}`);
     const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    const rankData = getComplexityRank(c.complexity_score || 0);
+    const rankData = getComplexityRank(allCases.length);
 
     const item = document.createElement('div');
     item.onclick = () => openCaseDetail(c.id);
@@ -6236,7 +6241,9 @@ function renderPortfolioCases() {
 
   el.innerHTML = allCases.map(c => {
     const date = new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics' }[c.specialty] || c.specialty;
+    const isSmile = c.specialty === 'smile';
+    const specLabel = { endo: 'Endodontics', restorative: 'Restorative', surgery: 'Surgery', paeds: 'Paediatric', prostho: 'Prosthodontics', smile: '✨ Smile Case' }[c.specialty] || c.specialty;
+    const caseTitle = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
     const isSelected = selectedCaseIds.has(c.id);
     return `
       <div class="portfolio-case-item ${isSelected ? 'selected' : ''}" onclick="toggleCaseSelection('${c.id}', this)">
@@ -6245,7 +6252,7 @@ function renderPortfolioCases() {
         </div>
         <div class="case-specialty-badge">${specLabel}</div>
         <div class="case-info" style="flex:1">
-          <div class="case-tooth">Tooth ${c.tooth_number}</div>
+          <div class="case-tooth">${caseTitle}</div>
           <div class="case-date">${date}</div>
         </div>
         <div style="text-align:right">
@@ -8243,7 +8250,7 @@ async function showVoiceResults(caseData, complexity, caseId) {
   }
 
   if (barEl) setTimeout(() => { barEl.style.width = `${complexity * 10}%`; }, 200);
-  if (specLabelEl) { const vRank = getComplexityRank(parseInt(complexity)||0); specLabelEl.textContent = `${vRank.rank} · ${specLabel}`; }
+  if (specLabelEl) { const vRank = getComplexityRank(allCases.length); specLabelEl.textContent = `${vRank.rank} · ${specLabel}`; }
 
   // Personalised protection line
   const firstName = currentProfile?.first_name || 'Doctor';
@@ -11061,7 +11068,7 @@ function renderLastCaseStrip() {
   const spec = specNames[last.specialty] || last.specialty || 'General';
   const col = specColors[last.specialty] || '#7C6FFF';
   const tooth = last.tooth_number ? `Tooth ${last.tooth_number}` : 'Case';
-  const rank = getComplexityRank(last.complexity_score || 0);
+  const rank = getComplexityRank(allCases.length);
   const score = last.complexity_score ? rank.rank : '';
   const daysAgo = last.created_at ? Math.floor((Date.now() - new Date(last.created_at)) / 86400000) : null;
   const when = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : daysAgo !== null ? `${daysAgo}d ago` : '';
@@ -11287,6 +11294,99 @@ function renderSkillProgressGraph() {
           <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#F59E0B;line-height:1;letter-spacing:-0.02em;">${avg}</div>
           <div style="font-size:0.48rem;color:rgba(245,158,11,0.3);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">Avg Score</div>
         </div>
+      </div>
+    </div>`;
+}
+
+// ─── RANK PROGRESSION CARD ───
+function renderRankProgression() {
+  const el = document.getElementById('rank-progression-card');
+  if (!el) return;
+
+  const total = allCases.length;
+  const currentRank = getComplexityRank(total);
+
+  const tiers = [
+    { rank: 'Bronze',   emoji: '🥉', min: 0,   max: 9,   color: '#CD7F32' },
+    { rank: 'Silver',   emoji: '🥈', min: 10,  max: 24,  color: '#C0C0C0' },
+    { rank: 'Gold',     emoji: '🥇', min: 25,  max: 49,  color: '#FFD700' },
+    { rank: 'Platinum', emoji: '💿', min: 50,  max: 99,  color: '#E5E4E2' },
+    { rank: 'Diamond',  emoji: '💎', min: 100, max: 199, color: '#B9F2FF' },
+    { rank: 'Apex',     emoji: '🔱', min: 200, max: null, color: '#7C6FFF' },
+  ];
+
+  const currentIdx = tiers.findIndex(t => t.rank === currentRank.rank);
+  const nextTier = tiers[currentIdx + 1] || null;
+  const casesForNext = nextTier ? nextTier.min - total : 0;
+  const progressPct = nextTier
+    ? Math.min(100, Math.round(((total - currentRank.min) / (nextTier.min - currentRank.min)) * 100))
+    : 100;
+
+  el.innerHTML = `
+    <div style="position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.07);">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${currentRank.color}60,transparent);"></div>
+      <div style="padding:20px 22px 22px;">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div>
+            <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:4px;">Your Rank</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:1.4rem;">${currentRank.emoji}</span>
+              <span style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:${currentRank.color};letter-spacing:-0.02em;">${currentRank.rank}</span>
+            </div>
+          </div>
+          ${nextTier ? `
+          <div style="text-align:right;">
+            <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Next rank</div>
+            <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+              <span style="font-size:1rem;">${nextTier.emoji}</span>
+              <span style="font-size:0.82rem;color:rgba(255,255,255,0.5);font-weight:600;">${nextTier.rank}</span>
+            </div>
+            <div style="font-size:0.62rem;color:${nextTier.color};margin-top:3px;font-weight:600;">${casesForNext} case${casesForNext !== 1 ? 's' : ''} away</div>
+          </div>` : `
+          <div style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);border-radius:100px;padding:6px 14px;">
+            <div style="font-size:0.62rem;color:#7C6FFF;font-weight:700;">Max Rank</div>
+          </div>`}
+        </div>
+
+        <!-- Progress bar -->
+        ${nextTier ? `
+        <div style="margin-bottom:20px;">
+          <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;margin-bottom:6px;">
+            <div style="height:100%;width:${progressPct}%;background:linear-gradient(90deg,${currentRank.color},${nextTier.color});border-radius:100px;transition:width 1s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 8px ${currentRank.color}60;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:0.55rem;color:rgba(255,255,255,0.2);">${total} cases</span>
+            <span style="font-size:0.55rem;color:rgba(255,255,255,0.2);">${nextTier.min} cases</span>
+          </div>
+        </div>` : ''}
+
+        <!-- All tiers -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          ${tiers.map(t => {
+            const isActive = t.rank === currentRank.rank;
+            const isDone = total >= t.min;
+            const isLocked = !isDone && !isActive;
+            return `
+            <div style="
+              border-radius:14px;padding:12px 8px;text-align:center;
+              background:${isActive ? t.color + '15' : isDone ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)'};
+              border:1px solid ${isActive ? t.color + '50' : isDone ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'};
+              ${isActive ? `box-shadow:0 0 20px ${t.color}20;` : ''}
+              position:relative;overflow:hidden;
+              transition:all 0.3s;
+            ">
+              ${isActive ? `<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${t.color}80,transparent);"></div>` : ''}
+              <div style="font-size:${isActive ? '1.5' : '1.1'}rem;margin-bottom:5px;${isLocked ? 'filter:grayscale(1);opacity:0.3;' : ''}">${t.emoji}</div>
+              <div style="font-size:0.65rem;font-weight:700;color:${isActive ? t.color : isDone ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.15)'};margin-bottom:3px;">${t.rank}</div>
+              <div style="font-size:0.5rem;color:${isActive ? t.color + '90' : 'rgba(255,255,255,0.15)'};">${t.max ? `${t.min}–${t.max}` : `${t.min}+`}</div>
+              ${isActive ? `<div style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:${t.color};box-shadow:0 0 6px ${t.color};"></div>` : ''}
+              ${isDone && !isActive ? `<div style="font-size:0.5rem;color:${t.color};margin-top:2px;">✓</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+
       </div>
     </div>`;
 }
