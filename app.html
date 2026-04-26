@@ -1210,120 +1210,92 @@ body::after {
 }
 
 /* ═══════════════════════════════════════════════
-   MOBILE PREMIUM LAYOUT  ≤ 680px
-   Reorder via flex+order, carousel pinned cases,
-   compact action strip, no layout rebuild
+   MOBILE LAYOUT  ≤ 680px
+   All rules scoped strictly to #view-dashboard
+   or to elements that only exist in dashboard.
+   DOES NOT touch any other view.
    ═══════════════════════════════════════════════ */
 @media(max-width:680px) {
 
-  /* Make dashboard a flex column so we can reorder freely */
-  #view-dashboard { display:flex; flex-direction:column; padding-bottom:100px; }
+  /* Dashboard becomes a flex column for reordering */
+  #view-dashboard { display:flex !important; flex-direction:column; padding-bottom:90px; }
 
-  /* Hide desktop topbar on mobile — mobile topbar already exists */
-  .db-topbar { display:none; }
+  /* Hide desktop topbar — mobile topbar replaces it */
+  #view-dashboard .db-topbar { display:none; }
 
-  /* ── ORDER ──────────────────────────────────── */
-  .db-hero              { order:1; margin-bottom:16px; }
-  /* Recent activity comes second — instant value */
-  #view-dashboard .db-section:has(#db-activity-list)    { order:2; }
-  /* Monthly mission */
-  #view-dashboard .db-section:has(#db-missions-grid)    { order:3; }
-  /* Rank card */
-  #view-dashboard .db-section:has(#db-rank-card)        { order:4; }
-  /* Stats strip — compact context, not hero */
-  .db-portfolio-strip   { order:5; }
-  /* Stat cards (shield/portfolio/AI) — compact row at bottom */
-  .db-stat-grid         { order:7; }
-  /* Proudest work + feedback bottom grid */
-  .db-bottom-grid       { order:6; }
-  /* Hidden legacy block stays hidden */
-  #view-dashboard > div[aria-hidden="true"] { order:99; }
-  #view-dashboard > div[style*="height:32px"] { order:100; }
-  #view-dashboard > div[style*="display:none"] { order:98; }
+  /* ── SECTION ORDER ───────────────────────────── */
+  #view-dashboard .db-hero                                  { order:1; margin-bottom:16px; }
+  #view-dashboard .db-section:has(#db-activity-list)        { order:2; }
+  #view-dashboard .db-section:has(#db-missions-grid)        { order:3; }
+  #view-dashboard .db-section:has(#db-rank-card)            { order:4; }
+  #view-dashboard .db-portfolio-strip                       { order:5; }
+  #view-dashboard .db-bottom-grid                           { order:6; }
+  #view-dashboard .db-stat-grid                             { order:7; }
+  #view-dashboard > div[aria-hidden="true"]                 { order:98; }
+  #view-dashboard > div:last-child                          { order:99; }
 
-  /* ── HERO — tighter on mobile ───────────────── */
-  .db-hero { border-radius:20px; padding:40px 20px 36px; }
-  .db-hero-title { font-size:52px; }
-  .db-hero-subtitle { font-size:26px; }
-  .db-mic-btn { width:100px; height:100px; }
-  .db-mic-svg { width:36px; height:36px; }
-  .db-mic-ring   { inset:-14px; }
-  .db-mic-ring-2 { inset:-30px; }
-  .db-mic-ring-3 { inset:-50px; }
+  /* ── HERO ────────────────────────────────────── */
+  #view-dashboard .db-hero { border-radius:18px; padding:38px 20px 34px; }
+  #view-dashboard .db-hero-title { font-size:48px; }
+  #view-dashboard .db-hero-subtitle { font-size:24px; }
+  #view-dashboard .db-mic-btn { width:96px; height:96px; }
+  #view-dashboard .db-mic-svg { width:34px; height:34px; }
 
-  /* ── STAT CARDS → compact horizontal pill row ─ */
-  .db-stat-grid {
-    display:flex; flex-direction:row; gap:8px;
+  /* ── STAT CARDS → horizontal scroll row ─────── */
+  #view-dashboard .db-stat-grid {
+    display:flex; flex-direction:row;
     overflow-x:auto; -webkit-overflow-scrolling:touch;
     scrollbar-width:none; scroll-snap-type:x mandatory;
-    padding-bottom:4px;
+    gap:10px; padding-bottom:6px;
   }
-  .db-stat-grid::-webkit-scrollbar { display:none; }
-  .db-stat-card {
-    flex:0 0 calc(50% - 4px); scroll-snap-align:start;
-    padding:16px 16px 14px; border-radius:14px;
-    min-width:0;
+  #view-dashboard .db-stat-grid::-webkit-scrollbar { display:none; }
+  #view-dashboard .db-stat-card {
+    flex:0 0 58%; scroll-snap-align:start;
+    padding:16px 16px 14px; border-radius:14px; min-width:0;
   }
-  .db-stat-val { font-size:32px; }
-  .db-stat-icon { width:28px; height:28px; border-radius:8px; margin-bottom:12px; }
+  #view-dashboard .db-stat-val { font-size:30px; }
+  #view-dashboard .db-stat-icon { width:28px; height:28px; border-radius:8px; margin-bottom:12px; }
 
   /* ── PINNED CASES → horizontal swipe carousel ─ */
   #db-top-cases-container {
-    flex-direction:row !important;
-    gap:10px !important;
     overflow-x:auto !important;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    scroll-snap-type:x mandatory;
-    padding-bottom:4px;
+    -webkit-overflow-scrolling:touch !important;
+    scrollbar-width:none !important;
+    scroll-snap-type:x mandatory !important;
+    gap:10px !important;
+    padding-bottom:4px !important;
   }
   #db-top-cases-container::-webkit-scrollbar { display:none; }
-  /* Each card in carousel: fixed width, snap */
-  #db-top-cases-container > div {
-    flex:0 0 82% !important;
+  /* Force every direct child to be carousel-card-sized */
+  #db-top-cases-container > * {
+    flex:0 0 85% !important;
     min-width:0 !important;
-    scroll-snap-align:start;
-    border-radius:16px !important;
-  }
-  /* Single full card also gets carousel sizing */
-  #db-top-cases-container .db-top-case-card {
-    flex:0 0 88% !important;
-    scroll-snap-align:start;
+    scroll-snap-align:start !important;
   }
 
-  /* ── BOTTOM GRID → single col stacked ─────── */
-  .db-bottom-grid { display:flex; flex-direction:column; gap:20px; }
+  /* ── BOTTOM GRID → single col ──────────────── */
+  #view-dashboard .db-bottom-grid { display:flex; flex-direction:column; gap:20px; }
 
-  /* ── SECTIONS — tighter mobile spacing ─────── */
-  .db-section { margin-bottom:20px; }
-  .db-portfolio-strip { margin-bottom:20px; border-radius:12px; padding:14px 16px; }
-  .db-strip-item { padding:2px 0; }
-  .db-strip-val { font-size:22px; }
-  .db-strip-label { font-size:10.5px; }
+  /* ── STATS STRIP ─────────────────────────────── */
+  #view-dashboard .db-portfolio-strip { border-radius:12px; padding:14px 16px; margin-bottom:20px; }
+  #view-dashboard .db-strip-val { font-size:21px; }
+  #view-dashboard .db-strip-label { font-size:10px; }
 
-  /* ── ACTIVITY ROWS — slightly smaller ───────── */
-  .db-activity-row { padding:9px 10px; gap:8px; }
-  .db-act-time { width:26px; font-size:10px; }
-  .db-act-name { font-size:12.5px; }
-
-  /* ── MISSION CARDS — tighter ─────────────────  */
-  .db-mission-card { padding:13px 14px; }
-
-  /* ── RANK CARD — full width ──────────────────── */
-  .db-rank-card { border-radius:16px; padding:20px; }
-
-  /* ── REVIEWS — single col already, just tighten */
-  .db-reviews-card { padding:12px; }
-  .db-review-item { padding:9px 10px; }
+  /* ── SECTIONS ────────────────────────────────── */
+  #view-dashboard .db-section { margin-bottom:18px; }
+  #view-dashboard .db-activity-row { padding:9px 10px; gap:8px; }
+  #view-dashboard .db-mission-card { padding:13px 14px; }
+  #view-dashboard .db-rank-card { border-radius:16px; padding:20px; }
+  #view-dashboard .db-reviews-card { padding:12px; }
+  #view-dashboard .db-review-item { padding:9px 10px; }
 }
 
 @media(max-width:520px) {
   .pd-micro-grid { gap:8px; }
   .pd-micro-stat { padding:14px 8px; }
   .pd-micro-stat strong { font-size:1.6rem; }
-  .db-hero-title { font-size:44px; }
-  .db-hero-subtitle { font-size:22px; }
-  .db-portfolio-strip { grid-template-columns:repeat(2,1fr); }
+  #view-dashboard .db-hero-title { font-size:40px; }
+  #view-dashboard .db-hero-subtitle { font-size:20px; }
 }
 
 </style>
@@ -11111,7 +11083,6 @@ function renderTopCaseThisMonth(thisMonth) {
 
   // Empty state
   if (!casesToShow.length) {
-    container.style.flexDirection = 'column';
     container.innerHTML = `<div style="text-align:center;padding:32px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;color:rgba(240,239,254,0.25);font-size:13px;">No cases pinned yet.<br><span style="font-size:12px;margin-top:4px;display:block;">Open any case → tap ✦ Pin to Proudest Cases</span></div>`;
     if (labelEl) labelEl.textContent = '✦ Pin a case';
     if (hintEl)  hintEl.textContent  = '';
@@ -11150,10 +11121,8 @@ function renderTopCaseThisMonth(thisMonth) {
     }
   });
 
-  // Multiple pinned — compact horizontal row
+  // Multiple pinned — let CSS handle carousel layout on mobile
   if (casesToShow.length > 1) {
-    container.style.flexDirection = 'row';
-    container.style.gap = '10px';
     container.innerHTML = casesToShow.map((c, i) => {
       const title     = c.specialty === 'smile' ? (c.procedure || 'Smile Case') : (c.procedure || c.case_type || `Tooth ${c.tooth_number || '—'}`);
       const shortDate = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
@@ -11185,9 +11154,7 @@ function renderTopCaseThisMonth(thisMonth) {
     return;
   }
 
-  // Single card — full size
-  container.style.flexDirection = 'column';
-  container.style.gap = '10px';
+  // Single card — CSS handles sizing
   const c         = casesToShow[0];
   const title     = c.specialty === 'smile' ? (c.procedure || 'Smile Case') : (c.procedure || c.case_type || `Tooth ${c.tooth_number || '—'}`);
   const date      = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
