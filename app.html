@@ -6,7 +6,7 @@
 <title>Provify — Clinical Case Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -914,8 +914,249 @@ body::after {
 .photo-upload-box:hover { border-color: rgba(124,111,255,0.4); background: rgba(124,111,255,0.04); }
 .photo-preview-empty { color: var(--gray); font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 
-/* ─── PROVIFY PREMIUM DASHBOARD MERGE ─── */
-.pd-dashboard{max-width:1040px;margin:0 auto 36px;display:flex;flex-direction:column;gap:14px}.pd-hero{position:relative;overflow:hidden;border-radius:30px;background:radial-gradient(ellipse 70% 55% at 50% -5%,rgba(124,111,255,.18),transparent 70%),linear-gradient(180deg,#090716 0%,#05040d 100%);border:1px solid rgba(255,255,255,.07);padding:18px 24px 32px;text-align:center;cursor:pointer;box-shadow:0 26px 80px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.04)}.pd-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(circle at 50% 30%,black 0%,transparent 78%);pointer-events:none}.pd-hero-orb{position:absolute;border-radius:50%;filter:blur(2px);pointer-events:none}.pd-hero-orb-a{width:320px;height:320px;right:-120px;top:-120px;background:radial-gradient(circle,rgba(124,111,255,.14),transparent 66%);animation:pdOrb 12s ease-in-out infinite}.pd-hero-orb-b{width:240px;height:240px;left:-90px;bottom:-120px;background:radial-gradient(circle,rgba(58,140,126,.08),transparent 66%);animation:pdOrb 15s ease-in-out 1.4s infinite reverse}@keyframes pdOrb{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(18px,10px,0)}}.pd-hero-topline{position:relative;z-index:2;display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:100px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);font-size:.52rem;text-transform:uppercase;letter-spacing:.22em;font-weight:700;color:rgba(255,255,255,.42);margin-bottom:28px}.pd-online-dot{width:6px;height:6px;border-radius:50%;background:#3dd68c;box-shadow:0 0 10px rgba(61,214,140,.7);animation:pdBlink 2.6s ease-in-out infinite}@keyframes pdBlink{0%,100%{opacity:.55}50%{opacity:1}}.pd-mic-stage{position:relative;z-index:2;width:112px;height:112px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center}.pd-mic-ring{position:absolute;border-radius:50%;border:1px solid rgba(124,111,255,.18);animation:pdRing 3.2s ease-out infinite}.pd-mic-ring-1{inset:16px;animation-delay:0s}.pd-mic-ring-2{inset:2px;animation-delay:.55s}.pd-mic-ring-3{inset:-16px;animation-delay:1.1s}@keyframes pdRing{0%{opacity:.8;transform:scale(.82)}100%{opacity:0;transform:scale(1.28)}}.pd-mic-button{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#8c80f0 0%,#6156d3 58%,#463ea8 100%);box-shadow:0 0 0 10px rgba(124,111,255,.08),0 0 45px rgba(124,111,255,.55),0 18px 38px rgba(0,0,0,.45);animation:pdMic 3s ease-in-out infinite}@keyframes pdMic{0%,100%{transform:scale(1);box-shadow:0 0 0 10px rgba(124,111,255,.08),0 0 45px rgba(124,111,255,.55),0 18px 38px rgba(0,0,0,.45)}50%{transform:scale(1.04);box-shadow:0 0 0 14px rgba(124,111,255,.10),0 0 62px rgba(124,111,255,.72),0 18px 38px rgba(0,0,0,.45)}}.pd-wave{position:relative;z-index:2;height:24px;margin:0 0 20px;display:flex;align-items:flex-end;justify-content:center;gap:5px}.pd-wave span{width:4px;border-radius:8px;background:rgba(155,143,245,.55);animation:pdWave 1.35s ease-in-out infinite}.pd-wave span:nth-child(1){height:6px;animation-delay:0s}.pd-wave span:nth-child(2){height:10px;animation-delay:.1s}.pd-wave span:nth-child(3){height:16px;animation-delay:.2s}.pd-wave span:nth-child(4){height:24px;animation-delay:.3s}.pd-wave span:nth-child(5){height:16px;animation-delay:.2s}.pd-wave span:nth-child(6){height:10px;animation-delay:.1s}.pd-wave span:nth-child(7){height:6px;animation-delay:0s}@keyframes pdWave{0%,100%{transform:scaleY(.6);opacity:.4}50%{transform:scaleY(1);opacity:1}}.pd-hero-title{position:relative;z-index:2;font-family:'Instrument Serif',serif;font-size:clamp(3rem,7vw,5.6rem);line-height:.9;letter-spacing:-.055em;color:rgba(255,255,255,.94);margin:0 0 18px}.pd-hero-title em{font-style:italic;color:#9b8ff5}.pd-hero-sub{position:relative;z-index:2;max-width:440px;margin:0 auto 22px;font-size:.9rem;line-height:1.65;color:rgba(255,255,255,.43)}.pd-hero-actions{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}.pd-primary-action,.pd-secondary-action{border:none;font-family:'Inter',sans-serif;cursor:pointer;transition:all .18s ease}.pd-primary-action{padding:13px 28px;border-radius:100px;color:white;font-weight:800;background:linear-gradient(135deg,#7c6fff,#9b91ff);box-shadow:0 0 24px rgba(124,111,255,.38)}.pd-primary-action:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 34px rgba(124,111,255,.55)}.pd-primary-action:active{transform:translateY(0) scale(.98)}.pd-secondary-action{background:transparent;color:rgba(255,255,255,.42);font-weight:650;padding:10px 12px;border-radius:100px}.pd-secondary-action:hover{color:#9b8ff5;background:rgba(124,111,255,.06)}.pd-trust-row{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.pd-trust-row span{font-size:.68rem;color:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);padding:6px 11px;border-radius:100px}.pd-micro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.pd-micro-stat{border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025);border-radius:18px;padding:16px 10px;text-align:center}.pd-micro-stat strong{font-family:'Instrument Serif',serif;font-size:2rem;line-height:1;color:white;font-weight:400;letter-spacing:-.04em;display:block}.pd-micro-stat span{font-size:.48rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(255,255,255,.2);display:block;margin-top:5px}.pd-micro-stat.pd-teal strong{color:#58b8a9}.pd-micro-stat.pd-gold strong{color:#c9a14d}.pd-micro-stat.pd-amber strong{color:#c4713a}.pd-modules{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:12px}.pd-module{position:relative;overflow:hidden;border-radius:22px;padding:20px;min-height:150px;cursor:pointer;border:1px solid rgba(255,255,255,.07);transition:all .2s ease;display:flex;gap:14px;align-items:flex-start}.pd-module:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.14);box-shadow:0 14px 36px rgba(0,0,0,.24)}.pd-module:before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.34),transparent)}.pd-module-shield{background:linear-gradient(135deg,rgba(196,113,58,.13),rgba(6,4,18,.86))}.pd-module-portfolio{background:linear-gradient(135deg,rgba(124,111,255,.13),rgba(6,4,18,.86))}.pd-module-ai{background:linear-gradient(135deg,rgba(58,140,126,.13),rgba(6,4,18,.86))}.pd-module-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);flex-shrink:0}.pd-module-copy span{font-size:.48rem;text-transform:uppercase;letter-spacing:.2em;font-weight:800;color:rgba(255,255,255,.3)}.pd-module-copy h2{font-family:'Instrument Serif',serif;font-size:1.45rem;line-height:1.08;color:rgba(255,255,255,.9);font-weight:400;margin:7px 0 8px;letter-spacing:-.03em;text-transform:capitalize}.pd-module-copy p{font-size:.72rem;line-height:1.5;color:rgba(255,255,255,.28)}.pd-ai-bars{position:absolute;right:18px;bottom:18px;display:flex;align-items:flex-end;gap:3px;height:24px}.pd-ai-bars i{width:3px;border-radius:6px;background:#58b8a9;opacity:.55;animation:pdWave 1.4s ease-in-out infinite}.pd-ai-bars i:nth-child(1){height:6px}.pd-ai-bars i:nth-child(2){height:12px;animation-delay:.1s}.pd-ai-bars i:nth-child(3){height:22px;animation-delay:.2s}.pd-ai-bars i:nth-child(4){height:14px;animation-delay:.3s}.pd-ai-bars i:nth-child(5){height:8px;animation-delay:.4s}.pd-section-label{display:flex;align-items:center;justify-content:space-between;margin:6px 2px -4px}.pd-section-label span{font-size:.52rem;text-transform:uppercase;letter-spacing:.24em;font-weight:800;color:rgba(255,255,255,.18)}.pd-section-label button,.pd-card-head button{border:none;background:transparent;color:rgba(155,143,245,.55);font-size:.72rem;font-weight:700;cursor:pointer}.pd-section-label button:hover,.pd-card-head button:hover{color:#9b8ff5}.pd-card-shell{position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);padding:18px 20px}.pd-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.pd-card-head span{font-size:.52rem;text-transform:uppercase;letter-spacing:.24em;font-weight:800;color:rgba(255,255,255,.18)}.pd-card-head strong{font-size:.84rem;color:#c9a14d}.pd-best-work-list{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.pd-reviews-list{display:flex;flex-direction:column;gap:10px}.pd-welcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pd-welcome-grid div{padding:14px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.055)}.pd-welcome-grid strong{display:block;color:rgba(255,255,255,.82);font-size:.8rem;margin-bottom:5px}.pd-welcome-grid p{font-size:.68rem;color:rgba(255,255,255,.3);line-height:1.5}@media(max-width:900px){.pd-dashboard{max-width:100%}.pd-modules{grid-template-columns:1fr}.pd-micro-grid{grid-template-columns:repeat(2,1fr)}.pd-hero{padding:16px 16px 28px}.pd-hero-title{font-size:3.25rem}.pd-welcome-grid{grid-template-columns:1fr}.pd-module{min-height:auto}}@media(max-width:520px){.pd-micro-grid{gap:8px}.pd-micro-stat{padding:14px 8px}.pd-micro-stat strong{font-size:1.6rem}.pd-hero-title{font-size:3rem}.pd-hero-sub{font-size:.78rem}.pd-trust-row span{font-size:.6rem}.pd-section-label{margin-top:8px}.pd-hero-topline{font-size:.44rem;letter-spacing:.16em}}
+/* ─── NEW PROVIFY DASHBOARD — 2025 REDESIGN ─── */
+
+/* Dashboard CSS variables (scoped to dashboard only) */
+#view-dashboard {
+  --db-bg2: #0f0f1a;
+  --db-bg3: #13131f;
+  --db-bg4: #1a1a2e;
+  --db-border: rgba(255,255,255,0.07);
+  --db-border-bright: rgba(255,255,255,0.12);
+  --db-text: #f0effe;
+  --db-text2: rgba(240,239,254,0.6);
+  --db-text3: rgba(240,239,254,0.35);
+  --db-gold: #d4a843;
+  --db-gold-dim: rgba(212,168,67,0.15);
+  --db-gold-glow: rgba(212,168,67,0.25);
+  --db-purple: #7c6fcd;
+  --db-purple-dim: rgba(124,111,205,0.12);
+  --db-purple-glow: rgba(124,111,205,0.3);
+  --db-green: #3dd68c;
+  --db-green-dim: rgba(61,214,140,0.1);
+  --db-orange: #f5893a;
+  font-family: 'DM Sans', 'Inter', sans-serif;
+}
+
+/* Topbar */
+.db-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom: 28px; }
+.db-topbar-date { font-size:13px; color:var(--db-text3); }
+.db-topbar-actions { display:flex; gap:8px; align-items:center; }
+
+/* Dashboard buttons */
+.db-btn { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:9px; font-family:'DM Sans','Inter',sans-serif; font-size:13.5px; font-weight:500; cursor:pointer; border:none; transition:all 0.15s; }
+.db-btn-primary { background:linear-gradient(135deg,#6b5fc7 0%,#4e40b0 100%); color:#fff; box-shadow:0 0 20px rgba(124,111,205,0.35),0 2px 8px rgba(0,0,0,0.4); }
+.db-btn-primary:hover { transform:translateY(-1px); box-shadow:0 0 28px rgba(124,111,205,0.5),0 4px 12px rgba(0,0,0,0.4); }
+.db-btn-ghost { background:transparent; color:var(--db-text2); border:1px solid var(--db-border-bright); }
+.db-btn-ghost:hover { background:rgba(255,255,255,0.04); color:var(--db-text); }
+
+/* Hero section */
+.db-hero { background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(124,111,205,0.12) 0%,transparent 70%), #0f0f1a; border:1px solid var(--db-border); border-radius:20px; padding:56px 40px 48px; text-align:center; position:relative; overflow:hidden; margin-bottom:28px; }
+.db-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 50% 40% at 50% -10%,rgba(124,111,205,0.08) 0%,transparent 70%); pointer-events:none; }
+.db-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+
+/* Mic */
+.db-mic-wrap { position:relative; display:inline-block; margin-bottom:28px; }
+.db-mic-ring { position:absolute; border-radius:50%; border:1px solid rgba(124,111,205,0.25); animation:db-pulse-ring 2.4s ease-out infinite; }
+.db-mic-ring-2 { position:absolute; inset:-26px; border-radius:50%; border:1px solid rgba(124,111,205,0.12); animation:db-pulse-ring 2.4s ease-out 0.5s infinite; }
+.db-mic-ring-3 { position:absolute; inset:-40px; border-radius:50%; border:1px solid rgba(124,111,205,0.06); animation:db-pulse-ring 2.4s ease-out 1s infinite; }
+@keyframes db-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.3)} }
+.db-mic-btn { width:72px; height:72px; border-radius:50%; background:linear-gradient(145deg,#7c6fcd,#4e40b0); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; z-index:1; box-shadow:0 0 0 8px rgba(124,111,205,0.08),0 0 30px rgba(124,111,205,0.5),0 8px 24px rgba(0,0,0,0.5); transition:all 0.2s; animation:db-mic-breathe 3s ease-in-out infinite; border:none; }
+@keyframes db-mic-breathe { 0%,100%{box-shadow:0 0 0 8px rgba(124,111,205,0.08),0 0 30px rgba(124,111,205,0.5),0 8px 24px rgba(0,0,0,0.5)} 50%{box-shadow:0 0 0 12px rgba(124,111,205,0.1),0 0 50px rgba(124,111,205,0.65),0 8px 24px rgba(0,0,0,0.5)} }
+.db-mic-btn:hover { transform:scale(1.06); }
+.db-mic-svg { width:28px; height:28px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* Hero text */
+.db-hero-title { font-family:'Instrument Serif',serif; font-size:48px; line-height:1; letter-spacing:-0.02em; color:var(--db-text); margin-bottom:6px; position:relative; z-index:1; }
+.db-hero-subtitle { font-family:'Instrument Serif',serif; font-size:22px; font-style:italic; color:var(--db-text2); margin-bottom:20px; position:relative; z-index:1; }
+.db-hero-line { font-size:13.5px; color:var(--db-text2); margin-bottom:20px; position:relative; z-index:1; }
+.db-hero-line span { color:var(--db-purple); font-weight:500; }
+.db-hero-tags { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:28px; flex-wrap:wrap; position:relative; z-index:1; }
+.db-tag { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:500; background:rgba(255,255,255,0.04); border:1px solid var(--db-border-bright); color:var(--db-text2); }
+.db-tag-dot { width:5px; height:5px; border-radius:50%; background:var(--db-green); flex-shrink:0; }
+.db-hero-actions { display:flex; align-items:center; justify-content:center; gap:10px; position:relative; z-index:1; }
+
+/* Stat cards row */
+.db-stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+.db-stat-card { background:var(--db-bg2); border:1px solid var(--db-border); border-radius:16px; padding:22px 24px; position:relative; overflow:hidden; transition:all 0.2s; cursor:default; }
+.db-stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); }
+.db-stat-card:hover { border-color:var(--db-border-bright); transform:translateY(-2px); }
+.db-stat-card.db-gold:hover { box-shadow:0 8px 32px rgba(212,168,67,0.12); }
+.db-stat-card.db-purple:hover { box-shadow:0 8px 32px rgba(124,111,205,0.12); }
+.db-stat-card.db-green:hover { box-shadow:0 8px 32px rgba(61,214,140,0.1); }
+.db-stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; font-size:16px; }
+.db-stat-icon.db-gold { background:var(--db-gold-dim); box-shadow:0 0 12px var(--db-gold-glow); }
+.db-stat-icon.db-purple { background:var(--db-purple-dim); box-shadow:0 0 12px var(--db-purple-glow); }
+.db-stat-icon.db-green { background:var(--db-green-dim); }
+.db-stat-val { font-family:'Instrument Serif',serif; font-size:36px; line-height:1; letter-spacing:-0.02em; margin-bottom:6px; }
+.db-stat-val.db-gold { color:var(--db-gold); }
+.db-stat-val.db-purple { color:var(--db-text); }
+.db-stat-val.db-green { color:var(--db-green); }
+.db-stat-sub { font-size:12.5px; color:var(--db-text3); }
+.db-shimmer { position:absolute; inset:0; background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.015) 50%,transparent 60%); pointer-events:none; }
+
+/* Section headers */
+.db-section-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; }
+.db-section-title { font-size:15px; font-weight:500; color:var(--db-text); letter-spacing:-0.01em; }
+.db-section-link { font-size:12.5px; color:var(--db-purple); cursor:pointer; opacity:0.8; }
+.db-section-link:hover { opacity:1; }
+
+/* Activity list */
+.db-activity-list { display:flex; flex-direction:column; gap:4px; }
+.db-activity-row { display:flex; align-items:center; gap:14px; padding:11px 14px; border-radius:10px; cursor:pointer; transition:background 0.15s; border:1px solid transparent; }
+.db-activity-row:hover { background:rgba(255,255,255,0.025); border-color:var(--db-border); }
+.db-act-time { font-size:11.5px; color:var(--db-text3); width:38px; flex-shrink:0; }
+.db-act-badge { font-size:10px; font-weight:600; letter-spacing:0.05em; padding:3px 8px; border-radius:5px; flex-shrink:0; }
+.db-act-badge.smile { background:rgba(212,168,67,0.12); color:var(--db-gold); border:1px solid rgba(212,168,67,0.2); }
+.db-act-badge.endo { background:rgba(124,111,205,0.12); color:var(--db-purple); border:1px solid rgba(124,111,205,0.2); }
+.db-act-badge.surg { background:rgba(245,137,58,0.12); color:var(--db-orange); border:1px solid rgba(245,137,58,0.2); }
+.db-act-badge.resto { background:rgba(245,158,11,0.12); color:#F59E0B; border:1px solid rgba(245,158,11,0.2); }
+.db-act-badge.paeds { background:rgba(52,211,153,0.12); color:#34D399; border:1px solid rgba(52,211,153,0.2); }
+.db-act-name { flex:1; font-size:13.5px; color:var(--db-text); font-weight:400; }
+.db-act-score { font-size:12px; color:var(--db-text3); margin-right:4px; }
+.db-status-pill { font-size:11px; font-weight:500; padding:3px 9px; border-radius:20px; flex-shrink:0; }
+.db-status-pill.gold { background:rgba(212,168,67,0.1); color:var(--db-gold); border:1px solid rgba(212,168,67,0.2); }
+.db-status-pill.verified { background:rgba(61,214,140,0.08); color:var(--db-green); border:1px solid rgba(61,214,140,0.2); }
+
+/* Monthly missions */
+.db-missions-grid { display:flex; flex-direction:column; gap:10px; }
+.db-mission-card { background:var(--db-bg2); border:1px solid var(--db-border); border-radius:13px; padding:16px 18px; transition:border-color 0.2s; }
+.db-mission-card:hover { border-color:var(--db-border-bright); }
+.db-mission-card.complete { border-color:rgba(61,214,140,0.15); }
+.db-mission-card.incomplete { border-color:rgba(245,137,58,0.1); }
+.db-mission-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.db-mission-name { font-size:13.5px; font-weight:500; color:var(--db-text); }
+.db-mission-pct { font-size:13px; font-weight:600; }
+.db-mission-pct.complete { color:var(--db-green); }
+.db-mission-pct.incomplete { color:var(--db-orange); }
+.db-mission-bar-track { height:3px; border-radius:2px; background:rgba(255,255,255,0.06); overflow:hidden; margin-bottom:9px; }
+.db-mission-bar-fill { height:100%; border-radius:2px; transition:width 0.6s ease; }
+.db-mission-bar-fill.complete { background:var(--db-green); box-shadow:0 0 6px rgba(61,214,140,0.6); }
+.db-mission-bar-fill.incomplete { background:var(--db-orange); box-shadow:0 0 6px rgba(245,137,58,0.4); }
+.db-mission-hint { font-size:12px; color:var(--db-text3); }
+.db-mission-hint.complete { color:rgba(61,214,140,0.6); }
+.db-missions-footer { margin-top:14px; display:flex; align-items:center; justify-content:space-between; }
+.db-missions-count { font-size:13px; color:var(--db-text2); }
+.db-missions-count span { color:var(--db-text); font-weight:500; }
+
+/* Rank card */
+.db-rank-card { background:radial-gradient(ellipse 80% 100% at 50% 100%,rgba(212,168,67,0.07) 0%,transparent 70%), #0f0f1a; border:1px solid var(--db-border); border-radius:18px; padding:28px 28px 24px; position:relative; overflow:hidden; margin-bottom:0; }
+.db-rank-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(212,168,67,0.25),transparent); }
+.db-rank-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; }
+.db-rank-current-label { font-size:12px; color:var(--db-text3); margin-bottom:4px; }
+.db-rank-badge { display:inline-flex; align-items:center; gap:7px; padding:6px 14px; background:var(--db-gold-dim); border:1px solid rgba(212,168,67,0.3); border-radius:8px; font-size:15px; font-weight:600; color:var(--db-gold); box-shadow:0 0 16px var(--db-gold-glow); }
+.db-rank-badge-dot { width:8px; height:8px; border-radius:50%; background:var(--db-gold); box-shadow:0 0 8px var(--db-gold); animation:db-pulse-dot 2s ease-in-out infinite; }
+@keyframes db-pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.7;transform:scale(0.85)} }
+.db-rank-stats-right { text-align:right; }
+.db-rank-stat-val { font-size:22px; font-weight:600; color:var(--db-text); }
+.db-rank-stat-sub { font-size:12px; color:var(--db-text3); }
+.db-rank-track { position:relative; margin-bottom:10px; }
+.db-rank-track-bg { height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; position:relative; }
+.db-rank-track-fill { height:100%; background:linear-gradient(90deg,#8b6914 0%,var(--db-gold) 100%); border-radius:3px; box-shadow:0 0 10px var(--db-gold-glow); position:relative; transition:width 0.8s ease; }
+.db-rank-track-fill::after { content:''; position:absolute; right:-1px; top:-4px; width:14px; height:14px; border-radius:50%; background:var(--db-gold); box-shadow:0 0 12px var(--db-gold),0 0 24px var(--db-gold-glow); animation:db-pulse-dot 2s ease-in-out infinite; border:2px solid var(--navy); }
+.db-rank-labels { display:flex; justify-content:space-between; margin-top:8px; margin-bottom:16px; }
+.db-rank-label-item { font-size:11px; color:var(--db-text3); text-align:center; }
+.db-rank-label-item.active { color:var(--db-gold); font-weight:600; }
+.db-rank-footer { display:flex; align-items:center; justify-content:space-between; }
+.db-rank-pct { font-size:13px; color:var(--db-text2); }
+.db-rank-pct strong { color:var(--db-green); }
+.db-rank-cta { font-size:12.5px; background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.18); color:var(--db-gold); padding:6px 14px; border-radius:8px; font-weight:500; }
+
+/* Portfolio strip */
+.db-portfolio-strip { background:var(--db-bg2); border:1px solid var(--db-border); border-radius:14px; padding:18px 24px; display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+.db-strip-item { text-align:center; padding:4px 0; border-right:1px solid var(--db-border); }
+.db-strip-item:last-child { border-right:none; }
+.db-strip-val { font-family:'Instrument Serif',serif; font-size:26px; line-height:1.1; letter-spacing:-0.01em; color:var(--db-text); margin-bottom:2px; }
+.db-strip-val.db-green { color:var(--db-green); }
+.db-strip-val.db-gold { color:var(--db-gold); }
+.db-strip-label { font-size:11.5px; color:var(--db-text3); }
+
+/* Bottom 2 col */
+.db-bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+/* Top case card */
+.db-top-case-card { background:var(--db-bg2); border:1px solid rgba(212,168,67,0.18); border-radius:16px; overflow:hidden; box-shadow:0 0 24px rgba(212,168,67,0.07); transition:box-shadow 0.2s; }
+.db-top-case-card:hover { box-shadow:0 0 36px rgba(212,168,67,0.13); }
+.db-top-case-img { width:100%; height:130px; background:linear-gradient(135deg,#1a1428 0%,#2a1f0a 50%,#1a1428 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+.db-top-case-img-art { font-size:52px; opacity:0.5; filter:grayscale(0.3); }
+.db-top-case-img-glow { position:absolute; inset:0; background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(212,168,67,0.1) 0%,transparent 70%); }
+.db-top-case-badge { position:absolute; top:12px; left:12px; font-size:10px; font-weight:600; padding:4px 9px; border-radius:6px; background:rgba(212,168,67,0.15); color:var(--db-gold); border:1px solid rgba(212,168,67,0.3); backdrop-filter:blur(8px); text-transform:uppercase; }
+.db-top-case-meta { position:absolute; top:12px; right:12px; font-size:10px; color:var(--db-text3); }
+.db-top-case-body { padding:16px; }
+.db-top-case-label { font-size:10.5px; color:var(--db-text3); margin-bottom:4px; letter-spacing:0.04em; text-transform:uppercase; }
+.db-top-case-title { font-family:'Instrument Serif',serif; font-size:20px; color:var(--db-text); margin-bottom:8px; letter-spacing:-0.01em; }
+.db-top-case-footer { display:flex; align-items:center; justify-content:space-between; }
+.db-complexity-pill { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--db-gold); background:var(--db-gold-dim); padding:3px 10px; border-radius:6px; border:1px solid rgba(212,168,67,0.15); }
+.db-top-case-date { font-size:11.5px; color:var(--db-text3); }
+
+/* Reviews card — real data only */
+.db-reviews-card { background:var(--db-bg2); border:1px solid var(--db-border); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:12px; }
+.db-review-item { background:var(--db-bg3,#13131f); border:1px solid var(--db-border); border-radius:11px; padding:14px 14px 12px; transition:border-color 0.15s; }
+.db-review-item:hover { border-color:var(--db-border-bright); }
+.db-review-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; }
+.db-review-author { display:flex; align-items:center; gap:8px; }
+.db-review-avatar { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; flex-shrink:0; }
+.db-review-name { font-size:13px; font-weight:500; color:var(--db-text); }
+.db-review-date { font-size:11px; color:var(--db-text3); }
+.db-stars { display:flex; gap:2px; }
+.db-star { font-size:12px; }
+.db-review-text { font-size:13px; color:var(--db-text2); line-height:1.55; }
+.db-reviews-empty { text-align:center; padding:28px 16px; color:var(--db-text3); font-size:13px; line-height:1.6; }
+.db-reviews-empty-icon { font-size:28px; margin-bottom:10px; opacity:0.4; }
+
+/* Section wrapper spacing */
+.db-section { margin-bottom:28px; }
+
+/* Micro stat grid (preserve existing IDs) */
+.pd-micro-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:28px; }
+.pd-micro-stat { border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.025); border-radius:18px; padding:16px 10px; text-align:center; }
+.pd-micro-stat strong { font-family:'Instrument Serif',serif; font-size:2rem; line-height:1; color:white; font-weight:400; letter-spacing:-0.04em; display:block; }
+.pd-micro-stat span { font-size:0.48rem; text-transform:uppercase; letter-spacing:0.13em; color:rgba(255,255,255,0.2); display:block; margin-top:5px; }
+.pd-micro-stat.pd-teal strong { color:#58b8a9; }
+.pd-micro-stat.pd-gold strong { color:#d4a843; }
+.pd-micro-stat.pd-amber strong { color:#c4713a; }
+.stat-pill { border:1px solid rgba(255,215,0,0.2); }
+
+/* Keep existing pd-section-label for live data sections */
+.pd-section-label { display:flex; align-items:center; justify-content:space-between; margin:6px 2px 12px; }
+.pd-section-label span { font-size:0.52rem; text-transform:uppercase; letter-spacing:0.24em; font-weight:800; color:rgba(255,255,255,0.18); }
+.pd-section-label button { border:none; background:transparent; color:rgba(155,143,245,0.55); font-size:0.72rem; font-weight:700; cursor:pointer; }
+.pd-section-label button:hover { color:#9b8ff5; }
+.pd-live-section { margin-bottom:0; }
+.pd-card-shell { position:relative; border-radius:20px; overflow:hidden; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.06); padding:18px 20px; }
+.pd-card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.pd-card-head span { font-size:0.52rem; text-transform:uppercase; letter-spacing:0.24em; font-weight:800; color:rgba(255,255,255,0.18); }
+.pd-card-head button { border:none; background:transparent; color:rgba(155,143,245,0.55); font-size:0.72rem; font-weight:700; cursor:pointer; }
+.pd-card-head button:hover { color:#9b8ff5; }
+.pd-card-head strong { font-size:0.84rem; color:#c9a14d; }
+.pd-best-work-list { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+.pd-reviews-list { display:flex; flex-direction:column; gap:10px; }
+.pd-welcome-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.pd-welcome-grid div { padding:14px; border-radius:16px; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.055); }
+.pd-welcome-grid strong { display:block; color:rgba(255,255,255,0.82); font-size:0.8rem; margin-bottom:5px; }
+.pd-welcome-grid p { font-size:0.68rem; color:rgba(255,255,255,0.3); line-height:1.5; }
+
+/* Responsive */
+@media(max-width:900px) {
+  .db-stat-grid { grid-template-columns:repeat(2,1fr); }
+  .db-bottom-grid { grid-template-columns:1fr; }
+  .pd-micro-grid { grid-template-columns:repeat(2,1fr); }
+  .db-hero { padding:32px 24px 36px; }
+  .db-hero-title { font-size:36px; }
+  .db-portfolio-strip { grid-template-columns:repeat(2,1fr); }
+  .db-strip-item:nth-child(2) { border-right:none; }
+  .db-strip-item:nth-child(3) { border-right:1px solid var(--db-border); }
+  .pd-welcome-grid { grid-template-columns:1fr; }
+}
+@media(max-width:520px) {
+  .db-stat-grid { grid-template-columns:1fr; }
+  .pd-micro-grid { gap:8px; }
+  .pd-micro-stat { padding:14px 8px; }
+  .pd-micro-stat strong { font-size:1.6rem; }
+  .db-hero-title { font-size:30px; }
+  .db-hero-subtitle { font-size:17px; }
+  .db-portfolio-strip { grid-template-columns:repeat(2,1fr); }
+}
 
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
@@ -2112,51 +2353,233 @@ body::after {
     <!-- MAIN -->
     <main class="main-content">
 
-      <!-- DASHBOARD VIEW -->
+      <!-- DASHBOARD VIEW — NEW 2025 DESIGN -->
       <div class="view active" id="view-dashboard">
-        <!-- PROVIFY PREMIUM DASHBOARD — merged safely into the real app shell -->
-        <section class="pd-dashboard">
-          <div class="pd-hero" onclick="openVoiceLog()" id="voice-cta-area">
-            <div class="pd-hero-grid"></div>
-            <div class="pd-hero-orb pd-hero-orb-a"></div>
-            <div class="pd-hero-orb pd-hero-orb-b"></div>
-            <div class="pd-hero-topline"><span class="pd-online-dot"></span><span>Voice System — Online</span></div>
-            <div class="pd-mic-stage" aria-label="Start voice log">
-              <span class="pd-mic-ring pd-mic-ring-1"></span><span class="pd-mic-ring pd-mic-ring-2"></span><span class="pd-mic-ring pd-mic-ring-3"></span>
-              <div class="pd-mic-button"><svg width="34" height="34" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+
+        <!-- TOPBAR -->
+        <div class="db-topbar">
+          <span class="db-topbar-date" id="db-today-date">Loading...</span>
+          <div class="db-topbar-actions">
+            <button class="db-btn db-btn-ghost" onclick="showView('profile')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notifications
+            </button>
+            <button class="db-btn db-btn-ghost" onclick="viewMyPortfolio()">View Portfolio</button>
+          </div>
+        </div>
+
+        <!-- HERO -->
+        <div class="db-hero" id="voice-cta-area">
+          <div class="db-hero-grid"></div>
+          <div class="db-mic-wrap">
+            <div class="db-mic-ring-3"></div>
+            <div class="db-mic-ring-2"></div>
+            <div class="db-mic-ring" style="inset:-14px;"></div>
+            <button class="db-mic-btn" onclick="openVoiceLog()" aria-label="Start voice case log">
+              <svg class="db-mic-svg" viewBox="0 0 24 24">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+            </button>
+          </div>
+          <div class="db-hero-title">Speak.</div>
+          <div class="db-hero-subtitle">I'll handle the rest.</div>
+          <div class="db-hero-line" id="dash-hero-subtext"><span id="db-hero-case-count">0 verified cases.</span> You're building something most dentists never will.</div>
+          <div class="db-hero-tags">
+            <span class="db-tag"><span class="db-tag-dot"></span>Auto-documented</span>
+            <span class="db-tag"><span class="db-tag-dot"></span>Legally structured</span>
+            <span class="db-tag"><span class="db-tag-dot"></span>Portfolio ready</span>
+          </div>
+          <div class="db-hero-actions">
+            <button class="db-btn db-btn-primary" onclick="openVoiceLog()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              Start Speaking
+            </button>
+            <button class="db-btn db-btn-ghost" onclick="showView('cases')">View last session</button>
+          </div>
+        </div>
+
+        <!-- MICRO STATS (IDs preserved — populated by updateDashboard) -->
+        <div class="pd-micro-grid" aria-label="Dashboard stats" style="margin-bottom:28px;">
+          <div class="pd-micro-stat"><strong id="micro-total">0</strong><span>Cases total</span></div>
+          <div class="pd-micro-stat pd-teal"><strong id="micro-this-month">0</strong><span>This month</span></div>
+          <div class="pd-micro-stat pd-gold stat-pill"><strong id="micro-rank">—</strong><span>Rank</span></div>
+          <div class="pd-micro-stat pd-amber"><strong id="micro-streak">0</strong><span>This week</span></div>
+        </div>
+
+        <!-- STAT CARDS ROW -->
+        <div class="db-stat-grid db-section">
+          <div class="db-stat-card db-gold">
+            <div class="db-shimmer"></div>
+            <div class="db-stat-icon db-gold">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <div class="pd-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-            <h1 class="pd-hero-title">Speak.<br><em>I'll handle</em><br>the rest.</h1>
-            <p class="pd-hero-sub" id="dash-hero-subtext">Dictate the case. Provify documents, signs, and protects it before you finish.</p>
-            <div class="pd-hero-actions"><button class="pd-primary-action" type="button" onclick="event.stopPropagation();openVoiceLog();">Start Speaking</button><button class="pd-secondary-action" type="button" onclick="event.stopPropagation();showView('cases');">View last session →</button></div>
-            <div class="pd-trust-row"><span>Auto-documented</span><span>Legally structured</span><span>Portfolio-ready</span></div>
+            <div class="db-stat-val db-gold" id="db-stat-protected">—</div>
+            <div class="db-stat-sub">Cases complaint-ready</div>
+          </div>
+          <div class="db-stat-card db-purple">
+            <div class="db-shimmer"></div>
+            <div class="db-stat-icon db-purple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c6fcd" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="db-stat-val db-purple" id="db-stat-portfolio">—</div>
+            <div class="db-stat-sub">Shareable & verified</div>
+          </div>
+          <div class="db-stat-card db-green">
+            <div class="db-shimmer"></div>
+            <div class="db-stat-icon db-green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            </div>
+            <div class="db-stat-val db-green" id="db-stat-growth">—</div>
+            <div class="db-stat-sub">Avg complexity score</div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY (live from Supabase) -->
+        <div class="db-section">
+          <div class="db-section-header">
+            <span class="db-section-title">Recent activity</span>
+            <span class="db-section-link" onclick="showView('cases')">View all →</span>
+          </div>
+          <div class="db-activity-list" id="db-activity-list">
+            <div style="text-align:center;padding:24px;color:rgba(240,239,254,0.25);font-size:13px;">Loading activity...</div>
+          </div>
+        </div>
+
+        <!-- MONTHLY MISSION (live) -->
+        <div class="db-section">
+          <div class="db-section-header">
+            <span class="db-section-title">Monthly mission</span>
+            <span style="font-size:12px;color:rgba(240,239,254,0.35);" id="db-mission-month"></span>
+          </div>
+          <div class="db-missions-grid" id="db-missions-grid">
+            <div style="text-align:center;padding:20px;color:rgba(240,239,254,0.25);font-size:13px;">Loading missions...</div>
+          </div>
+          <div class="db-missions-footer">
+            <span class="db-missions-count"><span id="db-missions-done">0</span> / <span id="db-missions-total">3</span> missions complete</span>
+            <span style="font-size:12px;color:rgba(240,239,254,0.35);" id="db-missions-reset"></span>
+          </div>
+        </div>
+
+        <!-- RANK CARD (live) -->
+        <div class="db-section">
+          <div class="db-rank-card" id="db-rank-card">
+            <div class="db-rank-top">
+              <div>
+                <div class="db-rank-current-label">Current rank</div>
+                <div class="db-rank-badge" id="db-rank-badge">
+                  <div class="db-rank-badge-dot" id="db-rank-dot"></div>
+                  <span id="db-rank-name">Bronze</span>
+                </div>
+              </div>
+              <div class="db-rank-stats-right">
+                <div class="db-rank-stat-val" id="db-rank-case-count">0</div>
+                <div class="db-rank-stat-sub">verified cases</div>
+              </div>
+            </div>
+            <div class="db-rank-track">
+              <div class="db-rank-track-bg">
+                <div class="db-rank-track-fill" id="db-rank-fill" style="width:0%"></div>
+              </div>
+            </div>
+            <div class="db-rank-labels">
+              <span class="db-rank-label-item" id="db-rl-bronze">Bronze</span>
+              <span class="db-rank-label-item" id="db-rl-silver">Silver</span>
+              <span class="db-rank-label-item" id="db-rl-gold">Gold</span>
+              <span class="db-rank-label-item" id="db-rl-platinum">Platinum</span>
+              <span class="db-rank-label-item" id="db-rl-diamond">Diamond</span>
+              <span class="db-rank-label-item" id="db-rl-apex">Apex</span>
+            </div>
+            <div class="db-rank-footer">
+              <span class="db-rank-pct" id="db-rank-pct">Loading...</span>
+              <span class="db-rank-cta" id="db-rank-cta"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PORTFOLIO STRIP -->
+        <div class="db-portfolio-strip db-section">
+          <div class="db-strip-item">
+            <div class="db-strip-val" id="db-strip-total">—</div>
+            <div class="db-strip-label">Total cases</div>
+          </div>
+          <div class="db-strip-item">
+            <div class="db-strip-val" id="db-strip-month">—</div>
+            <div class="db-strip-label">This month</div>
+          </div>
+          <div class="db-strip-item">
+            <div class="db-strip-val db-green" id="db-strip-delta">—</div>
+            <div class="db-strip-label">vs last month</div>
+          </div>
+          <div class="db-strip-item">
+            <div class="db-strip-val db-gold" id="db-strip-avg">—</div>
+            <div class="db-strip-label">Avg score / 10</div>
+          </div>
+        </div>
+
+        <!-- BOTTOM 2-COL: Top case + Patient reviews -->
+        <div class="db-bottom-grid db-section">
+
+          <!-- Top case this month -->
+          <div>
+            <div class="db-section-header">
+              <span class="db-section-title">Top case this month</span>
+              <span class="db-status-pill gold" style="font-size:11px;" id="db-top-case-label">⭐ Best of month</span>
+            </div>
+            <div class="db-top-case-card" id="db-top-case-card" onclick="" style="cursor:pointer;">
+              <div class="db-top-case-img" id="db-top-case-img">
+                <div class="db-top-case-img-glow"></div>
+                <div class="db-top-case-img-art" id="db-top-case-art">🦷</div>
+                <span class="db-top-case-badge" id="db-top-case-badge">—</span>
+                <span class="db-top-case-meta" id="db-top-case-meta">—</span>
+              </div>
+              <div class="db-top-case-body">
+                <div class="db-top-case-label">Highest complexity this month</div>
+                <div class="db-top-case-title" id="db-top-case-title">No cases yet</div>
+                <div class="db-top-case-footer">
+                  <div class="db-complexity-pill" id="db-top-case-score">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+                    Score — / 10
+                  </div>
+                  <span class="db-top-case-date" id="db-top-case-date">—</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="pd-micro-grid" aria-label="Dashboard stats">
-            <div class="pd-micro-stat"><strong id="micro-total">0</strong><span>Cases total</span></div>
-            <div class="pd-micro-stat pd-teal"><strong id="micro-this-month">0</strong><span>This month</span></div>
-            <div class="pd-micro-stat pd-gold stat-pill"><strong id="micro-rank">—</strong><span>Rank</span></div>
-            <div class="pd-micro-stat pd-amber"><strong id="micro-streak">0</strong><span>This week</span></div>
+          <!-- Patient feedback — REAL reviews only, no fake data -->
+          <div>
+            <div class="db-section-header">
+              <span class="db-section-title">Patient feedback</span>
+              <span class="db-section-link" onclick="showView('cases')">View all →</span>
+            </div>
+            <div class="db-reviews-card" id="db-real-reviews-card">
+              <!-- Populated by renderDashboardReviews() — real data only -->
+              <div class="db-reviews-empty">
+                <div class="db-reviews-empty-icon">⭐</div>
+                <div>No reviews yet.</div>
+                <div style="margin-top:6px;font-size:12px;">Open a case → Patient Review to collect your first one.</div>
+              </div>
+            </div>
           </div>
 
-          <section class="pd-modules" aria-label="Core modules">
-            <article class="pd-module pd-module-shield" onclick="navToShield()"><div class="pd-module-icon">🛡️</div><div class="pd-module-copy"><span>Shield</span><h2><span id="micro-total-shield">—</span> cases protected</h2><p>Complaint letter in 60s · One tap defence</p></div></article>
-            <article class="pd-module pd-module-portfolio" onclick="viewMyPortfolio()"><div class="pd-module-icon">◈</div><div class="pd-module-copy"><span>Portfolio</span><h2><span id="micro-total-port">—</span> verified cases</h2><p id="val-portfolio-text">Shareable · Tamper-proof · Career-ready</p></div></article>
-            <article class="pd-module pd-module-ai" onclick="showView('progress')"><div class="pd-module-icon">⌁</div><div class="pd-module-copy"><span>AI Insight</span><h2 id="val-growth-text">Clinical trajectory</h2><p>Strongest patterns · Weak spots · Next move</p></div><div class="pd-ai-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></article>
-          </section>
+        </div>
 
-          <div class="pd-section-label"><span>Recent Activity</span><button type="button" onclick="showView('cases')">Open cases →</button></div>
-          <div id="last-case-strip" class="pd-live-section"></div>
-          <div class="pd-section-label"><span>Monthly Mission</span><button type="button" onclick="showView('progress')">Progress →</button></div>
-          <div id="monthly-objectives" class="pd-live-section" style="display:none;"></div>
-          <div class="pd-section-label"><span>Career Trajectory</span><button type="button" onclick="showView('career')">Career →</button></div>
-          <div id="rank-progression-card" class="pd-live-section"></div>
-          <div id="portfolio-teaser-card" class="pd-live-section" style="display:none;"></div>
-          <div id="skill-progress-card" class="pd-live-section" style="display:none;"></div>
-          <div class="pd-live-section" id="best-work-card" style="display:none;"><div class="pd-card-shell"><div class="pd-card-head"><span>Case Vault</span><button type="button" onclick="viewMyPortfolio()">Portfolio →</button></div><div id="best-work-list" class="pd-best-work-list"></div></div></div>
-          <div class="pd-live-section" id="dashboard-reviews-card" style="display:none;"><div class="pd-card-shell"><div class="pd-card-head"><span>Patient Feedback</span><strong id="dashboard-avg-rating"></strong></div><div id="dashboard-reviews-list" class="pd-reviews-list"></div></div></div>
-          <div id="welcome-card" class="pd-live-section" style="display:none;"><div class="pd-card-shell pd-welcome"><div class="pd-card-head"><span>Why Provify</span></div><div class="pd-welcome-grid"><div><strong>Shield</strong><p>Timestamped records when a patient questions your work.</p></div><div><strong>Portfolio</strong><p>A verified career record instead of random phone photos.</p></div><div><strong>AI Growth</strong><p>See your clinical patterns and what to improve next.</p></div></div></div></div>
-        </section>
+        <!-- LIVE DATA SECTIONS (IDs unchanged — JS still targets these) -->
+        <div class="pd-section-label" style="display:none;"><span>Recent Activity</span><button type="button" onclick="showView('cases')">Open cases →</button></div>
+        <div id="last-case-strip" class="pd-live-section" style="display:none;"></div>
+        <div class="pd-section-label" style="display:none;"><span>Monthly Mission</span><button type="button" onclick="showView('progress')">Progress →</button></div>
+        <div id="monthly-objectives" class="pd-live-section" style="display:none;"></div>
+        <div class="pd-section-label" style="display:none;"><span>Career Trajectory</span><button type="button" onclick="showView('career')">Career →</button></div>
+        <div id="rank-progression-card" class="pd-live-section" style="display:none;"></div>
+        <div id="portfolio-teaser-card" class="pd-live-section" style="display:none;"></div>
+        <div id="skill-progress-card" class="pd-live-section" style="display:none;"></div>
+        <div class="pd-live-section" id="best-work-card" style="display:none;"><div class="pd-card-shell"><div class="pd-card-head"><span>Case Vault</span><button type="button" onclick="viewMyPortfolio()">Portfolio →</button></div><div id="best-work-list" class="pd-best-work-list"></div></div></div>
+        <div class="pd-live-section" id="dashboard-reviews-card" style="display:none;"><div class="pd-card-shell"><div class="pd-card-head"><span>Patient Feedback</span><strong id="dashboard-avg-rating"></strong></div><div id="dashboard-reviews-list" class="pd-reviews-list"></div></div></div>
+        <div id="welcome-card" class="pd-live-section" style="display:none;"><div class="pd-card-shell pd-welcome"><div class="pd-card-head"><span>Why Provify</span></div><div class="pd-welcome-grid"><div><strong>Shield</strong><p>Timestamped records when a patient questions your work.</p></div><div><strong>Portfolio</strong><p>A verified career record instead of random phone photos.</p></div><div><strong>AI Growth</strong><p>See your clinical patterns and what to improve next.</p></div></div></div></div>
+
+        <div style="height:32px"></div>
 
       </div><!-- /view-dashboard -->
 
@@ -3648,6 +4071,7 @@ function updateDashboard() {
   renderValueStrip();
   renderLastCaseStrip();
   renderRankProgression();
+  renderNewDashboard();
 
   // ── PROGRESSIVE NAV DISCLOSURE ──
   // Show secondary nav items progressively as user logs more cases
@@ -10231,6 +10655,293 @@ function maybeOpenSmileReveal(caseData) {
   if (caseData.specialty === 'smile' && (window._smileBeforeURL || window._smileAfterURL)) {
     setTimeout(() => openSmileReveal(caseData), 800);
   }
+}
+
+// ─── NEW DASHBOARD RENDER FUNCTIONS ───
+
+function renderNewDashboard() {
+  if (!allCases) return;
+  const total = allCases.length;
+  const now = new Date();
+
+  // Topbar date
+  const dateEl = document.getElementById('db-today-date');
+  if (dateEl) {
+    dateEl.textContent = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+
+  // Hero case count line
+  const heroCount = document.getElementById('db-hero-case-count');
+  if (heroCount) heroCount.textContent = `${total} verified case${total !== 1 ? 's' : ''}.`;
+
+  // Stat cards
+  const protected_count = allCases.filter(c => c.note && c.note.includes('|| ML_RECORD:')).length;
+  const avg = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score || 0), 0) / total) : 0;
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('db-stat-protected', protected_count || total);
+  setEl('db-stat-portfolio', total);
+  setEl('db-stat-growth', total > 0 ? avg.toFixed(1) : '—');
+
+  // Activity list
+  renderNewActivityList();
+
+  // Monthly missions
+  renderNewMissions();
+
+  // Rank card
+  renderNewRankCard();
+
+  // Portfolio strip
+  const thisMonth = allCases.filter(c => {
+    const d = new Date(c.created_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonth = allCases.filter(c => {
+    const d = new Date(c.created_at);
+    return d.getMonth() === lastMonthDate.getMonth() && d.getFullYear() === lastMonthDate.getFullYear();
+  });
+  const delta = thisMonth.length - lastMonth.length;
+  setEl('db-strip-total', total);
+  setEl('db-strip-month', thisMonth.length);
+  const deltaEl = document.getElementById('db-strip-delta');
+  if (deltaEl) { deltaEl.textContent = (delta >= 0 ? '+' : '') + delta; }
+  setEl('db-strip-avg', total > 0 ? avg.toFixed(1) : '—');
+
+  // Top case this month
+  renderTopCaseThisMonth(thisMonth);
+
+  // Real reviews
+  renderDashboardReviews();
+
+  // Mission month label
+  const monthEl = document.getElementById('db-mission-month');
+  if (monthEl) monthEl.textContent = now.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+}
+
+function renderNewActivityList() {
+  const list = document.getElementById('db-activity-list');
+  if (!list) return;
+  const recent = allCases.slice(0, 6);
+  if (recent.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:24px;color:rgba(240,239,254,0.25);font-size:13px;">No cases logged yet. Hit Start Speaking to begin.</div>`;
+    return;
+  }
+
+  const specBadgeClass = { endo:'endo', restorative:'resto', surgery:'surg', paeds:'paeds', smile:'smile', prostho:'endo' };
+  const specLabel = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
+
+  list.innerHTML = recent.map(c => {
+    const d = new Date(c.created_at);
+    const ageMs = Date.now() - d.getTime();
+    const ageH = Math.floor(ageMs / 3600000);
+    const timeStr = ageH < 1 ? 'Now' : ageH < 24 ? `${ageH}h ago` : `${Math.floor(ageH/24)}d ago`;
+    const badge = (specBadgeClass[c.specialty] || 'endo');
+    const label = (specLabel[c.specialty] || (c.specialty||'').toUpperCase().slice(0,5));
+    const title = c.specialty === 'smile'
+      ? (c.procedure || 'Smile Case')
+      : (c.tooth_number ? `Tooth ${c.tooth_number} · ${c.procedure || c.case_type || c.specialty || '—'}` : (c.procedure || c.case_type || 'Case'));
+    const score = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
+    const level = getLevel(allCases.length);
+    return `
+      <div class="db-activity-row" onclick="openCaseDetail('${c.id}')">
+        <span class="db-act-time">${timeStr}</span>
+        <span class="db-act-badge ${badge}">${label}</span>
+        <span class="db-act-name">${title}</span>
+        <span class="db-act-score">${score}</span>
+        <span class="db-status-pill ${allCases.length >= 25 ? 'gold' : 'verified'}">${allCases.length >= 25 ? level.name : 'Verified'}</span>
+      </div>`;
+  }).join('');
+}
+
+function renderNewMissions() {
+  const grid = document.getElementById('db-missions-grid');
+  if (!grid) return;
+  const now = new Date();
+  const thisMonth = allCases.filter(c => {
+    const d = new Date(c.created_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+
+  const endoThisMonth = thisMonth.filter(c => c.specialty === 'endo').length;
+  const highComp = thisMonth.filter(c => (c.complexity_score || 0) >= 8).length;
+
+  const missions = [
+    { name: 'Log 8 cases this month', target: 8, current: Math.min(thisMonth.length, 8), hint: "You're ahead of 78% of users" },
+    { name: '5 endodontic cases',     target: 5, current: Math.min(endoThisMonth, 5),    hint: 'Strong consistency detected' },
+    { name: '2 challenging cases (score ≥ 8)', target: 2, current: Math.min(highComp, 2), hint: 'These boost your rank faster' },
+  ];
+
+  let done = 0;
+  grid.innerHTML = missions.map(m => {
+    const pct = Math.round((m.current / m.target) * 100);
+    const complete = pct >= 100;
+    if (complete) done++;
+    return `
+      <div class="db-mission-card ${complete ? 'complete' : 'incomplete'}">
+        <div class="db-mission-top">
+          <span class="db-mission-name">${m.name}</span>
+          <span class="db-mission-pct ${complete ? 'complete' : 'incomplete'}">${pct}%</span>
+        </div>
+        <div class="db-mission-bar-track">
+          <div class="db-mission-bar-fill ${complete ? 'complete' : 'incomplete'}" style="width:${pct}%"></div>
+        </div>
+        <span class="db-mission-hint ${complete ? 'complete' : ''}">${complete ? '✓ ' : ''}${m.hint}</span>
+      </div>`;
+  }).join('');
+
+  const doneEl = document.getElementById('db-missions-done');
+  const totalEl = document.getElementById('db-missions-total');
+  if (doneEl) doneEl.textContent = done;
+  if (totalEl) totalEl.textContent = missions.length;
+
+  // Days to end of month
+  const resetEl = document.getElementById('db-missions-reset');
+  if (resetEl) {
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const daysLeft = Math.ceil((endOfMonth - now) / 86400000);
+    resetEl.textContent = `Resets in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`;
+  }
+}
+
+function renderNewRankCard() {
+  const total = allCases.length;
+  const level = getLevel(total);
+  const xp = getXP(total);
+  const rankNames = ['Bronze','Silver','Gold','Platinum','Diamond','Apex'];
+
+  // Badge color per rank
+  const rankColors = {
+    Bronze:'#CD7F32', Silver:'#C0C0C0', Gold:'#d4a843',
+    Platinum:'#E5E4E2', Diamond:'#B9F2FF', Elite:'#7C6FFF',
+    Master:'#A78BFA', 'Grand Master':'#F59E0B', Legend:'#EF4444', Apex:'#7C6FFF'
+  };
+  const col = rankColors[level.name] || '#d4a843';
+
+  // Badge styling
+  const badge = document.getElementById('db-rank-badge');
+  const dot = document.getElementById('db-rank-dot');
+  const nameEl = document.getElementById('db-rank-name');
+  if (badge) { badge.style.background = `rgba(${hexToRgb(col)},0.15)`; badge.style.borderColor = `rgba(${hexToRgb(col)},0.3)`; badge.style.color = col; badge.style.boxShadow = `0 0 16px rgba(${hexToRgb(col)},0.25)`; }
+  if (dot) { dot.style.background = col; dot.style.boxShadow = `0 0 8px ${col}`; }
+  if (nameEl) nameEl.textContent = level.name;
+
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('db-rank-case-count', total);
+
+  // Fill bar
+  const fill = document.getElementById('db-rank-fill');
+  if (fill) fill.style.width = `${xp.pct}%`;
+
+  // Label highlights
+  const levelToLabel = { 1:'bronze',2:'silver',3:'gold',4:'platinum',5:'diamond',6:'apex',7:'apex',8:'apex',9:'apex',10:'apex' };
+  const activeLabel = levelToLabel[level.level] || 'bronze';
+  ['bronze','silver','gold','platinum','diamond','apex'].forEach(r => {
+    const el = document.getElementById(`db-rl-${r}`);
+    if (el) { el.className = `db-rank-label-item${r === activeLabel ? ' active' : ''}`; if (r === activeLabel) { el.style.color = col; } else { el.style.color = ''; } }
+  });
+
+  // Footer
+  const pctEl = document.getElementById('db-rank-pct');
+  const ctaEl = document.getElementById('db-rank-cta');
+  if (pctEl) {
+    const ahead = Math.round((xp.pct / 100) * 82); // approximation
+    pctEl.innerHTML = `You're ahead of <strong>${Math.max(10, ahead)}%</strong> of users`;
+  }
+  if (ctaEl) {
+    if (level.level < 10) {
+      const next = LEVELS[level.level];
+      ctaEl.textContent = `${xp.toNext} more cases → ${next.name}`;
+    } else {
+      ctaEl.textContent = '🔱 Apex — Maximum rank';
+    }
+  }
+}
+
+function renderTopCaseThisMonth(thisMonth) {
+  if (!thisMonth || thisMonth.length === 0) return;
+  const top = [...thisMonth].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))[0];
+  if (!top) return;
+
+  const specLabel = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
+  const specArt = { endo:'⚙️', restorative:'✨', surgery:'🔪', paeds:'🧒', smile:'😁', prostho:'👑' };
+  const title = top.specialty === 'smile'
+    ? (top.procedure || 'Smile Case')
+    : (top.procedure || top.case_type || `Tooth ${top.tooth_number || '—'}`);
+  const date = new Date(top.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  const shortDate = new Date(top.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('db-top-case-badge', specLabel[top.specialty] || 'CASE');
+  setEl('db-top-case-art', specArt[top.specialty] || '🦷');
+  setEl('db-top-case-meta', shortDate);
+  setEl('db-top-case-title', title);
+  setEl('db-top-case-date', date);
+
+  const scoreEl = document.getElementById('db-top-case-score');
+  if (scoreEl) scoreEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg> Score ${top.complexity_score ? top.complexity_score.toFixed(1) : '—'} / 10`;
+
+  const card = document.getElementById('db-top-case-card');
+  if (card) card.onclick = () => openCaseDetail(top.id);
+
+  const now = new Date();
+  const labelEl = document.getElementById('db-top-case-label');
+  if (labelEl) labelEl.textContent = `⭐ Best of ${now.toLocaleDateString('en-GB', { month:'long' })}`;
+}
+
+async function renderDashboardReviews() {
+  const card = document.getElementById('db-real-reviews-card');
+  if (!card || !currentUser) return;
+  const caseIds = allCases.map(c => c.id);
+  if (caseIds.length === 0) return;
+
+  const { data: reviews } = await sb
+    .from('reviews')
+    .select('*')
+    .in('case_id', caseIds)
+    .not('rating', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(4);
+
+  if (!reviews || reviews.length === 0) return; // keep empty state
+
+  const avatarColors = [
+    { bg:'rgba(124,111,205,0.15)', col:'#7c6fcd' },
+    { bg:'rgba(61,214,140,0.1)',   col:'#3dd68c' },
+    { bg:'rgba(212,168,67,0.1)',   col:'#d4a843' },
+    { bg:'rgba(239,68,68,0.1)',    col:'#EF4444' },
+  ];
+
+  card.innerHTML = reviews.map((r, i) => {
+    const ac = avatarColors[i % avatarColors.length];
+    const name = r.reviewer_name || 'Anonymous';
+    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    const date = new Date(r.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const stars = Array.from({length:5}, (_,k) =>
+      `<span class="db-star" style="color:${k < r.rating ? '#d4a843' : 'rgba(255,255,255,0.12)'};">★</span>`
+    ).join('');
+    const isPatient = r.reviewer_type === 'patient';
+    return `
+      <div class="db-review-item">
+        <div class="db-review-top">
+          <div class="db-review-author">
+            <div class="db-review-avatar" style="background:${ac.bg};color:${ac.col};">${initials}</div>
+            <div>
+              <div class="db-review-name">${name}</div>
+              <div class="db-review-date">${isPatient ? 'Patient · ' : 'Peer · '}${date}</div>
+            </div>
+          </div>
+          <div class="db-stars">${stars}</div>
+        </div>
+        ${r.comment ? `<div class="db-review-text">${r.comment}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// Helper: hex color to rgb string (for rgba())
+function hexToRgb(hex) {
+  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return r ? `${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}` : '124,111,205';
 }
 
 // ─── START ───
