@@ -2197,7 +2197,7 @@ body::after {
 <div class="ds" style="margin-bottom:14px;">
   <div style="font-size:0.42rem;color:rgba(255,255,255,0.1);text-transform:uppercase;letter-spacing:0.28em;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;"><span>Modules</span><span style="color:rgba(155,143,245,0.3);">3 active</span></div>
 
-  <div class="pm pm-warm" onclick="navToShield()" style="background:linear-gradient(130deg,rgba(196,113,58,0.1),rgba(160,80,30,0.05) 60%,rgba(6,4,18,0));border:1px solid rgba(196,113,58,0.2);border-radius:22px;padding:20px 22px 18px;margin-bottom:8px;box-shadow:0 6px 28px rgba(196,113,58,0.08);">
+  <div class="pm pm-warm" onclick="navToShield()" style="background:linear-gradient(130deg,rgba(196,113,58,0.07),rgba(160,80,30,0.03) 60%,rgba(6,4,18,0));border:1px solid rgba(196,113,58,0.16);border-radius:22px;padding:20px 22px 18px;margin-bottom:8px;box-shadow:0 4px 20px rgba(196,113,58,0.05);">
     <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,113,58,0.7),rgba(220,140,70,0.4),transparent);animation:modglow 3.5s ease-in-out infinite;"></div>
     <div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;background:radial-gradient(circle,rgba(196,113,58,0.1),transparent 70%);pointer-events:none;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -10952,7 +10952,8 @@ function renderValueStrip() {
         return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
       }).length;
       const pct = lastMonth > 0 ? Math.min(999, Math.max(-99, Math.round(((thisMonth - lastMonth) / lastMonth) * 100))) : null;
-      grwEl.innerHTML = pct !== null
+      const showPct = pct !== null && Math.abs(pct) <= 200;
+      grwEl.innerHTML = showPct
         ? `<span style="color:rgba(58,140,126,0.9);font-size:1.1rem;font-weight:800;">${pct >= 0 ? '+' : ''}${pct}%</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.2);">vs last month</span>`
         : `<span style="font-size:0.9rem;font-weight:700;color:rgba(58,140,126,0.8);">${thisMonth}</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.2);">this month</span>`;
     } else {
