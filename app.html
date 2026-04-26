@@ -6088,7 +6088,7 @@ async function loadDashboardReviews() {
             <div style="width:32px;height:32px;border-radius:50%;background:${isPatient ? 'rgba(245,158,11,0.12)' : 'rgba(124,111,255,0.12)'};display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0">${isPatient ? '👤' : '👨‍⚕️'}</div>
             <div>
               <div style="font-size:0.82rem;color:var(--white);font-weight:500">${r.reviewer_name || 'Anonymous'}</div>
-              <div style="font-size:0.68rem;color:var(--gray)">${isPatient ? 'Patient' : (r.reviewer_role || 'Peer Review')}${caseInfo ? ' · Tooth ' + caseInfo.tooth_number : ''}</div>
+              <div style="font-size:0.68rem;color:var(--gray)">${isPatient ? 'Patient' : (r.reviewer_role || 'Peer Review')}${caseInfo ? (caseInfo.specialty === 'smile' ? ' · ' + (caseInfo.procedure || 'Smile Case') : (caseInfo.tooth_number ? ' · Tooth ' + caseInfo.tooth_number : '')) : ''}</div>
             </div>
           </div>
           <div style="text-align:right">
@@ -10951,10 +10951,10 @@ function renderValueStrip() {
         const lm = new Date(now.getFullYear(), now.getMonth() - 1);
         return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
       }).length;
-      const pct = lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : null;
+      const pct = lastMonth > 0 ? Math.min(999, Math.max(-99, Math.round(((thisMonth - lastMonth) / lastMonth) * 100))) : null;
       grwEl.innerHTML = pct !== null
         ? `<span style="color:rgba(58,140,126,0.9);font-size:1.1rem;font-weight:800;">${pct >= 0 ? '+' : ''}${pct}%</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.2);">vs last month</span>`
-        : `Clinical<br>growth`;
+        : `<span style="font-size:0.9rem;font-weight:700;color:rgba(58,140,126,0.8);">${thisMonth}</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.2);">this month</span>`;
     } else {
       grwEl.innerHTML = `Clinical<br>growth`;
     }
@@ -11149,6 +11149,8 @@ function renderInactivityAlert() {
 // ─── PORTFOLIO TEASER CARD ───
 function renderPortfolioTeaserCard() {
   const el = document.getElementById('portfolio-teaser-card');
+  if (el) el.style.display = 'none'; // replaced by portfolio module in power modules
+}
   if (!el || allCases.length < 1) { if (el) el.style.display = 'none'; return; }
   el.style.display = 'block';
   const total = allCases.length;
@@ -11210,62 +11212,7 @@ function renderPortfolioTeaserCard() {
 // ─── SKILL PROGRESS GRAPH ───
 function renderSkillProgressGraph() {
   const el = document.getElementById('skill-progress-card');
-  if (!el || allCases.length < 2) { if (el) el.style.display = 'none'; return; }
-  el.style.display = 'block';
-
-  // Group cases by week for last 12 weeks
-  const now = new Date();
-  const weeks = [];
-  for (let i = 11; i >= 0; i--) {
-    const weekStart = new Date(now);
-    weekStart.setDate(weekStart.getDate() - (i * 7) - weekStart.getDay());
-    weekStart.setHours(0,0,0,0);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 7);
-    const count = allCases.filter(c => {
-      const d = new Date(c.created_at);
-      return d >= weekStart && d < weekEnd;
-    }).length;
-    weeks.push({ label: weekStart.toLocaleDateString('en-GB', { day:'numeric', month:'short' }), count, weekStart });
-  }
-
-  const maxCount = Math.max(...weeks.map(w => w.count), 1);
-  const totalThisMonth = allCases.filter(c => {
-    const d = new Date(c.created_at);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }).length;
-  const totalLastMonth = allCases.filter(c => {
-    const d = new Date(c.created_at);
-    const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
-  }).length;
-  const trend = totalThisMonth - totalLastMonth;
-  const trendSign = trend >= 0 ? '+' : '';
-  const trendColor = trend > 0 ? '#34D399' : trend === 0 ? '#F59E0B' : '#EF4444';
-
-  const avg = allCases.length > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / allCases.length).toFixed(1) : '—';
-
-  el.innerHTML = `
-    <div style="border-radius:18px;overflow:hidden;margin-bottom:16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);">
-        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;line-height:1;letter-spacing:-0.02em;">${allCases.length}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">Total</div>
-        </div>
-        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#7C6FFF;line-height:1;letter-spacing:-0.02em;">${totalThisMonth}</div>
-          <div style="font-size:0.48rem;color:rgba(124,111,255,0.3);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">This Month</div>
-        </div>
-        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:${trendColor};line-height:1;letter-spacing:-0.02em;">${trendSign}${trend}</div>
-          <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">vs Last</div>
-        </div>
-        <div style="padding:16px 12px;text-align:center;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#F59E0B;line-height:1;letter-spacing:-0.02em;">${avg}</div>
-          <div style="font-size:0.48rem;color:rgba(245,158,11,0.3);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">Avg Score</div>
-        </div>
-      </div>
-    </div>`;
+  if (el) el.style.display = 'none';
 }
 
 // ─── RANK PROGRESSION CARD ───
