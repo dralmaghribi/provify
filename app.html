@@ -11151,65 +11151,7 @@ function renderPortfolioTeaserCard() {
   const el = document.getElementById('portfolio-teaser-card');
   if (el) el.style.display = 'none'; // replaced by portfolio module in power modules
 }
-  if (!el || allCases.length < 1) { if (el) el.style.display = 'none'; return; }
-  el.style.display = 'block';
-  const total = allCases.length;
 
-  // Build cumulative monthly data
-  const sorted = [...allCases].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-  const monthMap = {};
-  sorted.forEach(c => {
-    const d = new Date(c.created_at);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    monthMap[key] = (monthMap[key] || 0) + 1;
-  });
-  const months = Object.keys(monthMap).sort().slice(-8);
-  let cumulative = 0;
-  const monthlyData = [];
-  // Get running total before our window
-  const windowStart = months[0];
-  sorted.forEach(c => {
-    const d = new Date(c.created_at);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    if (key < windowStart) cumulative++;
-  });
-  months.forEach(m => {
-    cumulative += monthMap[m];
-    monthlyData.push(cumulative);
-  });
-
-  const maxVal = Math.max(...monthlyData, 1);
-  const W = 400, H = 60, PAD = 10;
-  const points = monthlyData.map((v, i) => ({
-    x: PAD + (i / Math.max(monthlyData.length-1,1)) * (W - PAD*2),
-    y: H - PAD - (v / maxVal) * (H - PAD*2)
-  }));
-  let path = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 1; i < points.length; i++) {
-    const mx = (points[i-1].x + points[i].x) / 2;
-    path += ` Q ${mx} ${points[i-1].y} ${points[i].x} ${points[i].y}`;
-  }
-  const fillPath = path + ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z`;
-
-  el.innerHTML = `
-    <div onclick="viewMyPortfolio()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.18);border-radius:16px;padding:14px 18px;transition:all 0.2s;"
-      onmouseover="this.style.borderColor='rgba(124,111,255,0.4)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.13),rgba(124,111,255,0.06))'"
-      onmouseout="this.style.borderColor='rgba(124,111,255,0.18)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.03))'">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div style="width:34px;height:34px;border-radius:10px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.9);"></div>
-        </div>
-        <div>
-          <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">Verified Portfolio · ${total} cases</div>
-          <div style="font-size:0.62rem;color:rgba(124,111,255,0.5);">Shareable · Tamper-proof</div>
-        </div>
-      </div>
-      <div style="font-size:0.72rem;color:rgba(124,111,255,0.6);font-weight:600;">View →</div>
-    </div>`;
-
-}
-
-// ─── SKILL PROGRESS GRAPH ───
 function renderSkillProgressGraph() {
   const el = document.getElementById('skill-progress-card');
   if (el) el.style.display = 'none';
