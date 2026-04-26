@@ -957,14 +957,14 @@ body::after {
 
 /* Mic */
 .db-mic-wrap { position:relative; display:inline-block; margin-bottom:36px; }
-.db-mic-ring { position:absolute; border-radius:50%; border:1.5px solid rgba(124,111,205,0.4); animation:db-pulse-ring 1.9s ease-out infinite; }
-.db-mic-ring-2 { position:absolute; inset:-36px; border-radius:50%; border:1px solid rgba(124,111,205,0.2); animation:db-pulse-ring 1.9s ease-out 0.42s infinite; }
-.db-mic-ring-3 { position:absolute; inset:-62px; border-radius:50%; border:1px solid rgba(124,111,205,0.08); animation:db-pulse-ring 1.9s ease-out 0.84s infinite; }
-@keyframes db-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.55)} }
-.db-mic-btn { width:110px; height:110px; border-radius:50%; background:linear-gradient(145deg,#9d92f5 0%,#6b5ed6 45%,#4a3eb8 100%); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; z-index:1; box-shadow:0 0 0 14px rgba(124,111,205,0.09),0 0 60px rgba(124,111,205,0.75),0 0 120px rgba(124,111,205,0.3),0 16px 40px rgba(0,0,0,0.65); transition:all 0.2s; animation:db-mic-breathe 2.6s ease-in-out infinite; border:none; }
-@keyframes db-mic-breathe { 0%,100%{box-shadow:0 0 0 14px rgba(124,111,205,0.09),0 0 60px rgba(124,111,205,0.75),0 0 120px rgba(124,111,205,0.3),0 16px 40px rgba(0,0,0,0.65)} 50%{box-shadow:0 0 0 22px rgba(124,111,205,0.11),0 0 90px rgba(124,111,205,0.95),0 0 180px rgba(124,111,205,0.4),0 16px 40px rgba(0,0,0,0.65)} }
-.db-mic-btn:hover { transform:scale(1.06); }
-.db-mic-svg { width:40px; height:40px; fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.db-mic-ring   { position:absolute; inset:-18px; border-radius:50%; border:1.5px solid rgba(124,111,205,0.45); animation:db-pulse-ring 1.7s ease-out 0s    infinite; }
+.db-mic-ring-2 { position:absolute; inset:-40px; border-radius:50%; border:1px   solid rgba(124,111,205,0.22); animation:db-pulse-ring 1.7s ease-out 0.38s infinite; }
+.db-mic-ring-3 { position:absolute; inset:-66px; border-radius:50%; border:1px   solid rgba(124,111,205,0.09); animation:db-pulse-ring 1.7s ease-out 0.76s infinite; }
+@keyframes db-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.6)} }
+.db-mic-btn { width:128px; height:128px; border-radius:50%; background:linear-gradient(145deg,#a99df7 0%,#7063e0 42%,#4a3eb8 100%); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; z-index:1; box-shadow:0 0 0 16px rgba(124,111,205,0.10),0 0 70px rgba(124,111,205,0.85),0 0 130px rgba(124,111,205,0.35),0 18px 44px rgba(0,0,0,0.7); transition:transform 0.2s; animation:db-mic-breathe 2.5s ease-in-out infinite; border:none; }
+@keyframes db-mic-breathe { 0%,100%{box-shadow:0 0 0 16px rgba(124,111,205,0.10),0 0 70px rgba(124,111,205,0.85),0 0 130px rgba(124,111,205,0.35),0 18px 44px rgba(0,0,0,0.7)} 50%{box-shadow:0 0 0 24px rgba(124,111,205,0.13),0 0 100px rgba(124,111,205,1),0 0 200px rgba(124,111,205,0.45),0 18px 44px rgba(0,0,0,0.7)} }
+.db-mic-btn:hover { transform:scale(1.05); }
+.db-mic-svg { width:46px; height:46px; fill:none; stroke:#fff; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 
 /* Hero text */
 .db-hero-title { font-family:'Instrument Serif',serif; font-size:64px; line-height:0.95; letter-spacing:-0.03em; color:#fff; margin-bottom:4px; position:relative; z-index:1; }
@@ -1143,53 +1143,60 @@ body::after {
 .pd-welcome-grid strong { display:block; color:rgba(255,255,255,0.82); font-size:0.8rem; margin-bottom:5px; }
 .pd-welcome-grid p { font-size:0.68rem; color:rgba(255,255,255,0.3); line-height:1.5; }
 
-/* Dim non-hero sections so voice hero dominates */
+/* Dim non-hero — stronger, so voice section clearly dominates */
 #view-dashboard .db-stat-grid,
 #view-dashboard .db-section,
 #view-dashboard .db-portfolio-strip,
-#view-dashboard .db-bottom-grid { opacity:0.82; transition:opacity 0.2s; }
+#view-dashboard .db-bottom-grid { opacity:0.70; transition:opacity 0.22s; }
 #view-dashboard .db-stat-grid:hover,
 #view-dashboard .db-section:hover,
 #view-dashboard .db-portfolio-strip:hover,
 #view-dashboard .db-bottom-grid:hover { opacity:1; }
 
-/* Dental specialty color coding for activity badges */
-.db-act-badge { font-size:10px; font-weight:700; letter-spacing:0.06em; padding:3px 9px; border-radius:6px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
-.db-act-badge::before { content:''; width:5px; height:5px; border-radius:50%; flex-shrink:0; }
-.db-act-badge.smile { background:rgba(212,168,67,0.12); color:var(--db-gold); border:1px solid rgba(212,168,67,0.25); }
-.db-act-badge.smile::before { background:var(--db-gold); box-shadow:0 0 4px var(--db-gold); }
-.db-act-badge.endo { background:rgba(124,111,205,0.12); color:#9b8ff5; border:1px solid rgba(124,111,205,0.28); }
-.db-act-badge.endo::before { background:#9b8ff5; box-shadow:0 0 4px rgba(124,111,205,0.8); }
-.db-act-badge.surg { background:rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.25); }
-.db-act-badge.surg::before { background:#f87171; box-shadow:0 0 4px rgba(239,68,68,0.7); }
-.db-act-badge.resto { background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.22); }
-.db-act-badge.resto::before { background:#fbbf24; }
-.db-act-badge.paeds { background:rgba(52,211,153,0.1); color:#34D399; border:1px solid rgba(52,211,153,0.22); }
-.db-act-badge.paeds::before { background:#34D399; }
+/* Stat card icons — no ambient glow, keep it clean outside hero */
+.db-stat-icon.db-gold   { background:rgba(212,168,67,0.10);  box-shadow:none; }
+.db-stat-icon.db-purple { background:rgba(124,111,205,0.10); box-shadow:none; }
+.db-stat-icon.db-green  { background:rgba(61,214,140,0.08);  box-shadow:none; }
 
-/* Canal dot indicators on activity rows */
-.db-canal-dots { display:inline-flex; gap:2px; align-items:center; margin-left:4px; }
-.db-canal-dot { width:4px; height:4px; border-radius:50%; background:rgba(155,143,245,0.5); }
-.db-canal-dot.filled { background:#9b8ff5; box-shadow:0 0 3px rgba(124,111,205,0.6); }
+/* Dental specialty badges — color-coded with inline SVG tooth icon */
+.db-act-badge { font-size:10px; font-weight:700; letter-spacing:0.05em; padding:3px 8px 3px 6px; border-radius:6px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
+/* ENDO = purple */
+.db-act-badge.endo  { background:rgba(124,111,205,0.12); color:#9b8ff5; border:1px solid rgba(124,111,205,0.28); }
+/* SMILE = gold */
+.db-act-badge.smile { background:rgba(212,168,67,0.11); color:#d4a843; border:1px solid rgba(212,168,67,0.24); }
+/* SURG = red */
+.db-act-badge.surg  { background:rgba(239,68,68,0.09);  color:#f87171; border:1px solid rgba(239,68,68,0.22); }
+/* RESTO = amber */
+.db-act-badge.resto { background:rgba(245,158,11,0.09); color:#fbbf24; border:1px solid rgba(245,158,11,0.20); }
+/* PAEDS = green */
+.db-act-badge.paeds { background:rgba(52,211,153,0.09); color:#34D399; border:1px solid rgba(52,211,153,0.20); }
 
-/* Verified review card — cleaner, smaller, clinical */
-.db-reviews-card { background:var(--db-bg2); border:1px solid var(--db-border); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:8px; }
-.db-review-item { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 13px; transition:border-color 0.15s; }
-.db-review-item:hover { border-color:rgba(255,255,255,0.1); }
-.db-review-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
-.db-review-author { display:flex; align-items:center; gap:7px; }
-.db-review-avatar { width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
-.db-review-name { font-size:12.5px; font-weight:500; color:var(--db-text); }
-.db-review-date { font-size:10.5px; color:var(--db-text3); }
+/* Activity row spacing */
+.db-activity-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px; cursor:pointer; transition:background 0.15s; border:1px solid transparent; }
+.db-activity-row:hover { background:rgba(255,255,255,0.022); border-color:rgba(255,255,255,0.06); }
+.db-act-time { font-size:11px; color:rgba(240,239,254,0.28); width:32px; flex-shrink:0; font-variant-numeric:tabular-nums; }
+.db-act-name { flex:1; font-size:13px; color:rgba(240,239,254,0.82); font-weight:400; }
+
+/* Patient feedback — tighter, cleaner */
+.db-reviews-card { background:rgba(255,255,255,0.018); border:1px solid rgba(255,255,255,0.065); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:7px; }
+.db-review-item { background:rgba(255,255,255,0.018); border:1px solid rgba(255,255,255,0.055); border-radius:9px; padding:10px 12px; transition:border-color 0.15s; }
+.db-review-item:hover { border-color:rgba(255,255,255,0.09); }
+.db-review-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.db-review-author { display:flex; align-items:center; gap:6px; }
+.db-review-avatar { width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; flex-shrink:0; }
+.db-review-name { font-size:12px; font-weight:600; color:rgba(240,239,254,0.88); }
+.db-review-date { font-size:10px; color:rgba(240,239,254,0.28); }
 .db-stars { display:flex; gap:1px; }
-.db-star { font-size:11px; }
-.db-review-text { font-size:12.5px; color:var(--db-text2); line-height:1.5; }
-.db-review-case-link { display:inline-flex; align-items:center; gap:5px; margin-top:6px; padding:3px 8px 3px 6px; background:rgba(124,111,205,0.08); border:1px solid rgba(124,111,205,0.15); border-radius:5px; font-size:10.5px; color:rgba(155,143,245,0.7); cursor:pointer; transition:all 0.15s; }
-.db-review-case-link:hover { background:rgba(124,111,205,0.14); color:#9b8ff5; border-color:rgba(124,111,205,0.3); }
-.db-review-case-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
-.db-qr-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 7px; background:rgba(61,214,140,0.08); border:1px solid rgba(61,214,140,0.18); border-radius:4px; font-size:9.5px; font-weight:600; color:rgba(61,214,140,0.7); letter-spacing:0.04em; }
-.db-reviews-empty { text-align:center; padding:24px 16px; color:var(--db-text3); font-size:12.5px; line-height:1.6; }
-.db-reviews-empty-icon { font-size:24px; margin-bottom:8px; opacity:0.35; }
+.db-star { font-size:10px; }
+.db-review-text { font-size:12px; color:rgba(240,239,254,0.58); line-height:1.5; margin-bottom:5px; }
+/* Case link — tooth + procedure */
+.db-review-case-link { display:inline-flex; align-items:center; gap:4px; padding:2px 7px 2px 5px; background:rgba(124,111,205,0.07); border:1px solid rgba(124,111,205,0.14); border-radius:4px; font-size:10px; color:rgba(155,143,245,0.65); cursor:pointer; transition:all 0.15s; margin-top:0; }
+.db-review-case-link:hover { background:rgba(124,111,205,0.13); color:#9b8ff5; border-color:rgba(124,111,205,0.28); }
+.db-review-case-dot { width:4px; height:4px; border-radius:50%; flex-shrink:0; }
+/* QR verified badge */
+.db-qr-badge { display:inline-flex; align-items:center; gap:3px; padding:1px 6px; background:rgba(61,214,140,0.07); border:1px solid rgba(61,214,140,0.16); border-radius:4px; font-size:9px; font-weight:600; color:rgba(61,214,140,0.65); letter-spacing:0.04em; white-space:nowrap; }
+.db-reviews-empty { text-align:center; padding:20px 14px; color:rgba(240,239,254,0.22); font-size:12px; line-height:1.6; }
+.db-reviews-empty-icon { font-size:22px; margin-bottom:6px; opacity:0.3; }
 @media(max-width:900px) {
   .db-stat-grid { grid-template-columns:repeat(2,1fr); }
   .db-bottom-grid { grid-template-columns:1fr; }
@@ -10810,7 +10817,14 @@ function renderNewActivityList() {
   const specLabel      = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
   const specCol        = { endo:'#9b8ff5', restorative:'#fbbf24', surgery:'#f87171', paeds:'#34D399', smile:'#d4a843', prostho:'#9b8ff5' };
 
-  // Canal count as compact text suffix for endo — no dot clutter
+  // Specialty SVG icons — tooth shape, color-coded
+  const specIcon = {
+    endo:  `<svg width="9" height="11" viewBox="0 0 9 11" fill="none"><path d="M2.5 0.8C1.8 0.8 0.7 1.3 0.5 2.8C0.2 4.3 0.7 5.7 1.3 6.9C1.7 7.7 2 9 2.3 10.2C2.4 10.5 2.6 10.5 2.7 10.2C3 9 3.2 7.7 4.5 7.7C5.8 7.7 6 9 6.3 10.2C6.4 10.5 6.6 10.5 6.7 10.2C7 9 7.3 7.7 7.7 6.9C8.3 5.7 8.8 4.3 8.5 2.8C8.3 1.3 7.2 0.8 6.5 0.8C6 0.8 5.7 1.1 5 1.1C4.3 1.1 4 0.8 3.5 0.8Z" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg>`,
+    smile: `<svg width="9" height="11" viewBox="0 0 9 11" fill="none"><path d="M2.5 0.8C1.8 0.8 0.7 1.3 0.5 2.8C0.2 4.3 0.7 5.7 1.3 6.9C1.7 7.7 2 9 2.3 10.2C2.4 10.5 2.6 10.5 2.7 10.2C3 9 3.2 7.7 4.5 7.7C5.8 7.7 6 9 6.3 10.2C6.4 10.5 6.6 10.5 6.7 10.2C7 9 7.3 7.7 7.7 6.9C8.3 5.7 8.8 4.3 8.5 2.8C8.3 1.3 7.2 0.8 6.5 0.8C6 0.8 5.7 1.1 5 1.1C4.3 1.1 4 0.8 3.5 0.8Z" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg>`,
+    surg:  `<svg width="9" height="11" viewBox="0 0 9 11" fill="none"><path d="M2.5 0.8C1.8 0.8 0.7 1.3 0.5 2.8C0.2 4.3 0.7 5.7 1.3 6.9C1.7 7.7 2 9 2.3 10.2C2.4 10.5 2.6 10.5 2.7 10.2C3 9 3.2 7.7 4.5 7.7C5.8 7.7 6 9 6.3 10.2C6.4 10.5 6.6 10.5 6.7 10.2C7 9 7.3 7.7 7.7 6.9C8.3 5.7 8.8 4.3 8.5 2.8C8.3 1.3 7.2 0.8 6.5 0.8C6 0.8 5.7 1.1 5 1.1C4.3 1.1 4 0.8 3.5 0.8Z" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg>`,
+    resto: `<svg width="9" height="11" viewBox="0 0 9 11" fill="none"><path d="M2.5 0.8C1.8 0.8 0.7 1.3 0.5 2.8C0.2 4.3 0.7 5.7 1.3 6.9C1.7 7.7 2 9 2.3 10.2C2.4 10.5 2.6 10.5 2.7 10.2C3 9 3.2 7.7 4.5 7.7C5.8 7.7 6 9 6.3 10.2C6.4 10.5 6.6 10.5 6.7 10.2C7 9 7.3 7.7 7.7 6.9C8.3 5.7 8.8 4.3 8.5 2.8C8.3 1.3 7.2 0.8 6.5 0.8C6 0.8 5.7 1.1 5 1.1C4.3 1.1 4 0.8 3.5 0.8Z" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg>`,
+    paeds: `<svg width="9" height="11" viewBox="0 0 9 11" fill="none"><path d="M2.5 0.8C1.8 0.8 0.7 1.3 0.5 2.8C0.2 4.3 0.7 5.7 1.3 6.9C1.7 7.7 2 9 2.3 10.2C2.4 10.5 2.6 10.5 2.7 10.2C3 9 3.2 7.7 4.5 7.7C5.8 7.7 6 9 6.3 10.2C6.4 10.5 6.6 10.5 6.7 10.2C7 9 7.3 7.7 7.7 6.9C8.3 5.7 8.8 4.3 8.5 2.8C8.3 1.3 7.2 0.8 6.5 0.8C6 0.8 5.7 1.1 5 1.1C4.3 1.1 4 0.8 3.5 0.8Z" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg>`,
+  };
   const canalSuffix = (c) => {
     if (c.specialty !== 'endo') return '';
     const n = parseInt(c.canals);
@@ -10829,10 +10843,11 @@ function renderNewActivityList() {
       : (c.procedure || c.case_type || `Tooth ${c.tooth_number || '—'}`);
     const score = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
     const rank = getLevel(allCases.length);
+    const icon  = specIcon[c.specialty] || specIcon.endo;
     return `
       <div class="db-activity-row" onclick="openCaseDetail('${c.id}')">
         <span class="db-act-time">${timeStr}</span>
-        <span class="db-act-badge ${badge}">${label}</span>
+        <span class="db-act-badge ${badge}" style="padding-left:5px;">${icon}${label}</span>
         <span class="db-act-name">${title}${canalSuffix(c)}</span>
         <span class="db-status-pill ${allCases.length >= 25 ? 'gold' : 'verified'}">${allCases.length >= 25 ? rank.name : 'Verified'}</span>
       </div>`;
@@ -11113,10 +11128,10 @@ async function renderDashboardReviews() {
     const caseCol = linkedCase ? (specCol[linkedCase.specialty] || '#9b8ff5') : '#9b8ff5';
     const caseDesc = linkedCase
       ? (linkedCase.specialty === 'smile'
-          ? `✨ Smile · ${linkedCase.procedure || 'Case'}`
+          ? `✨ Smile – ${linkedCase.procedure || 'Case'}`
           : linkedCase.tooth_number
-            ? `Tooth ${linkedCase.tooth_number} · ${specLabel[linkedCase.specialty] || linkedCase.specialty || 'Case'}`
-            : `${specLabel[linkedCase.specialty] || linkedCase.specialty || 'Case'}`)
+            ? `Tooth ${linkedCase.tooth_number} – ${linkedCase.procedure || linkedCase.case_type || specLabel[linkedCase.specialty] || 'Case'}`
+            : `${linkedCase.procedure || specLabel[linkedCase.specialty] || 'Case'}`)
       : null;
 
     return `
