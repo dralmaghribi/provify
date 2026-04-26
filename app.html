@@ -913,6 +913,61 @@ body::after {
 }
 .photo-upload-box:hover { border-color: rgba(124,111,255,0.4); background: rgba(124,111,255,0.04); }
 .photo-preview-empty { color: var(--gray); font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+/* ── Premium Dashboard Sections ── */
+/* Stat Cards */
+.pds-stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+.pds-stat-card { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:18px 20px; position:relative; overflow:hidden; transition:all 0.2s; cursor:default; }
+.pds-stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent); }
+.pds-stat-card:hover { transform:translateY(-2px); border-color:rgba(255,255,255,0.1); }
+.pds-stat-card.gold:hover { box-shadow:0 8px 28px rgba(212,168,67,0.1); }
+.pds-stat-card.purple:hover { box-shadow:0 8px 28px rgba(124,111,205,0.1); }
+.pds-stat-card.green:hover { box-shadow:0 8px 28px rgba(52,211,153,0.08); }
+.pds-stat-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+.pds-stat-icon.gold { background:rgba(212,168,67,0.12); box-shadow:0 0 10px rgba(212,168,67,0.18); }
+.pds-stat-icon.purple { background:rgba(124,111,205,0.12); box-shadow:0 0 10px rgba(124,111,205,0.2); }
+.pds-stat-icon.green { background:rgba(52,211,153,0.1); }
+.pds-stat-val { font-family:'Instrument Serif',serif; font-size:2.2rem; line-height:1; letter-spacing:-0.03em; margin-bottom:5px; }
+.pds-stat-val.gold { color:rgba(212,168,67,0.9); }
+.pds-stat-val.purple { color:rgba(255,255,255,0.88); }
+.pds-stat-val.green { color:#34D399; }
+.pds-stat-sub { font-size:0.65rem; color:rgba(255,255,255,0.22); }
+.pds-stat-shimmer { position:absolute; inset:0; background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.012) 50%,transparent 60%); pointer-events:none; }
+
+/* Activity rows */
+.pds-act-list { display:flex; flex-direction:column; gap:3px; }
+.pds-act-row { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; cursor:pointer; transition:background 0.15s; border:1px solid transparent; }
+.pds-act-row:hover { background:rgba(255,255,255,0.025); border-color:rgba(255,255,255,0.06); }
+.pds-act-time { font-size:0.58rem; color:rgba(255,255,255,0.22); width:52px; flex-shrink:0; text-align:right; }
+.pds-act-sep { width:1px; height:28px; background:rgba(255,255,255,0.05); flex-shrink:0; }
+.pds-act-badge { font-size:0.42rem; font-weight:800; letter-spacing:0.06em; padding:3px 8px; border-radius:6px; flex-shrink:0; }
+.pds-act-badge.endo { background:rgba(124,111,232,0.12); color:rgba(155,143,245,0.9); border:1px solid rgba(124,111,232,0.22); }
+.pds-act-badge.rest { background:rgba(245,158,11,0.1); color:rgba(245,168,50,0.85); border:1px solid rgba(245,158,11,0.2); }
+.pds-act-badge.surg { background:rgba(239,68,68,0.1); color:rgba(239,100,100,0.85); border:1px solid rgba(239,68,68,0.2); }
+.pds-act-badge.paed { background:rgba(52,211,153,0.1); color:rgba(52,211,153,0.85); border:1px solid rgba(52,211,153,0.2); }
+.pds-act-badge.pros { background:rgba(80,140,200,0.1); color:rgba(100,160,220,0.85); border:1px solid rgba(80,140,200,0.2); }
+.pds-act-badge.smil { background:rgba(212,168,67,0.12); color:rgba(212,168,67,0.9); border:1px solid rgba(212,168,67,0.22); }
+.pds-act-name { flex:1; font-size:0.78rem; color:rgba(255,255,255,0.78); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pds-act-rank { font-size:0.52rem; font-weight:700; padding:2px 8px; border-radius:100px; flex-shrink:0; }
+
+/* Mission cards */
+.pds-mission-card { background:rgba(255,255,255,0.02); border-radius:11px; padding:12px 14px; transition:border-color 0.2s; position:relative; overflow:hidden; }
+.pds-mission-card.done { border:1px solid rgba(52,211,153,0.16); }
+.pds-mission-card.todo { border:1px solid rgba(255,255,255,0.06); }
+.pds-mission-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.pds-mission-bar-track { height:2px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden; margin-bottom:7px; }
+.pds-mission-bar-fill { height:100%; border-radius:2px; transition:width 0.8s ease; }
+.pds-mission-bar-fill.done { background:#34D399; box-shadow:0 0 6px rgba(52,211,153,0.4); }
+.pds-mission-bar-fill.todo { background:rgba(196,113,58,0.75); box-shadow:0 0 5px rgba(196,113,58,0.3); }
+
+/* Mic pulse animations (used in hero) */
+@keyframes pds-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.35)} }
+@keyframes pds-mic-breathe {
+  0%,100%{box-shadow:0 0 0 8px rgba(123,110,232,0.07),0 0 28px rgba(123,110,232,0.45),0 8px 22px rgba(0,0,0,0.5)}
+  50%{box-shadow:0 0 0 14px rgba(123,110,232,0.1),0 0 48px rgba(123,110,232,0.6),0 8px 22px rgba(0,0,0,0.5)}
+}
+@keyframes pds-tag-dot-blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes pds-rank-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.8)} }
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 
@@ -2114,149 +2169,145 @@ body::after {
 
 <!-- § 01 HERO -->
 <div class="ds" style="margin-bottom:14px;">
-<div style="position:relative;border-radius:30px;overflow:hidden;background:#060412;">
-  <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(123,110,232,0.11),transparent 45%,rgba(58,140,126,0.05));background-size:200% 200%;animation:bgdrift 20s ease infinite;"></div>
-  <div style="position:absolute;top:-90px;right:-70px;width:360px;height:360px;background:radial-gradient(circle,rgba(123,110,232,0.18) 0%,transparent 65%);animation:orb1 12s ease-in-out infinite;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:-70px;left:-50px;width:260px;height:260px;background:radial-gradient(circle,rgba(58,140,126,0.07) 0%,transparent 65%);animation:orb2 15s ease-in-out infinite;pointer-events:none;"></div>
+<div style="position:relative;border-radius:24px;overflow:hidden;background:#060412;">
+  <!-- Grid lines -->
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.013) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.013) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
-  <div style="position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.05),transparent);animation:streak 9s ease-in-out 3s infinite;pointer-events:none;"></div>
-  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.8),rgba(58,140,126,0.3),transparent);animation:topglow 5s ease-in-out infinite;z-index:3;"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,#060412,transparent);pointer-events:none;z-index:2;"></div>
+  <!-- Glow blobs -->
+  <div style="position:absolute;top:-80px;right:-60px;width:320px;height:320px;background:radial-gradient(circle,rgba(123,110,232,0.16) 0%,transparent 65%);animation:orb1 12s ease-in-out infinite;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-60px;left:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(58,140,126,0.06) 0%,transparent 65%);animation:orb2 15s ease-in-out infinite;pointer-events:none;"></div>
+  <!-- Top accent line -->
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.7),rgba(58,140,126,0.25),transparent);animation:topglow 5s ease-in-out infinite;z-index:3;"></div>
 
-  <div style="position:relative;z-index:5;padding:15px 20px 0;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:7px;">
+  <!-- Status bar -->
+  <div style="position:relative;z-index:5;padding:14px 20px 0;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:6px;">
       <div style="width:5px;height:5px;border-radius:50%;background:#3A8C7E;box-shadow:0 0 8px rgba(58,140,126,0.8);animation:blink 2.5s ease-in-out infinite;"></div>
-      <span style="font-size:0.44rem;color:rgba(58,140,126,0.55);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">Voice · Online</span>
+      <span style="font-size:0.44rem;color:rgba(58,140,126,0.5);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">Voice · Online</span>
     </div>
     <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:4px 12px;border-radius:100px;">
-      <span id="dash-rank-icon" style="font-size:0.65rem;">⚡</span>
-      <span id="dash-ring-label" style="font-size:0.5rem;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.07em;">—</span>
+      <span id="dash-rank-icon" style="font-size:0.62rem;">⚡</span>
+      <span id="dash-ring-label" style="font-size:0.48rem;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.07em;">—</span>
     </div>
   </div>
 
-  <div onclick="openVoiceLog()" id="voice-cta-area" style="position:relative;z-index:5;padding:36px 24px 30px;cursor:pointer;text-align:center;">
-    <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:30px;">
-      <div style="position:absolute;top:50%;left:50%;width:220px;height:220px;border-radius:50%;border:1px solid rgba(123,110,232,0.1);transform-origin:top left;animation:mpulse 3.5s ease-out 0s infinite;"></div>
-      <div style="position:absolute;top:50%;left:50%;width:168px;height:168px;border-radius:50%;border:1px solid rgba(123,110,232,0.17);transform-origin:top left;animation:mpulse 3.5s ease-out 0.87s infinite;"></div>
-      <div style="position:absolute;top:50%;left:50%;width:124px;height:124px;border-radius:50%;border:1px solid rgba(123,110,232,0.25);transform-origin:top left;animation:mpulse 3.5s ease-out 1.75s infinite;"></div>
-      <div style="position:absolute;width:106px;height:106px;border-radius:50%;border:1px solid rgba(123,110,232,0.14);"></div>
-      <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(145deg,#8C80F0 0%,#5A50C8 55%,#463EA8 100%);display:flex;align-items:center;justify-content:center;animation:mbreathe 3.5s ease-in-out infinite;position:relative;z-index:1;flex-shrink:0;">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+  <!-- Main CTA -->
+  <div onclick="openVoiceLog()" id="voice-cta-area" style="position:relative;z-index:5;padding:40px 24px 32px;cursor:pointer;text-align:center;">
+
+    <!-- Mic button with pulse rings -->
+    <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:32px;">
+      <div style="position:absolute;width:160px;height:160px;border-radius:50%;border:1px solid rgba(123,110,232,0.08);animation:pds-pulse-ring 3s ease-out 0s infinite;"></div>
+      <div style="position:absolute;width:124px;height:124px;border-radius:50%;border:1px solid rgba(123,110,232,0.14);animation:pds-pulse-ring 3s ease-out 0.75s infinite;"></div>
+      <div style="position:absolute;width:94px;height:94px;border-radius:50%;border:1px solid rgba(123,110,232,0.22);animation:pds-pulse-ring 3s ease-out 1.5s infinite;"></div>
+      <div style="width:78px;height:78px;border-radius:50%;background:linear-gradient(145deg,#8C80F0 0%,#5A50C8 55%,#463EA8 100%);display:flex;align-items:center;justify-content:center;animation:pds-mic-breathe 3.5s ease-in-out infinite;position:relative;z-index:1;flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
       </div>
     </div>
 
-    <div style="display:flex;align-items:flex-end;justify-content:center;height:26px;margin-bottom:24px;">
-      <span class="wv" style="height:4px;background:rgba(123,110,232,0.2);"></span>
-      <span class="wv" style="height:8px;background:rgba(123,110,232,0.3);"></span>
-      <span class="wv" style="height:14px;background:rgba(123,110,232,0.42);"></span>
-      <span class="wv" style="height:20px;background:rgba(123,110,232,0.6);"></span>
-      <span class="wv" style="height:26px;background:rgba(123,110,232,0.82);"></span>
-      <span class="wv" style="height:20px;background:rgba(123,110,232,0.6);"></span>
-      <span class="wv" style="height:14px;background:rgba(123,110,232,0.42);"></span>
-      <span class="wv" style="height:8px;background:rgba(123,110,232,0.3);"></span>
-      <span class="wv" style="height:4px;background:rgba(123,110,232,0.2);"></span>
+    <!-- Wordmark -->
+    <div style="font-family:'Instrument Serif',serif;font-size:2.8rem;color:rgba(255,255,255,0.92);letter-spacing:-0.04em;line-height:0.9;margin-bottom:12px;">
+      Speak.<br><em style="color:#9B8FF5;font-style:italic;">I'll handle the rest.</em>
     </div>
 
-    <div style="font-family:'Instrument Serif',serif;font-size:3rem;color:rgba(255,255,255,0.92);letter-spacing:-0.04em;line-height:0.92;margin-bottom:14px;">
-      Speak.<br><em style="color:#9B8FF5;font-style:italic;">I'll handle</em><br>the rest.
-    </div>
-    <div id="dash-hero-subtext" style="font-size:0.68rem;color:rgba(255,255,255,0.25);line-height:1.7;max-width:250px;margin:0 auto 26px;">
+    <!-- Dynamic subtext -->
+    <div id="dash-hero-subtext" style="font-size:0.68rem;color:rgba(255,255,255,0.22);line-height:1.7;max-width:260px;margin:0 auto 22px;">
       Dictate the case. Provify documents, signs, and protects it before you finish.
     </div>
 
-    <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(123,110,232,0.15);border:1px solid rgba(123,110,232,0.38);padding:12px 26px;border-radius:100px;transition:all 0.2s;"
-      onmouseover="this.style.background='rgba(123,110,232,0.28)';this.style.transform='scale(1.04)'"
-      onmouseout="this.style.background='rgba(123,110,232,0.15)';this.style.transform='scale(1)'">
-      <span style="font-size:0.88rem;color:rgba(255,255,255,0.9);font-weight:700;">Start Speaking</span>
-      <span style="font-size:0.55rem;color:rgba(155,143,245,0.6);background:rgba(123,110,232,0.14);padding:3px 9px;border-radius:100px;">Hold Space</span>
+    <!-- Tags -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:24px;">
+      <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;font-size:0.6rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.45);">
+        <span style="width:4px;height:4px;border-radius:50%;background:#34D399;display:inline-block;animation:pds-tag-dot-blink 2s infinite;"></span>Auto-documented
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;font-size:0.6rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.45);">
+        <span style="width:4px;height:4px;border-radius:50%;background:#34D399;display:inline-block;animation:pds-tag-dot-blink 2s 0.5s infinite;"></span>Legally structured
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;font-size:0.6rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.45);">
+        <span style="width:4px;height:4px;border-radius:50%;background:#34D399;display:inline-block;animation:pds-tag-dot-blink 2s 1s infinite;"></span>Portfolio ready
+      </span>
+    </div>
+
+    <!-- CTA buttons -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+      <div style="display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,rgba(110,98,210,0.9),rgba(78,64,176,0.95));border:1px solid rgba(123,110,232,0.4);padding:11px 24px;border-radius:100px;transition:all 0.2s;box-shadow:0 0 20px rgba(123,110,232,0.3),0 4px 14px rgba(0,0,0,0.4);"
+        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 0 32px rgba(123,110,232,0.45),0 6px 18px rgba(0,0,0,0.4)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 0 20px rgba(123,110,232,0.3),0 4px 14px rgba(0,0,0,0.4)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>
+        <span style="font-size:0.82rem;color:rgba(255,255,255,0.92);font-weight:700;">Start Speaking</span>
+        <span style="font-size:0.48rem;color:rgba(155,143,245,0.55);background:rgba(123,110,232,0.16);padding:2px 8px;border-radius:100px;">Hold Space</span>
+      </div>
+      <div onclick="event.stopPropagation();showView('cases')" style="display:inline-flex;align-items:center;padding:11px 20px;border-radius:100px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);font-size:0.78rem;color:rgba(255,255,255,0.45);font-weight:500;cursor:pointer;transition:all 0.15s;"
+        onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.65)'"
+        onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.color='rgba(255,255,255,0.45)'">
+        View last session
+      </div>
     </div>
   </div>
 
+  <!-- Micro stats strip -->
   <div style="position:relative;z-index:5;border-top:1px solid rgba(255,255,255,0.05);display:grid;grid-template-columns:repeat(4,1fr);">
-    <div style="padding:16px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-      <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:white;line-height:1;letter-spacing:-0.04em;animation:numglow 3s ease-in-out infinite;" id="micro-total">0</div>
-      <div style="font-size:0.42rem;color:rgba(255,255,255,0.16);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">Cases · Total</div>
+    <div style="padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+      <div style="font-family:'Instrument Serif',serif;font-size:1.9rem;color:white;line-height:1;letter-spacing:-0.04em;animation:numglow 3s ease-in-out infinite;" id="micro-total">0</div>
+      <div style="font-size:0.42rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">Cases · Total</div>
     </div>
-    <div style="padding:16px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-      <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:rgba(58,140,126,0.85);line-height:1;letter-spacing:-0.04em;" id="micro-this-month">0</div>
+    <div style="padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+      <div style="font-family:'Instrument Serif',serif;font-size:1.9rem;color:rgba(58,140,126,0.85);line-height:1;letter-spacing:-0.04em;" id="micro-this-month">0</div>
       <div style="font-size:0.42rem;color:rgba(58,140,126,0.28);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">This Month</div>
     </div>
-    <div style="padding:16px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+    <div style="padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
       <div style="font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(185,155,70,0.85);line-height:1;margin-top:8px;" id="micro-rank">—</div>
       <div style="font-size:0.42rem;color:rgba(185,155,70,0.25);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">Rank</div>
     </div>
-    <div style="padding:16px 8px;text-align:center;">
-      <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:rgba(196,113,58,0.8);line-height:1;letter-spacing:-0.04em;" id="micro-streak">0</div>
+    <div style="padding:14px 8px;text-align:center;">
+      <div style="font-family:'Instrument Serif',serif;font-size:1.9rem;color:rgba(196,113,58,0.8);line-height:1;letter-spacing:-0.04em;" id="micro-streak">0</div>
       <div style="font-size:0.42rem;color:rgba(196,113,58,0.26);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">This Week</div>
     </div>
   </div>
 </div>
 </div>
 
-<!-- § 02 MODULES -->
-<div class="ds" style="margin-bottom:14px;">
-  <div style="font-size:0.42rem;color:rgba(255,255,255,0.1);text-transform:uppercase;letter-spacing:0.28em;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;"><span>Modules</span><span style="color:rgba(155,143,245,0.3);">3 active</span></div>
+<!-- § 02 STAT CARDS -->
+<!-- Hidden legacy IDs for JS compatibility -->
+<span id="micro-total-shield" style="display:none;"></span>
+<span id="val-portfolio-text" style="display:none;"></span>
+<span id="micro-total-port" style="display:none;"></span>
+<span id="val-growth-text" style="display:none;"></span>
 
-  <div class="pm pm-warm" onclick="navToShield()" style="background:linear-gradient(130deg,rgba(196,113,58,0.1),rgba(160,80,30,0.05) 60%,rgba(6,4,18,0));border:1px solid rgba(196,113,58,0.2);border-radius:22px;padding:20px 22px 18px;margin-bottom:8px;box-shadow:0 6px 28px rgba(196,113,58,0.08);">
-    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,113,58,0.7),rgba(220,140,70,0.4),transparent);animation:modglow 3.5s ease-in-out infinite;"></div>
-    <div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;background:radial-gradient(circle,rgba(196,113,58,0.1),transparent 70%);pointer-events:none;"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:14px;">
-        <div style="width:46px;height:46px;border-radius:13px;background:rgba(196,113,58,0.12);border:1px solid rgba(196,113,58,0.24);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="rgba(210,130,70,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
-        </div>
-        <div>
-          <div style="font-size:0.44rem;color:rgba(196,113,58,0.5);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Shield · Tamper-proof</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(255,255,255,0.88);letter-spacing:-0.02em;line-height:1.05;">Every case.<br>Protected.</div>
-        </div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;padding-left:12px;">
-        <div style="font-family:'Instrument Serif',serif;font-size:2.4rem;color:rgba(196,113,58,0.5);line-height:1;letter-spacing:-0.04em;" id="micro-total-shield">—</div>
-        <div style="font-size:0.4rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Protected</div>
-      </div>
+<div class="pds-stat-grid">
+  <!-- Cases Protected -->
+  <div class="pds-stat-card gold" onclick="navToShield()" style="cursor:pointer;">
+    <div class="pds-stat-shimmer"></div>
+    <div class="pds-stat-icon gold">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(212,168,67,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
     </div>
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(196,113,58,0.08);font-size:0.58rem;color:rgba(255,255,255,0.2);">Complaint letter · 60s · One tap defence</div>
+    <div class="pds-stat-val gold" id="stat-protected-count">—</div>
+    <div style="font-size:0.72rem;color:rgba(212,168,67,0.6);font-weight:600;margin-bottom:3px;">Cases Protected</div>
+    <div class="pds-stat-sub">Complaint-ready in seconds</div>
   </div>
-
-  <div style="display:grid;grid-template-columns:3fr 2fr;gap:8px;">
-    <div class="pm pm-violet" onclick="viewMyPortfolio()" style="background:linear-gradient(145deg,rgba(123,110,232,0.11),rgba(80,65,190,0.05));border:1px solid rgba(123,110,232,0.18);border-radius:22px;padding:20px 18px 16px;box-shadow:0 6px 28px rgba(123,110,232,0.08);display:flex;flex-direction:column;min-height:178px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.75),transparent);animation:modglow 3.5s ease-in-out 1.2s infinite;"></div>
-      <div style="position:absolute;bottom:-30px;right:-20px;width:110px;height:110px;background:radial-gradient(circle,rgba(123,110,232,0.1),transparent 70%);pointer-events:none;"></div>
-      <div style="width:42px;height:42px;border-radius:12px;background:rgba(123,110,232,0.12);border:1px solid rgba(123,110,232,0.22);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(155,143,245,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="6" y1="8" x2="10" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/></svg>
-      </div>
-      <div style="font-size:0.42rem;color:rgba(123,110,232,0.48);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:5px;">Portfolio · Verified</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:rgba(255,255,255,0.85);line-height:1.1;flex:1;" id="val-portfolio-text">Verified<br>portfolio</div>
-      <div style="margin-top:auto;padding-top:14px;display:flex;align-items:flex-end;justify-content:space-between;">
-        <div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:rgba(123,110,232,0.55);line-height:1;letter-spacing:-0.03em;" id="micro-total-port">—</div>
-          <div style="font-size:0.4rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Verified</div>
-        </div>
-        <div style="font-size:0.6rem;color:rgba(123,110,232,0.45);font-weight:600;">View →</div>
-      </div>
+  <!-- Verified Portfolio -->
+  <div class="pds-stat-card purple" onclick="viewMyPortfolio()" style="cursor:pointer;">
+    <div class="pds-stat-shimmer"></div>
+    <div class="pds-stat-icon purple">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(155,143,245,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
     </div>
-
-    <div class="pm pm-teal" onclick="showView('progress')" style="background:linear-gradient(145deg,rgba(58,140,126,0.1),rgba(30,100,88,0.04));border:1px solid rgba(58,140,126,0.16);border-radius:22px;padding:20px 16px 16px;box-shadow:0 6px 28px rgba(58,140,126,0.07);display:flex;flex-direction:column;min-height:178px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(58,140,126,0.65),transparent);animation:modglow 3.5s ease-in-out 2.4s infinite;"></div>
-      <div style="width:42px;height:42px;border-radius:12px;background:rgba(58,140,126,0.11);border:1px solid rgba(58,140,126,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(70,175,158,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      </div>
-      <div style="font-size:0.42rem;color:rgba(58,140,126,0.48);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:5px;">AI · Trajectory</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.85);line-height:1.2;flex:1;" id="val-growth-text">Clinical<br>growth</div>
-      <div style="display:flex;align-items:flex-end;gap:2px;height:22px;margin-top:auto;padding-top:14px;">
-        <span style="width:2px;height:4px;background:rgba(58,140,126,0.28);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.00s ease-in-out infinite;"></span>
-        <span style="width:2px;height:8px;background:rgba(58,140,126,0.4);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.14s ease-in-out infinite;"></span>
-        <span style="width:2px;height:14px;background:rgba(58,140,126,0.55);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.28s ease-in-out infinite;"></span>
-        <span style="width:2px;height:22px;background:rgba(58,140,126,0.75);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.42s ease-in-out infinite;"></span>
-        <span style="width:2px;height:15px;background:rgba(58,140,126,0.55);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.28s ease-in-out infinite;"></span>
-        <span style="width:2px;height:8px;background:rgba(58,140,126,0.38);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.14s ease-in-out infinite;"></span>
-      </div>
+    <div class="pds-stat-val purple" id="stat-portfolio-count">—</div>
+    <div style="font-size:0.72rem;color:rgba(155,143,245,0.55);font-weight:600;margin-bottom:3px;">Verified Portfolio</div>
+    <div class="pds-stat-sub">Career-ready, shareable</div>
+  </div>
+  <!-- AI Growth -->
+  <div class="pds-stat-card green" onclick="showView('progress')" style="cursor:pointer;">
+    <div class="pds-stat-shimmer"></div>
+    <div class="pds-stat-icon green">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
     </div>
+    <div class="pds-stat-val green" id="stat-growth-val">—</div>
+    <div style="font-size:0.72rem;color:rgba(52,211,153,0.5);font-weight:600;margin-bottom:3px;">AI Growth</div>
+    <div class="pds-stat-sub">Performance increasing</div>
   </div>
 </div>
 
 <!-- § 03 ACTIVITY -->
 <div class="ds" id="last-case-strip" style="margin-bottom:14px;"></div>
+
 
 <!-- § 04 OBJECTIVES -->
 <div id="monthly-objectives" style="display:none;"></div>
@@ -4931,6 +4982,18 @@ function updateDashboard() {
   setMicro('micro-total-port', total || '—');
   setMicro('micro-streak', streak);
   setMicro('micro-rank', total > 0 ? level.name : '—');
+
+  // Premium stat cards
+  setMicro('stat-protected-count', total || '—');
+  setMicro('stat-portfolio-count', total > 0 ? `${total} cases` : '—');
+  // AI Growth: percentage change vs first logged case month
+  if (total >= 2) {
+    const _now2 = new Date();
+    const _thisM = allCases.filter(c => { const d = new Date(c.created_at); return d.getMonth()===_now2.getMonth()&&d.getFullYear()===_now2.getFullYear(); }).length;
+    const _lastM = allCases.filter(c => { const d = new Date(c.created_at); const lm = new Date(_now2.getFullYear(), _now2.getMonth()-1, 1); return d.getMonth()===lm.getMonth()&&d.getFullYear()===lm.getFullYear(); }).length;
+    if (_lastM > 0) { setMicro('stat-growth-val', `+${Math.round((_thisM-_lastM)/_lastM*100)}%`); }
+    else { setMicro('stat-growth-val', total > 0 ? `+${total * 100}%` : '—'); }
+  } else { setMicro('stat-growth-val', total > 0 ? '↑ Growing' : '—'); }
   const _now = new Date();
   const _thisMonth = allCases.filter(c => { const d = new Date(c.created_at); return d.getMonth()===_now.getMonth()&&d.getFullYear()===_now.getFullYear(); }).length;
   setMicro('micro-this-month', _thisMonth);
@@ -10973,59 +11036,59 @@ function renderLastCaseStrip() {
   const recent = sorted.slice(0, 5);
   const rank = getComplexityRank(allCases.length);
 
-  const specColors = { endo:'rgba(123,110,232,0.8)', restorative:'rgba(196,160,58,0.8)', surgery:'rgba(196,80,80,0.8)', paeds:'rgba(58,140,126,0.8)', prostho:'rgba(80,140,200,0.8)', smile:'rgba(196,140,58,0.8)' };
-  const specShort  = { endo:'ENDO', restorative:'REST', surgery:'SURG', paeds:'PAED', prostho:'PROS', smile:'SMIL' };
-  const specLabel  = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
+  const specBadgeClass = { endo:'endo', restorative:'rest', surgery:'surg', paeds:'paed', prostho:'pros', smile:'smil' };
+  const specShort      = { endo:'ENDO', restorative:'REST', surgery:'SURG', paeds:'PAED', prostho:'PROS', smile:'SMIL' };
+  const specLabel      = { endo:'Endodontics', restorative:'Restorative', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
 
   strip.style.display = 'block';
   strip.innerHTML = `
-    <div style="position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.4),transparent);"></div>
-      <div style="padding:14px 18px 6px;display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
-        <div style="font-size:0.44rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;">Recent Activity</div>
-        <div style="font-size:0.44rem;color:rgba(255,255,255,0.1);text-transform:uppercase;letter-spacing:0.14em;">${recent.length} events</div>
+    <div style="position:relative;border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.35),transparent);"></div>
+
+      <!-- Header -->
+      <div style="padding:13px 16px 4px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.24em;font-weight:700;">Recent Activity</div>
+        <span onclick="showView('cases')" style="font-size:0.52rem;color:rgba(123,110,232,0.55);cursor:pointer;font-weight:600;transition:color 0.15s;" onmouseover="this.style.color='rgba(123,110,232,0.85)'" onmouseout="this.style.color='rgba(123,110,232,0.55)'">View all →</span>
       </div>
-      <div>
+
+      <!-- Rows -->
+      <div class="pds-act-list" style="padding:4px 8px 8px;">
         ${recent.map((c, i) => {
           const d = new Date(c.created_at);
           const timeStr = d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
           const daysAgo = Math.floor((Date.now() - d) / 86400000);
-          const dayLabel = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo}d ago`;
-          const col = specColors[c.specialty] || 'rgba(123,110,232,0.8)';
-          const abbr = specShort[c.specialty] || 'CASE';
-          const isSmile = c.specialty === 'smile';
-          const title = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'} · ${specLabel[c.specialty] || c.specialty}`;
+          const dayLabel = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yest.' : `${daysAgo}d ago`;
+          const badgeCls = specBadgeClass[c.specialty] || 'endo';
+          const abbr     = specShort[c.specialty] || 'CASE';
+          const isSmile  = c.specialty === 'smile';
+          const title    = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'} · ${specLabel[c.specialty] || c.specialty}`;
           const photoCount = c.photo_urls ? Object.values(c.photo_urls).filter(Boolean).length : 0;
-          const hasSigned = c.note && c.note.includes('ML_RECORD');
+          const hasSigned  = c.note && c.note.includes('ML_RECORD');
+          const rankCol    = rank.color || 'rgba(123,110,232,0.8)';
           return `
-          <div class="arow" onclick="openCaseDetail('${c.id}')" style="display:flex;align-items:center;gap:12px;padding:11px 18px;cursor:pointer;border-top:1px solid rgba(255,255,255,${i===0?'0':'0.03'});animation:actrow 0.4s ${i*0.07}s ease both;">
-            <div style="flex-shrink:0;text-align:right;width:36px;">
-              <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);font-weight:600;">${timeStr}</div>
-              <div style="font-size:0.44rem;color:rgba(255,255,255,0.15);margin-top:1px;">${dayLabel}</div>
+          <div class="pds-act-row" onclick="openCaseDetail('${c.id}')" style="animation:actrow 0.35s ${i*0.06}s ease both;">
+            <div class="pds-act-time">
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.32);font-weight:600;">${timeStr}</div>
+              <div style="font-size:0.42rem;color:rgba(255,255,255,0.14);margin-top:1px;">${dayLabel}</div>
             </div>
-            <div style="width:1px;height:32px;background:rgba(255,255,255,0.06);flex-shrink:0;"></div>
-            <div style="width:36px;height:32px;border-radius:8px;background:${col.replace('0.8','0.1')};border:1px solid ${col.replace('0.8','0.22')};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <span style="font-size:0.42rem;font-weight:800;color:${col};letter-spacing:0.05em;">${abbr}</span>
+            <div class="pds-act-sep"></div>
+            <span class="pds-act-badge ${badgeCls}">${abbr}</span>
+            <div class="pds-act-name">
+              ${title}
+              ${hasSigned || photoCount > 0 ? `<span style="font-size:0.42rem;color:rgba(255,255,255,0.18);margin-left:4px;">${hasSigned ? '· Signed' : ''}${photoCount > 0 ? ` · ${photoCount}📷` : ''}</span>` : ''}
             </div>
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
-              <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
-                ${hasSigned ? `<span style="font-size:0.44rem;color:rgba(255,255,255,0.2);">· Signed</span>` : ''}
-                ${photoCount > 0 ? `<span style="font-size:0.44rem;color:rgba(255,255,255,0.2);">· ${photoCount} photo${photoCount>1?'s':''}</span>` : ''}
-              </div>
-            </div>
-            <div style="flex-shrink:0;">
-              <div style="font-size:0.56rem;font-weight:700;color:${col};background:${col.replace('0.8','0.1')};padding:3px 8px;border-radius:100px;border:1px solid ${col.replace('0.8','0.2')};">${rank.rank}</div>
-            </div>
+            <div class="pds-act-rank" style="color:${rankCol};background:${rankCol.replace(/[\d.]+\)$/, '0.1)')};border:1px solid ${rankCol.replace(/[\d.]+\)$/, '0.2)')};">${rank.rank}</div>
           </div>`;
         }).join('')}
       </div>
-      <div style="padding:10px 18px;border-top:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <div style="width:4px;height:4px;border-radius:50%;background:rgba(58,140,126,0.7);box-shadow:0 0 6px rgba(58,140,126,0.5);"></div>
-          <span style="font-size:0.42rem;color:rgba(255,255,255,0.14);">All cases verified · SHA-256 + RFC-3161</span>
+
+      <!-- Footer -->
+      <div style="padding:8px 16px;border-top:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:5px;">
+          <div style="width:4px;height:4px;border-radius:50%;background:rgba(52,211,153,0.7);box-shadow:0 0 5px rgba(52,211,153,0.5);"></div>
+          <span style="font-size:0.42rem;color:rgba(255,255,255,0.12);">All cases verified · SHA-256 + RFC-3161</span>
         </div>
-        <span style="font-size:0.42rem;color:rgba(123,110,232,0.3);font-weight:600;">Provify · v2.4</span>
+        <span style="font-size:0.42rem;color:rgba(123,110,232,0.25);font-weight:600;">Provify · v2.4</span>
       </div>
     </div>`;
 }
@@ -11037,9 +11100,8 @@ function renderMonthlyObjectives() {
   const { month, objectives } = getMonthlyObjectives();
   const doneCount = objectives.filter(o => o.current >= o.target).length;
 
-  // AI hints per objective type
   const hints = {
-    'log':        doneCount >= 2 ? 'You\'re already ahead of 78% of users'  : 'Every case logged compounds your record',
+    'log':        doneCount >= 2 ? "You're already ahead of 78% of users" : 'Every case logged compounds your record',
     'endo':       'Strong speciality consistency detected',
     'challenging':'High-impact cases boost your rank faster',
     'smile':      'Aesthetic cases are your fastest-growing category',
@@ -11057,60 +11119,59 @@ function renderMonthlyObjectives() {
 
   el.style.display = 'block';
   el.innerHTML = `
-    <div style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);margin-bottom:14px;">
+    <div style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);margin-bottom:14px;">
 
       <!-- Header -->
       <div style="padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.04);">
-        <div style="font-size:0.4rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">${month} Mission</div>
-        <div style="font-size:0.5rem;color:rgba(255,255,255,0.22);font-weight:500;">${doneCount} of ${objectives.length} complete</div>
+        <div style="font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">${month} Mission</div>
+        <div style="font-size:0.52rem;color:rgba(255,255,255,0.25);font-weight:500;">${doneCount} of ${objectives.length} complete</div>
       </div>
 
-      <!-- Cards -->
-      <div style="padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;">
+      <!-- Mission cards -->
+      <div style="padding:8px 10px 4px;display:flex;flex-direction:column;gap:6px;">
         ${objectives.map(o => {
           const done = o.current >= o.target;
           const pct  = Math.min(100, Math.round(o.current / o.target * 100));
           const hint = getHint(o.label);
-
-          const cardBg     = done ? 'rgba(255,255,255,0.02)'           : 'rgba(255,255,255,0.02)';
-          const cardBorder = done ? 'rgba(52,211,153,0.16)'            : 'rgba(255,255,255,0.06)';
-          const topGlow    = done ? 'rgba(52,211,153,0.3)'             : 'transparent';
-          const barFill    = done ? '#34D399'                          : 'rgba(196,113,58,0.75)';
-          const barBg      = done ? 'rgba(52,211,153,0.1)'             : 'rgba(255,255,255,0.05)';
-          const barGlow    = done ? '0 0 6px rgba(52,211,153,0.3)'     : 'none';
-          const pctCol     = done ? 'rgba(52,211,153,0.85)'            : 'rgba(196,113,58,0.7)';
-          const titleCol   = done ? 'rgba(255,255,255,0.35)'           : 'rgba(255,255,255,0.78)';
-          const hintCol    = done ? 'rgba(52,211,153,0.45)'            : 'rgba(255,255,255,0.2)';
-          const statusText = done ? 'Done'                             : 'In progress';
-          const statusCol  = done ? 'rgba(52,211,153,0.6)'             : 'rgba(196,113,58,0.5)';
-
           return `
-          <div style="background:${cardBg};border:1px solid ${cardBorder};border-radius:11px;padding:10px 12px;position:relative;overflow:hidden;">
-            ${done ? `<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${topGlow},transparent);"></div>` : ''}
-            <div style="display:flex;align-items:center;gap:10px;">
-              <!-- Icon -->
-              <div style="width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.75rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);">${o.icon}</div>
-
-              <!-- Title + hint + bar -->
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:0.68rem;color:${titleCol};font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.1);' : ''}">${o.label}</div>
-                <div style="font-size:0.54rem;color:${hintCol};margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hint}</div>
-                <!-- Bar -->
-                <div style="height:2px;background:${barBg};border-radius:100px;overflow:hidden;">
-                  <div style="height:100%;width:${pct}%;background:${barFill};border-radius:100px;box-shadow:${barGlow};transition:width 0.8s ease;"></div>
-                </div>
+          <div class="pds-mission-card ${done ? 'done' : 'todo'}">
+            ${done ? `<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.3),transparent);"></div>` : ''}
+            <div class="pds-mission-top">
+              <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+                <div style="width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.72rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);">${o.icon}</div>
+                <div style="font-size:0.68rem;color:${done ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.78)'};font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.12);' : ''}">${o.label}</div>
               </div>
-
-              <!-- Right: % + status -->
-              <div style="flex-shrink:0;text-align:right;min-width:36px;">
-                <div style="font-size:0.62rem;font-weight:700;color:${pctCol};line-height:1;">${pct}%</div>
-                <div style="font-size:0.42rem;color:${statusCol};margin-top:2px;">${statusText}</div>
+              <div style="flex-shrink:0;text-align:right;margin-left:10px;">
+                <div style="font-size:0.62rem;font-weight:700;color:${done ? 'rgba(52,211,153,0.85)' : 'rgba(196,113,58,0.7)'};">${pct}%</div>
+                <div style="font-size:0.4rem;color:${done ? 'rgba(52,211,153,0.5)' : 'rgba(196,113,58,0.45)'};margin-top:1px;">${done ? 'Done' : 'In progress'}</div>
               </div>
             </div>
+            <div class="pds-mission-bar-track">
+              <div class="pds-mission-bar-fill ${done ? 'done' : 'todo'}" style="width:${pct}%;"></div>
+            </div>
+            <div style="font-size:0.54rem;color:${done ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.2)'};">${done ? '✓ ' : ''}${hint}</div>
           </div>`;
         }).join('')}
       </div>
+
+      <!-- Footer -->
+      <div style="padding:10px 16px 12px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:0.54rem;color:rgba(255,255,255,0.25);">
+          <span style="color:rgba(255,255,255,0.55);font-weight:600;">${doneCount} / ${objectives.length}</span> missions complete
+        </div>
+        <div style="font-size:0.48rem;color:rgba(255,255,255,0.15);" id="mission-reset-label"></div>
+      </div>
     </div>`;
+
+  // Days until reset
+  const resetLabel = el.querySelector('#mission-reset-label');
+  if (resetLabel) {
+    const now = new Date();
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const daysLeft = Math.ceil((endOfMonth - now) / (1000*60*60*24));
+    resetLabel.textContent = `Resets in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`;
+  }
+}
 }
 // ─── INACTIVITY TRACKER ───
 function renderInactivityAlert() {
@@ -11281,85 +11342,79 @@ function renderRankProgression() {
     { rank: 'Apex',     min: 200, max: null,color: 'rgba(123,110,232,0.9)'  },
   ];
 
-  const currentIdx = tiers.findIndex(t => t.rank === currentRank.rank);
-  const nextTier   = tiers[currentIdx + 1] || null;
-  const casesAway  = nextTier ? nextTier.min - total : 0;
+  const currentIdx  = tiers.findIndex(t => t.rank === currentRank.rank);
+  const nextTier    = tiers[currentIdx + 1] || null;
+  const casesAway   = nextTier ? nextTier.min - total : 0;
   const progressPct = nextTier
     ? Math.min(100, Math.round(((total - currentRank.min) / (nextTier.min - currentRank.min)) * 100))
     : 100;
-
   const curCol = currentRank.color || 'rgba(185,155,70,0.9)';
+  const trackFillPct = ((currentIdx / (tiers.length - 1)) * 100) + (progressPct / (tiers.length - 1));
+
+  // Percentile — rough estimate based on rank tier
+  const percentileMap = { Bronze:40, Silver:60, Gold:78, Platinum:88, Diamond:95, Apex:99 };
+  const percentile = percentileMap[currentRank.rank] || 50;
 
   el.innerHTML = `
-    <div style="position:relative;border-radius:22px;overflow:hidden;background:rgba(6,4,18,0.8);border:1px solid rgba(255,255,255,0.07);margin-bottom:14px;">
-      <!-- Grid -->
-      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;"></div>
+    <div style="position:relative;border-radius:18px;overflow:hidden;background:rgba(6,4,18,0.85);border:1px solid rgba(255,255,255,0.07);margin-bottom:14px;">
+      <!-- Subtle grid -->
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.011) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.011) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;"></div>
       <!-- Top accent -->
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${curCol.replace('0.9','0.6').replace('0.85','0.5')},transparent);"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${curCol.replace('0.9','0.55').replace('0.85','0.45')},transparent);"></div>
+      <!-- Bottom radial glow -->
+      <div style="position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);width:280px;height:120px;background:radial-gradient(ellipse,${curCol.replace('0.9','0.07').replace('0.85','0.06')},transparent 70%);pointer-events:none;"></div>
 
-      <div style="position:relative;z-index:1;padding:18px 20px 20px;">
+      <div style="position:relative;z-index:1;padding:16px 18px 18px;">
 
-        <!-- Header -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;">
+        <!-- Header row -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;">
           <div>
-            <div style="font-size:0.42rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;margin-bottom:6px;">Rank Trajectory</div>
-            <div style="display:flex;align-items:baseline;gap:8px;">
-              <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:${curCol};letter-spacing:-0.03em;line-height:1;">${currentRank.rank}</div>
-              ${nextTier ? `<div style="font-size:0.6rem;color:rgba(255,255,255,0.2);font-weight:500;">${casesAway} to ${nextTier.rank}</div>` : `<div style="font-size:0.6rem;color:rgba(123,110,232,0.5);font-weight:600;">Max rank</div>`}
+            <div style="font-size:0.42rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.24em;font-weight:700;margin-bottom:6px;">Rank Trajectory</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:${curCol.replace('0.9','0.1').replace('0.85','0.1')};border:1px solid ${curCol.replace('0.9','0.28').replace('0.85','0.24')};border-radius:8px;box-shadow:0 0 14px ${curCol.replace('0.9','0.2').replace('0.85','0.18')};">
+                <div style="width:7px;height:7px;border-radius:50%;background:${curCol};box-shadow:0 0 7px ${curCol};animation:pds-rank-dot 2s ease-in-out infinite;"></div>
+                <span style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:${curCol};letter-spacing:-0.01em;line-height:1;">${currentRank.rank}</span>
+              </div>
+              ${nextTier ? `<span style="font-size:0.55rem;color:rgba(255,255,255,0.2);">${casesAway} → ${nextTier.rank}</span>` : `<span style="font-size:0.55rem;color:rgba(123,110,232,0.45);">Max rank</span>`}
             </div>
           </div>
           <div style="text-align:right;">
-            <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(255,255,255,0.55);letter-spacing:-0.03em;">${total}</div>
-            <div style="font-size:0.42rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.12em;margin-top:1px;">Verified cases</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:rgba(255,255,255,0.6);line-height:1;letter-spacing:-0.03em;">${total}</div>
+            <div style="font-size:0.42rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Verified cases</div>
           </div>
         </div>
 
-        <!-- Trajectory beam -->
-        <div style="position:relative;margin-bottom:18px;">
-          <!-- Track -->
-          <div style="height:2px;background:rgba(255,255,255,0.06);border-radius:100px;position:relative;overflow:visible;">
-            <!-- Progress fill -->
-            <div style="position:absolute;left:0;top:0;height:100%;width:${(currentIdx / (tiers.length - 1)) * 100 + (progressPct / (tiers.length - 1))}%;background:linear-gradient(90deg,rgba(160,110,60,0.5),${curCol});border-radius:100px;box-shadow:0 0 8px ${curCol.replace('0.9','0.4').replace('0.85','0.35')};transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
-          </div>
-
-          <!-- Nodes -->
-          <div style="display:flex;justify-content:space-between;margin-top:-5px;position:relative;">
-            ${tiers.map((t, i) => {
-              const isPast    = total >= t.min && (t.max === null || total <= t.max || i < currentIdx);
-              const isActive  = t.rank === currentRank.rank;
-              const isFuture  = i > currentIdx;
-              const nodeCol   = isActive ? curCol : isPast ? t.color : 'rgba(255,255,255,0.1)';
-              return `
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <!-- Node -->
-                <div style="width:12px;height:12px;border-radius:50%;
-                  background:${isActive ? curCol : isPast ? t.color.replace('0.85','0.6').replace('0.9','0.6') : 'rgba(255,255,255,0.07)'};
-                  border:1px solid ${isActive ? curCol : isPast ? t.color.replace('0.85','0.4') : 'rgba(255,255,255,0.08)'};
-                  ${isActive ? `box-shadow:0 0 10px ${curCol.replace('0.9','0.7').replace('0.85','0.65')};` : ''}
-                  position:relative;z-index:1;flex-shrink:0;transition:all 0.4s;">
-                  ${isPast && !isActive ? `<div style="position:absolute;inset:2px;border-radius:50%;background:${t.color.replace('0.85','0.8').replace('0.9','0.8')};"></div>` : ''}
-                </div>
-                <!-- Label -->
-                <div style="font-size:0.4rem;font-weight:${isActive ? '800' : '400'};
-                  color:${isActive ? curCol : isFuture ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.35)'};
-                  letter-spacing:0.06em;text-align:center;white-space:nowrap;
-                  ${isActive ? `text-shadow:0 0 8px ${curCol.replace('0.9','0.5')};` : ''}">
-                  ${t.rank}
-                </div>
-              </div>`;
-            }).join('')}
+        <!-- Track -->
+        <div style="position:relative;margin-bottom:6px;">
+          <div style="height:4px;background:rgba(255,255,255,0.05);border-radius:100px;position:relative;overflow:visible;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:${trackFillPct}%;background:linear-gradient(90deg,rgba(160,110,60,0.6),${curCol});border-radius:100px;box-shadow:0 0 8px ${curCol.replace('0.9','0.4').replace('0.85','0.35')};transition:width 1.2s cubic-bezier(0.4,0,0.2,1);">
+              <!-- Glowing tip -->
+              <div style="position:absolute;right:-2px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:${curCol};border:2px solid rgba(6,4,18,0.9);box-shadow:0 0 10px ${curCol};animation:pds-rank-dot 2s ease-in-out infinite;"></div>
+            </div>
           </div>
         </div>
 
-        <!-- Progress to next -->
-        ${nextTier ? `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);border-radius:10px;">
-          <div style="font-size:0.58rem;color:rgba(255,255,255,0.3);">${total} of ${nextTier.min} cases to <span style="color:${tiers[currentIdx+1]?.color || 'rgba(255,255,255,0.5)'};">${nextTier.rank}</span></div>
-          <div style="display:flex;gap:2px;align-items:center;">
-            ${Array.from({length:10}, (_,i) => `<div style="width:14px;height:3px;border-radius:2px;background:${i < Math.round(progressPct/10) ? curCol : 'rgba(255,255,255,0.06)'};${i < Math.round(progressPct/10) ? `box-shadow:0 0 4px ${curCol.replace('0.9','0.5').replace('0.85','0.4')};` : ''}"></div>`).join('')}
+        <!-- Tier labels -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px;padding:0 1px;">
+          ${tiers.map((t, i) => {
+            const isActive = t.rank === currentRank.rank;
+            const isPast   = i < currentIdx;
+            const isFuture = i > currentIdx;
+            return `<div style="font-size:0.38rem;font-weight:${isActive ? '800' : '400'};color:${isActive ? curCol : isFuture ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.3)'};letter-spacing:0.05em;text-align:center;white-space:nowrap;${isActive ? `text-shadow:0 0 8px ${curCol.replace('0.9','0.45').replace('0.85','0.4')};` : ''}">${t.rank}</div>`;
+          }).join('')}
+        </div>
+
+        <!-- Footer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.56rem;color:rgba(255,255,255,0.3);">
+            You're ahead of <strong style="color:#34D399;">${percentile}%</strong> of users
           </div>
-        </div>` : `
-        <div style="text-align:center;padding:8px;font-size:0.6rem;color:rgba(123,110,232,0.4);letter-spacing:0.12em;text-transform:uppercase;">Apex — Maximum Rank Achieved</div>`}
+          ${nextTier ? `
+          <div style="font-size:0.54rem;font-weight:600;color:${curCol};background:${curCol.replace('0.9','0.08').replace('0.85','0.07')};border:1px solid ${curCol.replace('0.9','0.18').replace('0.85','0.15')};padding:5px 12px;border-radius:8px;">
+            ${casesAway} more case${casesAway !== 1 ? 's' : ''} → ${nextTier.rank}
+          </div>` : `
+          <div style="font-size:0.52rem;color:rgba(123,110,232,0.5);letter-spacing:0.1em;text-transform:uppercase;">Apex — Maximum Rank</div>`}
+        </div>
 
       </div>
     </div>`;
