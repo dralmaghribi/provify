@@ -2602,18 +2602,17 @@ body::after {
 
         </div>
 
-        <!-- LIVE DATA SECTIONS (IDs unchanged — JS still targets these) -->
-        <div class="pd-section-label" style="display:none;"><span>Recent Activity</span><button type="button" onclick="showView('cases')">Open cases →</button></div>
-        <div id="last-case-strip" class="pd-live-section" style="display:none;"></div>
-        <div class="pd-section-label" style="display:none;"><span>Monthly Mission</span><button type="button" onclick="showView('progress')">Progress →</button></div>
-        <div id="monthly-objectives" class="pd-live-section" style="display:none;"></div>
-        <div class="pd-section-label" style="display:none;"><span>Career Trajectory</span><button type="button" onclick="showView('career')">Career →</button></div>
-        <div id="rank-progression-card" class="pd-live-section" style="display:none;"></div>
-        <div id="portfolio-teaser-card" class="pd-live-section" style="display:none;"></div>
-        <div id="skill-progress-card" class="pd-live-section" style="display:none;"></div>
-        <div class="pd-live-section" id="best-work-card" style="display:none;"><div class="pd-card-shell"><div class="pd-card-head"><span>Case Vault</span><button type="button" onclick="viewMyPortfolio()">Portfolio →</button></div><div id="best-work-list" class="pd-best-work-list"></div></div></div>
-        <div class="pd-live-section" id="dashboard-reviews-card" style="display:none;"><div class="pd-card-shell"><div class="pd-card-head"><span>Patient Feedback</span><strong id="dashboard-avg-rating"></strong></div><div id="dashboard-reviews-list" class="pd-reviews-list"></div></div></div>
-        <div id="welcome-card" class="pd-live-section" style="display:none;"><div class="pd-card-shell pd-welcome"><div class="pd-card-head"><span>Why Provify</span></div><div class="pd-welcome-grid"><div><strong>Shield</strong><p>Timestamped records when a patient questions your work.</p></div><div><strong>Portfolio</strong><p>A verified career record instead of random phone photos.</p></div><div><strong>AI Growth</strong><p>See your clinical patterns and what to improve next.</p></div></div></div></div>
+        <!-- Legacy IDs kept invisible so JS doesn't crash -->
+        <div style="display:none!important;visibility:hidden;height:0;overflow:hidden;" aria-hidden="true">
+          <div id="last-case-strip"></div>
+          <div id="monthly-objectives"></div>
+          <div id="rank-progression-card"></div>
+          <div id="portfolio-teaser-card"></div>
+          <div id="skill-progress-card"></div>
+          <div id="best-work-card"><div id="best-work-list"></div></div>
+          <div id="dashboard-reviews-card"><strong id="dashboard-avg-rating"></strong><div id="dashboard-reviews-list"></div></div>
+          <div id="welcome-card"></div>
+        </div>
 
         <div style="height:32px"></div>
 
