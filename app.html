@@ -1752,48 +1752,84 @@ body::after {
 </div>
 
 <!-- ─── VOICE LOG MODAL ─── -->
-<div id="voice-log-modal" style="display:none;position:fixed;inset:0;background:rgba(8,15,30,0.98);z-index:600;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:linear-gradient(145deg,#0C0C0F,#111118);border:1px solid rgba(124,111,255,0.25);border-radius:28px;width:100%;max-width:500px;position:relative;overflow:visible;box-shadow:0 40px 120px rgba(0,0,0,0.8);max-height:90vh;overflow-y:auto;">
-    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8),transparent);"></div>
+<div id="voice-log-modal" style="display:none;position:fixed;inset:0;background:rgba(4,3,14,0.97);z-index:600;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:linear-gradient(160deg,#0e0c1e 0%,#0a0914 100%);border:1px solid rgba(124,111,255,0.3);border-radius:32px;width:100%;max-width:660px;position:relative;overflow:visible;box-shadow:0 0 0 1px rgba(255,255,255,0.03) inset,0 60px 160px rgba(0,0,0,0.9),0 0 80px rgba(124,111,255,0.08);max-height:92vh;overflow-y:auto;">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.9),rgba(155,145,255,0.5),transparent);border-radius:32px 32px 0 0;"></div>
 
-    <!-- Close -->
-    <button onclick="closeVoiceLog()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;padding:6px;line-height:1;z-index:10;transition:color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
+    <!-- Recording screen close handled inline -->
 
     <!-- SCREEN 1: Coaching -->
-    <div id="vl-screen-coach" style="padding:36px 32px;">
-      <div style="font-size:0.62rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:20px;">🎙 Voice Log</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.7rem;color:var(--white);letter-spacing:-0.02em;margin-bottom:8px;line-height:1.2;">Speak your case.<br>Provify logs it.</div>
-      <div style="font-size:0.82rem;color:var(--gray);margin-bottom:28px;line-height:1.7;">60 seconds. Say what you'd tell a colleague. We'll extract every clinical field automatically.</div>
+    <div id="vl-screen-coach" style="padding:52px 48px 44px;">
+
+      <!-- Top status bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.07);">
+          <div style="width:6px;height:6px;border-radius:50%;background:#3dd68c;box-shadow:0 0 8px rgba(61,214,140,0.7);animation:pdBlink 2.6s ease-in-out infinite;"></div>
+          <span style="font-size:0.52rem;text-transform:uppercase;letter-spacing:0.2em;font-weight:700;color:rgba(255,255,255,0.42);">Voice System — Online</span>
+        </div>
+        <button onclick="closeVoiceLog()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);cursor:pointer;padding:8px;border-radius:10px;line-height:1;transition:all 0.2s;" onmouseover="this.style.color='white';this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.color='rgba(255,255,255,0.4)';this.style.background='rgba(255,255,255,0.05)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Mic icon centred -->
+      <div style="text-align:center;margin-bottom:36px;">
+        <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:120px;height:120px;margin:0 auto;">
+          <!-- Rings -->
+          <div style="position:absolute;inset:-18px;border-radius:50%;border:1px solid rgba(124,111,255,0.12);animation:db-pulse-ring 2.4s ease-out 0s infinite;"></div>
+          <div style="position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(124,111,255,0.2);animation:db-pulse-ring 2.4s ease-out 0.5s infinite;"></div>
+          <!-- Button -->
+          <button onclick="startVoiceRecording()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(145deg,#8c80f0,#6156d3 55%,#4a3eb8);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(124,111,255,0.07),0 0 60px rgba(124,111,255,0.55),0 20px 48px rgba(0,0,0,0.55);animation:db-mic-breathe 3s ease-in-out infinite;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- Wave bars -->
+        <div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;height:22px;margin:18px auto 0;">
+          <span style="width:3px;height:6px;background:rgba(155,143,245,0.4);border-radius:6px;animation:pdWave 1.35s ease-in-out 0s infinite;display:block;"></span>
+          <span style="width:3px;height:10px;background:rgba(155,143,245,0.4);border-radius:6px;animation:pdWave 1.35s ease-in-out 0.1s infinite;display:block;"></span>
+          <span style="width:3px;height:16px;background:rgba(155,143,245,0.5);border-radius:6px;animation:pdWave 1.35s ease-in-out 0.2s infinite;display:block;"></span>
+          <span style="width:3px;height:22px;background:rgba(155,143,245,0.55);border-radius:6px;animation:pdWave 1.35s ease-in-out 0.3s infinite;display:block;"></span>
+          <span style="width:3px;height:16px;background:rgba(155,143,245,0.5);border-radius:6px;animation:pdWave 1.35s ease-in-out 0.2s infinite;display:block;"></span>
+          <span style="width:3px;height:10px;background:rgba(155,143,245,0.4);border-radius:6px;animation:pdWave 1.35s ease-in-out 0.1s infinite;display:block;"></span>
+          <span style="width:3px;height:6px;background:rgba(155,143,245,0.4);border-radius:6px;animation:pdWave 1.35s ease-in-out 0s infinite;display:block;"></span>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div style="text-align:center;margin-bottom:36px;">
+        <div style="font-family:'Instrument Serif',serif;font-size:2.8rem;color:white;letter-spacing:-0.03em;line-height:1;margin-bottom:8px;">Speak.</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;font-style:italic;color:rgba(155,143,245,0.8);margin-bottom:16px;">I'll handle the rest.</div>
+        <div style="font-size:0.88rem;color:rgba(255,255,255,0.38);line-height:1.65;max-width:400px;margin:0 auto;">60 seconds. Say what you'd tell a colleague.<br>We extract every clinical field automatically.</div>
+      </div>
 
       <!-- Specialty pills -->
-      <div style="margin-bottom:20px;">
-        <div style="font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Your specialty</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="vl-spec-row">
-          <button onclick="setVLSpecialty('endo',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(124,111,255,0.4);background:rgba(124,111,255,0.15);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;">Endo</button>
-          <button onclick="setVLSpecialty('restorative',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Restorative</button>
-          <button onclick="setVLSpecialty('surgery',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Surgery</button>
-          <button onclick="setVLSpecialty('paeds',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Paeds</button>
-          <button onclick="setVLSpecialty('prostho',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;">Prostho</button>
-          <button onclick="setVLSpecialty('smile',this)" class="vl-spec-btn" style="padding:8px 16px;border-radius:100px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.06);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;">✨ Smile</button>
+      <div style="margin-bottom:24px;">
+        <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:12px;text-align:center;">Your specialty</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;" id="vl-spec-row">
+          <button onclick="setVLSpecialty('endo',this)" class="vl-spec-btn" style="padding:9px 18px;border-radius:100px;border:1px solid rgba(124,111,255,0.4);background:rgba(124,111,255,0.15);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;">Endo</button>
+          <button onclick="setVLSpecialty('restorative',this)" class="vl-spec-btn" style="padding:9px 18px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Restorative</button>
+          <button onclick="setVLSpecialty('surgery',this)" class="vl-spec-btn" style="padding:9px 18px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Surgery</button>
+          <button onclick="setVLSpecialty('paeds',this)" class="vl-spec-btn" style="padding:9px 18px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Paeds</button>
+          <button onclick="setVLSpecialty('prostho',this)" class="vl-spec-btn" style="padding:9px 18px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Prostho</button>
+          <button onclick="setVLSpecialty('smile',this)" class="vl-spec-btn" style="padding:9px 18px;border-radius:100px;border:1px solid rgba(251,191,36,0.3);background:rgba(251,191,36,0.06);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;">✨ Smile</button>
         </div>
       </div>
 
       <!-- Example phrase -->
-      <div id="vl-example" style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:16px 18px;margin-bottom:24px;">
-        <div style="font-size:0.6rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">💡 Say something like this</div>
-        <div id="vl-example-text" style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.75;font-style:italic;">"Tooth 36, primary RCT, three canals, moderate curvature, NaOCl and EDTA irrigation, warm vertical compaction, no complications, patient tolerated well, age 35"</div>
+      <div id="vl-example" style="background:rgba(124,111,255,0.06);border:1px solid rgba(124,111,255,0.15);border-radius:16px;padding:18px 22px;margin-bottom:28px;">
+        <div style="font-size:0.58rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:8px;">💡 Say something like this</div>
+        <div id="vl-example-text" style="font-size:0.86rem;color:rgba(255,255,255,0.65);line-height:1.8;font-style:italic;">"Tooth 36, primary RCT, three canals, moderate curvature, NaOCl and EDTA irrigation, warm vertical compaction, no complications, patient tolerated well, age 35"</div>
       </div>
 
       <!-- Start button -->
-      <button onclick="startVoiceRecording()" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;padding:16px;border-radius:16px;border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,111,255,0.5);display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <button onclick="startVoiceRecording()" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:700;padding:18px;border-radius:18px;border:none;cursor:pointer;box-shadow:0 6px 30px rgba(124,111,255,0.5);display:flex;align-items:center;justify-content:center;gap:12px;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 40px rgba(124,111,255,0.6)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 30px rgba(124,111,255,0.5)'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Start Speaking
+        <span style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-weight:400;background:rgba(0,0,0,0.2);padding:3px 10px;border-radius:100px;">Hold Space</span>
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:var(--gray);">60 seconds max · Speak clearly · We'll handle the rest</div>
-      <div style="text-align:center;margin-top:10px;">
-        <button onclick="closeVoiceLog();showView('log');" style="background:none;border:none;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;font-size:0.72rem;cursor:pointer;text-decoration:underline;padding:4px;">Prefer typing? Use the manual form →</button>
+      <div style="text-align:center;margin-top:16px;">
+        <button onclick="closeVoiceLog();showView('log');" style="background:none;border:none;color:rgba(255,255,255,0.22);font-family:'Inter',sans-serif;font-size:0.75rem;cursor:pointer;padding:4px;">View last session →</button>
       </div>
     </div>
 
@@ -2400,12 +2436,12 @@ body::after {
           </div>
         </div>
 
-        <!-- MICRO STATS (IDs preserved — populated by updateDashboard) -->
-        <div class="pd-micro-grid" aria-label="Dashboard stats" style="margin-bottom:28px;">
-          <div class="pd-micro-stat"><strong id="micro-total">0</strong><span>Cases total</span></div>
-          <div class="pd-micro-stat pd-teal"><strong id="micro-this-month">0</strong><span>This month</span></div>
-          <div class="pd-micro-stat pd-gold stat-pill"><strong id="micro-rank">—</strong><span>Rank</span></div>
-          <div class="pd-micro-stat pd-amber"><strong id="micro-streak">0</strong><span>This week</span></div>
+        <!-- MICRO STATS (hidden from UI but IDs preserved for JS compatibility) -->
+        <div style="display:none;" aria-hidden="true">
+          <strong id="micro-total">0</strong>
+          <strong id="micro-this-month">0</strong>
+          <strong id="micro-rank">—</strong>
+          <strong id="micro-streak">0</strong>
         </div>
 
         <!-- STAT CARDS ROW -->
