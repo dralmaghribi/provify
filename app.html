@@ -951,49 +951,56 @@ body::after {
 .db-btn-ghost:hover { background:rgba(255,255,255,0.04); color:var(--db-text); }
 
 /* Hero section */
-.db-hero { background:radial-gradient(ellipse 80% 70% at 50% 0%,rgba(124,111,205,0.18) 0%,transparent 70%), #0c0b18; border:1px solid rgba(124,111,205,0.18); border-radius:24px; padding:68px 40px 58px; text-align:center; position:relative; overflow:hidden; margin-bottom:28px; box-shadow:0 0 0 1px rgba(124,111,205,0.06) inset, 0 30px 80px rgba(0,0,0,0.4); }
-.db-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 50% -5%,rgba(124,111,205,0.13) 0%,transparent 65%); pointer-events:none; }
-.db-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(124,111,205,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,205,0.04) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+.db-hero { background:radial-gradient(ellipse 90% 75% at 50% 0%,rgba(124,111,205,0.22) 0%,rgba(124,111,205,0.04) 55%,transparent 75%), #0a0917; border:1px solid rgba(124,111,205,0.22); border-radius:24px; padding:80px 40px 64px; text-align:center; position:relative; overflow:hidden; margin-bottom:28px; box-shadow:0 0 0 1px rgba(124,111,205,0.08) inset, 0 40px 100px rgba(0,0,0,0.5); }
+.db-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 55% at 50% -10%,rgba(124,111,205,0.16) 0%,transparent 60%); pointer-events:none; }
+.db-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(124,111,205,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,205,0.05) 1px,transparent 1px); background-size:44px 44px; mask-image:radial-gradient(ellipse 80% 60% at 50% 30%,black,transparent); pointer-events:none; }
 
 /* Mic */
-.db-mic-wrap { position:relative; display:inline-block; margin-bottom:32px; }
-.db-mic-ring { position:absolute; border-radius:50%; border:1px solid rgba(124,111,205,0.35); animation:db-pulse-ring 2s ease-out infinite; }
-.db-mic-ring-2 { position:absolute; inset:-30px; border-radius:50%; border:1px solid rgba(124,111,205,0.18); animation:db-pulse-ring 2s ease-out 0.45s infinite; }
-.db-mic-ring-3 { position:absolute; inset:-50px; border-radius:50%; border:1px solid rgba(124,111,205,0.08); animation:db-pulse-ring 2s ease-out 0.9s infinite; }
-@keyframes db-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.45)} }
-.db-mic-btn { width:80px; height:80px; border-radius:50%; background:linear-gradient(145deg,#8c80f0,#6156d3 55%,#4a3eb8); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; z-index:1; box-shadow:0 0 0 10px rgba(124,111,205,0.1),0 0 50px rgba(124,111,205,0.7),0 0 100px rgba(124,111,205,0.25),0 12px 32px rgba(0,0,0,0.6); transition:all 0.2s; animation:db-mic-breathe 2.8s ease-in-out infinite; border:none; }
-@keyframes db-mic-breathe { 0%,100%{box-shadow:0 0 0 10px rgba(124,111,205,0.1),0 0 50px rgba(124,111,205,0.7),0 0 100px rgba(124,111,205,0.25),0 12px 32px rgba(0,0,0,0.6)} 50%{box-shadow:0 0 0 16px rgba(124,111,205,0.12),0 0 80px rgba(124,111,205,0.9),0 0 150px rgba(124,111,205,0.35),0 12px 32px rgba(0,0,0,0.6)} }
-.db-mic-btn:hover { transform:scale(1.07); }
-.db-mic-svg { width:30px; height:30px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.db-mic-wrap { position:relative; display:inline-block; margin-bottom:36px; }
+.db-mic-ring { position:absolute; border-radius:50%; border:1.5px solid rgba(124,111,205,0.4); animation:db-pulse-ring 1.9s ease-out infinite; }
+.db-mic-ring-2 { position:absolute; inset:-36px; border-radius:50%; border:1px solid rgba(124,111,205,0.2); animation:db-pulse-ring 1.9s ease-out 0.42s infinite; }
+.db-mic-ring-3 { position:absolute; inset:-62px; border-radius:50%; border:1px solid rgba(124,111,205,0.08); animation:db-pulse-ring 1.9s ease-out 0.84s infinite; }
+@keyframes db-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.55)} }
+.db-mic-btn { width:110px; height:110px; border-radius:50%; background:linear-gradient(145deg,#9d92f5 0%,#6b5ed6 45%,#4a3eb8 100%); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; z-index:1; box-shadow:0 0 0 14px rgba(124,111,205,0.09),0 0 60px rgba(124,111,205,0.75),0 0 120px rgba(124,111,205,0.3),0 16px 40px rgba(0,0,0,0.65); transition:all 0.2s; animation:db-mic-breathe 2.6s ease-in-out infinite; border:none; }
+@keyframes db-mic-breathe { 0%,100%{box-shadow:0 0 0 14px rgba(124,111,205,0.09),0 0 60px rgba(124,111,205,0.75),0 0 120px rgba(124,111,205,0.3),0 16px 40px rgba(0,0,0,0.65)} 50%{box-shadow:0 0 0 22px rgba(124,111,205,0.11),0 0 90px rgba(124,111,205,0.95),0 0 180px rgba(124,111,205,0.4),0 16px 40px rgba(0,0,0,0.65)} }
+.db-mic-btn:hover { transform:scale(1.06); }
+.db-mic-svg { width:40px; height:40px; fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 
 /* Hero text */
-.db-hero-title { font-family:'Instrument Serif',serif; font-size:48px; line-height:1; letter-spacing:-0.02em; color:var(--db-text); margin-bottom:6px; position:relative; z-index:1; }
-.db-hero-subtitle { font-family:'Instrument Serif',serif; font-size:22px; font-style:italic; color:var(--db-text2); margin-bottom:20px; position:relative; z-index:1; }
-.db-hero-line { font-size:13.5px; color:var(--db-text2); margin-bottom:20px; position:relative; z-index:1; }
-.db-hero-line span { color:var(--db-purple); font-weight:500; }
+.db-hero-title { font-family:'Instrument Serif',serif; font-size:64px; line-height:0.95; letter-spacing:-0.03em; color:#fff; margin-bottom:4px; position:relative; z-index:1; }
+.db-hero-subtitle { font-family:'Instrument Serif',serif; font-size:36px; font-style:italic; color:rgba(155,143,245,0.75); margin-bottom:22px; position:relative; z-index:1; letter-spacing:-0.02em; line-height:1; }
+.db-hero-line { font-size:13.5px; color:rgba(240,239,254,0.45); margin-bottom:22px; position:relative; z-index:1; }
+.db-hero-line span { color:#9b8ff5; font-weight:500; }
 .db-hero-tags { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:28px; flex-wrap:wrap; position:relative; z-index:1; }
-.db-tag { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:500; background:rgba(255,255,255,0.04); border:1px solid var(--db-border-bright); color:var(--db-text2); }
-.db-tag-dot { width:5px; height:5px; border-radius:50%; background:var(--db-green); flex-shrink:0; }
+.db-tag { display:inline-flex; align-items:center; gap:5px; padding:5px 13px; border-radius:20px; font-size:11.5px; font-weight:500; background:rgba(124,111,205,0.07); border:1px solid rgba(124,111,205,0.18); color:rgba(240,239,254,0.55); }
+.db-tag-dot { width:5px; height:5px; border-radius:50%; background:var(--db-green); box-shadow:0 0 5px var(--db-green); flex-shrink:0; }
 .db-hero-actions { display:flex; align-items:center; justify-content:center; gap:10px; position:relative; z-index:1; }
 
-/* Stat cards row */
+/* Stat cards — clinical premium */
 .db-stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
-.db-stat-card { background:var(--db-bg2); border:1px solid var(--db-border); border-radius:16px; padding:22px 24px; position:relative; overflow:hidden; transition:all 0.2s; cursor:default; }
-.db-stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); }
-.db-stat-card:hover { border-color:var(--db-border-bright); transform:translateY(-2px); }
-.db-stat-card.db-gold:hover { box-shadow:0 8px 32px rgba(212,168,67,0.12); }
-.db-stat-card.db-purple:hover { box-shadow:0 8px 32px rgba(124,111,205,0.12); }
-.db-stat-card.db-green:hover { box-shadow:0 8px 32px rgba(61,214,140,0.1); }
-.db-stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; font-size:16px; }
-.db-stat-icon.db-gold { background:var(--db-gold-dim); box-shadow:0 0 12px var(--db-gold-glow); }
-.db-stat-icon.db-purple { background:var(--db-purple-dim); box-shadow:0 0 12px var(--db-purple-glow); }
-.db-stat-icon.db-green { background:var(--db-green-dim); }
-.db-stat-val { font-family:'Instrument Serif',serif; font-size:36px; line-height:1; letter-spacing:-0.02em; margin-bottom:6px; }
+.db-stat-card { background:linear-gradient(145deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015)); border:1px solid rgba(255,255,255,0.07); border-radius:18px; padding:24px 24px 20px; position:relative; overflow:hidden; transition:all 0.22s; cursor:default; }
+.db-stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; }
+.db-stat-card.db-gold::before { background:linear-gradient(90deg,transparent,rgba(212,168,67,0.5),transparent); }
+.db-stat-card.db-purple::before { background:linear-gradient(90deg,transparent,rgba(124,111,205,0.5),transparent); }
+.db-stat-card.db-green::before { background:linear-gradient(90deg,transparent,rgba(61,214,140,0.45),transparent); }
+.db-stat-card:hover { border-color:rgba(255,255,255,0.11); transform:translateY(-2px); }
+.db-stat-card.db-gold:hover { background:linear-gradient(145deg,rgba(212,168,67,0.06),rgba(212,168,67,0.02)); box-shadow:0 12px 40px rgba(212,168,67,0.1); }
+.db-stat-card.db-purple:hover { background:linear-gradient(145deg,rgba(124,111,205,0.07),rgba(124,111,205,0.02)); box-shadow:0 12px 40px rgba(124,111,205,0.1); }
+.db-stat-card.db-green:hover { background:linear-gradient(145deg,rgba(61,214,140,0.05),rgba(61,214,140,0.01)); box-shadow:0 12px 40px rgba(61,214,140,0.08); }
+.db-stat-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.db-stat-icon.db-gold { background:rgba(212,168,67,0.12); box-shadow:0 0 14px rgba(212,168,67,0.2); }
+.db-stat-icon.db-purple { background:rgba(124,111,205,0.12); box-shadow:0 0 14px rgba(124,111,205,0.2); }
+.db-stat-icon.db-green { background:rgba(61,214,140,0.1); box-shadow:0 0 14px rgba(61,214,140,0.15); }
+.db-stat-val { font-family:'Instrument Serif',serif; font-size:42px; line-height:1; letter-spacing:-0.03em; margin-bottom:5px; }
 .db-stat-val.db-gold { color:var(--db-gold); }
-.db-stat-val.db-purple { color:var(--db-text); }
+.db-stat-val.db-purple { color:rgba(240,239,254,0.92); }
 .db-stat-val.db-green { color:var(--db-green); }
-.db-stat-sub { font-size:12.5px; color:var(--db-text3); }
-.db-shimmer { position:absolute; inset:0; background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.015) 50%,transparent 60%); pointer-events:none; }
+.db-stat-label { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:3px; }
+.db-stat-label.db-gold { color:rgba(212,168,67,0.5); }
+.db-stat-label.db-purple { color:rgba(124,111,205,0.5); }
+.db-stat-label.db-green { color:rgba(61,214,140,0.5); }
+.db-stat-sub { font-size:12px; color:rgba(240,239,254,0.3); }
+.db-shimmer { position:absolute; inset:0; background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.012) 50%,transparent 60%); pointer-events:none; }
 
 /* Section headers */
 .db-section-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; }
@@ -2495,26 +2502,29 @@ body::after {
           <div class="db-stat-card db-gold">
             <div class="db-shimmer"></div>
             <div class="db-stat-icon db-gold">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
+            <div class="db-stat-label db-gold">Shield</div>
             <div class="db-stat-val db-gold" id="db-stat-protected">—</div>
             <div class="db-stat-sub">Cases complaint-ready</div>
           </div>
           <div class="db-stat-card db-purple">
             <div class="db-shimmer"></div>
             <div class="db-stat-icon db-purple">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c6fcd" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9b8ff5" stroke-width="2" stroke-linecap="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </div>
+            <div class="db-stat-label db-purple">Portfolio</div>
             <div class="db-stat-val db-purple" id="db-stat-portfolio">—</div>
-            <div class="db-stat-sub">Shareable & verified</div>
+            <div class="db-stat-sub">Verified & shareable</div>
           </div>
           <div class="db-stat-card db-green">
             <div class="db-shimmer"></div>
             <div class="db-stat-icon db-green">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
             </div>
+            <div class="db-stat-label db-green">Complexity</div>
             <div class="db-stat-val db-green" id="db-stat-growth">—</div>
-            <div class="db-stat-sub">Avg complexity score</div>
+            <div class="db-stat-sub">Avg score / 10</div>
           </div>
         </div>
 
@@ -2603,10 +2613,10 @@ body::after {
         <!-- BOTTOM 2-COL: Top case + Patient reviews -->
         <div class="db-bottom-grid db-section">
 
-          <!-- Top case / pinned cases -->
+          <!-- Pinned / top cases -->
           <div>
             <div class="db-section-header">
-              <span class="db-section-title">Top cases<span id="db-pin-hint" style="font-size:11px;color:rgba(240,239,254,0.25);font-weight:400;margin-left:6px;"></span></span>
+              <span class="db-section-title">✦ Proudest Work<span id="db-pin-hint" style="font-size:11px;color:rgba(240,239,254,0.22);font-weight:400;margin-left:8px;"></span></span>
               <span class="db-status-pill gold" style="font-size:11px;" id="db-top-case-label">⭐ Best of month</span>
             </div>
             <div id="db-top-cases-container" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -10791,36 +10801,28 @@ function renderNewActivityList() {
   if (!list) return;
   const recent = allCases.slice(0, 6);
   if (recent.length === 0) {
-    list.innerHTML = `<div style="text-align:center;padding:24px;color:rgba(240,239,254,0.25);font-size:13px;">No cases logged yet. Hit Start Speaking to begin.</div>`;
+    list.innerHTML = `<div style="text-align:center;padding:24px;color:rgba(240,239,254,0.22);font-size:13px;">No cases logged yet. Hit Start Speaking to begin.</div>`;
     return;
   }
 
   const specBadgeClass = { endo:'endo', restorative:'resto', surgery:'surg', paeds:'paeds', smile:'smile', prostho:'endo' };
-  const specLabel = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
-  // Tooth SVG icon — clinical, minimal
-  const toothSVG = (col) => `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" style="flex-shrink:0;opacity:0.7;"><path d="M4.5 1C3.5 1 1.5 1.8 1 4C0.5 6.2 1.2 8 2 9.5C2.6 10.7 3 12.5 3.4 14C3.5 14.4 3.9 14.4 4 14C4.4 12.5 4.8 10.5 6.5 10.5C8.2 10.5 8.6 12.5 9 14C9.1 14.4 9.5 14.4 9.6 14C10 12.5 10.4 10.7 11 9.5C11.8 8 12.5 6.2 12 4C11.5 1.8 9.5 1 8.5 1C7.8 1 7.3 1.4 6.5 1.4C5.7 1.4 5.2 1 4.5 1Z" stroke="${col}" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const specLabel      = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
+  const specCol        = { endo:'#9b8ff5', restorative:'#fbbf24', surgery:'#f87171', paeds:'#34D399', smile:'#d4a843', prostho:'#9b8ff5' };
 
-  // Canal dots for endo cases
-  const canalDots = (c) => {
+  // Canal count as compact text suffix for endo — no dot clutter
+  const canalSuffix = (c) => {
     if (c.specialty !== 'endo') return '';
-    const n = parseInt(c.canals) || 0;
-    if (n < 1 || n > 4) return '';
-    const dots = Array.from({length: n}, (_,i) =>
-      `<span class="db-canal-dot filled"></span>`
-    ).join('');
-    return `<span class="db-canal-dots" title="${n} canal${n>1?'s':''}">${dots}</span>`;
+    const n = parseInt(c.canals);
+    if (!n || n < 1) return '';
+    return `<span style="font-size:10px;color:rgba(155,143,245,0.5);margin-left:4px;">${n}c</span>`;
   };
 
-  const specCol = { endo:'#9b8ff5', restorative:'#fbbf24', surgery:'#f87171', paeds:'#34D399', smile:'#d4a843', prostho:'#9b8ff5' };
-
   list.innerHTML = recent.map(c => {
-    const d = new Date(c.created_at);
-    const ageMs = Date.now() - d.getTime();
+    const ageMs = Date.now() - new Date(c.created_at).getTime();
     const ageH = Math.floor(ageMs / 3600000);
-    const timeStr = ageH < 1 ? 'Now' : ageH < 24 ? `${ageH}h ago` : `${Math.floor(ageH/24)}d ago`;
+    const timeStr = ageH < 1 ? 'Now' : ageH < 24 ? `${ageH}h` : `${Math.floor(ageH/24)}d`;
     const badge = specBadgeClass[c.specialty] || 'endo';
     const label = specLabel[c.specialty] || (c.specialty||'').toUpperCase().slice(0,5);
-    const col = specCol[c.specialty] || '#9b8ff5';
     const title = c.specialty === 'smile'
       ? (c.procedure || 'Smile Case')
       : (c.procedure || c.case_type || `Tooth ${c.tooth_number || '—'}`);
@@ -10829,10 +10831,8 @@ function renderNewActivityList() {
     return `
       <div class="db-activity-row" onclick="openCaseDetail('${c.id}')">
         <span class="db-act-time">${timeStr}</span>
-        ${toothSVG(col)}
         <span class="db-act-badge ${badge}">${label}</span>
-        ${canalDots(c)}
-        <span class="db-act-name">${title}</span>
+        <span class="db-act-name">${title}${canalSuffix(c)}</span>
         <span class="db-act-score">${score}</span>
         <span class="db-status-pill ${allCases.length >= 25 ? 'gold' : 'verified'}">${allCases.length >= 25 ? rank.name : 'Verified'}</span>
       </div>`;
@@ -10983,7 +10983,48 @@ function renderTopCaseThisMonth(thisMonth) {
     casesToShow = [[...thisMonth].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))[0]];
   }
 
-  if (!casesToShow.length) {
+  if (casesToShow.length > 1) {
+    // Horizontal compact row for 2-3 pinned
+    container.style.flexDirection = 'row';
+    container.style.gap = '10px';
+    container.innerHTML = casesToShow.map((c, i) => {
+      const title = c.specialty === 'smile'
+        ? (c.procedure || 'Smile Case')
+        : (c.procedure || c.case_type || `Tooth ${c.tooth_number || '—'}`);
+      const shortDate = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+      const badge = specLabel[c.specialty] || 'CASE';
+      const bgCol = specCol[c.specialty] || 'rgba(124,111,205,0.2)';
+      const score = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
+
+      let photoUrl = null;
+      if (c.photo_urls && typeof c.photo_urls === 'object') {
+        photoUrl = Object.values(c.photo_urls).find(v => v && typeof v === 'string') || null;
+      }
+      const art = specArt[c.specialty] || '🦷';
+      const imgContent = photoUrl
+        ? `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+           <div style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:28px;opacity:0.45;">${art}</div>`
+        : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;opacity:0.45;">${art}</div>`;
+
+      return `<div onclick="openCaseDetail('${c.id}')" style="flex:1;min-width:0;background:rgba(255,255,255,0.025);border:1px solid rgba(212,168,67,0.15);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(212,168,67,0.3)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(212,168,67,0.15)';this.style.transform='none'">
+        <div style="height:90px;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a1428,${bgCol},#1a1428);">
+          ${imgContent}
+          <span style="position:absolute;top:8px;left:8px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(0,0,0,0.55);color:var(--db-gold);border:1px solid rgba(212,168,67,0.25);backdrop-filter:blur(4px);text-transform:uppercase;letter-spacing:0.05em;">${badge}</span>
+          <span style="position:absolute;top:8px;right:8px;font-size:9px;color:rgba(240,239,254,0.35);">${shortDate}</span>
+          ${i===0 ? `<span style="position:absolute;bottom:8px;left:8px;font-size:9px;color:rgba(212,168,67,0.7);font-weight:600;">✦ Featured</span>` : ''}
+        </div>
+        <div style="padding:10px 11px;">
+          <div style="font-family:'Instrument Serif',serif;font-size:14px;color:rgba(240,239,254,0.88);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
+          <div style="font-size:10.5px;color:var(--db-gold);opacity:0.7;">Score ${score} / 10</div>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  // Single card — full size
+  container.style.flexDirection = 'column';
+  container.style.gap = '10px';
     container.innerHTML = `<div style="text-align:center;padding:32px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;color:rgba(240,239,254,0.25);font-size:13px;">No cases pinned yet.<br><span style="font-size:12px;margin-top:4px;display:block;">Open any case → tap ✦ Pin to Proudest Cases</span></div>`;
     if (labelEl) labelEl.textContent = '✦ Pin a case';
     if (hintEl) hintEl.textContent = '';
@@ -11083,8 +11124,10 @@ async function renderDashboardReviews() {
     const caseCol = linkedCase ? (specCol[linkedCase.specialty] || '#9b8ff5') : '#9b8ff5';
     const caseDesc = linkedCase
       ? (linkedCase.specialty === 'smile'
-          ? `Smile · ${linkedCase.procedure || 'Case'}`
-          : `Tooth ${linkedCase.tooth_number || '—'} · ${specLabel[linkedCase.specialty] || linkedCase.specialty || 'Case'}`)
+          ? `✨ Smile · ${linkedCase.procedure || 'Case'}`
+          : linkedCase.tooth_number
+            ? `Tooth ${linkedCase.tooth_number} · ${specLabel[linkedCase.specialty] || linkedCase.specialty || 'Case'}`
+            : `${specLabel[linkedCase.specialty] || linkedCase.specialty || 'Case'}`)
       : null;
 
     return `
