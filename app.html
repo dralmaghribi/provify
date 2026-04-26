@@ -951,20 +951,20 @@ body::after {
 .db-btn-ghost:hover { background:rgba(255,255,255,0.04); color:var(--db-text); }
 
 /* Hero section */
-.db-hero { background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(124,111,205,0.12) 0%,transparent 70%), #0f0f1a; border:1px solid var(--db-border); border-radius:20px; padding:56px 40px 48px; text-align:center; position:relative; overflow:hidden; margin-bottom:28px; }
-.db-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 50% 40% at 50% -10%,rgba(124,111,205,0.08) 0%,transparent 70%); pointer-events:none; }
-.db-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+.db-hero { background:radial-gradient(ellipse 80% 70% at 50% 0%,rgba(124,111,205,0.18) 0%,transparent 70%), #0c0b18; border:1px solid rgba(124,111,205,0.18); border-radius:24px; padding:68px 40px 58px; text-align:center; position:relative; overflow:hidden; margin-bottom:28px; box-shadow:0 0 0 1px rgba(124,111,205,0.06) inset, 0 30px 80px rgba(0,0,0,0.4); }
+.db-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 50% -5%,rgba(124,111,205,0.13) 0%,transparent 65%); pointer-events:none; }
+.db-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(124,111,205,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,205,0.04) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
 
 /* Mic */
-.db-mic-wrap { position:relative; display:inline-block; margin-bottom:28px; }
-.db-mic-ring { position:absolute; border-radius:50%; border:1px solid rgba(124,111,205,0.25); animation:db-pulse-ring 2.4s ease-out infinite; }
-.db-mic-ring-2 { position:absolute; inset:-26px; border-radius:50%; border:1px solid rgba(124,111,205,0.12); animation:db-pulse-ring 2.4s ease-out 0.5s infinite; }
-.db-mic-ring-3 { position:absolute; inset:-40px; border-radius:50%; border:1px solid rgba(124,111,205,0.06); animation:db-pulse-ring 2.4s ease-out 1s infinite; }
-@keyframes db-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.3)} }
-.db-mic-btn { width:72px; height:72px; border-radius:50%; background:linear-gradient(145deg,#7c6fcd,#4e40b0); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; z-index:1; box-shadow:0 0 0 8px rgba(124,111,205,0.08),0 0 30px rgba(124,111,205,0.5),0 8px 24px rgba(0,0,0,0.5); transition:all 0.2s; animation:db-mic-breathe 3s ease-in-out infinite; border:none; }
-@keyframes db-mic-breathe { 0%,100%{box-shadow:0 0 0 8px rgba(124,111,205,0.08),0 0 30px rgba(124,111,205,0.5),0 8px 24px rgba(0,0,0,0.5)} 50%{box-shadow:0 0 0 12px rgba(124,111,205,0.1),0 0 50px rgba(124,111,205,0.65),0 8px 24px rgba(0,0,0,0.5)} }
-.db-mic-btn:hover { transform:scale(1.06); }
-.db-mic-svg { width:28px; height:28px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.db-mic-wrap { position:relative; display:inline-block; margin-bottom:32px; }
+.db-mic-ring { position:absolute; border-radius:50%; border:1px solid rgba(124,111,205,0.35); animation:db-pulse-ring 2s ease-out infinite; }
+.db-mic-ring-2 { position:absolute; inset:-30px; border-radius:50%; border:1px solid rgba(124,111,205,0.18); animation:db-pulse-ring 2s ease-out 0.45s infinite; }
+.db-mic-ring-3 { position:absolute; inset:-50px; border-radius:50%; border:1px solid rgba(124,111,205,0.08); animation:db-pulse-ring 2s ease-out 0.9s infinite; }
+@keyframes db-pulse-ring { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(1.45)} }
+.db-mic-btn { width:80px; height:80px; border-radius:50%; background:linear-gradient(145deg,#8c80f0,#6156d3 55%,#4a3eb8); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; z-index:1; box-shadow:0 0 0 10px rgba(124,111,205,0.1),0 0 50px rgba(124,111,205,0.7),0 0 100px rgba(124,111,205,0.25),0 12px 32px rgba(0,0,0,0.6); transition:all 0.2s; animation:db-mic-breathe 2.8s ease-in-out infinite; border:none; }
+@keyframes db-mic-breathe { 0%,100%{box-shadow:0 0 0 10px rgba(124,111,205,0.1),0 0 50px rgba(124,111,205,0.7),0 0 100px rgba(124,111,205,0.25),0 12px 32px rgba(0,0,0,0.6)} 50%{box-shadow:0 0 0 16px rgba(124,111,205,0.12),0 0 80px rgba(124,111,205,0.9),0 0 150px rgba(124,111,205,0.35),0 12px 32px rgba(0,0,0,0.6)} }
+.db-mic-btn:hover { transform:scale(1.07); }
+.db-mic-svg { width:30px; height:30px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
 /* Hero text */
 .db-hero-title { font-family:'Instrument Serif',serif; font-size:48px; line-height:1; letter-spacing:-0.02em; color:var(--db-text); margin-bottom:6px; position:relative; z-index:1; }
@@ -1136,7 +1136,53 @@ body::after {
 .pd-welcome-grid strong { display:block; color:rgba(255,255,255,0.82); font-size:0.8rem; margin-bottom:5px; }
 .pd-welcome-grid p { font-size:0.68rem; color:rgba(255,255,255,0.3); line-height:1.5; }
 
-/* Responsive */
+/* Dim non-hero sections so voice hero dominates */
+#view-dashboard .db-stat-grid,
+#view-dashboard .db-section,
+#view-dashboard .db-portfolio-strip,
+#view-dashboard .db-bottom-grid { opacity:0.82; transition:opacity 0.2s; }
+#view-dashboard .db-stat-grid:hover,
+#view-dashboard .db-section:hover,
+#view-dashboard .db-portfolio-strip:hover,
+#view-dashboard .db-bottom-grid:hover { opacity:1; }
+
+/* Dental specialty color coding for activity badges */
+.db-act-badge { font-size:10px; font-weight:700; letter-spacing:0.06em; padding:3px 9px; border-radius:6px; flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
+.db-act-badge::before { content:''; width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+.db-act-badge.smile { background:rgba(212,168,67,0.12); color:var(--db-gold); border:1px solid rgba(212,168,67,0.25); }
+.db-act-badge.smile::before { background:var(--db-gold); box-shadow:0 0 4px var(--db-gold); }
+.db-act-badge.endo { background:rgba(124,111,205,0.12); color:#9b8ff5; border:1px solid rgba(124,111,205,0.28); }
+.db-act-badge.endo::before { background:#9b8ff5; box-shadow:0 0 4px rgba(124,111,205,0.8); }
+.db-act-badge.surg { background:rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.25); }
+.db-act-badge.surg::before { background:#f87171; box-shadow:0 0 4px rgba(239,68,68,0.7); }
+.db-act-badge.resto { background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.22); }
+.db-act-badge.resto::before { background:#fbbf24; }
+.db-act-badge.paeds { background:rgba(52,211,153,0.1); color:#34D399; border:1px solid rgba(52,211,153,0.22); }
+.db-act-badge.paeds::before { background:#34D399; }
+
+/* Canal dot indicators on activity rows */
+.db-canal-dots { display:inline-flex; gap:2px; align-items:center; margin-left:4px; }
+.db-canal-dot { width:4px; height:4px; border-radius:50%; background:rgba(155,143,245,0.5); }
+.db-canal-dot.filled { background:#9b8ff5; box-shadow:0 0 3px rgba(124,111,205,0.6); }
+
+/* Verified review card — cleaner, smaller, clinical */
+.db-reviews-card { background:var(--db-bg2); border:1px solid var(--db-border); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:8px; }
+.db-review-item { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 13px; transition:border-color 0.15s; }
+.db-review-item:hover { border-color:rgba(255,255,255,0.1); }
+.db-review-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+.db-review-author { display:flex; align-items:center; gap:7px; }
+.db-review-avatar { width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
+.db-review-name { font-size:12.5px; font-weight:500; color:var(--db-text); }
+.db-review-date { font-size:10.5px; color:var(--db-text3); }
+.db-stars { display:flex; gap:1px; }
+.db-star { font-size:11px; }
+.db-review-text { font-size:12.5px; color:var(--db-text2); line-height:1.5; }
+.db-review-case-link { display:inline-flex; align-items:center; gap:5px; margin-top:6px; padding:3px 8px 3px 6px; background:rgba(124,111,205,0.08); border:1px solid rgba(124,111,205,0.15); border-radius:5px; font-size:10.5px; color:rgba(155,143,245,0.7); cursor:pointer; transition:all 0.15s; }
+.db-review-case-link:hover { background:rgba(124,111,205,0.14); color:#9b8ff5; border-color:rgba(124,111,205,0.3); }
+.db-review-case-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+.db-qr-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 7px; background:rgba(61,214,140,0.08); border:1px solid rgba(61,214,140,0.18); border-radius:4px; font-size:9.5px; font-weight:600; color:rgba(61,214,140,0.7); letter-spacing:0.04em; }
+.db-reviews-empty { text-align:center; padding:24px 16px; color:var(--db-text3); font-size:12.5px; line-height:1.6; }
+.db-reviews-empty-icon { font-size:24px; margin-bottom:8px; opacity:0.35; }
 @media(max-width:900px) {
   .db-stat-grid { grid-template-columns:repeat(2,1fr); }
   .db-bottom-grid { grid-template-columns:1fr; }
@@ -10751,26 +10797,44 @@ function renderNewActivityList() {
 
   const specBadgeClass = { endo:'endo', restorative:'resto', surgery:'surg', paeds:'paeds', smile:'smile', prostho:'endo' };
   const specLabel = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
+  // Tooth SVG icon — clinical, minimal
+  const toothSVG = (col) => `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" style="flex-shrink:0;opacity:0.7;"><path d="M4.5 1C3.5 1 1.5 1.8 1 4C0.5 6.2 1.2 8 2 9.5C2.6 10.7 3 12.5 3.4 14C3.5 14.4 3.9 14.4 4 14C4.4 12.5 4.8 10.5 6.5 10.5C8.2 10.5 8.6 12.5 9 14C9.1 14.4 9.5 14.4 9.6 14C10 12.5 10.4 10.7 11 9.5C11.8 8 12.5 6.2 12 4C11.5 1.8 9.5 1 8.5 1C7.8 1 7.3 1.4 6.5 1.4C5.7 1.4 5.2 1 4.5 1Z" stroke="${col}" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  // Canal dots for endo cases
+  const canalDots = (c) => {
+    if (c.specialty !== 'endo') return '';
+    const n = parseInt(c.canals) || 0;
+    if (n < 1 || n > 4) return '';
+    const dots = Array.from({length: n}, (_,i) =>
+      `<span class="db-canal-dot filled"></span>`
+    ).join('');
+    return `<span class="db-canal-dots" title="${n} canal${n>1?'s':''}">${dots}</span>`;
+  };
+
+  const specCol = { endo:'#9b8ff5', restorative:'#fbbf24', surgery:'#f87171', paeds:'#34D399', smile:'#d4a843', prostho:'#9b8ff5' };
 
   list.innerHTML = recent.map(c => {
     const d = new Date(c.created_at);
     const ageMs = Date.now() - d.getTime();
     const ageH = Math.floor(ageMs / 3600000);
     const timeStr = ageH < 1 ? 'Now' : ageH < 24 ? `${ageH}h ago` : `${Math.floor(ageH/24)}d ago`;
-    const badge = (specBadgeClass[c.specialty] || 'endo');
-    const label = (specLabel[c.specialty] || (c.specialty||'').toUpperCase().slice(0,5));
+    const badge = specBadgeClass[c.specialty] || 'endo';
+    const label = specLabel[c.specialty] || (c.specialty||'').toUpperCase().slice(0,5);
+    const col = specCol[c.specialty] || '#9b8ff5';
     const title = c.specialty === 'smile'
       ? (c.procedure || 'Smile Case')
-      : (c.tooth_number ? `Tooth ${c.tooth_number} · ${c.procedure || c.case_type || c.specialty || '—'}` : (c.procedure || c.case_type || 'Case'));
+      : (c.procedure || c.case_type || `Tooth ${c.tooth_number || '—'}`);
     const score = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
-    const level = getLevel(allCases.length);
+    const rank = getLevel(allCases.length);
     return `
       <div class="db-activity-row" onclick="openCaseDetail('${c.id}')">
         <span class="db-act-time">${timeStr}</span>
+        ${toothSVG(col)}
         <span class="db-act-badge ${badge}">${label}</span>
+        ${canalDots(c)}
         <span class="db-act-name">${title}</span>
         <span class="db-act-score">${score}</span>
-        <span class="db-status-pill ${allCases.length >= 25 ? 'gold' : 'verified'}">${allCases.length >= 25 ? level.name : 'Verified'}</span>
+        <span class="db-status-pill ${allCases.length >= 25 ? 'gold' : 'verified'}">${allCases.length >= 25 ? rank.name : 'Verified'}</span>
       </div>`;
   }).join('');
 }
@@ -10993,24 +11057,36 @@ async function renderDashboardReviews() {
     .order('created_at', { ascending: false })
     .limit(4);
 
-  if (!reviews || reviews.length === 0) return; // keep empty state
+  if (!reviews || reviews.length === 0) return;
 
+  const specCol   = { endo:'#9b8ff5', restorative:'#fbbf24', surgery:'#f87171', paeds:'#34D399', smile:'#d4a843', prostho:'#9b8ff5' };
+  const specLabel = { endo:'Endo', restorative:'Resto', surgery:'Surgery', paeds:'Paeds', smile:'Smile', prostho:'Prostho' };
   const avatarColors = [
-    { bg:'rgba(124,111,205,0.15)', col:'#7c6fcd' },
+    { bg:'rgba(124,111,205,0.15)', col:'#9b8ff5' },
     { bg:'rgba(61,214,140,0.1)',   col:'#3dd68c' },
-    { bg:'rgba(212,168,67,0.1)',   col:'#d4a843' },
-    { bg:'rgba(239,68,68,0.1)',    col:'#EF4444' },
+    { bg:'rgba(212,168,67,0.12)',  col:'#d4a843' },
+    { bg:'rgba(239,68,68,0.1)',    col:'#f87171' },
   ];
 
   card.innerHTML = reviews.map((r, i) => {
     const ac = avatarColors[i % avatarColors.length];
     const name = r.reviewer_name || 'Anonymous';
     const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-    const date = new Date(r.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const ts = new Date(r.created_at);
+    const dateStr = ts.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const timeStr = ts.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
     const stars = Array.from({length:5}, (_,k) =>
-      `<span class="db-star" style="color:${k < r.rating ? '#d4a843' : 'rgba(255,255,255,0.12)'};">★</span>`
+      `<span class="db-star" style="color:${k < r.rating ? '#d4a843' : 'rgba(255,255,255,0.1)'};">★</span>`
     ).join('');
     const isPatient = r.reviewer_type === 'patient';
+    const linkedCase = allCases.find(c => c.id === r.case_id);
+    const caseCol = linkedCase ? (specCol[linkedCase.specialty] || '#9b8ff5') : '#9b8ff5';
+    const caseDesc = linkedCase
+      ? (linkedCase.specialty === 'smile'
+          ? `Smile · ${linkedCase.procedure || 'Case'}`
+          : `Tooth ${linkedCase.tooth_number || '—'} · ${specLabel[linkedCase.specialty] || linkedCase.specialty || 'Case'}`)
+      : null;
+
     return `
       <div class="db-review-item">
         <div class="db-review-top">
@@ -11018,12 +11094,22 @@ async function renderDashboardReviews() {
             <div class="db-review-avatar" style="background:${ac.bg};color:${ac.col};">${initials}</div>
             <div>
               <div class="db-review-name">${name}</div>
-              <div class="db-review-date">${isPatient ? 'Patient · ' : 'Peer · '}${date}</div>
+              <div class="db-review-date">${isPatient ? 'Patient' : (r.reviewer_role || 'Peer')} · ${dateStr} ${timeStr}</div>
             </div>
           </div>
-          <div class="db-stars">${stars}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <div class="db-stars">${stars}</div>
+            <span class="db-qr-badge">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2h-2zM18 14h3M14 18h2M18 18h3M14 21h5v-3"/></svg>
+              QR Verified
+            </span>
+          </div>
         </div>
         ${r.comment ? `<div class="db-review-text">${r.comment}</div>` : ''}
+        ${caseDesc ? `<div class="db-review-case-link" onclick="event.stopPropagation();openCaseDetail('${r.case_id}')">
+          <span class="db-review-case-dot" style="background:${caseCol};box-shadow:0 0 4px ${caseCol};"></span>
+          ${caseDesc}
+        </div>` : ''}
       </div>`;
   }).join('');
 }
