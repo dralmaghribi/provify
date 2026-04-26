@@ -1208,13 +1208,121 @@ body::after {
   .db-strip-item:nth-child(3) { border-right:1px solid var(--db-border); }
   .pd-welcome-grid { grid-template-columns:1fr; }
 }
+
+/* ═══════════════════════════════════════════════
+   MOBILE PREMIUM LAYOUT  ≤ 680px
+   Reorder via flex+order, carousel pinned cases,
+   compact action strip, no layout rebuild
+   ═══════════════════════════════════════════════ */
+@media(max-width:680px) {
+
+  /* Make dashboard a flex column so we can reorder freely */
+  #view-dashboard { display:flex; flex-direction:column; padding-bottom:100px; }
+
+  /* Hide desktop topbar on mobile — mobile topbar already exists */
+  .db-topbar { display:none; }
+
+  /* ── ORDER ──────────────────────────────────── */
+  .db-hero              { order:1; margin-bottom:16px; }
+  /* Recent activity comes second — instant value */
+  #view-dashboard .db-section:has(#db-activity-list)    { order:2; }
+  /* Monthly mission */
+  #view-dashboard .db-section:has(#db-missions-grid)    { order:3; }
+  /* Rank card */
+  #view-dashboard .db-section:has(#db-rank-card)        { order:4; }
+  /* Stats strip — compact context, not hero */
+  .db-portfolio-strip   { order:5; }
+  /* Stat cards (shield/portfolio/AI) — compact row at bottom */
+  .db-stat-grid         { order:7; }
+  /* Proudest work + feedback bottom grid */
+  .db-bottom-grid       { order:6; }
+  /* Hidden legacy block stays hidden */
+  #view-dashboard > div[aria-hidden="true"] { order:99; }
+  #view-dashboard > div[style*="height:32px"] { order:100; }
+  #view-dashboard > div[style*="display:none"] { order:98; }
+
+  /* ── HERO — tighter on mobile ───────────────── */
+  .db-hero { border-radius:20px; padding:40px 20px 36px; }
+  .db-hero-title { font-size:52px; }
+  .db-hero-subtitle { font-size:26px; }
+  .db-mic-btn { width:100px; height:100px; }
+  .db-mic-svg { width:36px; height:36px; }
+  .db-mic-ring   { inset:-14px; }
+  .db-mic-ring-2 { inset:-30px; }
+  .db-mic-ring-3 { inset:-50px; }
+
+  /* ── STAT CARDS → compact horizontal pill row ─ */
+  .db-stat-grid {
+    display:flex; flex-direction:row; gap:8px;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; scroll-snap-type:x mandatory;
+    padding-bottom:4px;
+  }
+  .db-stat-grid::-webkit-scrollbar { display:none; }
+  .db-stat-card {
+    flex:0 0 calc(50% - 4px); scroll-snap-align:start;
+    padding:16px 16px 14px; border-radius:14px;
+    min-width:0;
+  }
+  .db-stat-val { font-size:32px; }
+  .db-stat-icon { width:28px; height:28px; border-radius:8px; margin-bottom:12px; }
+
+  /* ── PINNED CASES → horizontal swipe carousel ─ */
+  #db-top-cases-container {
+    flex-direction:row !important;
+    gap:10px !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    scroll-snap-type:x mandatory;
+    padding-bottom:4px;
+  }
+  #db-top-cases-container::-webkit-scrollbar { display:none; }
+  /* Each card in carousel: fixed width, snap */
+  #db-top-cases-container > div {
+    flex:0 0 82% !important;
+    min-width:0 !important;
+    scroll-snap-align:start;
+    border-radius:16px !important;
+  }
+  /* Single full card also gets carousel sizing */
+  #db-top-cases-container .db-top-case-card {
+    flex:0 0 88% !important;
+    scroll-snap-align:start;
+  }
+
+  /* ── BOTTOM GRID → single col stacked ─────── */
+  .db-bottom-grid { display:flex; flex-direction:column; gap:20px; }
+
+  /* ── SECTIONS — tighter mobile spacing ─────── */
+  .db-section { margin-bottom:20px; }
+  .db-portfolio-strip { margin-bottom:20px; border-radius:12px; padding:14px 16px; }
+  .db-strip-item { padding:2px 0; }
+  .db-strip-val { font-size:22px; }
+  .db-strip-label { font-size:10.5px; }
+
+  /* ── ACTIVITY ROWS — slightly smaller ───────── */
+  .db-activity-row { padding:9px 10px; gap:8px; }
+  .db-act-time { width:26px; font-size:10px; }
+  .db-act-name { font-size:12.5px; }
+
+  /* ── MISSION CARDS — tighter ─────────────────  */
+  .db-mission-card { padding:13px 14px; }
+
+  /* ── RANK CARD — full width ──────────────────── */
+  .db-rank-card { border-radius:16px; padding:20px; }
+
+  /* ── REVIEWS — single col already, just tighten */
+  .db-reviews-card { padding:12px; }
+  .db-review-item { padding:9px 10px; }
+}
+
 @media(max-width:520px) {
-  .db-stat-grid { grid-template-columns:1fr; }
   .pd-micro-grid { gap:8px; }
   .pd-micro-stat { padding:14px 8px; }
   .pd-micro-stat strong { font-size:1.6rem; }
-  .db-hero-title { font-size:30px; }
-  .db-hero-subtitle { font-size:17px; }
+  .db-hero-title { font-size:44px; }
+  .db-hero-subtitle { font-size:22px; }
   .db-portfolio-strip { grid-template-columns:repeat(2,1fr); }
 }
 
@@ -11012,6 +11120,35 @@ function renderTopCaseThisMonth(thisMonth) {
 
   if (labelEl) labelEl.textContent = isPinned ? `✦ ${pinnedCases.length} pinned` : '⭐ Best of month';
   if (hintEl)  hintEl.textContent  = isPinned ? '' : '· Pin a case to feature it here';
+
+  // Inject swipe hint + dot indicator on mobile after render
+  requestAnimationFrame(() => {
+    const isMobile = window.innerWidth <= 680;
+    const existingHint = document.getElementById('db-carousel-hint');
+    if (existingHint) existingHint.remove();
+    if (isMobile && casesToShow.length > 1) {
+      const hint = document.createElement('div');
+      hint.id = 'db-carousel-hint';
+      hint.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:0 2px;';
+      // Dot indicators
+      const dots = casesToShow.map((_,i) =>
+        `<div class="db-carousel-dot${i===0?' active':''}" data-idx="${i}" style="width:${i===0?'18':'6'}px;height:6px;border-radius:3px;background:${i===0?'rgba(212,168,67,0.7)':'rgba(255,255,255,0.15)'};transition:all 0.2s;"></div>`
+      ).join('');
+      hint.innerHTML = `
+        <div style="display:flex;gap:4px;align-items:center;">${dots}</div>
+        <span onclick="showView('cases')" style="font-size:11px;color:rgba(155,143,245,0.6);cursor:pointer;">View all →</span>`;
+      container.after(hint);
+
+      // Update dots on scroll
+      container.addEventListener('scroll', () => {
+        const idx = Math.round(container.scrollLeft / (container.clientWidth * 0.82));
+        hint.querySelectorAll('.db-carousel-dot').forEach((d,i) => {
+          d.style.width = i===idx ? '18px' : '6px';
+          d.style.background = i===idx ? 'rgba(212,168,67,0.7)' : 'rgba(255,255,255,0.15)';
+        });
+      }, { passive:true });
+    }
+  });
 
   // Multiple pinned — compact horizontal row
   if (casesToShow.length > 1) {
