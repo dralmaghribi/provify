@@ -10531,6 +10531,10 @@ function togglePinCase(caseId) {
   localStorage.setItem('provify_pinned_cases', JSON.stringify(capped));
   updatePinButton(caseId);
   loadBestWork();
+  // Refresh dashboard top case card
+  const now = new Date();
+  const thisMonth = allCases.filter(c => { const d = new Date(c.created_at); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  renderTopCaseThisMonth(thisMonth);
 }
 
 function updatePinButton(caseId) {
@@ -10743,7 +10747,7 @@ function renderNewDashboard() {
   if (deltaEl) { deltaEl.textContent = (delta >= 0 ? '+' : '') + delta; }
   setEl('db-strip-avg', total > 0 ? avg.toFixed(1) : '—');
 
-  // Top case this month
+  // Top case — pinned first, fallback to best this month
   renderTopCaseThisMonth(thisMonth);
 
   // Real reviews
@@ -10841,52 +10845,76 @@ function renderNewMissions() {
 
 function renderNewRankCard() {
   const total = allCases.length;
-  const level = getLevel(total);
-  const xp = getXP(total);
-  const rankNames = ['Bronze','Silver','Gold','Platinum','Diamond','Apex'];
+  // Use COMPLEXITY_RANKS (cases-based) not LEVELS (molars-based) — matches the 6 labels shown
+  const rank = getComplexityRank(total);
 
-  // Badge color per rank
   const rankColors = {
     Bronze:'#CD7F32', Silver:'#C0C0C0', Gold:'#d4a843',
-    Platinum:'#E5E4E2', Diamond:'#B9F2FF', Elite:'#7C6FFF',
-    Master:'#A78BFA', 'Grand Master':'#F59E0B', Legend:'#EF4444', Apex:'#7C6FFF'
+    Platinum:'#E5E4E2', Diamond:'#B9F2FF', Apex:'#7C6FFF'
   };
-  const col = rankColors[level.name] || '#d4a843';
+  const col = rankColors[rank.rank] || '#d4a843';
 
-  // Badge styling
+  // Badge
   const badge = document.getElementById('db-rank-badge');
   const dot = document.getElementById('db-rank-dot');
   const nameEl = document.getElementById('db-rank-name');
   if (badge) { badge.style.background = `rgba(${hexToRgb(col)},0.15)`; badge.style.borderColor = `rgba(${hexToRgb(col)},0.3)`; badge.style.color = col; badge.style.boxShadow = `0 0 16px rgba(${hexToRgb(col)},0.25)`; }
   if (dot) { dot.style.background = col; dot.style.boxShadow = `0 0 8px ${col}`; }
-  if (nameEl) nameEl.textContent = level.name;
+  if (nameEl) nameEl.textContent = rank.rank;
 
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   setEl('db-rank-case-count', total);
 
-  // Fill bar
-  const fill = document.getElementById('db-rank-fill');
-  if (fill) fill.style.width = `${xp.pct}%`;
+  // Bar fill — map current rank position across 6 slots (0-100%)
+  // Slots: Bronze(0) Silver(1) Gold(2) Platinum(3) Diamond(4) Apex(5)
+  const rankOrder = ['Bronze','Silver','Gold','Platinum','Diamond','Apex'];
+  const rankIdx = rankOrder.indexOf(rank.rank); // 0-5
+  const slotWidth = 100 / (rankOrder.length - 1); // 20% per slot
+  // Progress within current rank tier
+  const tierProgress = rankIdx < rankOrder.length - 1
+    ? Math.min((total - rank.min) / (rank.max - rank.min), 1)
+    : 1;
+  const fillPct = Math.min((rankIdx * slotWidth) + (tierProgress * slotWidth), 100);
 
-  // Label highlights
-  const levelToLabel = { 1:'bronze',2:'silver',3:'gold',4:'platinum',5:'diamond',6:'apex',7:'apex',8:'apex',9:'apex',10:'apex' };
-  const activeLabel = levelToLabel[level.level] || 'bronze';
-  ['bronze','silver','gold','platinum','diamond','apex'].forEach(r => {
-    const el = document.getElementById(`db-rl-${r}`);
-    if (el) { el.className = `db-rank-label-item${r === activeLabel ? ' active' : ''}`; if (r === activeLabel) { el.style.color = col; } else { el.style.color = ''; } }
+  const fill = document.getElementById('db-rank-fill');
+  if (fill) {
+    fill.style.width = `${fillPct}%`;
+    fill.style.background = `linear-gradient(90deg, #8b6914 0%, ${col} 100%)`;
+    fill.style.boxShadow = `0 0 10px rgba(${hexToRgb(col)},0.5)`;
+    // Move the glowing dot on the fill bar
+    fill.style.position = 'relative';
+  }
+
+  // Label highlights — mark current rank
+  rankOrder.forEach(r => {
+    const el = document.getElementById(`db-rl-${r.toLowerCase()}`);
+    if (!el) return;
+    if (r === rank.rank) {
+      el.className = 'db-rank-label-item active';
+      el.style.color = col;
+      el.style.fontWeight = '700';
+    } else {
+      el.className = 'db-rank-label-item';
+      el.style.color = '';
+      el.style.fontWeight = '';
+    }
   });
 
   // Footer
   const pctEl = document.getElementById('db-rank-pct');
   const ctaEl = document.getElementById('db-rank-cta');
   if (pctEl) {
-    const ahead = Math.round((xp.pct / 100) * 82); // approximation
-    pctEl.innerHTML = `You're ahead of <strong>${Math.max(10, ahead)}%</strong> of users`;
+    // Rough percentile: higher rank = higher percentile
+    const percentiles = { Bronze:15, Silver:35, Gold:58, Platinum:72, Diamond:85, Apex:95 };
+    const pct = percentiles[rank.rank] || 15;
+    pctEl.innerHTML = `You're ahead of <strong>${pct}%</strong> of users`;
   }
   if (ctaEl) {
-    if (level.level < 10) {
-      const next = LEVELS[level.level];
-      ctaEl.textContent = `${xp.toNext} more cases → ${next.name}`;
+    const nextRank = rankOrder[rankIdx + 1];
+    if (nextRank) {
+      const nextDef = COMPLEXITY_RANKS.find(r => r.rank === nextRank);
+      const needed = nextDef ? nextDef.min - total : 0;
+      ctaEl.textContent = `${needed} more cases → ${nextRank}`;
     } else {
       ctaEl.textContent = '🔱 Apex — Maximum rank';
     }
@@ -10894,8 +10922,23 @@ function renderNewRankCard() {
 }
 
 function renderTopCaseThisMonth(thisMonth) {
-  if (!thisMonth || thisMonth.length === 0) return;
-  const top = [...thisMonth].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))[0];
+  // Use pinned cases first (user's deliberate choice), fall back to highest complexity this month
+  const pinnedIds = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
+  
+  let top = null;
+  let isPinned = false;
+
+  // Try to find the most recently pinned case that exists in allCases
+  for (const id of pinnedIds) {
+    const c = allCases.find(x => x.id === id);
+    if (c) { top = c; isPinned = true; break; }
+  }
+
+  // Fall back to highest complexity this month
+  if (!top && thisMonth && thisMonth.length > 0) {
+    top = [...thisMonth].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))[0];
+  }
+
   if (!top) return;
 
   const specLabel = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
@@ -10919,9 +10962,29 @@ function renderTopCaseThisMonth(thisMonth) {
   const card = document.getElementById('db-top-case-card');
   if (card) card.onclick = () => openCaseDetail(top.id);
 
-  const now = new Date();
+  // Label reflects whether it's pinned or auto-selected
   const labelEl = document.getElementById('db-top-case-label');
-  if (labelEl) labelEl.textContent = `⭐ Best of ${now.toLocaleDateString('en-GB', { month:'long' })}`;
+  const now = new Date();
+  if (labelEl) {
+    labelEl.textContent = isPinned
+      ? '✦ Pinned by you'
+      : `⭐ Best of ${now.toLocaleDateString('en-GB', { month:'long' })}`;
+  }
+
+  // Section header hint
+  const sectionTitle = document.querySelector('#db-top-case-card')?.closest('.db-bottom-grid')?.previousElementSibling?.querySelector('.db-section-title');
+  // Show a subtle hint to pin if not pinned yet
+  const hintEl = document.getElementById('db-pin-hint');
+  if (!hintEl) {
+    const hint = document.createElement('span');
+    hint.id = 'db-pin-hint';
+    hint.style.cssText = 'font-size:11px;color:rgba(240,239,254,0.25);margin-left:6px;';
+    hint.textContent = isPinned ? '' : '· Pin a case to feature it here';
+    const titleEl = document.querySelector('.db-section-header .db-section-title');
+    if (titleEl && titleEl.textContent === 'Top case this month') titleEl.after(hint);
+  } else {
+    hintEl.textContent = isPinned ? '' : '· Pin a case to feature it here';
+  }
 }
 
 async function renderDashboardReviews() {
