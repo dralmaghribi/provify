@@ -11037,41 +11037,150 @@ function renderMonthlyObjectives() {
   const { month, objectives } = getMonthlyObjectives();
   const doneCount = objectives.filter(o => o.current >= o.target).length;
 
+  // AI hints per objective type
+  const hints = {
+    'log':        doneCount >= 2 ? 'You\'re already ahead of 78% of users'  : 'Every case logged compounds your record',
+    'endo':       'Strong speciality consistency detected',
+    'challenging':'High-impact cases boost your rank faster',
+    'smile':      'Aesthetic cases are your fastest-growing category',
+    'default':    'Keep the momentum — consistency is everything',
+  };
+
+  function getHint(label) {
+    const l = label.toLowerCase();
+    if (l.includes('endo')) return hints.endo;
+    if (l.includes('challeng')) return hints.challenging;
+    if (l.includes('smile')) return hints.smile;
+    if (l.includes('log')) return hints.log;
+    return hints.default;
+  }
+
   el.style.display = 'block';
   el.innerHTML = `
     <div style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);margin-bottom:14px;">
-      <div style="padding:12px 16px 6px;display:flex;align-items:center;justify-content:space-between;">
+
+      <!-- Header -->
+      <div style="padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.04);">
         <div style="font-size:0.4rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">${month} Mission</div>
-        <div style="font-size:0.52rem;color:rgba(255,255,255,0.25);font-weight:600;">${doneCount} / ${objectives.length} complete</div>
+        <div style="font-size:0.5rem;color:rgba(255,255,255,0.22);font-weight:500;">${doneCount} of ${objectives.length} complete</div>
       </div>
-      <div style="padding:6px 10px 10px;display:flex;flex-direction:column;gap:6px;">
+
+      <!-- Cards -->
+      <div style="padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;">
         ${objectives.map(o => {
           const done = o.current >= o.target;
           const pct  = Math.min(100, Math.round(o.current / o.target * 100));
+          const hint = getHint(o.label);
 
-          const bg     = done ? 'rgba(52,211,153,0.05)'  : 'rgba(255,255,255,0.025)';
-          const border = done ? 'rgba(52,211,153,0.18)'  : 'rgba(255,255,255,0.06)';
-          const barCol = done ? '#34D399'                 : 'rgba(196,113,58,0.7)';
-          const barBg  = done ? 'rgba(52,211,153,0.12)'  : 'rgba(255,255,255,0.05)';
-          const barGlow= done ? '0 0 6px rgba(52,211,153,0.35)' : 'none';
-          const pctCol = done ? 'rgba(52,211,153,0.8)'   : 'rgba(196,113,58,0.7)';
+          const cardBg     = done ? 'rgba(255,255,255,0.02)'           : 'rgba(255,255,255,0.02)';
+          const cardBorder = done ? 'rgba(52,211,153,0.16)'            : 'rgba(255,255,255,0.06)';
+          const topGlow    = done ? 'rgba(52,211,153,0.3)'             : 'transparent';
+          const barFill    = done ? '#34D399'                          : 'rgba(196,113,58,0.75)';
+          const barBg      = done ? 'rgba(52,211,153,0.1)'             : 'rgba(255,255,255,0.05)';
+          const barGlow    = done ? '0 0 6px rgba(52,211,153,0.3)'     : 'none';
+          const pctCol     = done ? 'rgba(52,211,153,0.85)'            : 'rgba(196,113,58,0.7)';
+          const titleCol   = done ? 'rgba(255,255,255,0.35)'           : 'rgba(255,255,255,0.78)';
+          const hintCol    = done ? 'rgba(52,211,153,0.45)'            : 'rgba(255,255,255,0.2)';
+          const statusText = done ? 'Done'                             : 'In progress';
+          const statusCol  = done ? 'rgba(52,211,153,0.6)'             : 'rgba(196,113,58,0.5)';
 
           return `
-          <div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:10px;">
-            <!-- Icon -->
-            <div style="width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;background:rgba(255,255,255,0.04);">${o.icon}</div>
-            <!-- Title + bar -->
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:0.66rem;color:${done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.72)'};font-weight:500;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.12);' : ''}">${o.label}</div>
-              <!-- Progress bar -->
-              <div style="height:3px;background:${barBg};border-radius:100px;overflow:hidden;">
-                <div style="height:100%;width:${pct}%;background:${barCol};border-radius:100px;box-shadow:${barGlow};transition:width 0.8s ease;"></div>
+          <div style="background:${cardBg};border:1px solid ${cardBorder};border-radius:11px;padding:10px 12px;position:relative;overflow:hidden;">
+            ${done ? `<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${topGlow},transparent);"></div>` : ''}
+            <div style="display:flex;align-items:center;gap:10px;">
+              <!-- Icon -->
+              <div style="width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.75rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);">${o.icon}</div>
+
+              <!-- Title + hint + bar -->
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:0.68rem;color:${titleCol};font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.1);' : ''}">${o.label}</div>
+                <div style="font-size:0.54rem;color:${hintCol};margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hint}</div>
+                <!-- Bar -->
+                <div style="height:2px;background:${barBg};border-radius:100px;overflow:hidden;">
+                  <div style="height:100%;width:${pct}%;background:${barFill};border-radius:100px;box-shadow:${barGlow};transition:width 0.8s ease;"></div>
+                </div>
+              </div>
+
+              <!-- Right: % + status -->
+              <div style="flex-shrink:0;text-align:right;min-width:36px;">
+                <div style="font-size:0.62rem;font-weight:700;color:${pctCol};line-height:1;">${pct}%</div>
+                <div style="font-size:0.42rem;color:${statusCol};margin-top:2px;">${statusText}</div>
               </div>
             </div>
-            <!-- Percentage -->
-            <div style="font-size:0.6rem;font-weight:700;color:${pctCol};flex-shrink:0;min-width:28px;text-align:right;">${pct}%</div>
           </div>`;
         }).join('')}
+      </div>
+    </div>`;
+}
+
+// ─── INACTIVITY TRACKER ───
+
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div style="position:relative;border-radius:22px;overflow:hidden;background:rgba(6,4,18,0.8);border:1px solid rgba(255,255,255,0.07);margin-bottom:14px;">
+      <!-- Faint grid -->
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;"></div>
+      <!-- Top accent -->
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${allDone ? 'rgba(58,140,126,0.7)' : 'rgba(123,110,232,0.55)'},transparent);"></div>
+
+      <div style="position:relative;z-index:1;padding:18px 20px 16px;">
+
+        <!-- Header row -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;">
+          <div>
+            <div style="font-size:0.42rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;margin-bottom:5px;">${month} Mission</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:rgba(255,255,255,0.88);letter-spacing:-0.03em;line-height:1;">${doneCount} <span style="color:rgba(255,255,255,0.2);font-size:1rem;">of ${objectives.length}</span></div>
+            <div style="font-size:0.46rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.14em;margin-top:3px;">Complete</div>
+          </div>
+          <!-- Segmented indicator -->
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;padding-top:4px;">
+            ${objectives.map(o => {
+              const done = o.current >= o.target;
+              return `<div style="width:32px;height:3px;border-radius:100px;background:${done ? doneColor : 'rgba(255,255,255,0.07)'};${done ? `box-shadow:0 0 8px ${doneColor};` : ''}transition:all 0.6s;"></div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Mission rows -->
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${objectives.map(o => {
+            const done = o.current >= o.target;
+            const pct  = Math.min(100, Math.round(o.current / o.target * 100));
+            const col  = done ? doneColor : pendColor;
+            const bg   = done ? doneBg : pendBg;
+            const bdr  = done ? doneBorder : pendBorder;
+
+            // Segmented rail — 10 segments
+            const segs = 10;
+            const filled = Math.round(pct / 100 * segs);
+            const railHTML = Array.from({length: segs}, (_,i) => {
+              const active = i < filled;
+              return `<div style="flex:1;height:3px;border-radius:2px;background:${active ? col : 'rgba(255,255,255,0.06)'};${active ? `box-shadow:0 0 4px ${col}80;` : ''}transition:background 0.4s ${i * 0.04}s;"></div>`;
+            }).join('');
+
+            return `
+            <div style="position:relative;border-radius:14px;overflow:hidden;background:${bg};border:1px solid ${bdr};padding:12px 14px;">
+              ${done ? `<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${col}80,transparent);"></div>` : ''}
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:${done ? '0' : '10px'};">
+                <!-- Icon -->
+                <div style="width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.85rem;background:${col.replace('0.9','0.1').replace('0.85','0.08')};border:1px solid ${bdr};">${o.icon}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:0.72rem;color:${done ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.75)'};font-weight:500;${done ? 'text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.1);' : ''}overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.label}</div>
+                </div>
+                <!-- Status chip -->
+                ${done
+                  ? `<div style="flex-shrink:0;font-size:0.4rem;font-weight:800;color:${doneColor};background:${doneBg};border:1px solid ${doneBorder};padding:3px 8px;border-radius:100px;letter-spacing:0.12em;text-transform:uppercase;">Complete</div>`
+                  : `<div style="flex-shrink:0;display:flex;align-items:center;gap:4px;">
+                      <span style="font-size:0.68rem;font-weight:700;color:${pendColor};font-variant-numeric:tabular-nums;">${o.current}</span>
+                      <span style="font-size:0.5rem;color:rgba(255,255,255,0.2);">/ ${o.target}</span>
+                    </div>`
+                }
+              </div>
+              ${!done ? `<div style="display:flex;gap:2px;margin-left:40px;">${railHTML}</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+
       </div>
     </div>`;
 }
