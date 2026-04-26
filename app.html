@@ -2517,14 +2517,14 @@ body::after {
             <div class="db-stat-val db-purple" id="db-stat-portfolio">—</div>
             <div class="db-stat-sub">Verified & shareable</div>
           </div>
-          <div class="db-stat-card db-green">
+          <div class="db-stat-card db-green" onclick="showView('progress')" style="cursor:pointer;">
             <div class="db-shimmer"></div>
             <div class="db-stat-icon db-green">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><polyline points="16 2 22 2 22 8"/><line x1="22" y1="2" x2="16" y2="8"/></svg>
             </div>
-            <div class="db-stat-label db-green">Complexity</div>
-            <div class="db-stat-val db-green" id="db-stat-growth">—</div>
-            <div class="db-stat-sub">Avg score / 10</div>
+            <div class="db-stat-label db-green">AI Analysis</div>
+            <div class="db-stat-val db-green" id="db-stat-growth" style="font-size:28px;margin-top:4px;">View →</div>
+            <div class="db-stat-sub">Clinical patterns & insights</div>
           </div>
         </div>
 
@@ -2606,7 +2606,7 @@ body::after {
           </div>
           <div class="db-strip-item">
             <div class="db-strip-val db-gold" id="db-strip-avg">—</div>
-            <div class="db-strip-label">Avg score / 10</div>
+            <div class="db-strip-label">Specialties</div>
           </div>
         </div>
 
@@ -10757,7 +10757,7 @@ function renderNewDashboard() {
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   setEl('db-stat-protected', protected_count || total);
   setEl('db-stat-portfolio', total);
-  setEl('db-stat-growth', total > 0 ? avg.toFixed(1) : '—');
+  // db-stat-growth is now AI Analysis CTA — no value needed
 
   // Activity list
   renderNewActivityList();
@@ -10779,11 +10779,12 @@ function renderNewDashboard() {
     return d.getMonth() === lastMonthDate.getMonth() && d.getFullYear() === lastMonthDate.getFullYear();
   });
   const delta = thisMonth.length - lastMonth.length;
+  const specCount = new Set(allCases.map(c => c.specialty).filter(Boolean)).size;
   setEl('db-strip-total', total);
   setEl('db-strip-month', thisMonth.length);
   const deltaEl = document.getElementById('db-strip-delta');
   if (deltaEl) { deltaEl.textContent = (delta >= 0 ? '+' : '') + delta; }
-  setEl('db-strip-avg', total > 0 ? avg.toFixed(1) : '—');
+  setEl('db-strip-avg', specCount || '—');
 
   // Top case — pinned first, fallback to best this month
   renderTopCaseThisMonth(thisMonth);
@@ -10833,7 +10834,6 @@ function renderNewActivityList() {
         <span class="db-act-time">${timeStr}</span>
         <span class="db-act-badge ${badge}">${label}</span>
         <span class="db-act-name">${title}${canalSuffix(c)}</span>
-        <span class="db-act-score">${score}</span>
         <span class="db-status-pill ${allCases.length >= 25 ? 'gold' : 'verified'}">${allCases.length >= 25 ? rank.name : 'Verified'}</span>
       </div>`;
   }).join('');
@@ -11026,7 +11026,7 @@ function renderTopCaseThisMonth(thisMonth) {
         </div>
         <div style="padding:10px 11px;">
           <div style="font-family:'Instrument Serif',serif;font-size:14px;color:rgba(240,239,254,0.88);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
-          <div style="font-size:10.5px;color:var(--db-gold);opacity:0.7;">Score ${score} / 10</div>
+          <div style="font-size:10.5px;color:rgba(240,239,254,0.3);">${shortDate}</div>
         </div>
       </div>`;
     }).join('');
@@ -11063,13 +11063,10 @@ function renderTopCaseThisMonth(thisMonth) {
         ${isPinned ? `<span style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(212,168,67,0.8);background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:20px;white-space:nowrap;backdrop-filter:blur(4px);">✦ Featured</span>` : ''}
       </div>
       <div class="db-top-case-body">
-        <div class="db-top-case-label">${isPinned ? 'Pinned by you' : 'Highest complexity this month'}</div>
+        <div class="db-top-case-label">${isPinned ? 'Pinned by you' : 'Best case this month'}</div>
         <div class="db-top-case-title">${title}</div>
         <div class="db-top-case-footer">
-          <div class="db-complexity-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
-            Score ${score} / 10
-          </div>
+          <span class="db-status-pill verified" style="font-size:11px;">✓ Verified</span>
           <span class="db-top-case-date">${date}</span>
         </div>
       </div>
