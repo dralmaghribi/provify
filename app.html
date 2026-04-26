@@ -2111,8 +2111,9 @@ body::after {
       <!-- DASHBOARD VIEW -->
       <div class="view active" id="view-dashboard">
 
-
-<!-- § 01 HERO -->
+<!-- ═══════════════════════════════════════════════════
+     § 01  VOICE COMMAND HERO
+═══════════════════════════════════════════════════ -->
 <div class="ds" style="margin-bottom:14px;">
 <div style="position:relative;border-radius:30px;overflow:hidden;background:#060412;">
   <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(123,110,232,0.11),transparent 45%,rgba(58,140,126,0.05));background-size:200% 200%;animation:bgdrift 20s ease infinite;"></div>
@@ -2123,6 +2124,7 @@ body::after {
   <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.8),rgba(58,140,126,0.3),transparent);animation:topglow 5s ease-in-out infinite;z-index:3;"></div>
   <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,#060412,transparent);pointer-events:none;z-index:2;"></div>
 
+  <!-- Status bar -->
   <div style="position:relative;z-index:5;padding:15px 20px 0;display:flex;align-items:center;justify-content:space-between;">
     <div style="display:flex;align-items:center;gap:7px;">
       <div style="width:5px;height:5px;border-radius:50%;background:#3A8C7E;box-shadow:0 0 8px rgba(58,140,126,0.8);animation:blink 2.5s ease-in-out infinite;"></div>
@@ -2134,6 +2136,7 @@ body::after {
     </div>
   </div>
 
+  <!-- Mic + headline -->
   <div onclick="openVoiceLog()" id="voice-cta-area" style="position:relative;z-index:5;padding:36px 24px 30px;cursor:pointer;text-align:center;">
     <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:30px;">
       <div style="position:absolute;top:50%;left:50%;width:220px;height:220px;border-radius:50%;border:1px solid rgba(123,110,232,0.1);transform-origin:top left;animation:mpulse 3.5s ease-out 0s infinite;"></div>
@@ -2144,7 +2147,6 @@ body::after {
         <svg width="34" height="34" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
       </div>
     </div>
-
     <div style="display:flex;align-items:flex-end;justify-content:center;height:26px;margin-bottom:24px;">
       <span class="wv" style="height:4px;background:rgba(123,110,232,0.2);"></span>
       <span class="wv" style="height:8px;background:rgba(123,110,232,0.3);"></span>
@@ -2156,14 +2158,12 @@ body::after {
       <span class="wv" style="height:8px;background:rgba(123,110,232,0.3);"></span>
       <span class="wv" style="height:4px;background:rgba(123,110,232,0.2);"></span>
     </div>
-
     <div style="font-family:'Instrument Serif',serif;font-size:3rem;color:rgba(255,255,255,0.92);letter-spacing:-0.04em;line-height:0.92;margin-bottom:14px;">
       Speak.<br><em style="color:#9B8FF5;font-style:italic;">I'll handle</em><br>the rest.
     </div>
     <div id="dash-hero-subtext" style="font-size:0.68rem;color:rgba(255,255,255,0.25);line-height:1.7;max-width:250px;margin:0 auto 26px;">
       Dictate the case. Provify documents, signs, and protects it before you finish.
     </div>
-
     <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(123,110,232,0.15);border:1px solid rgba(123,110,232,0.38);padding:12px 26px;border-radius:100px;transition:all 0.2s;"
       onmouseover="this.style.background='rgba(123,110,232,0.28)';this.style.transform='scale(1.04)'"
       onmouseout="this.style.background='rgba(123,110,232,0.15)';this.style.transform='scale(1)'">
@@ -2171,114 +2171,111 @@ body::after {
       <span style="font-size:0.55rem;color:rgba(155,143,245,0.6);background:rgba(123,110,232,0.14);padding:3px 9px;border-radius:100px;">Hold Space</span>
     </div>
   </div>
-
-  <div style="position:relative;z-index:5;border-top:1px solid rgba(255,255,255,0.05);display:grid;grid-template-columns:repeat(4,1fr);">
-    <div style="padding:16px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-      <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:white;line-height:1;letter-spacing:-0.04em;animation:numglow 3s ease-in-out infinite;" id="micro-total">0</div>
-      <div style="font-size:0.42rem;color:rgba(255,255,255,0.16);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">Cases · Total</div>
-    </div>
-    <div style="padding:16px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-      <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:rgba(58,140,126,0.85);line-height:1;letter-spacing:-0.04em;" id="micro-this-month">0</div>
-      <div style="font-size:0.42rem;color:rgba(58,140,126,0.28);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">This Month</div>
-    </div>
-    <div style="padding:16px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
-      <div style="font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(185,155,70,0.85);line-height:1;margin-top:8px;" id="micro-rank">—</div>
-      <div style="font-size:0.42rem;color:rgba(185,155,70,0.25);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">Rank</div>
-    </div>
-    <div style="padding:16px 8px;text-align:center;">
-      <div style="font-family:'Instrument Serif',serif;font-size:2rem;color:rgba(196,113,58,0.8);line-height:1;letter-spacing:-0.04em;" id="micro-streak">0</div>
-      <div style="font-size:0.42rem;color:rgba(196,113,58,0.26);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">This Week</div>
-    </div>
-  </div>
 </div>
 </div>
 
-<!-- § 02 MODULES -->
+<!-- ═══════════════════════════════════════════════════
+     § 02  POWER MODULES
+═══════════════════════════════════════════════════ -->
 <div class="ds" style="margin-bottom:14px;">
   <div style="font-size:0.42rem;color:rgba(255,255,255,0.1);text-transform:uppercase;letter-spacing:0.28em;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;"><span>Modules</span><span style="color:rgba(155,143,245,0.3);">3 active</span></div>
 
-  <div class="pm pm-warm" onclick="navToShield()" style="background:linear-gradient(130deg,rgba(196,113,58,0.07),rgba(160,80,30,0.03) 60%,rgba(6,4,18,0));border:1px solid rgba(196,113,58,0.16);border-radius:22px;padding:20px 22px 18px;margin-bottom:8px;box-shadow:0 4px 20px rgba(196,113,58,0.05);">
-    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,113,58,0.7),rgba(220,140,70,0.4),transparent);animation:modglow 3.5s ease-in-out infinite;"></div>
-    <div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;background:radial-gradient(circle,rgba(196,113,58,0.1),transparent 70%);pointer-events:none;"></div>
+  <!-- SHIELD — full width warm -->
+  <div class="pm pm-warm" onclick="navToShield()" style="background:linear-gradient(130deg,rgba(196,113,58,0.08),rgba(160,80,30,0.03) 60%,transparent);border:1px solid rgba(196,113,58,0.16);border-radius:22px;padding:20px 22px 16px;margin-bottom:8px;box-shadow:0 4px 20px rgba(196,113,58,0.05);">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,113,58,0.6),rgba(220,140,70,0.3),transparent);animation:modglow 3.5s ease-in-out infinite;"></div>
+    <div style="position:absolute;top:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(196,113,58,0.08),transparent 70%);pointer-events:none;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:14px;">
-        <div style="width:46px;height:46px;border-radius:13px;background:rgba(196,113,58,0.12);border:1px solid rgba(196,113,58,0.24);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="rgba(210,130,70,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(196,113,58,0.1);border:1px solid rgba(196,113,58,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(210,130,70,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
         </div>
         <div>
-          <div style="font-size:0.44rem;color:rgba(196,113,58,0.5);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Shield · Tamper-proof</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(255,255,255,0.88);letter-spacing:-0.02em;line-height:1.05;">Every case.<br>Protected.</div>
+          <div style="font-size:0.42rem;color:rgba(196,113,58,0.5);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Shield · Tamper-proof</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:rgba(255,255,255,0.88);letter-spacing:-0.02em;line-height:1.1;"><span id="micro-total-shield" style="color:rgba(196,113,58,0.75);">—</span> cases protected.</div>
+          <div style="font-size:0.56rem;color:rgba(255,255,255,0.2);margin-top:4px;">Complaint letter in 60s · One tap defence</div>
         </div>
       </div>
-      <div style="text-align:right;flex-shrink:0;padding-left:12px;">
-        <div style="font-family:'Instrument Serif',serif;font-size:2.4rem;color:rgba(196,113,58,0.5);line-height:1;letter-spacing:-0.04em;" id="micro-total-shield">—</div>
-        <div style="font-size:0.4rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;">Protected</div>
-      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(196,113,58,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(196,113,58,0.08);font-size:0.58rem;color:rgba(255,255,255,0.2);">Complaint letter · 60s · One tap defence</div>
   </div>
 
+  <!-- PORTFOLIO + AI side by side 3fr/2fr -->
   <div style="display:grid;grid-template-columns:3fr 2fr;gap:8px;">
-    <div class="pm pm-violet" onclick="viewMyPortfolio()" style="background:linear-gradient(145deg,rgba(123,110,232,0.11),rgba(80,65,190,0.05));border:1px solid rgba(123,110,232,0.18);border-radius:22px;padding:20px 18px 16px;box-shadow:0 6px 28px rgba(123,110,232,0.08);display:flex;flex-direction:column;min-height:178px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.75),transparent);animation:modglow 3.5s ease-in-out 1.2s infinite;"></div>
-      <div style="position:absolute;bottom:-30px;right:-20px;width:110px;height:110px;background:radial-gradient(circle,rgba(123,110,232,0.1),transparent 70%);pointer-events:none;"></div>
-      <div style="width:42px;height:42px;border-radius:12px;background:rgba(123,110,232,0.12);border:1px solid rgba(123,110,232,0.22);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(155,143,245,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="6" y1="8" x2="10" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/></svg>
+
+    <!-- PORTFOLIO -->
+    <div class="pm pm-violet" onclick="viewMyPortfolio()" style="background:linear-gradient(145deg,rgba(123,110,232,0.1),rgba(80,65,190,0.04));border:1px solid rgba(123,110,232,0.16);border-radius:22px;padding:18px 16px 16px;box-shadow:0 4px 20px rgba(123,110,232,0.06);display:flex;flex-direction:column;min-height:165px;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.7),transparent);animation:modglow 3.5s ease-in-out 1.2s infinite;"></div>
+      <div style="position:absolute;bottom:-20px;right:-15px;width:100px;height:100px;background:radial-gradient(circle,rgba(123,110,232,0.08),transparent 70%);pointer-events:none;"></div>
+      <div style="width:40px;height:40px;border-radius:11px;background:rgba(123,110,232,0.1);border:1px solid rgba(123,110,232,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(155,143,245,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="6" y1="8" x2="10" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/></svg>
       </div>
-      <div style="font-size:0.42rem;color:rgba(123,110,232,0.48);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:5px;">Portfolio · Verified</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:rgba(255,255,255,0.85);line-height:1.1;flex:1;" id="val-portfolio-text">Verified<br>portfolio</div>
-      <div style="margin-top:auto;padding-top:14px;display:flex;align-items:flex-end;justify-content:space-between;">
-        <div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.8rem;color:rgba(123,110,232,0.55);line-height:1;letter-spacing:-0.03em;" id="micro-total-port">—</div>
-          <div style="font-size:0.4rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Verified</div>
-        </div>
-        <div style="font-size:0.6rem;color:rgba(123,110,232,0.45);font-weight:600;">View →</div>
+      <div style="font-size:0.42rem;color:rgba(123,110,232,0.45);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:4px;">Portfolio · Verified</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.85);line-height:1.15;flex:1;">
+        <span id="micro-total-port" style="color:rgba(123,110,232,0.7);">—</span> verified cases.
       </div>
+      <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:4px;line-height:1.5;">Shareable · Tamper-proof<br>Career-ready</div>
+      <div style="font-size:0.58rem;color:rgba(123,110,232,0.4);font-weight:600;margin-top:10px;">View →</div>
     </div>
 
-    <div class="pm pm-teal" onclick="showView('progress')" style="background:linear-gradient(145deg,rgba(58,140,126,0.1),rgba(30,100,88,0.04));border:1px solid rgba(58,140,126,0.16);border-radius:22px;padding:20px 16px 16px;box-shadow:0 6px 28px rgba(58,140,126,0.07);display:flex;flex-direction:column;min-height:178px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(58,140,126,0.65),transparent);animation:modglow 3.5s ease-in-out 2.4s infinite;"></div>
-      <div style="width:42px;height:42px;border-radius:12px;background:rgba(58,140,126,0.11);border:1px solid rgba(58,140,126,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(70,175,158,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <!-- AI INSIGHT -->
+    <div class="pm pm-teal" onclick="showView('progress')" style="background:linear-gradient(145deg,rgba(58,140,126,0.09),rgba(30,100,88,0.03));border:1px solid rgba(58,140,126,0.14);border-radius:22px;padding:18px 14px 16px;box-shadow:0 4px 20px rgba(58,140,126,0.05);display:flex;flex-direction:column;min-height:165px;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(58,140,126,0.6),transparent);animation:modglow 3.5s ease-in-out 2.4s infinite;"></div>
+      <div style="width:40px;height:40px;border-radius:11px;background:rgba(58,140,126,0.1);border:1px solid rgba(58,140,126,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(70,175,158,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
-      <div style="font-size:0.42rem;color:rgba(58,140,126,0.48);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:5px;">AI · Trajectory</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.85);line-height:1.2;flex:1;" id="val-growth-text">Clinical<br>growth</div>
-      <div style="display:flex;align-items:flex-end;gap:2px;height:22px;margin-top:auto;padding-top:14px;">
+      <div style="font-size:0.42rem;color:rgba(58,140,126,0.45);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:4px;">AI · Insight</div>
+      <div style="flex:1;" id="val-growth-text">
+        <span style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.85);line-height:1.2;">Clinical<br>growth</span>
+      </div>
+      <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:4px;line-height:1.5;" id="val-portfolio-text">Tracking your trajectory</div>
+      <!-- Mini waveform -->
+      <div style="display:flex;align-items:flex-end;gap:2px;height:18px;margin-top:10px;">
         <span style="width:2px;height:4px;background:rgba(58,140,126,0.28);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.00s ease-in-out infinite;"></span>
         <span style="width:2px;height:8px;background:rgba(58,140,126,0.4);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.14s ease-in-out infinite;"></span>
         <span style="width:2px;height:14px;background:rgba(58,140,126,0.55);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.28s ease-in-out infinite;"></span>
-        <span style="width:2px;height:22px;background:rgba(58,140,126,0.75);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.42s ease-in-out infinite;"></span>
-        <span style="width:2px;height:15px;background:rgba(58,140,126,0.55);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.28s ease-in-out infinite;"></span>
-        <span style="width:2px;height:8px;background:rgba(58,140,126,0.38);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.14s ease-in-out infinite;"></span>
+        <span style="width:2px;height:18px;background:rgba(58,140,126,0.75);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.42s ease-in-out infinite;"></span>
+        <span style="width:2px;height:12px;background:rgba(58,140,126,0.55);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.28s ease-in-out infinite;"></span>
+        <span style="width:2px;height:6px;background:rgba(58,140,126,0.35);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.14s ease-in-out infinite;"></span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- § 03 ACTIVITY -->
+<!-- ═══════════════════════════════════════════════════
+     § 03  RECENT ACTIVITY
+═══════════════════════════════════════════════════ -->
 <div class="ds" id="last-case-strip" style="margin-bottom:14px;"></div>
 
-<!-- § 04 OBJECTIVES -->
+<!-- ═══════════════════════════════════════════════════
+     § 04  APRIL MISSION CONTROL
+═══════════════════════════════════════════════════ -->
 <div id="monthly-objectives" style="display:none;"></div>
 
-<!-- § 05 RANK -->
+<!-- ═══════════════════════════════════════════════════
+     § 05  CAREER TRAJECTORY (RANK)
+═══════════════════════════════════════════════════ -->
 <div id="rank-progression-card" style="margin-bottom:14px;"></div>
 
-<!-- § 06 PORTFOLIO TEASER -->
-<div id="portfolio-teaser-card" style="display:none;margin-bottom:14px;"></div>
-
-<!-- § 07 SKILL -->
-<div id="skill-progress-card" style="display:none;margin-bottom:14px;"></div>
-
-<!-- § 08 BEST WORK -->
+<!-- ═══════════════════════════════════════════════════
+     § 06  CASE VAULT (replaces Proudest Cases)
+═══════════════════════════════════════════════════ -->
 <div class="ds" id="best-work-card" style="display:none;margin-bottom:14px;">
-  <div style="position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);padding:18px 20px;">
-    <div style="font-size:0.44rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;margin-bottom:14px;">Best Work</div>
-    <div id="best-work-list" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
+  <div style="position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(185,155,70,0.4),transparent);"></div>
+    <div style="padding:16px 20px 8px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:0.42rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;margin-bottom:4px;">Case Vault</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(255,255,255,0.7);letter-spacing:-0.02em;">Your best work. Verified.</div>
+      </div>
+      <div style="font-size:1rem;opacity:0.5;">✦</div>
+    </div>
+    <div id="best-work-list" style="padding:0 20px 16px;display:flex;flex-direction:column;gap:8px;"></div>
   </div>
 </div>
 
-<!-- § 09 REVIEWS -->
+<!-- ═══════════════════════════════════════════════════
+     § 07  REVIEWS
+═══════════════════════════════════════════════════ -->
 <div class="ds" id="dashboard-reviews-card" style="display:none;margin-bottom:14px;">
   <div style="position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);padding:18px 20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -2289,7 +2286,17 @@ body::after {
   </div>
 </div>
 
-<!-- § 10 EMPTY STATE -->
+<!-- hidden legacy containers -->
+<div id="portfolio-teaser-card" style="display:none;"></div>
+<div id="skill-progress-card" style="display:none;"></div>
+<div id="micro-total" style="display:none;">0</div>
+<div id="micro-this-month" style="display:none;">0</div>
+<div id="micro-rank" style="display:none;">—</div>
+<div id="micro-streak" style="display:none;">0</div>
+
+<!-- ═══════════════════════════════════════════════════
+     § 08  EMPTY / WELCOME STATE
+═══════════════════════════════════════════════════ -->
 <div id="welcome-card" style="display:none;margin-bottom:16px;">
   <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:22px;margin-bottom:10px;">
     <div style="font-size:0.54rem;color:rgba(255,255,255,0.16);text-transform:uppercase;letter-spacing:0.16em;margin-bottom:16px;font-weight:600;">Why Provify</div>
@@ -2298,1286 +2305,30 @@ body::after {
         <div style="width:32px;height:32px;border-radius:9px;background:rgba(196,113,58,0.1);border:1px solid rgba(196,113,58,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🛡️</div>
         <div>
           <div style="font-size:0.76rem;color:rgba(255,255,255,0.82);font-weight:600;margin-bottom:3px;">If a patient ever complains</div>
-          <div style="font-size:0.62rem;color:rgba(255,255,255,0.26);line-height:1.55;">Every case you log is timestamped and tamper-proof. One tap generates a professional complaint response letter. Most dentists have nothing.</div>
-        </div>
-              <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="width:34px;height:34px;border-radius:10px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🏆</div>
-                <div>
-                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.88);font-weight:600;margin-bottom:3px;">When you apply for anything</div>
-                  <div style="font-size:0.65rem;color:rgba(255,255,255,0.28);line-height:1.55;">Send a verified portfolio link showing your complexity growth over time. Employers and universities have never seen anything like it.</div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="width:34px;height:34px;border-radius:10px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;">🧠</div>
-                <div>
-                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.88);font-weight:600;margin-bottom:3px;">After every single case</div>
-                  <div style="font-size:0.65rem;color:rgba(255,255,255,0.28);line-height:1.55;">AI tells you exactly what you did well, what to watch next time, and a clinical pearl specific to your case. A mentor in your pocket.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div style="text-align:center;">
-            <span onclick="showView('log')" style="font-size:0.7rem;color:rgba(124,111,255,0.4);cursor:pointer;text-decoration:underline;">Prefer typing? Use the manual form →</span>
-          </div>
-          <div id="career-teaser-card" style="display:none;"></div>
-        </div>
-
-      </div>
-
-
-      <!-- LOG CASE VIEW -->
-      <div class="view" id="view-log">
-        <div class="page-header">
-          <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-            <div>
-              <div class="page-title" id="log-step-title">Log a Case</div>
-              <div class="page-sub" id="log-step-sub">Step 1 of 3 — The essentials</div>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <div style="background:var(--navy-2); border:1px solid var(--white-faint); border-radius:10px; padding:8px 14px; display:flex; align-items:center; gap:10px;">
-                <div id="timer-display" style="font-family:monospace; font-size:1rem; color:var(--white); min-width:52px">00:00</div>
-                <button onclick="toggleTimer()" id="timer-btn" style="background:var(--teal-dim); border:1px solid var(--teal-mid); color:var(--teal); font-size:0.75rem; font-weight:600; padding:4px 12px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s;">▶ Start</button>
-              </div>
-            </div>
-          </div>
-          <!-- Step indicator -->
-          <div style="display:flex;align-items:center;gap:0;margin-top:20px;">
-            <div class="log-step-indicator active" id="step-ind-1" onclick="goToLogStep(1)">
-              <div class="step-num">1</div>
-              <div class="step-label">Essentials</div>
-            </div>
-            <div class="step-line" id="step-line-1"></div>
-            <div class="log-step-indicator" id="step-ind-2" onclick="goToLogStep(2)">
-              <div class="step-num">2</div>
-              <div class="step-label">Clinical Details</div>
-            </div>
-            <div class="step-line" id="step-line-2"></div>
-            <div class="log-step-indicator" id="step-ind-3" onclick="goToLogStep(3)">
-              <div class="step-num">3</div>
-              <div class="step-label">Record & Photos</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="log-form">
-
-          <!-- ═══ STEP 1 — ESSENTIALS ═══ -->
-          <div class="log-step-panel active" id="log-step-1">
-
-          <!-- QUICK TEMPLATES -->
-          <div style="margin-bottom:20px;">
-            <div class="form-section-title" style="margin-bottom:12px">Quick Start — Pick a Template</div>
-            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;" id="template-grid">
-              <button class="template-card" onclick="applyTemplate('rct')">
-                <div class="template-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 2.5 1.5 4.5 3 6l1 5h6l1-5c1.5-1.5 3-3.5 3-6 0-4-3-7-7-7z"/><path d="M9 15h6"/></svg>
-                </div>
-                <div class="template-label">Routine RCT</div>
-                <div class="template-sub">Primary · NaOCl+EDTA · Warm Vertical</div>
-              </button>
-              <button class="template-card" onclick="applyTemplate('retreatment')">
-                <div class="template-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-5.5"/></svg>
-                </div>
-                <div class="template-label">Retreatment</div>
-                <div class="template-sub">Retreatment · NaOCl+EDTA+CHX</div>
-              </button>
-              <button class="template-card" onclick="applyTemplate('composite')">
-                <div class="template-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                </div>
-                <div class="template-label">Composite</div>
-                <div class="template-sub">Restorative · Composite · Rubber Dam</div>
-              </button>
-              <button class="template-card" onclick="applyTemplate('extraction')">
-                <div class="template-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M8 8c0-2.2 1.8-4 4-4s4 1.8 4 4c0 1.5-.8 2.8-2 3.5V22"/><path d="M9.5 8.5c0 1.4 1.1 2.5 2.5 2.5"/></svg>
-                </div>
-                <div class="template-label">Extraction</div>
-                <div class="template-sub">Surgery · Simple · Local Anaesthesia</div>
-              </button>
-              <button class="template-card" onclick="applyTemplate('ssc')">
-                <div class="template-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-1a6 6 0 0 1 12 0v1"/><path d="M9 13l-2 4h10l-2-4"/></svg>
-                </div>
-                <div class="template-label">Paeds SSC</div>
-                <div class="template-sub">Paediatric · Pulpotomy + Crown</div>
-              </button>
-            </div>
-            <div style="text-align:center; margin-top:10px;">
-              <button onclick="document.getElementById('template-grid').style.display='none'; this.parentElement.style.display='none';" style="background:none; border:none; color:var(--gray); font-size:0.8rem; cursor:pointer; font-family:'Inter',sans-serif;">or start from scratch →</button>
-            </div>
-          </div>
-
-          <!-- SPECIALTY SELECTOR -->
-          <div class="form-section-title">Specialty</div>
-          <div class="specialty-selector" style="grid-template-columns:repeat(2,1fr);">
-            <button class="specialty-btn active" onclick="selectSpecialty('endo', this)">
-              <span class="spec-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                  <path d="M8 2c-1.5 0-3 1.5-3 3.5 0 1.5.5 2.5 1 3.5L7 14h2l.5-3h1L11 14h2l1-5c.5-1 1-2 1-3.5C15 3.5 13.5 2 12 2c-1 0-1.8.5-2 1C9.8 2.5 9 2 8 2z"/>
-                  <line x1="10" y1="6" x2="10" y2="12" stroke-width="1"/>
-                  <line x1="12" y1="6" x2="12" y2="12" stroke-width="1"/>
-                </svg>
-              </span>
-              Endodontics
-            </button>
-            <button class="specialty-btn" onclick="selectSpecialty('restorative', this)">
-              <span class="spec-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                  <path d="M7 3h10c.5 0 1 .5 1 1v2c0 4-2 7-3 9v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4C8 13 6 10 6 6V4c0-.5.5-1 1-1z"/>
-                  <path d="M9 8h6" stroke-width="1.2"/>
-                  <path d="M9 11h4" stroke-width="1.2"/>
-                </svg>
-              </span>
-              Restorative
-            </button>
-            <button class="specialty-btn" onclick="selectSpecialty('surgery', this)">
-              <span class="spec-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                  <path d="M20 4L8 16"/>
-                  <path d="M20 4l-3 1-5 11-2 1 1-2 5-11 1-3 3 3z"/>
-                  <path d="M4 20l4-4"/>
-                  <circle cx="5.5" cy="18.5" r="1.5"/>
-                </svg>
-              </span>
-              Oral Surgery
-            </button>
-            <button class="specialty-btn" onclick="selectSpecialty('paeds', this)">
-              <span class="spec-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                  <circle cx="12" cy="7" r="3"/>
-                  <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
-                  <path d="M9 14s-2 1-2 3"/>
-                  <path d="M15 14s2 1 2 3"/>
-                </svg>
-              </span>
-              Paediatric
-            </button>
-            <button class="specialty-btn" onclick="selectSpecialty('prostho', this)">
-              <span class="spec-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                  <path d="M6 3h12a1 1 0 0 1 1 1v2a9 9 0 0 1-4 7.5V20a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-6.5A9 9 0 0 1 5 6V4a1 1 0 0 1 1-1z"/>
-                  <path d="M5 8h14" stroke-width="1.2"/>
-                  <path d="M10 8v5" stroke-width="1"/>
-                  <path d="M14 8v5" stroke-width="1"/>
-                </svg>
-              </span>
-              Prosthodontics
-            </button>
-            <button class="specialty-btn smile-spec-btn" onclick="selectSpecialty('smile', this)" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.05));border-color:rgba(251,191,36,0.25);">
-              <span class="spec-icon" style="background:rgba(251,191,36,0.12);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#FBB424" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
-                  <path d="M8 13s1.5 3 4 3 4-3 4-3"/>
-                  <line x1="9" y1="9" x2="9.01" y2="9" stroke-width="2.5" stroke-linecap="round"/>
-                  <line x1="15" y1="9" x2="15.01" y2="9" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </span>
-              <span style="color:#FBB424;font-weight:700;">✨ Smile Case</span>
-              <span style="display:block;font-size:0.6rem;color:rgba(251,191,36,0.5);margin-top:2px;font-weight:400;">Veneers · Bonding · Makeovers</span>
-            </button>
-          </div>
-
-          <!-- PATIENT INFO -->
-          <div class="form-section">
-            <div class="form-section-title">Patient Information</div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" id="age-label">Age Range</label>
-                <!-- Adult age dropdown — shown for endo/resto/surgery -->
-                <select class="form-select" id="f-age-select">
-                  <option value="">Select age range</option>
-                  <option>10-20</option><option>20-30</option><option>30-40</option>
-                  <option>40-50</option><option>50+</option>
-                </select>
-                <!-- Paeds age text input — shown for paeds -->
-                <input type="text" class="form-input" id="f-age-text" placeholder="e.g. 4 years, 7 years" style="display:none;">
-                <input type="hidden" id="f-age">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Chief Complaint</label>
-                <select class="form-select" id="f-complaint">
-                  <option value="">Select complaint</option>
-                  <option>Pain</option><option>Swelling</option><option>Sensitivity</option>
-                  <option>Routine</option><option>Trauma</option><option>Other</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group" id="tooth-selector-group">
-              <label class="form-label" id="tooth-selector-label">Select Tooth</label>
-              <div id="chart-mode-badge" style="display:none;margin-bottom:8px;background:rgba(124,111,255,0.08);border:1px solid rgba(124,111,255,0.2);border-radius:8px;padding:6px 12px;font-size:0.72rem;color:var(--teal);display:inline-flex;align-items:center;gap:6px;">
-                🧒 Showing primary dentition (FDI 51–85)
-              </div>
-              <div class="tooth-chart" id="tooth-chart-wrap">
-                <div class="arch-label">Upper Arch</div>
-                <div class="arch-container" id="upper-arch"></div>
-                <div class="arch-divider"></div>
-                <div class="arch-container" id="lower-arch"></div>
-                <div class="arch-label">Lower Arch</div>
-              </div>
-              <div id="selected-tooth-display" style="margin-top:8px; font-size:0.85rem; color:var(--teal); display:none;">
-                Selected: <span id="selected-tooth-text"></span>
-              </div>
-              <!-- SMILE ARCH SELECTOR — shown only for smile specialty -->
-              <div id="smile-arch-selector" style="display:none;margin-top:4px;">
-                <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:10px;">Which teeth are being treated?</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                  <button type="button" onclick="setSmileArch('upper',this)" style="padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Upper Arch</button>
-                  <button type="button" onclick="setSmileArch('lower',this)" style="padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Lower Arch</button>
-                  <button type="button" onclick="setSmileArch('both',this)" class="smile-arch-active" style="padding:11px;border-radius:12px;border:1px solid rgba(251,191,36,0.35);background:rgba(251,191,36,0.1);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;">Full Mouth ✨</button>
-                  <button type="button" onclick="setSmileArch('anterior',this)" style="padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">Anterior Only</button>
-                </div>
-              </div>
-              <input type="hidden" id="f-smile-arch" value="both">
-              <input type="hidden" id="f-tooth">
-            </div>
-          </div><!-- end patient info form-section -->
-
-          <!-- Step 1 next button -->
-          <div class="step-nav">
-            <button class="step-btn-next" onclick="goToLogStep(2)" id="step1-next-btn">Next — Clinical Details →</button>
-          </div>
-
-          </div><!-- end log-step-1 -->
-
-          <!-- ═══ STEP 2 — CLINICAL DETAILS ═══ -->
-          <div class="log-step-panel" id="log-step-2">
-
-          <!-- ENDO FIELDS -->
-          <div id="endo-fields">
-            <div class="form-section">
-              <div class="form-section-title">Diagnosis</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Pulp Diagnosis</label>
-                  <select class="form-select" id="f-pulp">
-                    <option value="">Select diagnosis</option>
-                    <option>Normal</option>
-                    <option>Reversible Pulpitis</option>
-                    <option>Irreversible Pulpitis</option>
-                    <option>Pulp Necrosis</option>
-                    <option>Previously Treated</option>
-                    <option>Previously Initiated</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Periapical Diagnosis</label>
-                  <select class="form-select" id="f-periapical">
-                    <option value="">Select diagnosis</option>
-                    <option>Normal</option>
-                    <option>Symptomatic Apical Periodontitis</option>
-                    <option>Asymptomatic Apical Periodontitis</option>
-                    <option>Acute Apical Abscess</option>
-                    <option>Chronic Apical Abscess</option>
-                    <option>Condensing Osteitis</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Case Type</label>
-                <select class="form-select" id="f-case-type">
-                  <option value="">Select type</option>
-                  <option>Primary Treatment</option>
-                  <option>Retreatment</option>
-                  <option>Apexification</option>
-                  <option>Pulpotomy</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <div class="form-section-title">Treatment Details</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Number of Canals</label>
-                  <select class="form-select" id="f-canals" onchange="updateCanalFields()">
-                    <option value="">Select</option>
-                    <option>1</option><option>2</option><option>3</option>
-                    <option>4</option><option>5</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Canal Curvature</label>
-                  <select class="form-select" id="f-curvature">
-                    <option value="">Select curvature</option>
-                    <option>Straight</option>
-                    <option>Slight</option>
-                    <option>Moderate</option>
-                    <option>Severe</option>
-                  </select>
-                  <div class="tip-box" id="tip-curvature">💡 Severe curvature above 30° — use pre-curved files and frequent recapitulation to avoid ledging.</div>
-                </div>
-              </div>
-
-              <div id="canal-wl-section" style="display:none">
-                <div class="form-section-title" style="margin-top:8px">Working Length per Canal</div>
-                <div class="tip-box" style="display:block; margin-bottom:12px">💡 Always confirm with both apex locator AND radiograph.</div>
-                <div id="canal-wl-fields"></div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Apical Size</label>
-                  <select class="form-select" id="f-apical">
-                    <option value="">Select size</option>
-                    <option>15</option><option>20</option><option>25</option>
-                    <option>30</option><option>35</option><option>40</option>
-                    <option>45</option><option>50</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Obturation Technique</label>
-                  <select class="form-select" id="f-obturation">
-                    <option value="">Select technique</option>
-                    <option>Cold Lateral</option>
-                    <option>Warm Vertical</option>
-                    <option>Single Cone</option>
-                    <option>Other</option>
-                  </select>
-                  <div class="tip-box" id="tip-obturation">💡 Single cone works best with matching taper. Ensure full canal coating with sealer before placing master cone.</div>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Irrigation Solution</label>
-                  <select class="form-select" id="f-irrigation">
-                    <option value="">Select solution</option>
-                    <option>NaOCl only</option>
-                    <option>NaOCl + EDTA</option>
-                    <option>NaOCl + EDTA + CHX</option>
-                    <option>Other</option>
-                  </select>
-                  <div class="tip-box" id="tip-irrigation">💡 NaOCl 2.5-5.25% is most effective. Always use a side-vented needle.</div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Calcification Present</label>
-                  <select class="form-select" id="f-calcification">
-                    <option value="">Select</option>
-                    <option>No</option>
-                    <option>Yes</option>
-                  </select>
-                  <div class="tip-box" id="tip-calcification">💡 Use EDTA gel before instrumentation. Patience and smaller file sizes prevent perforation.</div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Separated Instrument</label>
-                <select class="form-select" id="f-separated">
-                  <option value="">Select</option>
-                  <option>No</option>
-                  <option>Yes</option>
-                </select>
-                <div class="tip-box" id="tip-separated">💡 Document this immediately in the patient record. Note location, file type, and whether it affects prognosis.</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- RESTORATIVE FIELDS -->
-          <div id="restorative-fields" style="display:none">
-            <div class="form-section">
-              <div class="form-section-title">Restoration Details</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Cavity Classification</label>
-                  <select class="form-select" id="f-cavity-class">
-                    <option value="">Select class</option>
-                    <option>Class I</option><option>Class II</option><option>Class III</option>
-                    <option>Class IV</option><option>Class V</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Number of Surfaces</label>
-                  <select class="form-select" id="f-surfaces">
-                    <option value="">Select</option>
-                    <option>1 Surface</option><option>2 Surfaces</option>
-                    <option>3 Surfaces</option><option>4+ Surfaces</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Material Used</label>
-                  <select class="form-select" id="f-material">
-                    <option value="">Select material</option>
-                    <option>Composite</option><option>Amalgam</option>
-                    <option>Ceramic / Porcelain</option><option>GIC</option><option>Other</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Isolation Method</label>
-                  <select class="form-select" id="f-isolation">
-                    <option value="">Select method</option>
-                    <option>Rubber Dam</option>
-                    <option>Cotton Roll</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- SURGERY FIELDS -->
-          <div id="surgery-fields" style="display:none">
-            <div class="form-section">
-              <div class="form-section-title">Surgical Details</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Procedure Type</label>
-                  <select class="form-select" id="f-procedure">
-                    <option value="">Select procedure</option>
-                    <option>Simple Extraction</option>
-                    <option>Surgical Extraction</option>
-                    <option>Impacted Wisdom Tooth</option>
-                    <option>Biopsy</option>
-                    <option>Surgical Endodontics</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Impaction Level</label>
-                  <select class="form-select" id="f-impaction">
-                    <option value="">Select (if applicable)</option>
-                    <option>N/A</option>
-                    <option>Soft Tissue</option>
-                    <option>Partial Bony</option>
-                    <option>Full Bony</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Anaesthesia</label>
-                  <select class="form-select" id="f-anaesthesia">
-                    <option value="">Select</option>
-                    <option>Local — Infiltration</option>
-                    <option>Local — Block</option>
-                    <option>Local — Both</option>
-                    <option>General</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Sutures Placed</label>
-                  <select class="form-select" id="f-sutures">
-                    <option value="">Select</option>
-                    <option>No</option>
-                    <option>Yes — Resorbable</option>
-                    <option>Yes — Non-resorbable</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PAEDIATRIC FIELDS -->
-          <div id="paeds-fields" style="display:none">
-            <div class="form-section">
-              <div class="form-section-title">Tooth Type</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Dentition</label>
-                  <select class="form-select" id="f-dentition">
-                    <option value="">Select dentition</option>
-                    <option>Primary</option>
-                    <option>Mixed</option>
-                    <option>Permanent (young patient)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Behaviour Management</label>
-                  <select class="form-select" id="f-behaviour">
-                    <option value="">Select technique</option>
-                    <option>Tell-Show-Do</option>
-                    <option>Positive Reinforcement</option>
-                    <option>Distraction</option>
-                    <option>Nitrous Oxide Sedation</option>
-                    <option>IV Sedation</option>
-                    <option>General Anaesthesia</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <div class="form-section-title">Treatment Details</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Procedure</label>
-                  <select class="form-select" id="f-paeds-procedure">
-                    <option value="">Select procedure</option>
-                    <option>Pulpotomy</option>
-                    <option>Pulpectomy</option>
-                    <option>Indirect Pulp Cap</option>
-                    <option>Direct Pulp Cap</option>
-                    <option>Composite Restoration</option>
-                    <option>Stainless Steel Crown</option>
-                    <option>Strip Crown</option>
-                    <option>Glass Ionomer Restoration</option>
-                    <option>Extraction</option>
-                    <option>Fissure Sealant</option>
-                    <option>Fluoride Application</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Restoration Material</label>
-                  <select class="form-select" id="f-paeds-material">
-                    <option value="">Select material</option>
-                    <option>Stainless Steel Crown</option>
-                    <option>Composite</option>
-                    <option>GIC</option>
-                    <option>Strip Crown (composite)</option>
-                    <option>Amalgam</option>
-                    <option>N/A</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Pulp Status</label>
-                  <select class="form-select" id="f-paeds-pulp">
-                    <option value="">Select</option>
-                    <option>Vital — No symptoms</option>
-                    <option>Vital — Reversible pulpitis</option>
-                    <option>Non-vital</option>
-                    <option>Pulp exposure — carious</option>
-                    <option>Pulp exposure — mechanical</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Space Maintainer</label>
-                  <select class="form-select" id="f-space-maintainer">
-                    <option value="">Select</option>
-                    <option>Not required</option>
-                    <option>Band and Loop placed</option>
-                    <option>Distal shoe placed</option>
-                    <option>Nance appliance</option>
-                    <option>Required — referred</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Child Cooperation Level</label>
-                <select class="form-select" id="f-cooperation">
-                  <option value="">Select</option>
-                  <option>Definitely positive</option>
-                  <option>Positive</option>
-                  <option>Negative</option>
-                  <option>Definitely negative</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- PROSTHODONTICS FIELDS -->
-          <div id="prostho-fields" style="display:none">
-
-            <div class="form-section">
-              <div class="form-section-title">Prosthesis Type</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Type of Prosthesis</label>
-                  <select class="form-select" id="f-prostho-type">
-                    <option value="">Select type</option>
-                    <optgroup label="Fixed">
-                      <option>Single Crown</option>
-                      <option>Fixed Bridge (FPD)</option>
-                      <option>Implant Crown</option>
-                      <option>Implant-Supported Bridge</option>
-                      <option>Veneer</option>
-                      <option>Onlay / Overlay</option>
-                      <option>Inlay</option>
-                      <option>Post & Core + Crown</option>
-                      <option>Full Mouth Rehabilitation</option>
-                    </optgroup>
-                    <optgroup label="Removable">
-                      <option>Complete Denture (Upper)</option>
-                      <option>Complete Denture (Lower)</option>
-                      <option>Complete Dentures (Both)</option>
-                      <option>Partial Denture (RPD)</option>
-                      <option>Implant-Supported Overdenture</option>
-                      <option>Immediate Denture</option>
-                    </optgroup>
-                    <optgroup label="Other">
-                      <option>Occlusal Splint / Night Guard</option>
-                      <option>Obturator</option>
-                      <option>Provisional / Temporary</option>
-                    </optgroup>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Restoration Material</label>
-                  <select class="form-select" id="f-prostho-material">
-                    <option value="">Select material</option>
-                    <optgroup label="All-Ceramic">
-                      <option>Zirconia (monolithic)</option>
-                      <option>Zirconia (layered)</option>
-                      <option>e.max (lithium disilicate)</option>
-                      <option>Feldspathic porcelain</option>
-                      <option>Leucite-reinforced ceramic</option>
-                    </optgroup>
-                    <optgroup label="Metal-based">
-                      <option>PFM (Porcelain-fused-to-metal)</option>
-                      <option>Full metal (gold)</option>
-                      <option>Full metal (base metal)</option>
-                      <option>Metal framework (RPD)</option>
-                    </optgroup>
-                    <optgroup label="Resin-based">
-                      <option>PMMA (acrylic)</option>
-                      <option>Composite resin</option>
-                      <option>Hybrid ceramic (VITA Enamic)</option>
-                    </optgroup>
-                    <option>Mixed materials</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <div class="form-section-title">Clinical Assessment</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Occlusal Scheme</label>
-                  <select class="form-select" id="f-prostho-occlusion">
-                    <option value="">Select occlusal scheme</option>
-                    <option>Mutually Protected Occlusion</option>
-                    <option>Canine-Guided Occlusion</option>
-                    <option>Group Function</option>
-                    <option>Balanced Occlusion (complete dentures)</option>
-                    <option>Lingualized Occlusion</option>
-                    <option>Existing occlusion maintained</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Vertical Dimension</label>
-                  <select class="form-select" id="f-prostho-vdo">
-                    <option value="">Select</option>
-                    <option>Maintained — No change</option>
-                    <option>Increased — Minor (1-2mm)</option>
-                    <option>Increased — Moderate (3-4mm)</option>
-                    <option>Increased — Significant (5mm+)</option>
-                    <option>Decreased — Restored</option>
-                    <option>N/A — Single unit restoration</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Preparation Design</label>
-                  <select class="form-select" id="f-prostho-prep">
-                    <option value="">Select prep design</option>
-                    <option>Shoulder (90°)</option>
-                    <option>Chamfer</option>
-                    <option>Feather edge / Knife edge</option>
-                    <option>Deep chamfer</option>
-                    <option>Butt joint (onlay)</option>
-                    <option>Minimal prep / No prep (veneer)</option>
-                    <option>N/A — Implant / Denture</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Impression / Record</label>
-                  <select class="form-select" id="f-prostho-impression">
-                    <option value="">Select method</option>
-                    <option>Conventional (PVS / Polyether)</option>
-                    <option>Digital scan (intraoral scanner)</option>
-                    <option>Combination (scan + conventional)</option>
-                    <option>Facebow + semi-adjustable articulator</option>
-                    <option>Fully adjustable articulator</option>
-                    <option>N/A</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <div class="form-section-title">Treatment Stage</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Stage of Treatment</label>
-                  <select class="form-select" id="f-prostho-stage">
-                    <option value="">Select stage</option>
-                    <option>Treatment planning & consent</option>
-                    <option>Tooth preparation</option>
-                    <option>Temporization</option>
-                    <option>Impression / Digital scan</option>
-                    <option>Try-in / Verification</option>
-                    <option>Fit & Cementation / Bonding</option>
-                    <option>Review & Adjustments</option>
-                    <option>Complete — Single visit</option>
-                    <option>Complete — Multiple visits</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Number of Units</label>
-                  <select class="form-select" id="f-prostho-units">
-                    <option value="">Select</option>
-                    <option>1 unit</option>
-                    <option>2-3 units</option>
-                    <option>4-6 units</option>
-                    <option>7-10 units</option>
-                    <option>Full arch (11-14 units)</option>
-                    <option>Full mouth rehabilitation</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Temporization</label>
-                  <select class="form-select" id="f-prostho-temp">
-                    <option value="">Select</option>
-                    <option>Chairside temporary (PMMA)</option>
-                    <option>Lab-fabricated temporary</option>
-                    <option>CAD/CAM temporary</option>
-                    <option>No temporary — direct to final</option>
-                    <option>N/A</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Cementation / Bonding</label>
-                  <select class="form-select" id="f-prostho-cement">
-                    <option value="">Select</option>
-                    <option>Resin cement (adhesive)</option>
-                    <option>Resin-modified GIC</option>
-                    <option>Zinc phosphate</option>
-                    <option>Zinc oxide eugenol (temporary)</option>
-                    <option>Screw-retained (implant)</option>
-                    <option>N/A — Not yet cemented</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <div class="form-section-title">Aesthetics & Complications</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Aesthetic Outcome</label>
-                  <select class="form-select" id="f-prostho-aesthetic">
-                    <option value="">Select</option>
-                    <option>Excellent — Patient very satisfied</option>
-                    <option>Good — Minor adjustments made</option>
-                    <option>Acceptable — Patient satisfied</option>
-                    <option>Requires further adjustment</option>
-                    <option>N/A — Posterior / Non-aesthetic zone</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Complications</label>
-                  <select class="form-select" id="f-prostho-complications">
-                    <option value="">Select</option>
-                    <option>None</option>
-                    <option>Post-operative sensitivity</option>
-                    <option>Occlusal adjustment required</option>
-                    <option>Fracture of temporary</option>
-                    <option>Poor fit — remade</option>
-                    <option>Debonding / Recementation</option>
-                    <option>Aesthetic rejection by patient</option>
-                    <option>Abutment fracture</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-          </div><!-- end prostho-fields -->
-
-          <!-- ✨ SMILE CASE FIELDS -->
-          <div id="smile-fields" style="display:none">
-
-            <style>
-              .smile-upload-zone{border:2px dashed rgba(251,191,36,0.25);border-radius:18px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(251,191,36,0.03);}
-              .smile-upload-zone:hover{border-color:rgba(251,191,36,0.5);background:rgba(251,191,36,0.07);}
-              .smile-upload-zone.has-image{border-style:solid;border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.05);}
-              .smile-preview-img{width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:block;}
-              @keyframes smileGlow{0%,100%{box-shadow:0 0 20px rgba(251,191,36,0.15)}50%{box-shadow:0 0 40px rgba(251,191,36,0.3)}}
-            </style>
-
-            <!-- SMILE HERO HEADER -->
-            <div style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(251,146,60,0.05));border:1px solid rgba(251,191,36,0.2);border-radius:20px;padding:18px 20px;margin-bottom:20px;text-align:center;">
-              <div style="font-size:1.8rem;margin-bottom:8px;">✨</div>
-              <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:white;letter-spacing:-0.02em;margin-bottom:4px;">Smile Case</div>
-              <div style="font-size:0.72rem;color:rgba(251,191,36,0.6);line-height:1.5;">Upload your before & after. Provify generates a shareable reveal card and AI aesthetic analysis — the feature every cosmetic dentist has been waiting for.</div>
-            </div>
-
-            <!-- PROCEDURE TYPE -->
-            <div class="form-section">
-              <div class="form-section-title" style="color:#FBB424;">Procedure</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-                <button type="button" class="smile-proc-btn active-proc" onclick="setSmileProc('veneers',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(251,191,36,0.35);background:rgba(251,191,36,0.1);color:#FBB424;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
-                  💎 Veneers
-                </button>
-                <button type="button" class="smile-proc-btn" onclick="setSmileProc('bonding',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
-                  🎨 Composite Bonding
-                </button>
-                <button type="button" class="smile-proc-btn" onclick="setSmileProc('makeover',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
-                  ⭐ Full Smile Makeover
-                </button>
-                <button type="button" class="smile-proc-btn" onclick="setSmileProc('whitening',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
-                  ✨ Whitening
-                </button>
-                <button type="button" class="smile-proc-btn" onclick="setSmileProc('crowns',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
-                  👑 Ceramic Crowns
-                </button>
-                <button type="button" class="smile-proc-btn" onclick="setSmileProc('gingival',this)" style="padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
-                  🌿 Gingival Contouring
-                </button>
-              </div>
-              <input type="hidden" id="f-smile-proc" value="veneers">
-            </div>
-
-            <!-- DETAILS -->
-            <div class="form-section">
-              <div class="form-section-title" style="color:#FBB424;">Case Details</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Number of Units / Teeth</label>
-                  <select class="form-select" id="f-smile-units">
-                    <option value="">Select</option>
-                    <option>1</option><option>2</option><option>4</option>
-                    <option>6</option><option>8</option><option>10</option>
-                    <option>12+</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Shade Selected</label>
-                  <select class="form-select" id="f-smile-shade">
-                    <option value="">Select shade</option>
-                    <option>BL1 (Bleach Light)</option><option>BL2</option><option>BL3</option><option>BL4</option>
-                    <option>A1</option><option>A2</option><option>A3</option><option>A3.5</option><option>A4</option>
-                    <option>B1</option><option>B2</option><option>B3</option><option>B4</option>
-                    <option>C1</option><option>C2</option><option>C3</option><option>C4</option>
-                    <option>D2</option><option>D3</option><option>D4</option>
-                    <option>Custom / Lab matched</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Material</label>
-                  <select class="form-select" id="f-smile-material">
-                    <option value="">Select material</option>
-                    <option>E.max (Lithium Disilicate)</option>
-                    <option>Zirconia</option>
-                    <option>Composite Resin</option>
-                    <option>Feldspathic Porcelain</option>
-                    <option>PMMA (Temporary)</option>
-                    <option>Hybrid Ceramic</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Prep Type</label>
-                  <select class="form-select" id="f-smile-prep">
-                    <option value="">Select</option>
-                    <option>No Prep / Ultra-thin</option>
-                    <option>Minimal Prep</option>
-                    <option>Conventional Prep</option>
-                    <option>Full Coverage</option>
-                    <option>Not Applicable</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group" style="margin-top:8px;">
-                <label class="form-label">Digital Smile Design Used?</label>
-                <select class="form-select" id="f-smile-dsd">
-                  <option value="">Select</option>
-                  <option>Yes — DSD Protocol</option>
-                  <option>Yes — Software assisted</option>
-                  <option>No — Freehand design</option>
-                  <option>Mock-up only</option>
-                </select>
-              </div>
-            </div>
-
-
-
-            <!-- OUTCOME -->
-            <div class="form-section">
-              <div class="form-section-title" style="color:#FBB424;">Result</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Patient Satisfaction</label>
-                  <select class="form-select" id="f-smile-satisfaction">
-                    <option value="">Select</option>
-                    <option>Extremely happy — loved it</option>
-                    <option>Happy — met expectations</option>
-                    <option>Satisfied — minor adjustments</option>
-                    <option>Needed significant revision</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Sessions Required</label>
-                  <select class="form-select" id="f-smile-sessions">
-                    <option value="">Select</option>
-                    <option>1 session</option><option>2 sessions</option>
-                    <option>3 sessions</option><option>4+ sessions</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group" style="margin-top:8px;">
-                <label class="form-label">Clinical Notes (optional)</label>
-                <textarea class="form-input" id="f-smile-notes" rows="3" placeholder="e.g. Patient requested minimal prep, shade matched to existing laterals, slight characterisation added for natural appearance..." style="resize:vertical;line-height:1.6;"></textarea>
-              </div>
-            </div>
-
-          </div><!-- end smile-fields -->
-
-          <!-- Step 2 nav -->
-          <div class="step-nav">
-            <button class="step-btn-back" onclick="goToLogStep(1)">← Back</button>
-            <button class="step-btn-next" onclick="goToLogStep(3)">Next — Record & Photos →</button>
-          </div>
-
-          </div><!-- end log-step-2 -->
-
-          <!-- ═══ STEP 3 — RECORD & PHOTOS ═══ -->
-          <div class="log-step-panel" id="log-step-3">
-
-          <!-- SMILE PHOTO SECTION — only shown for smile specialty -->
-          <div id="smile-photo-step" style="display:none;">
-            <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.04));border:1px solid rgba(251,191,36,0.18);border-radius:20px;padding:18px;margin-bottom:20px;">
-              <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;margin-bottom:4px;">✨ Smile Case · Before & After</div>
-              <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:white;letter-spacing:-0.02em;margin-bottom:4px;">Upload your transformation photos</div>
-              <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);line-height:1.5;">These generate your shareable reveal card — the most powerful thing in your portfolio.</div>
-            </div>
-
-            <!-- BEFORE & AFTER SIDE BY SIDE -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-              <!-- BEFORE -->
-              <div>
-                <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;text-align:center;">Before</div>
-                <div id="smile-before-zone" onclick="document.getElementById('smile-before-input').click()" style="border:2px dashed rgba(255,255,255,0.12);border-radius:16px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);"
-                  onmouseover="this.style.borderColor='rgba(255,255,255,0.25)'"
-                  onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
-                  <img id="smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;border-radius:14px;">
-                  <div id="smile-before-placeholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                    <div style="font-size:2rem;">📷</div>
-                    <div style="font-size:0.65rem;color:rgba(255,255,255,0.25);">Tap to upload</div>
-                  </div>
-                </div>
-                <input type="file" id="smile-before-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('before',this)">
-              </div>
-
-              <!-- AFTER -->
-              <div>
-                <div style="font-size:0.6rem;color:rgba(251,191,36,0.65);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px;text-align:center;">After ✨</div>
-                <div id="smile-after-zone" onclick="document.getElementById('smile-after-input').click()" style="border:2px dashed rgba(251,191,36,0.25);border-radius:16px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;overflow:hidden;position:relative;background:rgba(251,191,36,0.03);"
-                  onmouseover="this.style.borderColor='rgba(251,191,36,0.5)'"
-                  onmouseout="this.style.borderColor='rgba(251,191,36,0.25)'">
-                  <img id="smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;border-radius:14px;">
-                  <div id="smile-after-placeholder" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                    <div style="font-size:2rem;">✨</div>
-                    <div style="font-size:0.65rem;color:rgba(251,191,36,0.4);">The result</div>
-                  </div>
-                </div>
-                <input type="file" id="smile-after-input" accept="image/*" style="display:none" onchange="handleSmilePhoto('after',this)">
-              </div>
-            </div>
-
-            <!-- Reveal preview banner -->
-            <div id="smile-reveal-preview" style="display:none;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.22);border-radius:14px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
-              <div style="font-size:1.2rem;">🎉</div>
-              <div>
-                <div style="font-size:0.75rem;color:#FBB424;font-weight:600;">Reveal card ready</div>
-                <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);">After logging you'll get a shareable before/after card</div>
-              </div>
-            </div>
-
-            <!-- Additional photos -->
-            <div style="margin-bottom:16px;">
-              <div style="font-size:0.6rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Additional angles (optional)</div>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-                <div onclick="document.getElementById('smile-extra1').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-                  <img id="smile-extra1-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
-                  <div id="smile-extra1-ph"><div style="font-size:1.3rem;">🦷</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.2);margin-top:3px;">Side</div></div>
-                  <input type="file" id="smile-extra1" accept="image/*" style="display:none" onchange="handleSmileExtra(1,this)">
-                </div>
-                <div onclick="document.getElementById('smile-extra2').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-                  <img id="smile-extra2-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
-                  <div id="smile-extra2-ph"><div style="font-size:1.3rem;">😊</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.2);margin-top:3px;">Full face</div></div>
-                  <input type="file" id="smile-extra2" accept="image/*" style="display:none" onchange="handleSmileExtra(2,this)">
-                </div>
-                <div onclick="document.getElementById('smile-extra3').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-                  <img id="smile-extra3-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
-                  <div id="smile-extra3-ph"><div style="font-size:1.3rem;">🔬</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.2);margin-top:3px;">Detail</div></div>
-                  <input type="file" id="smile-extra3" accept="image/*" style="display:none" onchange="handleSmileExtra(3,this)">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- X-RAYS (hidden for smile) -->
-          <div id="step3-clinical-content">
-          <div class="form-section">
-            <div class="form-section-title">X-Rays <span style="color:var(--teal); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">★ Pre-op required for Verified badge</span></div>
-            <div id="xray-endo">
-              <div class="xray-grid">
-                <div class="photo-slot" onclick="triggerUpload('xr-preop')">
-                  <div class="photo-slot-label">Pre-op</div>
-                  <div class="photo-slot-preview" id="prev-xr-preop">📷</div>
-                  <img class="photo-slot-img" id="img-xr-preop" style="display:none">
-                  <input type="file" id="xr-preop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-preop')">
-                </div>
-                <div class="photo-slot" onclick="triggerUpload('xr-wl')">
-                  <div class="photo-slot-label">Working Length</div>
-                  <div class="photo-slot-preview" id="prev-xr-wl">📷</div>
-                  <img class="photo-slot-img" id="img-xr-wl" style="display:none">
-                  <input type="file" id="xr-wl" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-wl')">
-                </div>
-                <div class="photo-slot" onclick="triggerUpload('xr-mc')">
-                  <div class="photo-slot-label">Master Cone</div>
-                  <div class="photo-slot-preview" id="prev-xr-mc">📷</div>
-                  <img class="photo-slot-img" id="img-xr-mc" style="display:none">
-                  <input type="file" id="xr-mc" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-mc')">
-                </div>
-                <div class="photo-slot" onclick="triggerUpload('xr-obturation')">
-                  <div class="photo-slot-label">Final Obturation</div>
-                  <div class="photo-slot-preview" id="prev-xr-obturation">📷</div>
-                  <img class="photo-slot-img" id="img-xr-obturation" style="display:none">
-                  <input type="file" id="xr-obturation" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-obturation')">
-                </div>
-                <div class="photo-slot" onclick="triggerUpload('xr-postop')">
-                  <div class="photo-slot-label">Post-op</div>
-                  <div class="photo-slot-preview" id="prev-xr-postop">📷</div>
-                  <img class="photo-slot-img" id="img-xr-postop" style="display:none">
-                  <input type="file" id="xr-postop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-postop')">
-                </div>
-              </div>
-            </div>
-            <div id="xray-general" style="display:none">
-              <div class="xray-grid">
-                <div class="photo-slot" onclick="triggerUpload('xr-gen-preop')">
-                  <div class="photo-slot-label">Pre-op X-Ray</div>
-                  <div class="photo-slot-preview" id="prev-xr-gen-preop">📷</div>
-                  <img class="photo-slot-img" id="img-xr-gen-preop" style="display:none">
-                  <input type="file" id="xr-gen-preop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-gen-preop')">
-                </div>
-                <div class="photo-slot" onclick="triggerUpload('xr-gen-postop')">
-                  <div class="photo-slot-label">Post-op X-Ray</div>
-                  <div class="photo-slot-preview" id="prev-xr-gen-postop">📷</div>
-                  <img class="photo-slot-img" id="img-xr-gen-postop" style="display:none">
-                  <input type="file" id="xr-gen-postop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'xr-gen-postop')">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CLINICAL PHOTOS -->
-          <div class="form-section">
-            <div class="form-section-title">Clinical Photos <span style="color:var(--gray); font-size:0.7rem; font-family:'Inter',sans-serif; font-weight:400">Optional</span></div>
-            <div class="xray-grid">
-              <div class="photo-slot" onclick="triggerUpload('cp-preop')">
-                <div class="photo-slot-label">Pre-op</div>
-                <div class="photo-slot-preview" id="prev-cp-preop">📷</div>
-                <img class="photo-slot-img" id="img-cp-preop" style="display:none">
-                <input type="file" id="cp-preop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'cp-preop')">
-              </div>
-              <div class="photo-slot" onclick="triggerUpload('cp-postop')">
-                <div class="photo-slot-label">Post-op</div>
-                <div class="photo-slot-preview" id="prev-cp-postop">📷</div>
-                <img class="photo-slot-img" id="img-cp-postop" style="display:none">
-                <input type="file" id="cp-postop" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'cp-postop')">
-              </div>
-              <div class="photo-slot" onclick="triggerUpload('cp-intraoral')">
-                <div class="photo-slot-label">Intraoral</div>
-                <div class="photo-slot-preview" id="prev-cp-intraoral">📷</div>
-                <img class="photo-slot-img" id="img-cp-intraoral" style="display:none">
-                <input type="file" id="cp-intraoral" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'cp-intraoral')">
-              </div>
-            </div>
-          </div>
-
-          <!-- OUTCOME -->
-          <div class="form-section">
-            <div class="form-section-title">Outcome</div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Post-op Symptoms</label>
-                <select class="form-select" id="f-postop">
-                  <option value="">Select</option>
-                  <option>None</option><option>Mild Pain</option>
-                  <option>Moderate Pain</option><option>Swelling</option><option>Other</option>
-                </select>
-                <div class="tip-box" id="tip-postop">💡 Mild pain for 48-72 hours is normal. Escalating pain after 72 hours warrants review.</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Follow-up Needed</label>
-                <select class="form-select" id="f-followup">
-                  <option value="">Select</option>
-                  <option>No</option><option>Yes — 1 week</option>
-                  <option>Yes — 1 month</option><option>Yes — 6 months</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Difficulty Rating</label>
-              <div class="star-rating" id="star-rating">
-                <span class="star" onclick="setRating(1)">★</span>
-                <span class="star" onclick="setRating(2)">★</span>
-                <span class="star" onclick="setRating(3)">★</span>
-                <span class="star" onclick="setRating(4)">★</span>
-                <span class="star" onclick="setRating(5)">★</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">
-                Case Narrative 
-                <span style="color:var(--teal); font-size:0.7rem">★ Highly Recommended</span>
-              </label>
-              <div style="background:var(--teal-dim); border:1px solid var(--teal-mid); border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:0.8rem; color:var(--gray); line-height:1.6;">
-                💡 <strong style="color:var(--white-dim)">Example:</strong> "A 35-year-old patient presented with spontaneous pain in the lower left. Diagnosis was irreversible pulpitis with symptomatic apical periodontitis on tooth 36. Treatment was completed in one visit under rubber dam isolation. Three canals were negotiated with moderate curvature in the mesial root. Patient was asymptomatic at review."
-              </div>
-              <textarea class="form-input" id="f-narrative" rows="5" placeholder="Tell the story of this case in your own words. This appears prominently in your portfolio and shows your clinical thinking..." style="resize:vertical; line-height:1.6"></textarea>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Personal Note <span style="color:var(--gray); font-size:0.7rem">Short internal note</span></label>
-              <input type="text" class="form-input" id="f-note" placeholder="One line about this case...">
-            </div>
-          </div>
-
-          <!-- MEDICO-LEGAL DOCUMENTATION -->
-          <div class="form-section" style="background:linear-gradient(135deg,rgba(124,111,255,0.06),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.2);border-radius:16px;padding:20px;">
-            <div class="form-section-title" style="color:var(--teal);border-bottom-color:rgba(124,111,255,0.2);">
-              🛡 Medico-Legal Record
-              <span style="margin-left:auto;font-size:0.65rem;color:var(--gray);text-transform:none;letter-spacing:0;font-weight:400;">Timestamped &amp; verifiable</span>
-            </div>
-            <div style="font-size:0.78rem;color:var(--gray);line-height:1.6;margin-bottom:16px;padding:10px 14px;background:rgba(124,111,255,0.04);border-radius:8px;border-left:3px solid rgba(124,111,255,0.3);">
-              This section creates a contemporaneous case record. Every entry is timestamped at the moment of submission and assigned a unique verifiable case ID.
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Informed Consent</label>
-                <select class="form-select" id="f-consent">
-                  <option value="">Select</option>
-                  <option>Verbal consent obtained</option>
-                  <option>Written consent obtained</option>
-                  <option>Consent form signed</option>
-                  <option>Emergency — consent not possible</option>
-                  <option>Guardian consent obtained</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Risks Discussed With Patient</label>
-                <select class="form-select" id="f-risks">
-                  <option value="">Select</option>
-                  <option>Yes — procedure risks discussed</option>
-                  <option>Yes — full risks and alternatives discussed</option>
-                  <option>Patient declined risk discussion</option>
-                  <option>Emergency — not applicable</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Complications <span style="color:var(--gray);font-size:0.7rem">If none, select None</span></label>
-              <select class="form-select" id="f-complications">
-                <option value="">Select</option>
-                <option>None</option>
-                <option>Haemorrhage — controlled</option>
-                <option>Instrument fracture — documented</option>
-                <option>Perforation — managed</option>
-                <option>Nerve paresthesia — noted</option>
-                <option>Oro-antral communication</option>
-                <option>Post-op infection</option>
-                <option>Referred for specialist management</option>
-                <option>Other — see narrative</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Clinician Declaration <span style="color:var(--gray);font-size:0.7rem">Optional free text</span></label>
-              <textarea class="form-input" id="f-declaration" rows="2" placeholder="e.g. Patient tolerated procedure well. All findings discussed. Patient advised to return if symptoms worsen..." style="resize:vertical;line-height:1.6;font-size:0.875rem;"></textarea>
-            </div>
-          </div>
-
-          </div><!-- end step3-clinical-content -->
-
-          <!-- Step 3 back button -->
-          <div style="margin-bottom:12px;">
-            <button class="step-btn-back" id="step3-back-btn" onclick="goToLogStep(selectedSpecialty==='smile'?1:2)">← Back</button>
-          </div>
-
-          <button class="btn btn-primary" onclick="submitCase()" id="submit-case-btn">
-            Log Case & Get AI Report →
-          </button>
-
-          </div><!-- end log-step-3 -->
-
-          <!-- AI REPORT -->
-          <div class="ai-report" id="ai-report">
-            <div class="ai-report-header">
-              <div class="ai-report-title">Case Intelligence Report</div>
-              <div class="verified-badge">✓ Verified</div>
-            </div>
-            <div class="complexity-display">
-              <div>
-                <div style="font-size: 0.75rem; color: var(--gray); margin-bottom: 4px;">Complexity Score</div>
-                <div class="complexity-number" id="report-score">—<span>/10</span></div>
-              </div>
-              <div class="complexity-bar" style="flex:1">
-                <div class="complexity-fill" id="report-bar" style="width:0%"></div>
-              </div>
-            </div>
-            <div id="report-insights"></div>
-            <div class="metrics-mini" id="report-metrics"></div>
-          </div>
-
-          <!-- AUTO CLINICAL NOTE — THE WOW MOMENT -->
-          <div id="auto-note-section" style="display:none;margin-top:20px;">
-
-            <!-- Reveal header -->
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:16px 20px;background:linear-gradient(135deg,rgba(52,211,153,0.08),rgba(52,211,153,0.02));border:1px solid rgba(52,211,153,0.2);border-radius:16px 16px 0 0;position:relative;overflow:hidden;">
-              <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.6),transparent);"></div>
-              <div style="width:40px;height:40px;border-radius:12px;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">📋</div>
-              <div style="flex:1;">
-                <div style="font-size:0.72rem;color:#34D399;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:3px;">Clinical Note — Ready</div>
-                <div style="font-size:0.8rem;color:var(--gray);">Paste directly into your hospital system — saves you 5–10 minutes</div>
-              </div>
-            </div>
-
-            <!-- Note content -->
-            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-top:none;border-radius:0 0 16px 16px;overflow:hidden;">
-              <div id="auto-note-text" style="padding:20px;font-size:0.875rem;color:var(--white-dim);line-height:1.9;font-family:'Inter',sans-serif;"></div>
-
-              <!-- Action bar -->
-              <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);display:flex;gap:10px;flex-wrap:wrap;">
-                <button onclick="copyAutoNote()" id="copy-note-btn" style="flex:1;background:linear-gradient(135deg,#34D399,#6EE7B7);color:#09090B;font-family:'Inter',sans-serif;font-size:0.875rem;font-weight:700;padding:12px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  Copy to clipboard — paste into hospital system
-                </button>
-                <button onclick="regenerateNote()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all 0.2s;" title="Regenerate note">
-                  ↺
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- THE GIFT — Verification share card -->
-          <div id="verification-share-card" style="display:none;margin-top:16px;background:linear-gradient(135deg,rgba(52,211,153,0.07),rgba(52,211,153,0.02));border:1px solid rgba(52,211,153,0.2);border-radius:16px;padding:20px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.6),transparent);"></div>
-            <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
-              <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🛡</div>
-              <div>
-                <div style="font-size:0.78rem;color:#34D399;font-weight:700;margin-bottom:4px;">This case is now permanently protected.</div>
-                <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);line-height:1.6;">Timestamped. Immutable. If this case is ever questioned — this link is your answer.</div>
-              </div>
-            </div>
-            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-              <div id="verify-url-display" style="font-size:0.72rem;color:#34D399;font-family:monospace;">provify.app/verify.html?id=...</div>
-              <button onclick="copyVerifyUrl()" style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);color:#34D399;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;">Copy Link</button>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button onclick="openVerifyPage()" style="flex:1;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);color:#34D399;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;">
-                Open Record →
-              </button>
-              <button onclick="shareVerifyWhatsApp()" style="flex:1;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);color:#25D366;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;">
-                Share via WhatsApp
-              </button>
-            </div>
-          </div>
-
+          <div style="font-size:0.62rem;color:rgba(255,255,255,0.26);line-height:1.55;">Every case you log is timestamped and tamper-proof. One tap generates a professional complaint response letter.</div>
         </div>
       </div>
-
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:32px;height:32px;border-radius:9px;background:rgba(123,110,232,0.1);border:1px solid rgba(123,110,232,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🏆</div>
+        <div>
+          <div style="font-size:0.76rem;color:rgba(255,255,255,0.82);font-weight:600;margin-bottom:3px;">When you apply for anything</div>
+          <div style="font-size:0.62rem;color:rgba(255,255,255,0.26);line-height:1.55;">Send a verified portfolio link showing your complexity growth. Employers have never seen anything like it.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:32px;height:32px;border-radius:9px;background:rgba(58,140,126,0.1);border:1px solid rgba(58,140,126,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🧠</div>
+        <div>
+          <div style="font-size:0.76rem;color:rgba(255,255,255,0.82);font-weight:600;margin-bottom:3px;">After every single case</div>
+          <div style="font-size:0.62rem;color:rgba(255,255,255,0.26);line-height:1.55;">AI tells you exactly what you did well, what to watch next time, and a clinical pearl. A mentor in your pocket.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <span onclick="showView('log')" style="font-size:0.7rem;color:rgba(123,110,232,0.4);cursor:pointer;text-decoration:underline;">Prefer typing? Use the manual form →</span>
+  </div>
+  <div id="career-teaser-card" style="display:none;"></div>
+</div>
       </div><!-- /view-dashboard -->
 
       <!-- CASES VIEW -->
@@ -6088,7 +4839,7 @@ async function loadDashboardReviews() {
             <div style="width:32px;height:32px;border-radius:50%;background:${isPatient ? 'rgba(245,158,11,0.12)' : 'rgba(124,111,255,0.12)'};display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0">${isPatient ? '👤' : '👨‍⚕️'}</div>
             <div>
               <div style="font-size:0.82rem;color:var(--white);font-weight:500">${r.reviewer_name || 'Anonymous'}</div>
-              <div style="font-size:0.68rem;color:var(--gray)">${isPatient ? 'Patient' : (r.reviewer_role || 'Peer Review')}${caseInfo ? (caseInfo.specialty === 'smile' ? ' · ' + (caseInfo.procedure || 'Smile Case') : (caseInfo.tooth_number ? ' · Tooth ' + caseInfo.tooth_number : '')) : ''}</div>
+              <div style="font-size:0.68rem;color:var(--gray)">${isPatient ? 'Patient' : (r.reviewer_role || 'Peer Review')}${caseInfo ? ' · Tooth ' + caseInfo.tooth_number : ''}</div>
             </div>
           </div>
           <div style="text-align:right">
@@ -10927,38 +9678,28 @@ function getMonthlyObjectives() {
 
 // ─── VALUE STRIP ───
 function renderValueStrip() {
-  const strip = document.getElementById('value-strip');
-  if (strip) strip.style.display = 'none'; // strip itself is hidden — we only update module text
-
+  const el = document.getElementById('value-strip');
+  if (el) el.style.display = 'none';
   const total = allCases.length;
   if (total === 0) return;
 
-  // Portfolio module text
-  const portEl = document.getElementById('val-portfolio-text');
-  if (portEl) portEl.innerHTML = `Verified<br>portfolio`;
-
-  // AI module text — show growth if available
   const grwEl = document.getElementById('val-growth-text');
-  if (grwEl) {
-    if (allCases.length >= 6) {
-      const now = new Date();
-      const thisMonth = allCases.filter(c => {
-        const d = new Date(c.created_at);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      }).length;
-      const lastMonth = allCases.filter(c => {
-        const d = new Date(c.created_at);
-        const lm = new Date(now.getFullYear(), now.getMonth() - 1);
-        return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
-      }).length;
-      const pct = lastMonth > 0 ? Math.min(999, Math.max(-99, Math.round(((thisMonth - lastMonth) / lastMonth) * 100))) : null;
-      const showPct = pct !== null && Math.abs(pct) <= 200;
-      grwEl.innerHTML = showPct
-        ? `<span style="color:rgba(58,140,126,0.9);font-size:1.1rem;font-weight:800;">${pct >= 0 ? '+' : ''}${pct}%</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.2);">vs last month</span>`
-        : `<span style="font-size:0.9rem;font-weight:700;color:rgba(58,140,126,0.8);">${thisMonth}</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.2);">this month</span>`;
-    } else {
-      grwEl.innerHTML = `Clinical<br>growth`;
-    }
+  const subEl = document.getElementById('val-portfolio-text');
+  if (grwEl && allCases.length >= 4) {
+    const now = new Date();
+    const tm = allCases.filter(c => { const d=new Date(c.created_at); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); }).length;
+    const lm = allCases.filter(c => { const d=new Date(c.created_at); const l=new Date(now.getFullYear(),now.getMonth()-1); return d.getMonth()===l.getMonth()&&d.getFullYear()===l.getFullYear(); }).length;
+    const pct = lm > 0 ? Math.min(200, Math.max(-99, Math.round(((tm-lm)/lm)*100))) : null;
+    const showPct = pct !== null && Math.abs(pct) <= 200;
+    grwEl.innerHTML = showPct
+      ? `<span style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(58,140,126,0.9);letter-spacing:-0.02em;">${pct>=0?'+':''}${pct}%</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.22);">trajectory</span>`
+      : `<span style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(58,140,126,0.85);">${tm}</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.22);">this month</span>`;
+    const specs = ['endo','restorative','surgery','paeds','prostho','smile'];
+    const dom = specs.map(s=>({s,n:allCases.filter(c=>c.specialty===s).length})).sort((a,b)=>b.n-a.n)[0];
+    const specNames = {endo:'Endodontics',restorative:'Restorative',surgery:'Surgery',paeds:'Paediatric',prostho:'Prosthodontics',smile:'Smile Cases'};
+    if (subEl && dom && dom.n > 0) subEl.innerHTML = `Strongest: ${specNames[dom.s]||dom.s}`;
+  } else if (grwEl) {
+    grwEl.innerHTML = `<span style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.6);">Clinical<br>growth</span>`;
   }
 }
 
@@ -11150,12 +9891,123 @@ function renderInactivityAlert() {
 // ─── PORTFOLIO TEASER CARD ───
 function renderPortfolioTeaserCard() {
   const el = document.getElementById('portfolio-teaser-card');
-  if (el) el.style.display = 'none'; // replaced by portfolio module in power modules
+  if (!el || allCases.length < 1) { if (el) el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const total = allCases.length;
+
+  // Build cumulative monthly data
+  const sorted = [...allCases].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  const monthMap = {};
+  sorted.forEach(c => {
+    const d = new Date(c.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    monthMap[key] = (monthMap[key] || 0) + 1;
+  });
+  const months = Object.keys(monthMap).sort().slice(-8);
+  let cumulative = 0;
+  const monthlyData = [];
+  // Get running total before our window
+  const windowStart = months[0];
+  sorted.forEach(c => {
+    const d = new Date(c.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if (key < windowStart) cumulative++;
+  });
+  months.forEach(m => {
+    cumulative += monthMap[m];
+    monthlyData.push(cumulative);
+  });
+
+  const maxVal = Math.max(...monthlyData, 1);
+  const W = 400, H = 60, PAD = 10;
+  const points = monthlyData.map((v, i) => ({
+    x: PAD + (i / Math.max(monthlyData.length-1,1)) * (W - PAD*2),
+    y: H - PAD - (v / maxVal) * (H - PAD*2)
+  }));
+  let path = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const mx = (points[i-1].x + points[i].x) / 2;
+    path += ` Q ${mx} ${points[i-1].y} ${points[i].x} ${points[i].y}`;
+  }
+  const fillPath = path + ` L ${points[points.length-1].x} ${H} L ${points[0].x} ${H} Z`;
+
+  el.innerHTML = `
+    <div onclick="viewMyPortfolio()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.18);border-radius:16px;padding:14px 18px;transition:all 0.2s;"
+      onmouseover="this.style.borderColor='rgba(124,111,255,0.4)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.13),rgba(124,111,255,0.06))'"
+      onmouseout="this.style.borderColor='rgba(124,111,255,0.18)';this.style.background='linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.03))'">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.9);"></div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">Verified Portfolio · ${total} cases</div>
+          <div style="font-size:0.62rem;color:rgba(124,111,255,0.5);">Shareable · Tamper-proof</div>
+        </div>
+      </div>
+      <div style="font-size:0.72rem;color:rgba(124,111,255,0.6);font-weight:600;">View →</div>
+    </div>`;
+
 }
 
+// ─── SKILL PROGRESS GRAPH ───
 function renderSkillProgressGraph() {
   const el = document.getElementById('skill-progress-card');
-  if (el) el.style.display = 'none';
+  if (!el || allCases.length < 2) { if (el) el.style.display = 'none'; return; }
+  el.style.display = 'block';
+
+  // Group cases by week for last 12 weeks
+  const now = new Date();
+  const weeks = [];
+  for (let i = 11; i >= 0; i--) {
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - (i * 7) - weekStart.getDay());
+    weekStart.setHours(0,0,0,0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const count = allCases.filter(c => {
+      const d = new Date(c.created_at);
+      return d >= weekStart && d < weekEnd;
+    }).length;
+    weeks.push({ label: weekStart.toLocaleDateString('en-GB', { day:'numeric', month:'short' }), count, weekStart });
+  }
+
+  const maxCount = Math.max(...weeks.map(w => w.count), 1);
+  const totalThisMonth = allCases.filter(c => {
+    const d = new Date(c.created_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const totalLastMonth = allCases.filter(c => {
+    const d = new Date(c.created_at);
+    const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
+  }).length;
+  const trend = totalThisMonth - totalLastMonth;
+  const trendSign = trend >= 0 ? '+' : '';
+  const trendColor = trend > 0 ? '#34D399' : trend === 0 ? '#F59E0B' : '#EF4444';
+
+  const avg = allCases.length > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / allCases.length).toFixed(1) : '—';
+
+  el.innerHTML = `
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);">
+        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:white;line-height:1;letter-spacing:-0.02em;">${allCases.length}</div>
+          <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">Total</div>
+        </div>
+        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#7C6FFF;line-height:1;letter-spacing:-0.02em;">${totalThisMonth}</div>
+          <div style="font-size:0.48rem;color:rgba(124,111,255,0.3);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">This Month</div>
+        </div>
+        <div style="padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.04);">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:${trendColor};line-height:1;letter-spacing:-0.02em;">${trendSign}${trend}</div>
+          <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">vs Last</div>
+        </div>
+        <div style="padding:16px 12px;text-align:center;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#F59E0B;line-height:1;letter-spacing:-0.02em;">${avg}</div>
+          <div style="font-size:0.48rem;color:rgba(245,158,11,0.3);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">Avg Score</div>
+        </div>
+      </div>
+    </div>`;
 }
 
 // ─── RANK PROGRESSION CARD ───
