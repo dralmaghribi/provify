@@ -2111,182 +2111,148 @@ body::after {
       <!-- DASHBOARD VIEW -->
       <div class="view active" id="view-dashboard">
 
-<!-- ═══════════════════════════════════════════════════
-     § 01  VOICE COMMAND HERO
-═══════════════════════════════════════════════════ -->
-<div class="ds" style="margin-bottom:14px;">
-<div style="position:relative;border-radius:30px;overflow:hidden;background:#060412;">
-  <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(123,110,232,0.11),transparent 45%,rgba(58,140,126,0.05));background-size:200% 200%;animation:bgdrift 20s ease infinite;"></div>
-  <div style="position:absolute;top:-90px;right:-70px;width:360px;height:360px;background:radial-gradient(circle,rgba(123,110,232,0.18) 0%,transparent 65%);animation:orb1 12s ease-in-out infinite;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:-70px;left:-50px;width:260px;height:260px;background:radial-gradient(circle,rgba(58,140,126,0.07) 0%,transparent 65%);animation:orb2 15s ease-in-out infinite;pointer-events:none;"></div>
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.013) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.013) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
-  <div style="position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.05),transparent);animation:streak 9s ease-in-out 3s infinite;pointer-events:none;"></div>
-  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.8),rgba(58,140,126,0.3),transparent);animation:topglow 5s ease-in-out infinite;z-index:3;"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,#060412,transparent);pointer-events:none;z-index:2;"></div>
+<!-- ═══ DASHBOARD ═══ -->
 
-  <!-- Status bar -->
-  <div style="position:relative;z-index:5;padding:15px 20px 0;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:7px;">
+<!-- § 1 · HERO -->
+<div class="ds" style="margin-bottom:16px;">
+<div style="position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(160deg,#07051a 0%,#060412 100%);">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;"></div>
+  <div style="position:absolute;top:-80px;right:-60px;width:340px;height:340px;background:radial-gradient(circle,rgba(123,110,232,0.16) 0%,transparent 65%);pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-60px;left:-40px;width:240px;height:240px;background:radial-gradient(circle,rgba(58,140,126,0.06) 0%,transparent 65%);pointer-events:none;"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.7),rgba(58,140,126,0.25),transparent);animation:topglow 5s ease-in-out infinite;z-index:2;"></div>
+
+  <!-- top bar -->
+  <div style="position:relative;z-index:3;padding:14px 18px 0;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:6px;">
       <div style="width:5px;height:5px;border-radius:50%;background:#3A8C7E;box-shadow:0 0 8px rgba(58,140,126,0.8);animation:blink 2.5s ease-in-out infinite;"></div>
-      <span style="font-size:0.44rem;color:rgba(58,140,126,0.55);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">Voice · Online</span>
+      <span style="font-size:0.43rem;color:rgba(58,140,126,0.5);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">Voice · Online</span>
     </div>
-    <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:4px 12px;border-radius:100px;">
-      <span id="dash-rank-icon" style="font-size:0.65rem;">⚡</span>
-      <span id="dash-ring-label" style="font-size:0.5rem;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.07em;">—</span>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:3px 11px;border-radius:100px;display:flex;align-items:center;gap:5px;">
+      <span id="dash-rank-icon" style="font-size:0.6rem;">⚡</span>
+      <span id="dash-ring-label" style="font-size:0.48rem;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.06em;">—</span>
     </div>
   </div>
 
-  <!-- Mic + headline -->
-  <div onclick="openVoiceLog()" id="voice-cta-area" style="position:relative;z-index:5;padding:36px 24px 30px;cursor:pointer;text-align:center;">
-    <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:30px;">
-      <div style="position:absolute;top:50%;left:50%;width:220px;height:220px;border-radius:50%;border:1px solid rgba(123,110,232,0.1);transform-origin:top left;animation:mpulse 3.5s ease-out 0s infinite;"></div>
-      <div style="position:absolute;top:50%;left:50%;width:168px;height:168px;border-radius:50%;border:1px solid rgba(123,110,232,0.17);transform-origin:top left;animation:mpulse 3.5s ease-out 0.87s infinite;"></div>
-      <div style="position:absolute;top:50%;left:50%;width:124px;height:124px;border-radius:50%;border:1px solid rgba(123,110,232,0.25);transform-origin:top left;animation:mpulse 3.5s ease-out 1.75s infinite;"></div>
-      <div style="position:absolute;width:106px;height:106px;border-radius:50%;border:1px solid rgba(123,110,232,0.14);"></div>
-      <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(145deg,#8C80F0 0%,#5A50C8 55%,#463EA8 100%);display:flex;align-items:center;justify-content:center;animation:mbreathe 3.5s ease-in-out infinite;position:relative;z-index:1;flex-shrink:0;">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+  <!-- mic + copy -->
+  <div onclick="openVoiceLog()" id="voice-cta-area" style="position:relative;z-index:3;padding:32px 20px 26px;cursor:pointer;text-align:center;">
+    <!-- mic orb -->
+    <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:26px;">
+      <div style="position:absolute;top:50%;left:50%;width:200px;height:200px;border-radius:50%;border:1px solid rgba(123,110,232,0.09);transform-origin:top left;animation:mpulse 3.5s ease-out 0s infinite;"></div>
+      <div style="position:absolute;top:50%;left:50%;width:154px;height:154px;border-radius:50%;border:1px solid rgba(123,110,232,0.15);transform-origin:top left;animation:mpulse 3.5s ease-out 0.87s infinite;"></div>
+      <div style="position:absolute;top:50%;left:50%;width:114px;height:114px;border-radius:50%;border:1px solid rgba(123,110,232,0.22);transform-origin:top left;animation:mpulse 3.5s ease-out 1.75s infinite;"></div>
+      <div style="width:84px;height:84px;border-radius:50%;background:linear-gradient(145deg,#8C80F0 0%,#5A50C8 55%,#463EA8 100%);display:flex;align-items:center;justify-content:center;animation:mbreathe 3.5s ease-in-out infinite;position:relative;z-index:1;flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
       </div>
     </div>
-    <div style="display:flex;align-items:flex-end;justify-content:center;height:26px;margin-bottom:24px;">
-      <span class="wv" style="height:4px;background:rgba(123,110,232,0.2);"></span>
-      <span class="wv" style="height:8px;background:rgba(123,110,232,0.3);"></span>
-      <span class="wv" style="height:14px;background:rgba(123,110,232,0.42);"></span>
-      <span class="wv" style="height:20px;background:rgba(123,110,232,0.6);"></span>
-      <span class="wv" style="height:26px;background:rgba(123,110,232,0.82);"></span>
-      <span class="wv" style="height:20px;background:rgba(123,110,232,0.6);"></span>
-      <span class="wv" style="height:14px;background:rgba(123,110,232,0.42);"></span>
-      <span class="wv" style="height:8px;background:rgba(123,110,232,0.3);"></span>
-      <span class="wv" style="height:4px;background:rgba(123,110,232,0.2);"></span>
+    <!-- waveform -->
+    <div style="display:flex;align-items:flex-end;justify-content:center;height:22px;margin-bottom:20px;gap:0;">
+      <span class="wv" style="height:3px;background:rgba(123,110,232,0.18);"></span>
+      <span class="wv" style="height:7px;background:rgba(123,110,232,0.28);"></span>
+      <span class="wv" style="height:13px;background:rgba(123,110,232,0.4);"></span>
+      <span class="wv" style="height:19px;background:rgba(123,110,232,0.58);"></span>
+      <span class="wv" style="height:22px;background:rgba(123,110,232,0.78);"></span>
+      <span class="wv" style="height:19px;background:rgba(123,110,232,0.58);"></span>
+      <span class="wv" style="height:13px;background:rgba(123,110,232,0.4);"></span>
+      <span class="wv" style="height:7px;background:rgba(123,110,232,0.28);"></span>
+      <span class="wv" style="height:3px;background:rgba(123,110,232,0.18);"></span>
     </div>
-    <div style="font-family:'Instrument Serif',serif;font-size:3rem;color:rgba(255,255,255,0.92);letter-spacing:-0.04em;line-height:0.92;margin-bottom:14px;">
+    <!-- headline -->
+    <div style="font-family:'Instrument Serif',serif;font-size:2.8rem;color:rgba(255,255,255,0.92);letter-spacing:-0.04em;line-height:0.92;margin-bottom:12px;">
       Speak.<br><em style="color:#9B8FF5;font-style:italic;">I'll handle</em><br>the rest.
     </div>
-    <div id="dash-hero-subtext" style="font-size:0.68rem;color:rgba(255,255,255,0.25);line-height:1.7;max-width:250px;margin:0 auto 26px;">
+    <div id="dash-hero-subtext" style="font-size:0.68rem;color:rgba(255,255,255,0.24);line-height:1.7;max-width:240px;margin:0 auto 22px;">
       Dictate the case. Provify documents, signs, and protects it before you finish.
     </div>
-    <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(123,110,232,0.15);border:1px solid rgba(123,110,232,0.38);padding:12px 26px;border-radius:100px;transition:all 0.2s;"
-      onmouseover="this.style.background='rgba(123,110,232,0.28)';this.style.transform='scale(1.04)'"
-      onmouseout="this.style.background='rgba(123,110,232,0.15)';this.style.transform='scale(1)'">
-      <span style="font-size:0.88rem;color:rgba(255,255,255,0.9);font-weight:700;">Start Speaking</span>
-      <span style="font-size:0.55rem;color:rgba(155,143,245,0.6);background:rgba(123,110,232,0.14);padding:3px 9px;border-radius:100px;">Hold Space</span>
+    <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(123,110,232,0.14);border:1px solid rgba(123,110,232,0.35);padding:11px 24px;border-radius:100px;transition:all 0.2s;"
+      onmouseover="this.style.background='rgba(123,110,232,0.26)';this.style.transform='scale(1.03)'"
+      onmouseout="this.style.background='rgba(123,110,232,0.14)';this.style.transform='scale(1)'">
+      <span style="font-size:0.85rem;color:rgba(255,255,255,0.88);font-weight:700;">Start Speaking</span>
+      <span style="font-size:0.52rem;color:rgba(155,143,245,0.55);background:rgba(123,110,232,0.12);padding:2px 8px;border-radius:100px;">Hold Space</span>
     </div>
   </div>
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     § 02  POWER MODULES
-═══════════════════════════════════════════════════ -->
-<div class="ds" style="margin-bottom:14px;">
-  <div style="font-size:0.42rem;color:rgba(255,255,255,0.1);text-transform:uppercase;letter-spacing:0.28em;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;"><span>Modules</span><span style="color:rgba(155,143,245,0.3);">3 active</span></div>
+<!-- § 2 · CORE MODULES (3 equal) -->
+<div class="ds" style="margin-bottom:16px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
 
-  <!-- SHIELD — full width warm -->
-  <div class="pm pm-warm" onclick="navToShield()" style="background:linear-gradient(130deg,rgba(196,113,58,0.08),rgba(160,80,30,0.03) 60%,transparent);border:1px solid rgba(196,113,58,0.16);border-radius:22px;padding:20px 22px 16px;margin-bottom:8px;box-shadow:0 4px 20px rgba(196,113,58,0.05);">
-    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,113,58,0.6),rgba(220,140,70,0.3),transparent);animation:modglow 3.5s ease-in-out infinite;"></div>
-    <div style="position:absolute;top:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(196,113,58,0.08),transparent 70%);pointer-events:none;"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:14px;">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(196,113,58,0.1);border:1px solid rgba(196,113,58,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(210,130,70,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
-        </div>
-        <div>
-          <div style="font-size:0.42rem;color:rgba(196,113,58,0.5);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Shield · Tamper-proof</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:rgba(255,255,255,0.88);letter-spacing:-0.02em;line-height:1.1;"><span id="micro-total-shield" style="color:rgba(196,113,58,0.75);">—</span> cases protected.</div>
-          <div style="font-size:0.56rem;color:rgba(255,255,255,0.2);margin-top:4px;">Complaint letter in 60s · One tap defence</div>
-        </div>
+    <!-- SHIELD -->
+    <div class="pm pm-warm" onclick="navToShield()" style="background:rgba(196,113,58,0.06);border:1px solid rgba(196,113,58,0.16);border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:0;min-height:130px;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,113,58,0.5),transparent);animation:modglow 4s ease-in-out infinite;"></div>
+      <div style="width:32px;height:32px;border-radius:9px;background:rgba(196,113,58,0.1);border:1px solid rgba(196,113,58,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:10px;flex-shrink:0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(210,130,70,0.85)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
       </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(196,113,58,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      <div style="font-size:0.4rem;color:rgba(196,113,58,0.45);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:5px;">Shield</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.15rem;color:rgba(255,255,255,0.85);line-height:1.1;margin-bottom:auto;">
+        <span id="micro-total-shield">—</span> cases<br>protected.
+      </div>
+      <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);margin-top:10px;line-height:1.5;">Complaint letter in 60s<br>One tap defence</div>
     </div>
-  </div>
-
-  <!-- PORTFOLIO + AI side by side 3fr/2fr -->
-  <div style="display:grid;grid-template-columns:3fr 2fr;gap:8px;">
 
     <!-- PORTFOLIO -->
-    <div class="pm pm-violet" onclick="viewMyPortfolio()" style="background:linear-gradient(145deg,rgba(123,110,232,0.1),rgba(80,65,190,0.04));border:1px solid rgba(123,110,232,0.16);border-radius:22px;padding:18px 16px 16px;box-shadow:0 4px 20px rgba(123,110,232,0.06);display:flex;flex-direction:column;min-height:165px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.7),transparent);animation:modglow 3.5s ease-in-out 1.2s infinite;"></div>
-      <div style="position:absolute;bottom:-20px;right:-15px;width:100px;height:100px;background:radial-gradient(circle,rgba(123,110,232,0.08),transparent 70%);pointer-events:none;"></div>
-      <div style="width:40px;height:40px;border-radius:11px;background:rgba(123,110,232,0.1);border:1px solid rgba(123,110,232,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(155,143,245,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="6" y1="8" x2="10" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/></svg>
+    <div class="pm pm-violet" onclick="viewMyPortfolio()" style="background:rgba(123,110,232,0.07);border:1px solid rgba(123,110,232,0.16);border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:0;min-height:130px;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,110,232,0.55),transparent);animation:modglow 4s ease-in-out 1.3s infinite;"></div>
+      <div style="width:32px;height:32px;border-radius:9px;background:rgba(123,110,232,0.1);border:1px solid rgba(123,110,232,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:10px;flex-shrink:0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(155,143,245,0.85)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
       </div>
-      <div style="font-size:0.42rem;color:rgba(123,110,232,0.45);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:4px;">Portfolio · Verified</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.85);line-height:1.15;flex:1;">
-        <span id="micro-total-port" style="color:rgba(123,110,232,0.7);">—</span> verified cases.
+      <div style="font-size:0.4rem;color:rgba(123,110,232,0.45);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:5px;">Portfolio</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.15rem;color:rgba(255,255,255,0.85);line-height:1.1;margin-bottom:auto;">
+        <span id="micro-total-port">—</span> verified<br>cases.
       </div>
-      <div style="font-size:0.52rem;color:rgba(255,255,255,0.2);margin-top:4px;line-height:1.5;">Shareable · Tamper-proof<br>Career-ready</div>
-      <div style="font-size:0.58rem;color:rgba(123,110,232,0.4);font-weight:600;margin-top:10px;">View →</div>
+      <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);margin-top:10px;line-height:1.5;">Shareable · Tamper-proof<br>Career-ready</div>
     </div>
 
     <!-- AI INSIGHT -->
-    <div class="pm pm-teal" onclick="showView('progress')" style="background:linear-gradient(145deg,rgba(58,140,126,0.09),rgba(30,100,88,0.03));border:1px solid rgba(58,140,126,0.14);border-radius:22px;padding:18px 14px 16px;box-shadow:0 4px 20px rgba(58,140,126,0.05);display:flex;flex-direction:column;min-height:165px;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(58,140,126,0.6),transparent);animation:modglow 3.5s ease-in-out 2.4s infinite;"></div>
-      <div style="width:40px;height:40px;border-radius:11px;background:rgba(58,140,126,0.1);border:1px solid rgba(58,140,126,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(70,175,158,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <div class="pm pm-teal" onclick="showView('progress')" style="background:rgba(58,140,126,0.06);border:1px solid rgba(58,140,126,0.14);border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:0;min-height:130px;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(58,140,126,0.5),transparent);animation:modglow 4s ease-in-out 2.6s infinite;"></div>
+      <div style="width:32px;height:32px;border-radius:9px;background:rgba(58,140,126,0.1);border:1px solid rgba(58,140,126,0.16);display:flex;align-items:center;justify-content:center;margin-bottom:10px;flex-shrink:0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(70,175,158,0.85)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
-      <div style="font-size:0.42rem;color:rgba(58,140,126,0.45);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:4px;">AI · Insight</div>
-      <div style="flex:1;" id="val-growth-text">
-        <span style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.85);line-height:1.2;">Clinical<br>growth</span>
-      </div>
-      <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:4px;line-height:1.5;" id="val-portfolio-text">Tracking your trajectory</div>
-      <!-- Mini waveform -->
-      <div style="display:flex;align-items:flex-end;gap:2px;height:18px;margin-top:10px;">
-        <span style="width:2px;height:4px;background:rgba(58,140,126,0.28);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.00s ease-in-out infinite;"></span>
-        <span style="width:2px;height:8px;background:rgba(58,140,126,0.4);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.14s ease-in-out infinite;"></span>
-        <span style="width:2px;height:14px;background:rgba(58,140,126,0.55);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.28s ease-in-out infinite;"></span>
-        <span style="width:2px;height:18px;background:rgba(58,140,126,0.75);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.42s ease-in-out infinite;"></span>
-        <span style="width:2px;height:12px;background:rgba(58,140,126,0.55);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.28s ease-in-out infinite;"></span>
-        <span style="width:2px;height:6px;background:rgba(58,140,126,0.35);border-radius:1px;display:inline-block;transform-origin:bottom;animation:wvbar 1.4s 0.14s ease-in-out infinite;"></span>
-      </div>
+      <div style="font-size:0.4rem;color:rgba(58,140,126,0.45);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:5px;">AI Insight</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.15rem;color:rgba(255,255,255,0.85);line-height:1.1;margin-bottom:auto;" id="val-growth-text">Clinical<br>growth.</div>
+      <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);margin-top:10px;line-height:1.5;" id="val-portfolio-text">Tracking trajectory</div>
     </div>
+
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     § 03  RECENT ACTIVITY
-═══════════════════════════════════════════════════ -->
-<div class="ds" id="last-case-strip" style="margin-bottom:14px;"></div>
+<!-- § 3 · RECENT ACTIVITY -->
+<div class="ds" id="last-case-strip" style="margin-bottom:16px;"></div>
 
-<!-- ═══════════════════════════════════════════════════
-     § 04  APRIL MISSION CONTROL
-═══════════════════════════════════════════════════ -->
-<div id="monthly-objectives" style="display:none;"></div>
+<!-- § 4 · MISSION CONTROL -->
+<div id="monthly-objectives" style="display:none;margin-bottom:16px;"></div>
 
-<!-- ═══════════════════════════════════════════════════
-     § 05  CAREER TRAJECTORY (RANK)
-═══════════════════════════════════════════════════ -->
-<div id="rank-progression-card" style="margin-bottom:14px;"></div>
+<!-- § 5 · CAREER TRAJECTORY -->
+<div id="rank-progression-card" style="margin-bottom:16px;"></div>
 
-<!-- ═══════════════════════════════════════════════════
-     § 06  CASE VAULT (replaces Proudest Cases)
-═══════════════════════════════════════════════════ -->
-<div class="ds" id="best-work-card" style="display:none;margin-bottom:14px;">
-  <div style="position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);">
-    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(185,155,70,0.4),transparent);"></div>
-    <div style="padding:16px 20px 8px;display:flex;align-items:center;justify-content:space-between;">
+<!-- § 6 · CASE VAULT -->
+<div class="ds" id="best-work-card" style="display:none;margin-bottom:16px;">
+  <div style="position:relative;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(185,155,70,0.35),transparent);"></div>
+    <div style="padding:15px 18px 6px;display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-size:0.42rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;margin-bottom:4px;">Case Vault</div>
-        <div style="font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(255,255,255,0.7);letter-spacing:-0.02em;">Your best work. Verified.</div>
+        <div style="font-size:0.4rem;color:rgba(255,255,255,0.13);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;margin-bottom:3px;">Case Vault</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Your best work. Pinned &amp; verified.</div>
       </div>
-      <div style="font-size:1rem;opacity:0.5;">✦</div>
+      <div style="font-size:0.85rem;color:rgba(185,155,70,0.35);">✦</div>
     </div>
-    <div id="best-work-list" style="padding:0 20px 16px;display:flex;flex-direction:column;gap:8px;"></div>
+    <div id="best-work-list" style="padding:8px 18px 14px;display:flex;flex-direction:column;gap:8px;"></div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     § 07  REVIEWS
-═══════════════════════════════════════════════════ -->
-<div class="ds" id="dashboard-reviews-card" style="display:none;margin-bottom:14px;">
-  <div style="position:relative;border-radius:20px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);padding:18px 20px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div style="font-size:0.44rem;color:rgba(255,255,255,0.14);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;">Reviews</div>
-      <div id="dashboard-avg-rating" style="font-size:0.82rem;color:rgba(196,113,58,0.8);font-weight:600;"></div>
+<!-- § 7 · REVIEWS -->
+<div class="ds" id="dashboard-reviews-card" style="display:none;margin-bottom:16px;">
+  <div style="position:relative;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);padding:15px 18px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:0.4rem;color:rgba(255,255,255,0.13);text-transform:uppercase;letter-spacing:0.26em;font-weight:700;">Reviews</div>
+      <div id="dashboard-avg-rating" style="font-size:0.75rem;color:rgba(185,155,70,0.7);font-weight:600;"></div>
     </div>
     <div id="dashboard-reviews-list" style="display:flex;flex-direction:column;gap:10px;"></div>
   </div>
 </div>
 
-<!-- hidden legacy containers -->
+<!-- hidden legacy IDs required by JS -->
 <div id="portfolio-teaser-card" style="display:none;"></div>
 <div id="skill-progress-card" style="display:none;"></div>
 <div id="micro-total" style="display:none;">0</div>
@@ -2294,38 +2260,36 @@ body::after {
 <div id="micro-rank" style="display:none;">—</div>
 <div id="micro-streak" style="display:none;">0</div>
 
-<!-- ═══════════════════════════════════════════════════
-     § 08  EMPTY / WELCOME STATE
-═══════════════════════════════════════════════════ -->
+<!-- § 8 · WELCOME / EMPTY STATE -->
 <div id="welcome-card" style="display:none;margin-bottom:16px;">
-  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:22px;margin-bottom:10px;">
-    <div style="font-size:0.54rem;color:rgba(255,255,255,0.16);text-transform:uppercase;letter-spacing:0.16em;margin-bottom:16px;font-weight:600;">Why Provify</div>
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:20px;margin-bottom:10px;">
+    <div style="font-size:0.5rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.16em;margin-bottom:14px;font-weight:600;">Why Provify</div>
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div style="display:flex;align-items:flex-start;gap:12px;">
-        <div style="width:32px;height:32px;border-radius:9px;background:rgba(196,113,58,0.1);border:1px solid rgba(196,113,58,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🛡️</div>
+        <div style="width:30px;height:30px;border-radius:8px;background:rgba(196,113,58,0.1);border:1px solid rgba(196,113,58,0.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;">🛡️</div>
         <div>
-          <div style="font-size:0.76rem;color:rgba(255,255,255,0.82);font-weight:600;margin-bottom:3px;">If a patient ever complains</div>
-          <div style="font-size:0.62rem;color:rgba(255,255,255,0.26);line-height:1.55;">Every case you log is timestamped and tamper-proof. One tap generates a professional complaint response letter.</div>
+          <div style="font-size:0.74rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">If a patient ever complains</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.24);line-height:1.55;">Every case is timestamped and tamper-proof. One tap generates a professional complaint response.</div>
         </div>
       </div>
       <div style="display:flex;align-items:flex-start;gap:12px;">
-        <div style="width:32px;height:32px;border-radius:9px;background:rgba(123,110,232,0.1);border:1px solid rgba(123,110,232,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🏆</div>
+        <div style="width:30px;height:30px;border-radius:8px;background:rgba(123,110,232,0.1);border:1px solid rgba(123,110,232,0.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;">🏆</div>
         <div>
-          <div style="font-size:0.76rem;color:rgba(255,255,255,0.82);font-weight:600;margin-bottom:3px;">When you apply for anything</div>
-          <div style="font-size:0.62rem;color:rgba(255,255,255,0.26);line-height:1.55;">Send a verified portfolio link showing your complexity growth. Employers have never seen anything like it.</div>
+          <div style="font-size:0.74rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">When you apply for anything</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.24);line-height:1.55;">Send a verified portfolio link showing your growth. Employers have never seen anything like it.</div>
         </div>
       </div>
       <div style="display:flex;align-items:flex-start;gap:12px;">
-        <div style="width:32px;height:32px;border-radius:9px;background:rgba(58,140,126,0.1);border:1px solid rgba(58,140,126,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🧠</div>
+        <div style="width:30px;height:30px;border-radius:8px;background:rgba(58,140,126,0.1);border:1px solid rgba(58,140,126,0.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;">🧠</div>
         <div>
-          <div style="font-size:0.76rem;color:rgba(255,255,255,0.82);font-weight:600;margin-bottom:3px;">After every single case</div>
-          <div style="font-size:0.62rem;color:rgba(255,255,255,0.26);line-height:1.55;">AI tells you exactly what you did well, what to watch next time, and a clinical pearl. A mentor in your pocket.</div>
+          <div style="font-size:0.74rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">After every case</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.24);line-height:1.55;">AI gives you a strength, a watch point, and a clinical pearl. A mentor in your pocket.</div>
         </div>
       </div>
     </div>
   </div>
-  <div style="text-align:center;">
-    <span onclick="showView('log')" style="font-size:0.7rem;color:rgba(123,110,232,0.4);cursor:pointer;text-decoration:underline;">Prefer typing? Use the manual form →</span>
+  <div style="text-align:center;margin-top:4px;">
+    <span onclick="showView('log')" style="font-size:0.68rem;color:rgba(123,110,232,0.35);cursor:pointer;text-decoration:underline;">Prefer typing? Use the manual form →</span>
   </div>
   <div id="career-teaser-card" style="display:none;"></div>
 </div>
@@ -9678,28 +9642,37 @@ function getMonthlyObjectives() {
 
 // ─── VALUE STRIP ───
 function renderValueStrip() {
-  const el = document.getElementById('value-strip');
-  if (el) el.style.display = 'none';
+  const strip = document.getElementById('value-strip');
+  if (strip) strip.style.display = 'none'; // strip itself is hidden — we only update module text
+
   const total = allCases.length;
   if (total === 0) return;
 
+  // Portfolio module text
+  const portEl = document.getElementById('val-portfolio-text');
+  if (portEl) portEl.innerHTML = `Verified<br>portfolio`;
+
+  // AI module text — show growth if available
   const grwEl = document.getElementById('val-growth-text');
-  const subEl = document.getElementById('val-portfolio-text');
-  if (grwEl && allCases.length >= 4) {
-    const now = new Date();
-    const tm = allCases.filter(c => { const d=new Date(c.created_at); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); }).length;
-    const lm = allCases.filter(c => { const d=new Date(c.created_at); const l=new Date(now.getFullYear(),now.getMonth()-1); return d.getMonth()===l.getMonth()&&d.getFullYear()===l.getFullYear(); }).length;
-    const pct = lm > 0 ? Math.min(200, Math.max(-99, Math.round(((tm-lm)/lm)*100))) : null;
-    const showPct = pct !== null && Math.abs(pct) <= 200;
-    grwEl.innerHTML = showPct
-      ? `<span style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(58,140,126,0.9);letter-spacing:-0.02em;">${pct>=0?'+':''}${pct}%</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.22);">trajectory</span>`
-      : `<span style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(58,140,126,0.85);">${tm}</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.22);">this month</span>`;
-    const specs = ['endo','restorative','surgery','paeds','prostho','smile'];
-    const dom = specs.map(s=>({s,n:allCases.filter(c=>c.specialty===s).length})).sort((a,b)=>b.n-a.n)[0];
-    const specNames = {endo:'Endodontics',restorative:'Restorative',surgery:'Surgery',paeds:'Paediatric',prostho:'Prosthodontics',smile:'Smile Cases'};
-    if (subEl && dom && dom.n > 0) subEl.innerHTML = `Strongest: ${specNames[dom.s]||dom.s}`;
-  } else if (grwEl) {
-    grwEl.innerHTML = `<span style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.6);">Clinical<br>growth</span>`;
+  if (grwEl) {
+    if (allCases.length >= 6) {
+      const now = new Date();
+      const thisMonth = allCases.filter(c => {
+        const d = new Date(c.created_at);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }).length;
+      const lastMonth = allCases.filter(c => {
+        const d = new Date(c.created_at);
+        const lm = new Date(now.getFullYear(), now.getMonth() - 1);
+        return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
+      }).length;
+      const pct = lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : null;
+      grwEl.innerHTML = pct !== null
+        ? `<span style="color:rgba(58,140,126,0.9);font-size:1.1rem;font-weight:800;">${pct >= 0 ? '+' : ''}${pct}%</span><br><span style="font-size:0.46rem;color:rgba(255,255,255,0.2);">vs last month</span>`
+        : `Clinical<br>growth`;
+    } else {
+      grwEl.innerHTML = `Clinical<br>growth`;
+    }
   }
 }
 
