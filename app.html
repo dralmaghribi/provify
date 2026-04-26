@@ -2557,31 +2557,13 @@ body::after {
         <!-- BOTTOM 2-COL: Top case + Patient reviews -->
         <div class="db-bottom-grid db-section">
 
-          <!-- Top case this month -->
+          <!-- Top case / pinned cases -->
           <div>
             <div class="db-section-header">
-              <span class="db-section-title">Top case this month</span>
+              <span class="db-section-title">Top cases<span id="db-pin-hint" style="font-size:11px;color:rgba(240,239,254,0.25);font-weight:400;margin-left:6px;"></span></span>
               <span class="db-status-pill gold" style="font-size:11px;" id="db-top-case-label">⭐ Best of month</span>
             </div>
-            <div class="db-top-case-card" id="db-top-case-card" onclick="" style="cursor:pointer;">
-              <div class="db-top-case-img" id="db-top-case-img">
-                <div class="db-top-case-img-glow"></div>
-                <div class="db-top-case-img-art" id="db-top-case-art">🦷</div>
-                <span class="db-top-case-badge" id="db-top-case-badge">—</span>
-                <span class="db-top-case-meta" id="db-top-case-meta">—</span>
-              </div>
-              <div class="db-top-case-body">
-                <div class="db-top-case-label">Highest complexity this month</div>
-                <div class="db-top-case-title" id="db-top-case-title">No cases yet</div>
-                <div class="db-top-case-footer">
-                  <div class="db-complexity-pill" id="db-top-case-score">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
-                    Score — / 10
-                  </div>
-                  <span class="db-top-case-date" id="db-top-case-date">—</span>
-                </div>
-              </div>
-            </div>
+            <div id="db-top-cases-container" style="display:flex;flex-direction:column;gap:10px;"></div>
           </div>
 
           <!-- Patient feedback — REAL reviews only, no fake data -->
@@ -10526,8 +10508,8 @@ function togglePinCase(caseId) {
     pinned.splice(idx, 1);
     showToast('Removed from Proudest Cases');
   }
-  // Cap at 5 pinned cases
-  const capped = pinned.slice(0, 5);
+  // Cap at 3 pinned cases
+  const capped = pinned.slice(0, 3);
   localStorage.setItem('provify_pinned_cases', JSON.stringify(capped));
   updatePinButton(caseId);
   loadBestWork();
@@ -10922,69 +10904,79 @@ function renderNewRankCard() {
 }
 
 function renderTopCaseThisMonth(thisMonth) {
-  // Use pinned cases first (user's deliberate choice), fall back to highest complexity this month
+  const container = document.getElementById('db-top-cases-container');
+  const labelEl = document.getElementById('db-top-case-label');
+  const hintEl = document.getElementById('db-pin-hint');
+  if (!container) return;
+
   const pinnedIds = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
-  
-  let top = null;
-  let isPinned = false;
+  const pinnedCases = pinnedIds.map(id => allCases.find(c => c.id === id)).filter(Boolean).slice(0, 3);
+  const isPinned = pinnedCases.length > 0;
 
-  // Try to find the most recently pinned case that exists in allCases
-  for (const id of pinnedIds) {
-    const c = allCases.find(x => x.id === id);
-    if (c) { top = c; isPinned = true; break; }
+  // Fallback: best complexity this month
+  let casesToShow = pinnedCases;
+  if (!isPinned && thisMonth && thisMonth.length > 0) {
+    casesToShow = [[...thisMonth].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))[0]];
   }
 
-  // Fall back to highest complexity this month
-  if (!top && thisMonth && thisMonth.length > 0) {
-    top = [...thisMonth].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))[0];
+  if (!casesToShow.length) {
+    container.innerHTML = `<div style="text-align:center;padding:32px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;color:rgba(240,239,254,0.25);font-size:13px;">No cases pinned yet.<br><span style="font-size:12px;margin-top:4px;display:block;">Open any case → tap ✦ Pin to Proudest Cases</span></div>`;
+    if (labelEl) labelEl.textContent = '✦ Pin a case';
+    if (hintEl) hintEl.textContent = '';
+    return;
   }
 
-  if (!top) return;
+  if (labelEl) labelEl.textContent = isPinned ? `✦ ${pinnedCases.length} pinned` : '⭐ Best of month';
+  if (hintEl) hintEl.textContent = isPinned ? '' : '· Pin a case to feature it here';
 
   const specLabel = { endo:'ENDO', restorative:'RESTO', surgery:'SURG', paeds:'PAEDS', smile:'SMILE', prostho:'PROSTHO' };
-  const specArt = { endo:'⚙️', restorative:'✨', surgery:'🔪', paeds:'🧒', smile:'😁', prostho:'👑' };
-  const title = top.specialty === 'smile'
-    ? (top.procedure || 'Smile Case')
-    : (top.procedure || top.case_type || `Tooth ${top.tooth_number || '—'}`);
-  const date = new Date(top.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-  const shortDate = new Date(top.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+  const specArt   = { endo:'⚙️', restorative:'✨', surgery:'🔪', paeds:'🧒', smile:'😁', prostho:'👑' };
+  const specCol   = { endo:'rgba(124,111,205,0.25)', restorative:'rgba(245,158,11,0.2)', surgery:'rgba(239,68,68,0.2)', paeds:'rgba(52,211,153,0.2)', smile:'rgba(212,168,67,0.25)', prostho:'rgba(56,189,248,0.2)' };
 
-  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setEl('db-top-case-badge', specLabel[top.specialty] || 'CASE');
-  setEl('db-top-case-art', specArt[top.specialty] || '🦷');
-  setEl('db-top-case-meta', shortDate);
-  setEl('db-top-case-title', title);
-  setEl('db-top-case-date', date);
+  container.innerHTML = casesToShow.map((c, i) => {
+    const title = c.specialty === 'smile'
+      ? (c.procedure || 'Smile Case')
+      : (c.procedure || c.case_type || `Tooth ${c.tooth_number || '—'}`);
+    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const shortDate = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    const badge = specLabel[c.specialty] || 'CASE';
+    const art = specArt[c.specialty] || '🦷';
+    const bgCol = specCol[c.specialty] || 'rgba(124,111,205,0.2)';
+    const score = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
 
-  const scoreEl = document.getElementById('db-top-case-score');
-  if (scoreEl) scoreEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg> Score ${top.complexity_score ? top.complexity_score.toFixed(1) : '—'} / 10`;
+    // Pick first available photo
+    let photoUrl = null;
+    if (c.photo_urls && typeof c.photo_urls === 'object') {
+      photoUrl = Object.values(c.photo_urls).find(v => v && typeof v === 'string') || null;
+    }
 
-  const card = document.getElementById('db-top-case-card');
-  if (card) card.onclick = () => openCaseDetail(top.id);
+    const imgContent = photoUrl
+      ? `<img src="${photoUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border-radius:16px 16px 0 0;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+         <div style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:42px;opacity:0.5;">${art}</div>`
+      : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;opacity:0.5;">${art}</div>`;
 
-  // Label reflects whether it's pinned or auto-selected
-  const labelEl = document.getElementById('db-top-case-label');
-  const now = new Date();
-  if (labelEl) {
-    labelEl.textContent = isPinned
-      ? '✦ Pinned by you'
-      : `⭐ Best of ${now.toLocaleDateString('en-GB', { month:'long' })}`;
-  }
-
-  // Section header hint
-  const sectionTitle = document.querySelector('#db-top-case-card')?.closest('.db-bottom-grid')?.previousElementSibling?.querySelector('.db-section-title');
-  // Show a subtle hint to pin if not pinned yet
-  const hintEl = document.getElementById('db-pin-hint');
-  if (!hintEl) {
-    const hint = document.createElement('span');
-    hint.id = 'db-pin-hint';
-    hint.style.cssText = 'font-size:11px;color:rgba(240,239,254,0.25);margin-left:6px;';
-    hint.textContent = isPinned ? '' : '· Pin a case to feature it here';
-    const titleEl = document.querySelector('.db-section-header .db-section-title');
-    if (titleEl && titleEl.textContent === 'Top case this month') titleEl.after(hint);
-  } else {
-    hintEl.textContent = isPinned ? '' : '· Pin a case to feature it here';
-  }
+    return `
+      <div class="db-top-case-card" onclick="openCaseDetail('${c.id}')" style="cursor:pointer;">
+        <div class="db-top-case-img" style="background:linear-gradient(135deg,#1a1428 0%,${bgCol} 50%,#1a1428 100%);position:relative;overflow:hidden;border-radius:16px 16px 0 0;">
+          <div class="db-top-case-img-glow"></div>
+          ${imgContent}
+          <span class="db-top-case-badge">${badge}</span>
+          <span class="db-top-case-meta">${shortDate}</span>
+          ${isPinned ? `<span style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(212,168,67,0.8);background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:20px;white-space:nowrap;backdrop-filter:blur(4px);">${i===0?'✦ Featured':'✦ Pinned'}</span>` : ''}
+        </div>
+        <div class="db-top-case-body">
+          <div class="db-top-case-label">${isPinned ? 'Pinned by you' : 'Highest complexity this month'}</div>
+          <div class="db-top-case-title">${title}</div>
+          <div class="db-top-case-footer">
+            <div class="db-complexity-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+              Score ${score} / 10
+            </div>
+            <span class="db-top-case-date">${date}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 async function renderDashboardReviews() {
