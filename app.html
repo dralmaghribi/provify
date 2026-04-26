@@ -1198,96 +1198,15 @@ body::after {
 .db-reviews-empty { text-align:center; padding:20px 14px; color:rgba(240,239,254,0.22); font-size:12px; line-height:1.6; }
 .db-reviews-empty-icon { font-size:22px; margin-bottom:6px; opacity:0.3; }
 @media(max-width:900px) {
-  .db-stat-grid { grid-template-columns:repeat(2,1fr); }
-  .db-bottom-grid { grid-template-columns:1fr; }
+  #view-dashboard .db-stat-grid { grid-template-columns:repeat(2,1fr); }
+  #view-dashboard .db-bottom-grid { grid-template-columns:1fr; }
   .pd-micro-grid { grid-template-columns:repeat(2,1fr); }
-  .db-hero { padding:32px 24px 36px; }
-  .db-hero-title { font-size:36px; }
-  .db-portfolio-strip { grid-template-columns:repeat(2,1fr); }
-  .db-strip-item:nth-child(2) { border-right:none; }
-  .db-strip-item:nth-child(3) { border-right:1px solid var(--db-border); }
+  #view-dashboard .db-hero { padding:32px 24px 36px; }
+  #view-dashboard .db-hero-title { font-size:36px; }
+  #view-dashboard .db-portfolio-strip { grid-template-columns:repeat(2,1fr); }
+  #view-dashboard .db-strip-item:nth-child(2) { border-right:none; }
+  #view-dashboard .db-strip-item:nth-child(3) { border-right:1px solid var(--db-border); }
   .pd-welcome-grid { grid-template-columns:1fr; }
-}
-
-/* ═══════════════════════════════════════════════
-   MOBILE LAYOUT  ≤ 680px
-   All rules scoped strictly to #view-dashboard
-   or to elements that only exist in dashboard.
-   DOES NOT touch any other view.
-   ═══════════════════════════════════════════════ */
-@media(max-width:680px) {
-
-  /* Dashboard becomes a flex column for reordering */
-  #view-dashboard { display:flex !important; flex-direction:column; padding-bottom:90px; }
-
-  /* Hide desktop topbar — mobile topbar replaces it */
-  #view-dashboard .db-topbar { display:none; }
-
-  /* ── SECTION ORDER ───────────────────────────── */
-  #view-dashboard .db-hero                                  { order:1; margin-bottom:16px; }
-  #view-dashboard .db-section:has(#db-activity-list)        { order:2; }
-  #view-dashboard .db-section:has(#db-missions-grid)        { order:3; }
-  #view-dashboard .db-section:has(#db-rank-card)            { order:4; }
-  #view-dashboard .db-portfolio-strip                       { order:5; }
-  #view-dashboard .db-bottom-grid                           { order:6; }
-  #view-dashboard .db-stat-grid                             { order:7; }
-  #view-dashboard > div[aria-hidden="true"]                 { order:98; }
-  #view-dashboard > div:last-child                          { order:99; }
-
-  /* ── HERO ────────────────────────────────────── */
-  #view-dashboard .db-hero { border-radius:18px; padding:38px 20px 34px; }
-  #view-dashboard .db-hero-title { font-size:48px; }
-  #view-dashboard .db-hero-subtitle { font-size:24px; }
-  #view-dashboard .db-mic-btn { width:96px; height:96px; }
-  #view-dashboard .db-mic-svg { width:34px; height:34px; }
-
-  /* ── STAT CARDS → horizontal scroll row ─────── */
-  #view-dashboard .db-stat-grid {
-    display:flex; flex-direction:row;
-    overflow-x:auto; -webkit-overflow-scrolling:touch;
-    scrollbar-width:none; scroll-snap-type:x mandatory;
-    gap:10px; padding-bottom:6px;
-  }
-  #view-dashboard .db-stat-grid::-webkit-scrollbar { display:none; }
-  #view-dashboard .db-stat-card {
-    flex:0 0 58%; scroll-snap-align:start;
-    padding:16px 16px 14px; border-radius:14px; min-width:0;
-  }
-  #view-dashboard .db-stat-val { font-size:30px; }
-  #view-dashboard .db-stat-icon { width:28px; height:28px; border-radius:8px; margin-bottom:12px; }
-
-  /* ── PINNED CASES → horizontal swipe carousel ─ */
-  #db-top-cases-container {
-    overflow-x:auto !important;
-    -webkit-overflow-scrolling:touch !important;
-    scrollbar-width:none !important;
-    scroll-snap-type:x mandatory !important;
-    gap:10px !important;
-    padding-bottom:4px !important;
-  }
-  #db-top-cases-container::-webkit-scrollbar { display:none; }
-  /* Force every direct child to be carousel-card-sized */
-  #db-top-cases-container > * {
-    flex:0 0 85% !important;
-    min-width:0 !important;
-    scroll-snap-align:start !important;
-  }
-
-  /* ── BOTTOM GRID → single col ──────────────── */
-  #view-dashboard .db-bottom-grid { display:flex; flex-direction:column; gap:20px; }
-
-  /* ── STATS STRIP ─────────────────────────────── */
-  #view-dashboard .db-portfolio-strip { border-radius:12px; padding:14px 16px; margin-bottom:20px; }
-  #view-dashboard .db-strip-val { font-size:21px; }
-  #view-dashboard .db-strip-label { font-size:10px; }
-
-  /* ── SECTIONS ────────────────────────────────── */
-  #view-dashboard .db-section { margin-bottom:18px; }
-  #view-dashboard .db-activity-row { padding:9px 10px; gap:8px; }
-  #view-dashboard .db-mission-card { padding:13px 14px; }
-  #view-dashboard .db-rank-card { border-radius:16px; padding:20px; }
-  #view-dashboard .db-reviews-card { padding:12px; }
-  #view-dashboard .db-review-item { padding:9px 10px; }
 }
 
 @media(max-width:520px) {
@@ -1296,6 +1215,86 @@ body::after {
   .pd-micro-stat strong { font-size:1.6rem; }
   #view-dashboard .db-hero-title { font-size:40px; }
   #view-dashboard .db-hero-subtitle { font-size:20px; }
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE LAYOUT  ≤ 680px
+   CRITICAL: .view.active#view-dashboard scoping
+   ensures display:none wins when view is hidden.
+   ═══════════════════════════════════════════════ */
+@media(max-width:680px) {
+
+  /* Hide desktop topbar — mobile topbar replaces it */
+  #view-dashboard .db-topbar { display:none; }
+
+  /* ONLY apply flex when dashboard is the ACTIVE view */
+  .view.active#view-dashboard { display:flex; flex-direction:column; padding-bottom:90px; }
+
+  /* ── SECTION ORDER ── only fires when active ── */
+  .view.active#view-dashboard .db-hero                             { order:1; margin-bottom:16px; }
+  .view.active#view-dashboard .db-section:has(#db-activity-list)  { order:2; }
+  .view.active#view-dashboard .db-section:has(#db-missions-grid)  { order:3; }
+  .view.active#view-dashboard .db-section:has(#db-rank-card)      { order:4; }
+  .view.active#view-dashboard .db-portfolio-strip                  { order:5; }
+  .view.active#view-dashboard .db-bottom-grid                      { order:6; }
+  .view.active#view-dashboard .db-stat-grid                        { order:7; }
+
+  /* ── HERO ── */
+  #view-dashboard .db-hero { border-radius:18px; padding:38px 20px 34px; }
+  #view-dashboard .db-hero-title { font-size:48px; }
+  #view-dashboard .db-hero-subtitle { font-size:24px; }
+  #view-dashboard .db-mic-btn { width:96px; height:96px; }
+  #view-dashboard .db-mic-svg { width:34px; height:34px; }
+
+  /* ── STAT CARDS → horizontal scroll row ── */
+  #view-dashboard .db-stat-grid {
+    display:flex; flex-direction:row;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; scroll-snap-type:x mandatory;
+    gap:10px; padding-bottom:6px; grid-template-columns:unset;
+  }
+  #view-dashboard .db-stat-grid::-webkit-scrollbar { display:none; }
+  #view-dashboard .db-stat-card {
+    flex:0 0 60%; scroll-snap-align:start;
+    padding:16px 16px 14px; border-radius:14px; min-width:0;
+  }
+  #view-dashboard .db-stat-val { font-size:30px; }
+  #view-dashboard .db-stat-icon { width:28px; height:28px; border-radius:8px; margin-bottom:12px; }
+
+  /* ── PINNED CASES → swipeable carousel ── */
+  #db-top-cases-container {
+    display:flex !important;
+    flex-direction:row !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    scrollbar-width:none !important;
+    scroll-snap-type:x mandatory !important;
+    gap:10px !important;
+    padding-bottom:6px !important;
+  }
+  #db-top-cases-container::-webkit-scrollbar { display:none; }
+  #db-top-cases-container > * {
+    flex:0 0 84% !important;
+    min-width:0 !important;
+    max-width:84% !important;
+    scroll-snap-align:start !important;
+  }
+
+  /* ── BOTTOM GRID → single col ── */
+  #view-dashboard .db-bottom-grid { display:flex; flex-direction:column; gap:20px; grid-template-columns:unset; }
+
+  /* ── STATS STRIP ── */
+  #view-dashboard .db-portfolio-strip { border-radius:12px; padding:14px 16px; margin-bottom:20px; grid-template-columns:repeat(4,1fr); }
+  #view-dashboard .db-strip-val { font-size:21px; }
+  #view-dashboard .db-strip-label { font-size:10px; }
+
+  /* ── SECTIONS ── */
+  #view-dashboard .db-section { margin-bottom:18px; }
+  #view-dashboard .db-activity-row { padding:9px 10px; gap:8px; }
+  #view-dashboard .db-mission-card { padding:13px 14px; }
+  #view-dashboard .db-rank-card { border-radius:16px; padding:20px; }
+  #view-dashboard .db-reviews-card { padding:12px; }
+  #view-dashboard .db-review-item { padding:9px 10px; }
 }
 
 </style>
