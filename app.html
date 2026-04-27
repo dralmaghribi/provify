@@ -8705,71 +8705,140 @@ function goToHeroSlide(idx, animate = true) {
 function _positionHeroTrack(idx, animate) {
   const track = document.getElementById('hero-swipe-track');
   if (!track) return;
-  // Each card is 100% viewport width + 12px gap
-  // We use the track width approach: translate by cardWidth * idx
-  const card = track.querySelector('.hero-swipe-card');
-  if (!card) return;
-  const cardW = card.offsetWidth + 12; // card width + gap
-  track.style.transition = animate ? 'transform 0.38s cubic-bezier(0.4,0,0.2,1)' : 'none';
+  // Use cached card width so resize events don't corrupt mid-gesture
+  const cardW = _heroSwiper.cardW || (track.querySelector('.hero-swipe-card')?.offsetWidth + 12) || 0;
+  track.style.transition = animate
+    ? 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)'  // ease-out, 280ms
+    : 'none';
   track.style.transform = `translateX(-${cardW * idx}px)`;
 }
 
 // ── Swipe listeners ───────────────────────────────────────────────
 function _attachHeroSwipeListeners(track, viewport) {
   const el = viewport || track;
-  let startX = 0, startY = 0, isDragging = false, hasMoved = false;
+
+  // Gesture state — all captured at touchstart/mousedown and frozen until release
+  let startX      = 0;
+  let startY      = 0;
+  let isDragging  = false;
+  let isScrolling = false; // set true when vertical intent detected — kills the gesture
+  let hasMoved    = false;
+  let cardW       = 0;     // locked at gesture start, never re-read mid-drag
+
+  // Drag resistance: finger travels further than card, capped at a max visual offset
+  // This prevents fast flicks from overshooting to a distant card
+  const DRAG_RESISTANCE = 0.42; // card moves at 42% of finger speed
+  const MAX_DRAG_PX     = 160;  // hard cap on visual offset during drag
 
   const onStart = (x, y) => {
-    startX = x; startY = y; isDragging = true; hasMoved = false;
+    // Snapshot card width once — don't re-read during move
+    const card = track.querySelector('.hero-swipe-card');
+    cardW = (card ? card.offsetWidth + 12 : 0);
+    _heroSwiper.cardW = cardW; // share with _positionHeroTrack
+
+    startX = x;
+    startY = y;
+    isDragging  = true;
+    isScrolling = false;
+    hasMoved    = false;
     track.style.transition = 'none';
   };
+
   const onMove = (x, y) => {
-    if (!isDragging) return;
+    if (!isDragging || isScrolling) return;
     const dx = x - startX;
     const dy = y - startY;
-    if (!hasMoved && Math.abs(dy) > Math.abs(dx) + 4) {
-      // Vertical scroll — abort swipe
-      isDragging = false; return;
+
+    // On first movement, decide: horizontal swipe or vertical scroll
+    if (!hasMoved) {
+      if (Math.abs(dy) > Math.abs(dx) + 6) {
+        // Clearly vertical — kill swipe, restore snap position and let browser scroll
+        isScrolling = true;
+        isDragging  = false;
+        goToHeroSlide(_heroSwiper.current); // re-apply snap transition
+        return;
+      }
+      if (Math.abs(dx) < 4) return; // dead zone — wait for intent
+      hasMoved = true;
     }
-    hasMoved = true;
-    const card = track.querySelector('.hero-swipe-card');
-    if (!card) return;
-    const cardW = card.offsetWidth + 12;
-    const base  = -cardW * _heroSwiper.current;
-    // Rubber-band at edges
-    const n = _heroSwiper.ordered.length;
-    let offset = dx;
-    if ((_heroSwiper.current === 0 && dx > 0) || (_heroSwiper.current === n - 1 && dx < 0)) {
-      offset = dx * 0.22;
+
+    if (!cardW) return;
+    const n    = _heroSwiper.ordered.length;
+    const base = -cardW * _heroSwiper.current;
+
+    // Apply resistance so finger always outruns the card
+    let visualOffset = dx * DRAG_RESISTANCE;
+
+    // Hard-cap the visual drag distance
+    visualOffset = Math.max(-MAX_DRAG_PX, Math.min(MAX_DRAG_PX, visualOffset));
+
+    // Extra rubber-band at both ends: compress further if already at boundary
+    if ((_heroSwiper.current === 0 && dx > 0) ||
+        (_heroSwiper.current === n - 1 && dx < 0)) {
+      visualOffset *= 0.3;
     }
-    track.style.transform = `translateX(${base + offset}px)`;
+
+    track.style.transform = `translateX(${base + visualOffset}px)`;
   };
+
   const onEnd = (x) => {
     if (!isDragging) return;
     isDragging = false;
-    const dx = x - startX;
-    const threshold = 50;
+
+    if (!hasMoved) return; // tap, not swipe
+
+    const dx        = x - startX;
+    const screenW   = window.innerWidth || 375;
+    // Threshold: 27% of screen width — wide enough to prevent accidental swipes
+    const threshold = screenW * 0.27;
+
     if (dx < -threshold) {
+      // Swipe left → next (clamp to +1 only)
       goToHeroSlide(_heroSwiper.current + 1);
     } else if (dx > threshold) {
+      // Swipe right → previous (clamp to -1 only)
       goToHeroSlide(_heroSwiper.current - 1);
     } else {
-      goToHeroSlide(_heroSwiper.current); // snap back
+      // Didn't cross threshold — snap back
+      goToHeroSlide(_heroSwiper.current);
     }
   };
 
-  // Touch
-  el.addEventListener('touchstart',  e => onStart(e.touches[0].clientX, e.touches[0].clientY), {passive:true});
-  el.addEventListener('touchmove',   e => onMove(e.touches[0].clientX, e.touches[0].clientY),  {passive:true});
-  el.addEventListener('touchend',    e => onEnd(e.changedTouches[0].clientX));
+  // ── Touch events ──────────────────────────────────────────────────
+  el.addEventListener('touchstart', e => {
+    onStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
 
-  // Mouse (desktop)
-  el.addEventListener('mousedown',  e => { onStart(e.clientX, e.clientY); });
-  window.addEventListener('mousemove', e => { if (isDragging) { onMove(e.clientX, e.clientY); e.preventDefault(); } });
-  window.addEventListener('mouseup',   e => { if (isDragging) onEnd(e.clientX); });
+  el.addEventListener('touchmove', e => {
+    onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
 
-  // Re-position on window resize (card width changes)
+  el.addEventListener('touchend', e => {
+    onEnd(e.changedTouches[0].clientX);
+  });
+
+  // ── Mouse events (desktop) ────────────────────────────────────────
+  el.addEventListener('mousedown', e => {
+    onStart(e.clientX, e.clientY);
+  });
+
+  // Bind move/up to window so fast mouse moves outside element still register
+  const onMouseMove = e => {
+    if (isDragging) {
+      e.preventDefault();
+      onMove(e.clientX, e.clientY);
+    }
+  };
+  const onMouseUp = e => {
+    if (isDragging) onEnd(e.clientX);
+  };
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup',   onMouseUp);
+
+  // ── Resize: re-snap without animation ────────────────────────────
   window.addEventListener('resize', () => {
+    // Invalidate cached card width on resize
+    _heroSwiper.cardW = null;
     if (document.getElementById('view-cases')?.classList.contains('active')) {
       _positionHeroTrack(_heroSwiper.current, false);
     }
