@@ -951,7 +951,7 @@ body::after {
 .db-btn-ghost:hover { background:rgba(255,255,255,0.04); color:var(--db-text); }
 
 /* Hero section */
-.db-hero { background:radial-gradient(ellipse 90% 75% at 50% 0%,rgba(124,111,205,0.22) 0%,rgba(124,111,205,0.04) 55%,transparent 75%), #0a0917; border:1px solid rgba(124,111,205,0.22); border-radius:24px; padding:80px 40px 64px; text-align:center; position:relative; overflow:hidden; margin-bottom:28px; box-shadow:0 0 0 1px rgba(124,111,205,0.08) inset, 0 40px 100px rgba(0,0,0,0.5); }
+.db-hero { background:radial-gradient(ellipse 90% 75% at 50% 0%,rgba(124,111,205,0.22) 0%,rgba(124,111,205,0.04) 55%,transparent 75%), #07060f; border:1px solid rgba(124,111,205,0.22); border-radius:24px; padding:80px 40px 64px; text-align:center; position:relative; overflow:hidden; margin-bottom:28px; box-shadow:0 0 0 1px rgba(124,111,205,0.08) inset, 0 40px 100px rgba(0,0,0,0.6); }
 .db-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 55% at 50% -10%,rgba(124,111,205,0.16) 0%,transparent 60%); pointer-events:none; }
 .db-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(124,111,205,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,205,0.05) 1px,transparent 1px); background-size:44px 44px; mask-image:radial-gradient(ellipse 80% 60% at 50% 30%,black,transparent); pointer-events:none; }
 
@@ -976,29 +976,31 @@ body::after {
 .db-tag-dot { width:5px; height:5px; border-radius:50%; background:var(--db-green); box-shadow:0 0 5px var(--db-green); flex-shrink:0; }
 .db-hero-actions { display:flex; align-items:center; justify-content:center; gap:10px; position:relative; z-index:1; }
 
-/* Stat panel — 3-col horizontal strip replacing separate cards */
-.db-stat-panel { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); border-radius:18px; overflow:hidden; margin-bottom:28px; }
-.db-stat-panel-divider { width:1px; background:rgba(255,255,255,0.07); margin:18px 0; }
-.db-stat-panel-item { padding:22px 20px 18px; display:flex; flex-direction:column; gap:2px; transition:background 0.18s; position:relative; }
+/* Stat panel */
+.db-stat-panel { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; background:rgba(255,255,255,0.022); border:1px solid rgba(255,255,255,0.07); border-radius:18px; overflow:hidden; margin-bottom:28px; }
+.db-stat-panel-divider { width:1px; background:rgba(255,255,255,0.07); margin:16px 0; }
+.db-stat-panel-item { padding:18px 18px 16px; display:flex; flex-direction:column; gap:0; transition:background 0.18s; position:relative; }
 .db-stat-panel-item::before { content:''; position:absolute; top:0; left:10%; right:10%; height:2px; border-radius:0 0 2px 2px; }
-.db-stat-panel-item:nth-child(1)::before { background:linear-gradient(90deg,transparent,rgba(212,168,67,0.55),transparent); }
-.db-stat-panel-item:nth-child(3)::before { background:linear-gradient(90deg,transparent,rgba(124,111,205,0.5),transparent); }
-.db-stat-panel-item:nth-child(5)::before { background:linear-gradient(90deg,transparent,rgba(61,214,140,0.45),transparent); }
+.db-stat-panel-item:nth-child(1)::before { background:linear-gradient(90deg,transparent,rgba(212,168,67,0.6),transparent); }
+.db-stat-panel-item:nth-child(3)::before { background:linear-gradient(90deg,transparent,rgba(124,111,205,0.55),transparent); }
+.db-stat-panel-item:nth-child(5)::before { background:linear-gradient(90deg,transparent,rgba(61,214,140,0.5),transparent); }
 .db-stat-panel-item:hover { background:rgba(255,255,255,0.03); }
-.db-stat-panel-icon { width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+.db-stat-panel-icon { width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; flex-shrink:0; }
 .db-stat-panel-item:nth-child(1) .db-stat-panel-icon { background:rgba(212,168,67,0.1); }
 .db-stat-panel-item:nth-child(3) .db-stat-panel-icon { background:rgba(124,111,205,0.1); }
 .db-stat-panel-item:nth-child(5) .db-stat-panel-icon { background:rgba(61,214,140,0.08); }
-.db-stat-panel-val { font-family:'Instrument Serif',serif; font-size:34px; line-height:1; letter-spacing:-0.03em; }
-.db-stat-panel-val.db-gold { color:var(--db-gold); }
-.db-stat-panel-val.db-purple { color:rgba(240,239,254,0.92); }
-.db-stat-panel-val.db-green { color:var(--db-green); }
-.db-stat-panel-label { font-size:9.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-top:6px; }
-.db-stat-panel-item:nth-child(1) .db-stat-panel-label { color:rgba(212,168,67,0.5); }
-.db-stat-panel-item:nth-child(3) .db-stat-panel-label { color:rgba(124,111,205,0.5); }
-.db-stat-panel-item:nth-child(5) .db-stat-panel-label { color:rgba(61,214,140,0.45); }
-.db-stat-panel-sub { font-size:11px; color:rgba(240,239,254,0.25); margin-top:1px; }
-/* Keep old classes for any remaining references */
+/* Primary value line — the main message */
+.db-stat-panel-val { font-size:13px; font-weight:600; line-height:1.25; letter-spacing:-0.01em; margin-bottom:4px; }
+.db-stat-panel-val.db-gold { color:rgba(212,168,67,0.92); }
+.db-stat-panel-val.db-purple { color:rgba(155,143,245,0.9); }
+.db-stat-panel-val.db-green { color:rgba(61,214,140,0.88); }
+/* Number accent embedded in value */
+.db-stat-panel-num { font-family:'Instrument Serif',serif; font-size:26px; line-height:1; letter-spacing:-0.03em; display:block; margin-bottom:4px; }
+.db-stat-panel-label { font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px; }
+.db-stat-panel-item:nth-child(1) .db-stat-panel-label { color:rgba(212,168,67,0.4); }
+.db-stat-panel-item:nth-child(3) .db-stat-panel-label { color:rgba(124,111,205,0.4); }
+.db-stat-panel-item:nth-child(5) .db-stat-panel-label { color:rgba(61,214,140,0.38); }
+.db-stat-panel-sub { font-size:10.5px; color:rgba(240,239,254,0.28); line-height:1.4; }
 .db-shimmer { display:none; }
 
 /* Section headers */
@@ -1008,10 +1010,17 @@ body::after {
 .db-section-link:hover { opacity:1; }
 
 /* Activity list */
-.db-activity-list { display:flex; flex-direction:column; gap:4px; }
-.db-activity-row { display:flex; align-items:center; gap:14px; padding:11px 14px; border-radius:10px; cursor:pointer; transition:background 0.15s; border:1px solid transparent; }
-.db-activity-row:hover { background:rgba(255,255,255,0.025); border-color:var(--db-border); }
-.db-act-time { font-size:11.5px; color:var(--db-text3); width:38px; flex-shrink:0; }
+.db-activity-list { display:flex; flex-direction:column; gap:3px; }
+.db-activity-row { display:flex; align-items:center; gap:10px; padding:10px 12px 10px 10px; border-radius:9px; cursor:pointer; transition:background 0.15s; border:1px solid transparent; border-left:2px solid transparent; }
+.db-activity-row:hover { background:rgba(255,255,255,0.025); border-color:rgba(255,255,255,0.06); }
+.db-activity-row:nth-child(even) { background:rgba(255,255,255,0.012); }
+/* Specialty left accent */
+.db-activity-row.spec-endo   { border-left-color:rgba(124,111,205,0.4); }
+.db-activity-row.spec-smile  { border-left-color:rgba(212,168,67,0.4); }
+.db-activity-row.spec-surg   { border-left-color:rgba(239,68,68,0.4); }
+.db-activity-row.spec-resto  { border-left-color:rgba(245,158,11,0.35); }
+.db-activity-row.spec-paeds  { border-left-color:rgba(52,211,153,0.35); }
+.db-act-time { font-size:11px; color:rgba(240,239,254,0.28); width:32px; flex-shrink:0; font-variant-numeric:tabular-nums; }
 .db-act-badge { font-size:10px; font-weight:600; letter-spacing:0.05em; padding:3px 8px; border-radius:5px; flex-shrink:0; }
 .db-act-badge.smile { background:rgba(212,168,67,0.12); color:var(--db-gold); border:1px solid rgba(212,168,67,0.2); }
 .db-act-badge.endo { background:rgba(124,111,205,0.12); color:var(--db-purple); border:1px solid rgba(124,111,205,0.2); }
@@ -1170,10 +1179,7 @@ body::after {
 /* PAEDS = green */
 .db-act-badge.paeds { background:rgba(52,211,153,0.09); color:#34D399; border:1px solid rgba(52,211,153,0.20); }
 
-/* Activity row spacing */
-.db-activity-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px; cursor:pointer; transition:background 0.15s; border:1px solid transparent; }
-.db-activity-row:hover { background:rgba(255,255,255,0.022); border-color:rgba(255,255,255,0.06); }
-.db-act-time { font-size:11px; color:rgba(240,239,254,0.28); width:32px; flex-shrink:0; font-variant-numeric:tabular-nums; }
+/* .db-act-name in dental identity block */
 .db-act-name { flex:1; font-size:13px; color:rgba(240,239,254,0.82); font-weight:400; }
 
 /* Patient feedback — tighter, cleaner */
@@ -1231,11 +1237,11 @@ body::after {
 
   /* ── SECTION ORDER ── only fires when active ── */
   .view.active#view-dashboard .db-hero                             { order:1; margin-bottom:16px; }
-  .view.active#view-dashboard .db-section:has(#db-activity-list)  { order:2; }
-  .view.active#view-dashboard .db-section:has(#db-rank-card)      { order:3; }
-  .view.active#view-dashboard .db-portfolio-strip                  { order:4; }
-  .view.active#view-dashboard .db-bottom-grid                      { order:5; }
-  .view.active#view-dashboard .db-stat-panel                       { order:6; }
+  .view.active#view-dashboard .db-section:has(#db-stat-protected)  { order:2; }
+  .view.active#view-dashboard .db-section:has(#db-rank-card)        { order:3; }
+  .view.active#view-dashboard .db-section:has(#db-activity-list)    { order:4; }
+  .view.active#view-dashboard .db-portfolio-strip                   { order:5; }
+  .view.active#view-dashboard .db-bottom-grid                       { order:6; }
 
   /* ── HERO ── */
   #view-dashboard .db-hero { border-radius:18px; padding:38px 20px 34px; }
@@ -2542,6 +2548,7 @@ body::after {
           <div class="db-hero-title">Speak.</div>
           <div class="db-hero-subtitle">I'll handle the rest.</div>
           <div class="db-hero-line" id="dash-hero-subtext"><span id="db-hero-case-count">0 verified cases.</span> You're building something most dentists never will.</div>
+          <div style="font-size:12.5px;color:rgba(240,239,254,0.32);max-width:460px;margin:0 auto 20px;line-height:1.65;position:relative;z-index:1;">Speak once. Documentation, legal structure, and records handled automatically.</div>
           <div class="db-hero-tags">
             <span class="db-tag"><span class="db-tag-dot"></span>Auto-documented</span>
             <span class="db-tag"><span class="db-tag-dot"></span>Legally structured</span>
@@ -2567,29 +2574,30 @@ body::after {
         <div class="db-stat-panel db-section">
           <div class="db-stat-panel-item" onclick="navToShield()" style="cursor:pointer;">
             <div class="db-stat-panel-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <div class="db-stat-panel-val db-gold" id="db-stat-protected">—</div>
             <div class="db-stat-panel-label">Shield</div>
-            <div class="db-stat-panel-sub">Cases protected</div>
+            <span class="db-stat-panel-num db-gold" id="db-stat-protected">—</span>
+            <div class="db-stat-panel-val db-gold">cases protected</div>
+            <div class="db-stat-panel-sub">Complaint-ready in seconds</div>
           </div>
           <div class="db-stat-panel-divider"></div>
           <div class="db-stat-panel-item" onclick="viewMyPortfolio()" style="cursor:pointer;">
             <div class="db-stat-panel-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9b8ff5" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b8ff5" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </div>
-            <div class="db-stat-panel-val db-purple" id="db-stat-portfolio">—</div>
             <div class="db-stat-panel-label">Portfolio</div>
-            <div class="db-stat-panel-sub">Verified cases</div>
+            <div class="db-stat-panel-val db-purple" id="db-stat-portfolio">Verified portfolio</div>
+            <div class="db-stat-panel-sub">Structured, shareable, career-ready</div>
           </div>
           <div class="db-stat-panel-divider"></div>
           <div class="db-stat-panel-item" onclick="showView('progress')" style="cursor:pointer;">
             <div class="db-stat-panel-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><polyline points="16 2 22 2 22 8"/><line x1="22" y1="2" x2="16" y2="8"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </div>
-            <div class="db-stat-panel-val db-green" id="db-stat-growth" style="font-size:20px;">View →</div>
-            <div class="db-stat-panel-label">AI Analysis</div>
-            <div class="db-stat-panel-sub">Patterns & insights</div>
+            <div class="db-stat-panel-label">AI Docs</div>
+            <div class="db-stat-panel-val db-green" id="db-stat-growth">AI documentation</div>
+            <div class="db-stat-panel-sub">Sessions auto-logged instantly</div>
           </div>
         </div>
 
@@ -10813,9 +10821,9 @@ function renderNewDashboard() {
   const protected_count = allCases.filter(c => c.note && c.note.includes('|| ML_RECORD:')).length;
   const avg = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score || 0), 0) / total) : 0;
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setEl('db-stat-protected', protected_count || total);
-  setEl('db-stat-portfolio', total);
-  // db-stat-growth is now AI Analysis CTA — no value needed
+  setEl('db-stat-protected', total);
+  // portfolio and growth are now static value-first text, no dynamic number needed
+  // db-stat-portfolio and db-stat-growth IDs still exist for legacy JS compatibility
 
   // Activity list
   renderNewActivityList();
@@ -10896,7 +10904,7 @@ function renderNewActivityList() {
     const rank = getLevel(allCases.length);
     const icon  = specIcon[c.specialty] || specIcon.endo;
     return `
-      <div class="db-activity-row" onclick="openCaseDetail('${c.id}')">
+      <div class="db-activity-row spec-${badge}" onclick="openCaseDetail('${c.id}')">
         <span class="db-act-time">${timeStr}</span>
         <span class="db-act-badge ${badge}" style="padding-left:5px;">${icon}${label}</span>
         <span class="db-act-name">${title}${canalSuffix(c)}</span>
