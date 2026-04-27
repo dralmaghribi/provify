@@ -2730,34 +2730,65 @@ body::after {
         </div>
 
         <!-- FEATURED GALAXY -->
-        <div id="orb-constellation-card" style="margin-bottom:16px;background:linear-gradient(160deg,#0b0b0f 0%,#0e0e13 100%);border:1px solid rgba(255,255,255,0.07);border-radius:24px;overflow:hidden;position:relative;">
+        <div id="orb-constellation-card" style="margin-bottom:16px;background:linear-gradient(160deg,#09090d 0%,#0d0d12 100%);border:1px solid rgba(255,255,255,0.08);border-radius:24px;overflow:hidden;position:relative;">
+          <!-- clinical grid texture -->
+          <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;opacity:0.045;">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="cgrid" width="28" height="28" patternUnits="userSpaceOnUse">
+                  <path d="M 28 0 L 0 0 0 28" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="0.5"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#cgrid)"/>
+            </svg>
+          </div>
+          <!-- ambient radial glow -->
           <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
-            <div id="orb-bg-glow" style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,255,0.05) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);transition:background 0.7s;"></div>
-            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="7%" cy="18%" r="1" fill="white"/><circle cx="21%" cy="7%" r="0.7" fill="white"/>
-              <circle cx="44%" cy="13%" r="1.1" fill="white"/><circle cx="66%" cy="5%" r="0.6" fill="white"/>
-              <circle cx="84%" cy="20%" r="0.9" fill="white"/><circle cx="93%" cy="52%" r="0.5" fill="white"/>
-              <circle cx="79%" cy="87%" r="0.8" fill="white"/><circle cx="54%" cy="93%" r="0.6" fill="white"/>
-              <circle cx="31%" cy="86%" r="1" fill="white"/><circle cx="11%" cy="69%" r="0.7" fill="white"/>
-              <circle cx="4%" cy="43%" r="0.5" fill="white"/><circle cx="96%" cy="33%" r="0.9" fill="white"/>
-              <circle cx="58%" cy="47%" r="0.4" fill="white"/><circle cx="37%" cy="55%" r="0.3" fill="white"/>
+            <div id="orb-bg-glow" style="position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,255,0.08) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);transition:background 0.8s;"></div>
+          </div>
+          <!-- star particles -->
+          <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.22" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="6%" cy="14%" r="0.9" fill="white" opacity="0.7"/>
+              <circle cx="19%" cy="6%" r="0.6" fill="white" opacity="0.5"/>
+              <circle cx="43%" cy="11%" r="1" fill="white" opacity="0.8"/>
+              <circle cx="65%" cy="4%" r="0.5" fill="white" opacity="0.4"/>
+              <circle cx="83%" cy="17%" r="0.8" fill="white" opacity="0.6"/>
+              <circle cx="94%" cy="48%" r="0.5" fill="white" opacity="0.35"/>
+              <circle cx="89%" cy="79%" r="0.7" fill="white" opacity="0.55"/>
+              <circle cx="72%" cy="91%" r="0.6" fill="white" opacity="0.45"/>
+              <circle cx="52%" cy="95%" r="0.5" fill="white" opacity="0.4"/>
+              <circle cx="29%" cy="88%" r="0.9" fill="white" opacity="0.6"/>
+              <circle cx="10%" cy="72%" r="0.7" fill="white" opacity="0.5"/>
+              <circle cx="3%" cy="40%" r="0.5" fill="white" opacity="0.35"/>
+              <circle cx="97%" cy="28%" r="0.8" fill="white" opacity="0.55"/>
+              <circle cx="35%" cy="50%" r="0.3" fill="white" opacity="0.25"/>
+              <circle cx="57%" cy="42%" r="0.35" fill="white" opacity="0.22"/>
+              <circle cx="76%" cy="62%" r="0.4" fill="white" opacity="0.3"/>
+              <circle cx="14%" cy="30%" r="0.35" fill="white" opacity="0.28"/>
             </svg>
           </div>
           <!-- header -->
           <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:16px 18px 0;position:relative;z-index:2;">
             <div>
-              <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.18);font-weight:700;margin-bottom:2px;">Featured Cases</div>
-              <div id="orb-total-label" style="font-size:0.72rem;color:rgba(255,255,255,0.3);"></div>
+              <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.2);font-weight:700;margin-bottom:2px;">Featured Cases</div>
+              <div id="orb-total-label" style="font-size:0.7rem;color:rgba(255,255,255,0.28);"></div>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;font-size:0.5rem;color:rgba(255,255,255,0.16);letter-spacing:0.05em;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.48rem;color:rgba(255,255,255,0.16);letter-spacing:0.05em;">
               <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#7C6FFF;display:inline-block;"></span>Endo</span>
               <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#F59E0B;display:inline-block;"></span>Smile</span>
               <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#EF4444;display:inline-block;"></span>Surg</span>
               <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#34D399;display:inline-block;"></span>Paeds</span>
             </div>
           </div>
-          <!-- orb canvas — taller for bigger orbs -->
-          <div id="orb-field" style="position:relative;width:100%;height:300px;overflow:hidden;"></div>
+          <!-- drag hint -->
+          <div style="padding:4px 18px 0;position:relative;z-index:2;">
+            <div style="font-size:0.56rem;color:rgba(255,255,255,0.14);letter-spacing:0.05em;">Drag to explore · Tap to open</div>
+          </div>
+          <!-- orb canvas — draggable -->
+          <div id="orb-field-wrap" style="position:relative;width:100%;height:310px;overflow:hidden;touch-action:pan-y;">
+            <div id="orb-field" style="position:absolute;top:0;left:0;height:100%;will-change:transform;cursor:grab;"></div>
+          </div>
           <!-- tooltip -->
           <div id="orb-tooltip" style="display:none;position:absolute;background:rgba(6,6,10,0.97);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:12px 16px;font-size:0.72rem;color:var(--white);pointer-events:none;z-index:200;max-width:210px;backdrop-filter:blur(16px);box-shadow:0 16px 40px rgba(0,0,0,0.7);"></div>
         </div>
@@ -8433,232 +8464,274 @@ function renderHeatmap() {
 }
 
 // ─── ORB CONSTELLATION ───
+let _galaxyDragging = false;
 function renderOrbConstellation(casesToRender) {
-  const field = document.getElementById('orb-field');
+  const wrap    = document.getElementById('orb-field-wrap');
+  const field   = document.getElementById('orb-field');
   const tooltip = document.getElementById('orb-tooltip');
   const totalLabel = document.getElementById('orb-total-label');
-  const bgGlow = document.getElementById('orb-bg-glow');
-  if (!field) return;
+  const bgGlow  = document.getElementById('orb-bg-glow');
+  if (!field || !wrap) return;
 
-  // ── SELECT FEATURED CASES (5–7, by role, not score) ──
-  const source = allCases; // always use full set for galaxy
+  // ── SELECT FEATURED: image-bearing cases only ──────────────────────────
+  const src = allCases;
   const pinnedIds = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
 
-  const featured = [];
-  const usedIds = new Set();
-
-  const tryAdd = (c, role) => {
-    if (!c || usedIds.has(c.id)) return;
-    featured.push({ c, role });
-    usedIds.add(c.id);
+  const hasImage = c => {
+    if (!c.photo_urls) return false;
+    if (c.specialty === 'smile')
+      return !!(c.photo_urls['smile-after'] || c.photo_urls['smile-before']);
+    return !!Object.values(c.photo_urls).find(Boolean);
+  };
+  const getImg = c => {
+    if (!c.photo_urls) return null;
+    if (c.specialty === 'smile')
+      return c.photo_urls['smile-after'] || c.photo_urls['smile-before'] || Object.values(c.photo_urls).find(Boolean);
+    return Object.values(c.photo_urls).find(Boolean);
   };
 
-  // 1. Newest case
-  tryAdd(source[0], 'newest');
-  // 2. First pinned/proud case (if any and different from newest)
-  const firstPinned = pinnedIds.map(id => source.find(c => c.id === id)).find(Boolean);
-  tryAdd(firstPinned, 'pinned');
-  // 3. Latest endo
-  tryAdd(source.find(c => c.specialty === 'endo' && !usedIds.has(c.id)), 'endo');
-  // 4. Latest smile or restorative
-  tryAdd(source.find(c => (c.specialty === 'smile' || c.specialty === 'restorative') && !usedIds.has(c.id)), 'smile');
-  // 5. Latest paeds
-  tryAdd(source.find(c => c.specialty === 'paeds' && !usedIds.has(c.id)), 'paeds');
-  // 6. Latest surgery
-  tryAdd(source.find(c => c.specialty === 'surgery' && !usedIds.has(c.id)), 'surgery');
-  // 7. Latest prostho (if not already 6 cases and exists)
-  if (featured.length < 6)
-    tryAdd(source.find(c => c.specialty === 'prostho' && !usedIds.has(c.id)), 'prostho');
-  // 8. Pad with next newest if still <5
-  for (const c of source) {
+  const featured = [];
+  const used = new Set();
+  const tryAdd = (c, role) => {
+    if (!c || used.has(c.id) || !hasImage(c)) return false;
+    featured.push({ c, role });
+    used.add(c.id);
+    return true;
+  };
+
+  // Priority: pinned → newest → per specialty (image-only)
+  pinnedIds.slice(0,1).forEach(id => tryAdd(src.find(c=>c.id===id), 'pinned'));
+  tryAdd(src[0], 'latest');
+  ['endo','smile','restorative','paeds','surgery','prostho'].forEach(sp =>
+    featured.length < 7 && tryAdd(src.find(c => c.specialty===sp && !used.has(c.id)), sp)
+  );
+  // Pad with any remaining image cases up to 7
+  for (const c of src) {
     if (featured.length >= 7) break;
-    if (!usedIds.has(c.id)) tryAdd(c, 'recent');
+    tryAdd(c, 'recent');
   }
 
-  const cases = featured;
-  if (totalLabel) totalLabel.textContent = `${source.length} case${source.length !== 1 ? 's' : ''} · ${cases.length} featured`;
-
-  const specColors  = { endo:'#7C6FFF', restorative:'#F59E0B', smile:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8' };
-  const specRgb     = { endo:'124,111,255', restorative:'245,158,11', smile:'245,158,11', surgery:'239,68,68', paeds:'52,211,153', prostho:'56,189,248' };
-  const roleLabels  = { newest:'Latest', pinned:'⭐ Proud', endo:'Endo', smile:'Smile', paeds:'Paeds', surgery:'Surgery', prostho:'Prostho', recent:'Recent' };
+  const cases = featured.slice(0, 7);
+  if (totalLabel) totalLabel.textContent =
+    `${src.length} case${src.length!==1?'s':''} · ${cases.length} featured`;
 
   if (cases.length === 0) {
-    field.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;"><div style="font-size:0.82rem;color:rgba(255,255,255,0.15);">Your case galaxy awaits</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.08);">Log your first case to begin</div></div>`;
+    field.style.width = wrap.offsetWidth + 'px';
+    field.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;"><div style="font-size:0.82rem;color:rgba(255,255,255,0.15);">Add photos to cases to see your galaxy</div></div>`;
     return;
   }
 
-  // Inject keyframes once
+  // ── KEYFRAMES ──────────────────────────────────────────────────────────
   if (!document.getElementById('galaxy-keyframes')) {
     const ks = document.createElement('style');
     ks.id = 'galaxy-keyframes';
     ks.textContent = `
-      @keyframes galaxyFloat  { 0%,100%{transform:translateY(0px)}  50%{transform:translateY(-5px)} }
-      @keyframes galaxyFloat2 { 0%,100%{transform:translateY(-2px)} 50%{transform:translateY(4px)} }
-      @keyframes galaxyFloat3 { 0%,100%{transform:translateY(-3px)} 50%{transform:translateY(3px)} }
+      @keyframes gFloat1 { 0%,100%{transform:translateY(0px)}   50%{transform:translateY(-6px)} }
+      @keyframes gFloat2 { 0%,100%{transform:translateY(-3px)}  50%{transform:translateY(5px)} }
+      @keyframes gFloat3 { 0%,100%{transform:translateY(-1px)}  50%{transform:translateY(4px)} }
+      @keyframes gFloat4 { 0%,100%{transform:translateY(-4px)}  50%{transform:translateY(2px)} }
+      @keyframes gPulseRing { 0%,100%{opacity:0.55;transform:scale(1)} 50%{opacity:0.25;transform:scale(1.08)} }
     `;
     document.head.appendChild(ks);
   }
 
-  const W = field.offsetWidth || 340;
-  const H = 300;
-  const floatAnims = ['galaxyFloat', 'galaxyFloat2', 'galaxyFloat3'];
+  const SPEC_COLOR = { endo:'#7C6FFF', restorative:'#F59E0B', smile:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8' };
+  const SPEC_RGB   = { endo:'124,111,255', restorative:'245,158,11', smile:'245,158,11', surgery:'239,68,68', paeds:'52,211,153', prostho:'56,189,248' };
+  const ROLE_LBL   = { latest:'Latest', pinned:'⭐ Proud', endo:'Endo', smile:'Smile', restorative:'Restorative', paeds:'Paeds', surgery:'Surgery', prostho:'Prostho', recent:'Recent' };
+  const FLOATS     = ['gFloat1','gFloat2','gFloat3','gFloat4'];
 
-  // Fixed radius per orb — large, uniform, premium feel
-  const BASE_R = 52; // px — a big, confident circle
+  // ── LAYOUT: 1 center + up to 6 in ring ────────────────────────────────
+  const wW = wrap.offsetWidth || 340;
+  const H  = 310;
+  // Canvas wider than wrap so drag reveals extra orbs
+  const CANVAS_EXTRA = cases.length > 4 ? 80 : 0;
+  const CW = wW + CANVAS_EXTRA;
+  const CX = CW / 2;   // center x of layout
+  const CY = H  / 2;
 
-  // Deterministic radial layout: place orbs in a ring + center
-  // Center gets the featured (pinned or newest), rest spread around
-  const layoutPositions = [];
-  const count = cases.length;
+  const CR = 60;  // center orb radius
+  const OR = 46;  // orbit orb radius
+  const RING_R = Math.min(CW * 0.29, H * 0.28, 118); // orbit ring radius
 
-  if (count === 1) {
-    layoutPositions.push({ x: W/2, y: H/2 });
-  } else {
-    // Center
-    layoutPositions.push({ x: W/2, y: H/2 });
-    // Remaining in ring
-    const ringCount = count - 1;
-    const ringR = Math.min(W * 0.33, H * 0.33, 110);
-    for (let i = 0; i < ringCount; i++) {
-      // start from top, go clockwise
-      const angle = (Math.PI * 2 / ringCount) * i - Math.PI / 2;
-      layoutPositions.push({
-        x: W/2 + ringR * Math.cos(angle),
-        y: H/2 + ringR * Math.sin(angle)
-      });
-    }
-  }
-
-  // Clamp to bounds
-  layoutPositions.forEach(p => {
-    p.x = Math.max(BASE_R + 6, Math.min(W - BASE_R - 6, p.x));
-    p.y = Math.max(BASE_R + 6, Math.min(H - BASE_R - 6, p.y));
+  const positions = [{ x: CX, y: CY, r: CR }]; // index 0 = center
+  const surround  = cases.slice(1);
+  surround.forEach((_, i) => {
+    const ang = (Math.PI * 2 / surround.length) * i - Math.PI / 2;
+    positions.push({
+      x: CX + RING_R * Math.cos(ang),
+      y: CY + RING_R * Math.sin(ang),
+      r: OR
+    });
   });
 
+  // ── BUILD FIELD ────────────────────────────────────────────────────────
   field.innerHTML = '';
+  field.style.width  = CW + 'px';
+  field.style.height = H + 'px';
+  field.style.position = 'absolute';
+  field.style.top = '0';
+  field.style.left = '0';
+
+  // Subtle ring guide behind orbit orbs
+  if (cases.length > 1) {
+    const ringGuide = document.createElement('div');
+    ringGuide.style.cssText = `
+      position:absolute;
+      width:${RING_R*2}px;height:${RING_R*2}px;
+      border-radius:50%;
+      border:1px dashed rgba(255,255,255,0.05);
+      left:${CX - RING_R}px;top:${CY - RING_R}px;
+      pointer-events:none;
+    `;
+    field.appendChild(ringGuide);
+  }
 
   cases.forEach(({ c, role }, idx) => {
-    const pos = layoutPositions[idx] || { x: W/2, y: H/2 };
-    const color = specColors[c.specialty] || '#7C6FFF';
-    const rgb   = specRgb[c.specialty]   || '124,111,255';
+    const pos   = positions[idx];
+    const { r } = pos;
+    const color = SPEC_COLOR[c.specialty] || '#7C6FFF';
+    const rgb   = SPEC_RGB[c.specialty]   || '124,111,255';
     const isCenter = idx === 0;
-    const R = isCenter ? BASE_R + 10 : BASE_R; // center orb slightly larger
-    const glowAlpha = isCenter ? 0.7 : 0.5;
-    const glowSpread = isCenter ? 28 : 20;
-    const animName = floatAnims[idx % 3];
-    const animDuration = (3.8 + idx * 0.5).toFixed(1);
-    const animDelay = (idx * 0.55).toFixed(2);
+    const glow  = isCenter ? 32 : 22;
+    const floatAnim = FLOATS[idx % 4];
+    const dur  = (3.6 + idx * 0.55).toFixed(1);
+    const del  = (idx * 0.48).toFixed(2);
 
-    const isSmile = c.specialty === 'smile';
-    let imgSrc = null;
-    if (c.photo_urls) {
-      imgSrc = isSmile
-        ? (c.photo_urls['smile-after'] || c.photo_urls['smile-before'] || Object.values(c.photo_urls).find(Boolean))
-        : Object.values(c.photo_urls).find(Boolean);
-    }
-    const hasImg = !!imgSrc;
-
+    const imgSrc = getImg(c);
     const nickname = getCaseNickname(c.id);
+    const isSmile = c.specialty === 'smile';
     const fdi = !isSmile && c.tooth_number ? toothQuadrant(c.tooth_number) : null;
     const fullLabel = isSmile
       ? (nickname || c.procedure || 'Smile Case')
-      : (nickname || (fdi ? `${fdi} · Tooth ${c.tooth_number}` : c.specialty || '—'));
-    const specLabel = { endo:'Endodontics', restorative:'Restorative', smile:'Smile Design', surgery:'Surgery', paeds:'Paediatric', prostho:'Prosthodontics' }[c.specialty] || c.specialty;
-    const dateStr = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    // Short label for inside orb
+      : (nickname || (fdi ? `${fdi} · T${c.tooth_number}` : c.specialty));
     const shortLabel = isSmile
-      ? (nickname ? nickname.slice(0,8) : (c.procedure||'Smile').slice(0,8))
-      : (fdi ? `T${c.tooth_number}` : (nickname||'').slice(0,6));
+      ? (nickname ? nickname.slice(0,9) : (c.procedure||'Smile').slice(0,9))
+      : (fdi ? `T${c.tooth_number}` : (nickname||'').slice(0,7));
+    const specLabel = { endo:'Endodontics', restorative:'Restorative', smile:'Smile', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho' }[c.specialty] || c.specialty;
+    const dateStr = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 
-    // Wrapper — positioned absolutely
+    // Outer wrapper (positions + float animation)
     const wrapper = document.createElement('div');
     wrapper.style.cssText = `
       position:absolute;
-      left:${pos.x - R}px;
-      top:${pos.y - R}px;
-      width:${R*2}px;
-      height:${R*2}px;
+      left:${pos.x - r}px;
+      top:${pos.y - r}px;
+      width:${r*2}px;
+      height:${r*2+24}px;
       cursor:pointer;
-      z-index:${isCenter ? 10 : 5};
-      animation:${animName} ${animDuration}s ${animDelay}s ease-in-out infinite;
-      transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1), filter 0.2s;
+      z-index:${isCenter ? 12 : 6};
+      animation:${floatAnim} ${dur}s ${del}s ease-in-out infinite;
+      transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+      user-select:none;
+      -webkit-user-select:none;
     `;
 
-    // Outer glow halo
+    // Radial glow halo (behind circle)
     const halo = document.createElement('div');
     halo.style.cssText = `
       position:absolute;
-      inset:-${glowSpread}px;
+      inset:-${glow}px 0;
+      margin:auto;
+      width:${r*2 + glow*2}px;
+      height:${r*2 + glow*2}px;
       border-radius:50%;
-      background:radial-gradient(circle, rgba(${rgb},${glowAlpha * 0.3}) 0%, transparent 65%);
+      background:radial-gradient(circle, rgba(${rgb},${isCenter?0.32:0.22}) 0%, transparent 65%);
       pointer-events:none;
+      top:-${glow}px;
+      left:-${glow}px;
     `;
+
+    // Pulsing outer ring on center orb only
+    if (isCenter) {
+      const pulseRing = document.createElement('div');
+      pulseRing.style.cssText = `
+        position:absolute;
+        inset:-10px;
+        border-radius:50%;
+        border:1.5px solid rgba(${rgb},0.35);
+        animation:gPulseRing 3s ease-in-out infinite;
+        pointer-events:none;
+      `;
+      wrapper.appendChild(pulseRing);
+    }
 
     // Main circle
     const circle = document.createElement('div');
     circle.style.cssText = `
       position:absolute;
-      inset:0;
+      top:0;left:0;
+      width:${r*2}px;height:${r*2}px;
       border-radius:50%;
       overflow:hidden;
       box-shadow:
-        0 0 0 2px rgba(${rgb},${0.3 + (isCenter?0.2:0)}),
-        0 0 ${glowSpread * 1.2}px rgba(${rgb},${glowAlpha * 0.65}),
-        0 8px 28px rgba(0,0,0,0.6);
+        0 0 0 ${isCenter?2.5:1.5}px rgba(${rgb},${isCenter?0.45:0.28}),
+        0 0 ${glow*1.1}px rgba(${rgb},${isCenter?0.55:0.4}),
+        0 8px 30px rgba(0,0,0,0.65);
       transition:box-shadow 0.2s;
     `;
 
-    if (hasImg) {
+    // Photo
+    if (imgSrc) {
       const img = document.createElement('img');
       img.src = imgSrc;
       img.loading = 'lazy';
-      img.style.cssText = `width:100%;height:100%;object-fit:cover;display:block;`;
-      // Specialty tint overlay
-      const tint = document.createElement('div');
-      tint.style.cssText = `position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(${rgb},0.15) 0%,rgba(0,0,0,0.0) 60%);pointer-events:none;`;
-      // Shine
-      const shine = document.createElement('div');
-      shine.style.cssText = `position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 28% 26%,rgba(255,255,255,0.2) 0%,transparent 50%);pointer-events:none;`;
+      img.draggable = false;
+      img.style.cssText = `width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;`;
       circle.appendChild(img);
+
+      // Specialty tint
+      const tint = document.createElement('div');
+      tint.style.cssText = `position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 28%,rgba(${rgb},0.16) 0%,rgba(0,0,0,0) 58%);pointer-events:none;`;
       circle.appendChild(tint);
-      circle.appendChild(shine);
-    } else {
-      circle.style.background = `radial-gradient(circle at 32% 30%, ${color}cc, ${color}44)`;
+
+      // Glass bottom gradient for readability
+      const glass = document.createElement('div');
+      glass.style.cssText = `position:absolute;inset:0;border-radius:50%;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.55) 100%);pointer-events:none;`;
+      circle.appendChild(glass);
+
+      // Shine highlight
       const shine = document.createElement('div');
-      shine.style.cssText = `position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 28%,rgba(255,255,255,0.25) 0%,transparent 52%);pointer-events:none;`;
+      shine.style.cssText = `position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 28% 24%,rgba(255,255,255,0.22) 0%,transparent 48%);pointer-events:none;`;
       circle.appendChild(shine);
     }
 
-    // Label below orb (outside the circle)
-    const lbl = document.createElement('div');
-    lbl.style.cssText = `
-      position:absolute;
-      bottom:-22px;
-      left:50%;
-      transform:translateX(-50%);
-      white-space:nowrap;
-      font-size:0.6rem;
-      font-weight:600;
-      color:rgba(255,255,255,0.5);
-      font-family:'Inter',sans-serif;
-      letter-spacing:0.02em;
-      pointer-events:none;
-      text-align:center;
-    `;
-    lbl.textContent = shortLabel || specLabel.slice(0,7);
+    // Label inside circle at bottom
+    if (shortLabel) {
+      const lbl = document.createElement('div');
+      lbl.textContent = shortLabel;
+      lbl.style.cssText = `
+        position:absolute;
+        bottom:${r < 50 ? 5 : 8}px;
+        left:0;right:0;
+        text-align:center;
+        font-size:${r < 50 ? 7.5 : 9}px;
+        font-weight:700;
+        color:rgba(255,255,255,0.92);
+        font-family:'Inter',sans-serif;
+        text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.7);
+        letter-spacing:0.01em;
+        pointer-events:none;
+        padding:0 4px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+      `;
+      circle.appendChild(lbl);
+    }
 
-    // Role badge (top-right of orb)
-    if (role === 'pinned' || role === 'newest') {
+    // Badge top-right (Latest / Pinned)
+    if (role === 'pinned' || role === 'latest') {
       const badge = document.createElement('div');
       badge.style.cssText = `
         position:absolute;
-        top:-4px;right:-4px;
-        width:18px;height:18px;
+        top:-3px;right:-3px;
+        width:17px;height:17px;
         border-radius:50%;
-        background:${role==='pinned'?'#FBB424':'rgba(124,111,255,0.9)'};
-        border:2px solid #0b0b0f;
+        background:${role==='pinned'?'#FBB424':'rgba(124,111,255,0.95)'};
+        border:2px solid #09090d;
         display:flex;align-items:center;justify-content:center;
-        font-size:0.5rem;z-index:2;pointer-events:none;
+        font-size:0.45rem;z-index:3;pointer-events:none;
+        box-shadow:0 0 6px rgba(0,0,0,0.5);
       `;
       badge.textContent = role==='pinned' ? '⭐' : '✦';
       wrapper.appendChild(badge);
@@ -8666,45 +8739,120 @@ function renderOrbConstellation(casesToRender) {
 
     wrapper.appendChild(halo);
     wrapper.appendChild(circle);
-    wrapper.appendChild(lbl);
 
-    // Events
+    // Hover / touch events
+    let longPressTimer = null;
+
     wrapper.addEventListener('mouseenter', (e) => {
-      wrapper.style.transform = 'scale(1.14)';
+      if (_galaxyDragging) return;
+      wrapper.style.transform = 'scale(1.12)';
       wrapper.style.zIndex = 50;
-      circle.style.boxShadow = `0 0 0 2.5px rgba(${rgb},0.75), 0 0 ${glowSpread*2}px rgba(${rgb},0.85), 0 10px 34px rgba(0,0,0,0.65)`;
-      if (bgGlow) bgGlow.style.background = `radial-gradient(circle,rgba(${rgb},0.1) 0%,transparent 70%)`;
+      circle.style.boxShadow = `0 0 0 2.5px rgba(${rgb},0.75), 0 0 ${glow*2}px rgba(${rgb},0.8), 0 10px 36px rgba(0,0,0,0.7)`;
+      if (bgGlow) bgGlow.style.background = `radial-gradient(circle,rgba(${rgb},0.12) 0%,transparent 65%)`;
 
-      const smileUnits = c.surfaces ? `· ${c.surfaces} units` : '';
+      const smileUnits = c.surfaces ? ` · ${c.surfaces} units` : '';
       tooltip.innerHTML = `
         <div style="font-weight:600;font-size:0.8rem;margin-bottom:5px;color:#fff;">${fullLabel}</div>
-        <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
           <span style="background:rgba(${rgb},0.2);color:${color};font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:2px 8px;border-radius:20px;">${specLabel}</span>
-          ${smileUnits?`<span style="font-size:0.6rem;color:rgba(255,255,255,0.3);">${smileUnits}</span>`:''}
-          <span style="font-size:0.58rem;color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:20px;">${roleLabels[role]||role}</span>
+          <span style="font-size:0.58rem;color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:20px;">${ROLE_LBL[role]||role}</span>
         </div>
-        <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);">${dateStr}</div>
-        <div style="font-size:0.6rem;color:rgba(255,255,255,0.18);margin-top:3px;">Tap to open case →</div>
+        <div style="font-size:0.63rem;color:rgba(255,255,255,0.3);margin-bottom:3px;">${dateStr}${smileUnits}</div>
+        <div style="font-size:0.58rem;color:rgba(255,255,255,0.16);">Tap to open · Hold to pin</div>
       `;
       tooltip.style.display = 'block';
-      const rect = field.getBoundingClientRect();
+      const rect = wrap.getBoundingClientRect();
       const tx = e.clientX - rect.left;
       const ty = e.clientY - rect.top;
-      tooltip.style.left = Math.min(Math.max(tx + 18, 4), W - 220) + 'px';
-      tooltip.style.top  = Math.max(ty - 80, 4) + 'px';
+      tooltip.style.left = Math.min(Math.max(tx + 16, 4), (wrap.offsetWidth||340) - 220) + 'px';
+      tooltip.style.top  = Math.max(ty - 90, 4) + 'px';
     });
 
     wrapper.addEventListener('mouseleave', () => {
       wrapper.style.transform = 'scale(1)';
-      wrapper.style.zIndex = isCenter ? 10 : 5;
-      circle.style.boxShadow = `0 0 0 2px rgba(${rgb},${0.3 + (isCenter?0.2:0)}), 0 0 ${glowSpread * 1.2}px rgba(${rgb},${glowAlpha * 0.65}), 0 8px 28px rgba(0,0,0,0.6)`;
+      wrapper.style.zIndex = isCenter ? 12 : 6;
+      circle.style.boxShadow = `0 0 0 ${isCenter?2.5:1.5}px rgba(${rgb},${isCenter?0.45:0.28}), 0 0 ${glow*1.1}px rgba(${rgb},${isCenter?0.55:0.4}), 0 8px 30px rgba(0,0,0,0.65)`;
       tooltip.style.display = 'none';
-      if (bgGlow) bgGlow.style.background = 'radial-gradient(circle,rgba(124,111,255,0.05) 0%,transparent 70%)';
+      if (bgGlow) bgGlow.style.background = 'radial-gradient(circle,rgba(124,111,255,0.08) 0%,transparent 65%)';
     });
 
-    wrapper.addEventListener('click', () => openCaseDetail(c.id));
+    // Long-press to pin (touch)
+    wrapper.addEventListener('touchstart', (e) => {
+      longPressTimer = setTimeout(() => {
+        longPressTimer = null;
+        if (typeof togglePinCase === 'function') togglePinCase(c.id);
+      }, 600);
+    }, { passive: true });
+    wrapper.addEventListener('touchend', () => { clearTimeout(longPressTimer); longPressTimer = null; });
+    wrapper.addEventListener('touchmove', () => { clearTimeout(longPressTimer); longPressTimer = null; }, { passive: true });
+
+    wrapper.addEventListener('click', (e) => {
+      if (_galaxyDragging) { e.stopPropagation(); return; }
+      openCaseDetail(c.id);
+    });
+
     field.appendChild(wrapper);
   });
+
+  // ── DRAG LOGIC ────────────────────────────────────────────────────────
+  _galaxyDragging = false;
+  let dragStartX = 0, fieldOffsetX = 0, velX = 0, lastX = 0, lastT = 0, rafId = null;
+  const maxOffset = CANVAS_EXTRA;
+
+  const clamp = v => Math.max(-maxOffset, Math.min(0, v));
+  const applyOffset = (x, animate) => {
+    field.style.transition = animate ? 'transform 0.35s cubic-bezier(0.25,1,0.5,1)' : 'none';
+    field.style.transform = `translateX(${x}px)`;
+  };
+
+  const onStart = (clientX) => {
+    cancelAnimationFrame(rafId);
+    dragStartX = clientX;
+    lastX = clientX;
+    lastT = Date.now();
+    velX = 0;
+    _galaxyDragging = false;
+    field.style.cursor = 'grabbing';
+  };
+  const onMove = (clientX) => {
+    const now = Date.now();
+    const dx = clientX - dragStartX;
+    if (!_galaxyDragging && Math.abs(dx) > 5) _galaxyDragging = true;
+    if (!_galaxyDragging) return;
+    tooltip.style.display = 'none';
+    velX = (clientX - lastX) / (now - lastT + 1);
+    lastX = clientX; lastT = now;
+    applyOffset(clamp(fieldOffsetX + dx), false);
+  };
+  const onEnd = (clientX) => {
+    const dx = clientX - dragStartX;
+    fieldOffsetX = clamp(fieldOffsetX + dx);
+    field.style.cursor = 'grab';
+    // Momentum
+    let v = velX * 14;
+    const decay = () => {
+      v *= 0.88;
+      fieldOffsetX = clamp(fieldOffsetX + v);
+      applyOffset(fieldOffsetX, false);
+      if (Math.abs(v) > 0.4) rafId = requestAnimationFrame(decay);
+      else applyOffset(fieldOffsetX, true);
+    };
+    rafId = requestAnimationFrame(decay);
+    setTimeout(() => { _galaxyDragging = false; }, 60);
+  };
+
+  // Mouse
+  field.addEventListener('mousedown', e => onStart(e.clientX));
+  window.addEventListener('mousemove', e => { if (field.style.cursor==='grabbing') onMove(e.clientX); });
+  window.addEventListener('mouseup',   e => { if (field.style.cursor==='grabbing') onEnd(e.clientX); });
+
+  // Touch
+  field.addEventListener('touchstart', e => onStart(e.touches[0].clientX), { passive: true });
+  field.addEventListener('touchmove',  e => onMove(e.touches[0].clientX),  { passive: true });
+  field.addEventListener('touchend',   e => onEnd(e.changedTouches[0].clientX), { passive: true });
+
+  // Initial field position centered
+  applyOffset(0, false);
 }
 
 // ─── PROVIFY SHIELD ───
