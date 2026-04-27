@@ -1292,24 +1292,126 @@ body::after {
   #view-dashboard .db-review-item { padding:9px 10px; }
 }
 
-/* ─── CINEMATIC CASES ─── */
-#cases-feed-scroll::-webkit-scrollbar { display:none; }
+/* ─── SWIPEABLE HERO CASES ─── */
 
-/* Hero image — slow Ken Burns (kept for reference, no longer applied) */
-@keyframes heroPanZoom {
-  0%   { transform:scale(1.0) translate(0,0); }
-  50%  { transform:scale(1.06) translate(-1%,0.5%); }
-  100% { transform:scale(1.0) translate(0,0); }
-}
-@keyframes heroImgLoad { from{opacity:0} to{opacity:1} }
-#hero-img {
-  animation: heroImgLoad 0.5s ease both;
+/* Viewport clips peek of adjacent cards */
+#hero-swipe-viewport {
+  overflow: hidden;
+  border-radius: 20px;
+  /* Negative margin + padding trick: lets adjacent cards peek by ~24px each side */
+  margin-left: -24px;
+  margin-right: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
-/* Feed rows hover */
-.cinematic-feed-card {
-  transition: background 0.15s !important;
+/* Each hero card fills the visible width exactly */
+.hero-swipe-card {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 65vh;
+  min-height: 380px;
+  max-height: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background: #0a0a10;
+  /* Small scale on non-active cards to create depth/peek effect */
+  transform: scale(0.94);
+  transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+  flex-shrink: 0;
+  /* Gap between cards in track */
+  margin-right: 12px;
 }
+.hero-swipe-card.active {
+  transform: scale(1.0);
+}
+
+/* Image fills entire card */
+.hero-swipe-card img.swipe-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Strong bottom gradient */
+.hero-swipe-card .swipe-card-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0) 28%,
+    rgba(0,0,0,0.5) 52%,
+    rgba(4,3,10,0.93) 72%,
+    rgba(4,3,10,1) 100%
+  );
+  pointer-events: none;
+}
+
+/* Content pinned bottom-left */
+.hero-swipe-card .swipe-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 22px 24px;
+  z-index: 3;
+}
+
+/* QR badge top-right */
+.hero-swipe-card .swipe-card-qr {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 20px;
+  padding: 5px 11px 5px 8px;
+}
+
+/* Dot indicators */
+#hero-dots .hero-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+#hero-dots .hero-dot.active {
+  width: 18px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.75);
+}
+
+/* Counter top-left */
+.swipe-card-counter {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
 
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
@@ -2741,84 +2843,61 @@ body::after {
 
       </div><!-- /view-dashboard -->
 
-      <!-- CASES VIEW — Featured Galaxy -->
+      <!-- CASES VIEW -->
       <div class="view" id="view-cases">
         <div class="page-header">
           <div class="page-title">My Cases</div>
           <div class="page-sub">Your clinical work, visualised.</div>
         </div>
 
-        <!-- CINEMATIC HERO CASE -->
-        <div id="cases-hero-section" style="margin-bottom:0;">
-          <!-- Hero card: 90vh tall, image fills entire card -->
-          <div id="cases-hero-card" style="position:relative;width:100%;border-radius:20px;overflow:hidden;cursor:pointer;background:#0a0a10;height:90vh;min-height:480px;max-height:780px;box-shadow:0 24px 80px rgba(0,0,0,0.7);transition:box-shadow 0.25s ease;"
-            onmouseover="this.style.boxShadow='0 28px 90px rgba(0,0,0,0.8)'"
-            onmouseout="this.style.boxShadow='0 24px 80px rgba(0,0,0,0.7)'">
+        <!-- SWIPEABLE HERO SYSTEM -->
+        <div id="cases-hero-section" style="margin-bottom:16px;position:relative;">
 
-            <!-- image fill — absolute, covers 100% of card -->
-            <div id="hero-img-layer" style="position:absolute;inset:0;">
-              <img id="hero-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;" />
-            </div>
+          <!-- Outer viewport: clips the peek of adjacent cards -->
+          <div id="hero-swipe-viewport" style="overflow:hidden;border-radius:20px;position:relative;">
 
-            <!-- empty state tooth -->
-            <div id="hero-empty-art" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0.12;pointer-events:none;">🦷</div>
-
-            <!-- strong black gradient: transparent top → near-black bottom -->
-            <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.55) 58%, rgba(4,3,10,0.92) 78%, rgba(4,3,10,0.99) 100%);pointer-events:none;"></div>
-
-            <!-- QR Protected badge — top right -->
-            <div style="position:absolute;top:16px;right:16px;z-index:10;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:5px 12px 5px 8px;">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,1)" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2h-2zM18 14h3M14 18h2M18 18h3M14 21h5v-3"/></svg>
-              <span style="font-size:0.58rem;font-weight:700;letter-spacing:0.08em;color:rgba(255,255,255,0.85);text-transform:uppercase;">QR Protected</span>
-            </div>
-
-            <!-- hidden glow kept for JS compat -->
-            <div id="hero-glow" style="display:none;"></div>
-
-            <!-- content pinned to bottom-left -->
-            <div style="position:absolute;bottom:0;left:0;right:0;z-index:5;padding:0 22px 28px;">
-              <!-- specialty badge -->
-              <div id="hero-badge" style="display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);font-size:0.58rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:20px;width:fit-content;margin-bottom:11px;backdrop-filter:blur(10px);"></div>
-              <!-- case title -->
-              <div id="hero-title" style="font-family:'Instrument Serif',serif;font-size:2.6rem;color:#FFFFFF;letter-spacing:-0.03em;line-height:1.04;margin-bottom:6px;text-shadow:0 2px 20px rgba(0,0,0,1),0 1px 4px rgba(0,0,0,0.8);"></div>
-              <!-- date -->
-              <div id="hero-date" style="font-size:0.73rem;color:rgba(255,255,255,0.48);margin-bottom:22px;"></div>
-              <!-- open button -->
-              <button id="hero-open-btn" style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,0.95);border:none;color:#08080f;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;padding:13px 28px;border-radius:12px;cursor:pointer;transition:all 0.2s ease;letter-spacing:0.01em;box-shadow:0 4px 20px rgba(0,0,0,0.5);"
-                onmouseover="this.style.background='#FFFFFF';this.style.transform='translateY(-2px)'"
-                onmouseout="this.style.background='rgba(255,255,255,0.95)';this.style.transform='none'">
-                Open Case
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
+            <!-- Inner track: slides left/right -->
+            <div id="hero-swipe-track" style="display:flex;transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);will-change:transform;">
+              <!-- Cards injected here by JS -->
             </div>
           </div>
 
-          <!-- RECENT CASES label -->
-          <div id="cases-feed-label" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.16em;color:rgba(255,255,255,0.45);font-weight:700;margin:28px 0 12px;"></div>
-          <!-- RECENT CASES — full-width rows (replaces carousel) -->
-          <div id="cases-feed-scroll" style="display:flex;flex-direction:column;gap:0;"></div>
-        </div>
-        <!-- MINI SPECIALTY STRIP — below recent cases -->
-        <div id="cases-mini-breakdown" style="margin-top:16px;margin-bottom:14px;"></div>
+          <!-- Dot indicators -->
+          <div id="hero-dots" style="display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;min-height:8px;"></div>
 
-        <!-- CASE ARCHIVE CTA — compact sticky row -->
-        <div id="cases-archive-cta" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;transition:border-color 0.2s,background 0.2s;"
+          <!-- Compat stubs: JS reads these ids — kept hidden -->
+          <div id="cases-hero-card" style="display:none;"></div>
+          <div id="hero-img-layer" style="display:none;"></div>
+          <img id="hero-img" style="display:none;" />
+          <div id="hero-badge" style="display:none;"></div>
+          <div id="hero-title" style="display:none;"></div>
+          <div id="hero-date" style="display:none;"></div>
+          <button id="hero-open-btn" style="display:none;"></button>
+          <div id="hero-glow" style="display:none;"></div>
+          <div id="hero-empty-art" style="display:none;"></div>
+        </div>
+
+        <!-- MINI SPECIALTY STRIP -->
+        <div id="cases-mini-breakdown" style="margin-bottom:12px;"></div>
+
+        <!-- CASE ARCHIVE CTA — compact row -->
+        <div id="cases-archive-cta" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;transition:border-color 0.2s,background 0.2s;"
           onclick="showCaseArchive()"
           onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.background='rgba(124,111,255,0.05)'"
           onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">
-          <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:0.82rem;color:rgba(255,255,255,0.85);font-weight:600;letter-spacing:-0.01em;">Case Archive</span>
-            <span id="archive-count-label" style="font-size:0.68rem;color:rgba(255,255,255,0.32);font-weight:400;"></span>
+          <div>
+            <div style="font-size:0.82rem;color:rgba(255,255,255,0.85);font-weight:600;letter-spacing:-0.01em;">Case Archive</div>
+            <div id="archive-count-label" style="font-size:0.68rem;color:rgba(255,255,255,0.32);margin-top:2px;"></div>
           </div>
-          <button onclick="event.stopPropagation();showCaseArchive()" style="background:rgba(124,111,255,0.14);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.76rem;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:all 0.18s;" onmouseover="this.style.background='rgba(124,111,255,0.24)';this.style.borderColor='rgba(124,111,255,0.45)'" onmouseout="this.style.background='rgba(124,111,255,0.14)';this.style.borderColor='rgba(124,111,255,0.25)'">Open →</button>
+          <button onclick="event.stopPropagation();showCaseArchive()" style="background:rgba(124,111,255,0.14);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.76rem;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:all 0.18s;" onmouseover="this.style.background='rgba(124,111,255,0.24)'" onmouseout="this.style.background='rgba(124,111,255,0.14)'">Open →</button>
         </div>
 
-        <!-- HIDDEN — kept for compat -->
+        <!-- HIDDEN compat stubs -->
+        <div id="cases-feed-label" style="display:none;"></div>
+        <div id="cases-feed-scroll" style="display:none;"></div>
         <div id="cases-heatmap-card" style="display:none;"><div id="cases-heatmap"></div><div id="heatmap-labels"></div></div>
         <div id="cases-specialty-chart" style="display:none;"></div>
-        <!-- hidden list container kept so filterCases() doesn't break -->
         <div style="display:none;"><div id="all-cases-list"></div></div>
-        <!-- hidden sort/search kept for filterCases() compat -->
         <input type="text" id="cases-search" style="display:none;">
         <select id="cases-sort" style="display:none;"><option value="newest">Newest First</option><option value="oldest">Oldest First</option><option value="highest">Highest Score</option><option value="lowest">Lowest Score</option></select>
       </div>
@@ -6694,14 +6773,16 @@ function renderCasesMiniBreakdown() {
   const total = allCases.length;
 
   el.innerHTML = `
-    <div style="padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      ${specs.map(s => `
-        <div style="display:flex;align-items:center;gap:4px;">
-          <div style="width:18px;height:2px;border-radius:100px;background:${s.color};opacity:${0.35 + (s.n/total)*0.55};"></div>
-          <span style="font-size:0.58rem;color:rgba(255,255,255,0.3);">${s.label}</span>
-          <span style="font-size:0.58rem;color:${s.color};font-weight:600;opacity:0.75;">${s.n}</span>
-        </div>`).join('<span style="color:rgba(255,255,255,0.08);font-size:0.55rem;">·</span>')}
-      <div style="margin-left:auto;font-size:0.56rem;color:rgba(255,255,255,0.15);">${total} total</div>
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:12px 16px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        ${specs.map(s => `
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:28px;height:4px;border-radius:100px;background:${s.color};opacity:${0.4 + (s.n/total)*0.6};"></div>
+            <span style="font-size:0.62rem;color:rgba(255,255,255,0.4);">${s.label}</span>
+            <span style="font-size:0.62rem;color:${s.color};font-weight:600;">${s.n}</span>
+          </div>`).join('<span style="color:rgba(255,255,255,0.1);font-size:0.6rem;">·</span>')}
+        <div style="margin-left:auto;font-size:0.62rem;color:rgba(255,255,255,0.2);">${total} total</div>
+      </div>
     </div>
   `;
 }
@@ -8475,20 +8556,24 @@ function renderOrbConstellation(casesToRender) {
   renderCinematicCases(casesToRender);
 }
 
-function renderCinematicCases(casesToRender) {
-  const heroCard    = document.getElementById('cases-hero-card');
-  const heroImg     = document.getElementById('hero-img');
-  const heroBadge   = document.getElementById('hero-badge');
-  const heroTitle   = document.getElementById('hero-title');
-  const heroDate    = document.getElementById('hero-date');
-  const heroBtn     = document.getElementById('hero-open-btn');
-  const heroGlow    = document.getElementById('hero-glow');
-  const heroEmpty   = document.getElementById('hero-empty-art');
-  const feedScroll  = document.getElementById('cases-feed-scroll');
-  const feedLabel   = document.getElementById('cases-feed-label');
-  if (!heroCard || !feedScroll) return;
+// ─── SWIPEABLE HERO CASES ───
+// State lives on the module-level object so nav arrows / dots can call goToSlide
+const _heroSwiper = {
+  ordered: [],
+  current: 0,
+  startX: 0,
+  startY: 0,
+  dragging: false,
+  dragDx: 0,
+};
 
-  // ── image helpers ──────────────────────────────────────────
+function renderCinematicCases(casesToRender) {
+  const track    = document.getElementById('hero-swipe-track');
+  const dots     = document.getElementById('hero-dots');
+  const viewport = document.getElementById('hero-swipe-viewport');
+  if (!track || !dots) return;
+
+  // ── helpers ──────────────────────────────────────────────────
   const getImg = c => {
     if (!c.photo_urls) return null;
     if (c.specialty === 'smile')
@@ -8496,127 +8581,201 @@ function renderCinematicCases(casesToRender) {
              || Object.values(c.photo_urls).find(Boolean) || null;
     return Object.values(c.photo_urls).find(Boolean) || null;
   };
-
-  // ── spec maps ──────────────────────────────────────────────
   const SC  = {endo:'#7C6FFF',restorative:'#F59E0B',smile:'#F59E0B',surgery:'#EF4444',paeds:'#34D399',prostho:'#38BDF8'};
   const SR  = {endo:'124,111,255',restorative:'245,158,11',smile:'245,158,11',surgery:'239,68,68',paeds:'52,211,153',prostho:'56,189,248'};
   const SLB = {endo:'ENDODONTICS',restorative:'RESTORATIVE',smile:'SMILE DESIGN',surgery:'SURGERY',paeds:'PAEDIATRIC',prostho:'PROSTHO'};
 
-  const src = allCases;
+  // ── build ordered list ────────────────────────────────────────
   const pinnedIds = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
-
-  // Build ordered list: pinned first, then by recency
   const used = new Set();
   const ordered = [];
   pinnedIds.forEach(id => {
-    const c = src.find(x => x.id === id);
+    const c = allCases.find(x => x.id === id);
     if (c && !used.has(c.id)) { ordered.push(c); used.add(c.id); }
   });
-  src.forEach(c => { if (!used.has(c.id)) { ordered.push(c); used.add(c.id); } });
+  allCases.forEach(c => { if (!used.has(c.id)) { ordered.push(c); used.add(c.id); } });
+  _heroSwiper.ordered = ordered;
+  _heroSwiper.current = 0;
 
-  // ── EMPTY STATE ───────────────────────────────────────────
+  // ── empty state ───────────────────────────────────────────────
   if (ordered.length === 0) {
-    heroTitle.textContent = 'No cases yet';
-    heroBadge.textContent = 'GET STARTED';
-    heroDate.textContent = 'Log your first case to see it here';
-    if (heroBtn) { heroBtn.style.display = 'none'; }
-    feedScroll.innerHTML = '';
-    if (feedLabel) feedLabel.textContent = '';
+    track.innerHTML = `
+      <div class="hero-swipe-card active" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+        <div style="font-size:48px;opacity:0.15;">🦷</div>
+        <div style="font-size:1rem;color:rgba(255,255,255,0.3);">No cases yet</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.18);">Log your first case to see it here</div>
+      </div>`;
+    dots.innerHTML = '';
     return;
   }
 
-  // ── HERO (first/pinned case) ──────────────────────────────
-  const hero = ordered[0];
-  const heroImgUrl = getImg(hero);
-  const heroSpecColor = SC[hero.specialty] || '#7C6FFF';
-  const heroSpecRgb   = SR[hero.specialty] || '124,111,255';
-  const heroSpecLabel = SLB[hero.specialty] || (hero.specialty||'CASE').toUpperCase();
-  const heroName = hero.specialty === 'smile'
-    ? (hero.procedure || 'Smile Case')
-    : (hero.procedure || hero.case_type || (hero.tooth_number ? `Tooth ${hero.tooth_number}` : heroSpecLabel));
-  const heroDateStr = new Date(hero.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
-
-  // Image
-  heroImg.src = heroImgUrl || '';
-  heroImg.style.display = heroImgUrl ? 'block' : 'none';
-  heroEmpty.style.display = heroImgUrl ? 'none' : 'flex';
-  if (heroImgUrl) {
-    // subtle ken-burns
-    setTimeout(() => { heroImg.style.transform = 'scale(1.04)'; }, 60);
-  }
-
-  // Badge color
-  heroBadge.textContent = heroSpecLabel;
-  heroBadge.style.background = `rgba(${heroSpecRgb},0.15)`;
-  heroBadge.style.borderColor = `rgba(${heroSpecRgb},0.3)`;
-  heroBadge.style.color = heroSpecColor;
-
-  // Glow
-  if (heroGlow) heroGlow.style.background = `radial-gradient(circle,rgba(${heroSpecRgb},0.13) 0%,transparent 65%)`;
-
-  heroTitle.textContent = heroName;
-  heroDate.textContent  = heroDateStr;
-
-  if (heroBtn) {
-    heroBtn.style.display = 'inline-flex';
-    heroBtn.onclick = () => openCaseDetail(hero.id);
-  }
-  heroCard.onclick = (e) => {
-    if (e.target === heroBtn || heroBtn.contains(e.target)) return;
-    openCaseDetail(hero.id);
-  };
-
-  // ── FEED (remaining cases — full-width rows, no carousel) ────
-  const feedCases = ordered.slice(1, 4); // show max 3 rows
-  if (feedLabel) {
-    feedLabel.textContent = feedCases.length > 0 ? 'Recent Cases' : '';
-  }
-
-  feedScroll.innerHTML = '';
-  feedCases.forEach((c, idx) => {
-    const imgUrl   = getImg(c);
-    const specCol  = SC[c.specialty]  || '#7C6FFF';
-    const specRgb  = SR[c.specialty]  || '124,111,255';
-    const label    = SLB[c.specialty] || (c.specialty||'CASE').toUpperCase();
-    const title    = c.specialty === 'smile'
+  // ── build all slide cards ─────────────────────────────────────
+  track.innerHTML = '';
+  ordered.forEach((c, idx) => {
+    const imgUrl    = getImg(c);
+    const specColor = SC[c.specialty]  || '#7C6FFF';
+    const specRgb   = SR[c.specialty]  || '124,111,255';
+    const specLabel = SLB[c.specialty] || (c.specialty||'CASE').toUpperCase();
+    const title     = c.specialty === 'smile'
       ? (c.procedure || 'Smile Case')
-      : (c.procedure || c.case_type || (c.tooth_number ? `Tooth ${c.tooth_number}` : label));
-    const shortDate = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      : (c.procedure || c.case_type || (c.tooth_number ? `Tooth ${c.tooth_number}` : specLabel));
+    const dateStr   = new Date(c.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+    const total     = ordered.length;
 
-    const row = document.createElement('div');
-    const isLast = idx === feedCases.length - 1;
-    row.style.cssText = `
-      display:flex;
-      align-items:center;
-      gap:13px;
-      padding:11px 4px;
-      border-bottom:${isLast ? 'none' : '1px solid rgba(255,255,255,0.055)'};
-      cursor:pointer;
-      transition:background 0.15s;
-      border-radius:10px;
-    `;
-    row.onmouseover = () => { row.style.background = 'rgba(255,255,255,0.03)'; };
-    row.onmouseout  = () => { row.style.background = 'transparent'; };
+    const card = document.createElement('div');
+    card.className = 'hero-swipe-card' + (idx === 0 ? ' active' : '');
+    card.dataset.idx = idx;
 
-    // thumbnail
-    const thumb = imgUrl
-      ? `<img src="${imgUrl}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0;display:block;" />`
-      : `<div style="width:52px;height:52px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,rgba(${specRgb},0.18),rgba(${specRgb},0.06));display:flex;align-items:center;justify-content:center;font-size:20px;opacity:0.5;">🦷</div>`;
-
-    row.innerHTML = `
-      ${thumb}
-      <div style="flex:1;min-width:0;">
-        <div style="font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(255,255,255,0.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;">${title}</div>
-        <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:3px;">${shortDate}</div>
+    card.innerHTML = `
+      ${imgUrl
+        ? `<img class="swipe-card-img" src="${imgUrl}" alt="" />`
+        : `<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(${specRgb},0.18),#0a0a10);display:flex;align-items:center;justify-content:center;font-size:52px;opacity:0.15;">🦷</div>`
+      }
+      <div class="swipe-card-gradient"></div>
+      <!-- counter top-left -->
+      <div class="swipe-card-counter">${idx + 1} / ${total}</div>
+      <!-- QR badge top-right -->
+      <div class="swipe-card-qr">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,1)" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2h-2zM18 14h3M14 18h2M18 18h3M14 21h5v-3"/></svg>
+        <span style="font-size:0.56rem;font-weight:700;letter-spacing:0.07em;color:rgba(255,255,255,0.8);text-transform:uppercase;">QR Protected</span>
       </div>
-      <div style="flex-shrink:0;text-align:right;">
-        <span style="font-size:0.52rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;background:rgba(${specRgb},0.15);border:1px solid rgba(${specRgb},0.28);color:${specCol};padding:3px 8px;border-radius:20px;display:inline-block;">${label}</span>
+      <!-- bottom-left content -->
+      <div class="swipe-card-content">
+        <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,0.4);border:1px solid rgba(${specRgb},0.35);color:${specColor};font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:10px;backdrop-filter:blur(10px);">${specLabel}</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:2.2rem;color:#FFFFFF;letter-spacing:-0.03em;line-height:1.05;margin-bottom:6px;text-shadow:0 2px 24px rgba(0,0,0,1),0 1px 4px rgba(0,0,0,0.8);">${title}</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);margin-bottom:20px;">${dateStr}</div>
+        <button onclick="event.stopPropagation();openCaseDetail('${c.id}')"
+          style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,0.94);border:none;color:#08080f;font-family:'Inter',sans-serif;font-size:0.87rem;font-weight:700;padding:12px 26px;border-radius:12px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(0,0,0,0.5);letter-spacing:0.01em;"
+          onmouseover="this.style.background='#fff';this.style.transform='translateY(-2px)'"
+          onmouseout="this.style.background='rgba(255,255,255,0.94)';this.style.transform='none'">
+          Open Case
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
       </div>
     `;
-    row.onclick = () => openCaseDetail(c.id);
-    feedScroll.appendChild(row);
+    track.appendChild(card);
+  });
+
+  // ── dot indicators ────────────────────────────────────────────
+  _renderHeroDots();
+
+  // ── position track at idx 0 ───────────────────────────────────
+  _positionHeroTrack(0, false);
+
+  // ── touch / mouse swipe ───────────────────────────────────────
+  _attachHeroSwipeListeners(track, viewport);
+}
+
+// ── Render dots ───────────────────────────────────────────────────
+function _renderHeroDots() {
+  const dots = document.getElementById('hero-dots');
+  if (!dots) return;
+  const n = _heroSwiper.ordered.length;
+  // Show dots only when <= 10 cases; beyond that just show counter in card
+  if (n <= 1) { dots.innerHTML = ''; return; }
+  const max = Math.min(n, 10);
+  dots.innerHTML = '';
+  for (let i = 0; i < max; i++) {
+    const d = document.createElement('div');
+    d.className = 'hero-dot' + (i === _heroSwiper.current ? ' active' : '');
+    d.onclick = () => goToHeroSlide(i);
+    dots.appendChild(d);
+  }
+}
+
+// ── Go to slide ───────────────────────────────────────────────────
+function goToHeroSlide(idx, animate = true) {
+  const n = _heroSwiper.ordered.length;
+  if (n === 0) return;
+  idx = Math.max(0, Math.min(n - 1, idx));
+  _heroSwiper.current = idx;
+  _positionHeroTrack(idx, animate);
+
+  // Update active class on cards
+  document.querySelectorAll('.hero-swipe-card').forEach((card, i) => {
+    card.classList.toggle('active', i === idx);
+  });
+  // Update dots
+  document.querySelectorAll('#hero-dots .hero-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
   });
 }
+
+// ── Position track ────────────────────────────────────────────────
+function _positionHeroTrack(idx, animate) {
+  const track = document.getElementById('hero-swipe-track');
+  if (!track) return;
+  // Each card is 100% viewport width + 12px gap
+  // We use the track width approach: translate by cardWidth * idx
+  const card = track.querySelector('.hero-swipe-card');
+  if (!card) return;
+  const cardW = card.offsetWidth + 12; // card width + gap
+  track.style.transition = animate ? 'transform 0.38s cubic-bezier(0.4,0,0.2,1)' : 'none';
+  track.style.transform = `translateX(-${cardW * idx}px)`;
+}
+
+// ── Swipe listeners ───────────────────────────────────────────────
+function _attachHeroSwipeListeners(track, viewport) {
+  const el = viewport || track;
+  let startX = 0, startY = 0, isDragging = false, hasMoved = false;
+
+  const onStart = (x, y) => {
+    startX = x; startY = y; isDragging = true; hasMoved = false;
+    track.style.transition = 'none';
+  };
+  const onMove = (x, y) => {
+    if (!isDragging) return;
+    const dx = x - startX;
+    const dy = y - startY;
+    if (!hasMoved && Math.abs(dy) > Math.abs(dx) + 4) {
+      // Vertical scroll — abort swipe
+      isDragging = false; return;
+    }
+    hasMoved = true;
+    const card = track.querySelector('.hero-swipe-card');
+    if (!card) return;
+    const cardW = card.offsetWidth + 12;
+    const base  = -cardW * _heroSwiper.current;
+    // Rubber-band at edges
+    const n = _heroSwiper.ordered.length;
+    let offset = dx;
+    if ((_heroSwiper.current === 0 && dx > 0) || (_heroSwiper.current === n - 1 && dx < 0)) {
+      offset = dx * 0.22;
+    }
+    track.style.transform = `translateX(${base + offset}px)`;
+  };
+  const onEnd = (x) => {
+    if (!isDragging) return;
+    isDragging = false;
+    const dx = x - startX;
+    const threshold = 50;
+    if (dx < -threshold) {
+      goToHeroSlide(_heroSwiper.current + 1);
+    } else if (dx > threshold) {
+      goToHeroSlide(_heroSwiper.current - 1);
+    } else {
+      goToHeroSlide(_heroSwiper.current); // snap back
+    }
+  };
+
+  // Touch
+  el.addEventListener('touchstart',  e => onStart(e.touches[0].clientX, e.touches[0].clientY), {passive:true});
+  el.addEventListener('touchmove',   e => onMove(e.touches[0].clientX, e.touches[0].clientY),  {passive:true});
+  el.addEventListener('touchend',    e => onEnd(e.changedTouches[0].clientX));
+
+  // Mouse (desktop)
+  el.addEventListener('mousedown',  e => { onStart(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', e => { if (isDragging) { onMove(e.clientX, e.clientY); e.preventDefault(); } });
+  window.addEventListener('mouseup',   e => { if (isDragging) onEnd(e.clientX); });
+
+  // Re-position on window resize (card width changes)
+  window.addEventListener('resize', () => {
+    if (document.getElementById('view-cases')?.classList.contains('active')) {
+      _positionHeroTrack(_heroSwiper.current, false);
+    }
+  });
+}
+
 
 
 
