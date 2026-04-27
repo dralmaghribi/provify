@@ -1294,41 +1294,33 @@ body::after {
 
 /* ─── SWIPEABLE HERO CASES ─── */
 
-/* Viewport clips peek of adjacent cards */
 #hero-swipe-viewport {
   overflow: hidden;
   border-radius: 20px;
-  /* Negative margin + padding trick: lets adjacent cards peek by ~24px each side */
-  margin-left: -24px;
-  margin-right: -24px;
-  padding-left: 24px;
-  padding-right: 24px;
+  width: 100%;
+  /* No negative margins, no padding tricks — just clip */
 }
 
-/* Each hero card fills the visible width exactly */
+#hero-swipe-track {
+  display: flex;
+  /* transition set by JS */
+  will-change: transform;
+  /* Cards sit flush with no gap — track width = N * cardWidth */
+}
+
 .hero-swipe-card {
-  flex: 0 0 100%;
-  width: 100%;
+  /* Width set explicitly by JS to match viewport px — no flex percentages */
+  flex-shrink: 0;
   height: 65vh;
   min-height: 380px;
   max-height: 600px;
   border-radius: 20px;
   overflow: hidden;
   position: relative;
-  cursor: pointer;
   background: #0a0a10;
-  /* Small scale on non-active cards to create depth/peek effect */
-  transform: scale(0.94);
-  transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
-  flex-shrink: 0;
-  /* Gap between cards in track */
-  margin-right: 12px;
-}
-.hero-swipe-card.active {
-  transform: scale(1.0);
+  /* No scale, no gap — cards sit edge to edge in track */
 }
 
-/* Image fills entire card */
 .hero-swipe-card img.swipe-card-img {
   position: absolute;
   inset: 0;
@@ -1338,7 +1330,6 @@ body::after {
   display: block;
 }
 
-/* Strong bottom gradient */
 .hero-swipe-card .swipe-card-gradient {
   position: absolute;
   inset: 0;
@@ -1353,21 +1344,16 @@ body::after {
   pointer-events: none;
 }
 
-/* Content pinned bottom-left */
 .hero-swipe-card .swipe-card-content {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   padding: 0 22px 24px;
   z-index: 3;
 }
 
-/* QR badge top-right */
 .hero-swipe-card .swipe-card-qr {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 14px; right: 14px;
   z-index: 4;
   display: flex;
   align-items: center;
@@ -1380,7 +1366,6 @@ body::after {
   padding: 5px 11px 5px 8px;
 }
 
-/* Dot indicators */
 #hero-dots .hero-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
@@ -1394,11 +1379,9 @@ body::after {
   background: rgba(255,255,255,0.75);
 }
 
-/* Counter top-left */
 .swipe-card-counter {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: 14px; left: 14px;
   z-index: 4;
   font-size: 0.6rem;
   font-weight: 700;
@@ -1408,6 +1391,10 @@ body::after {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.1);
 }
@@ -8656,14 +8643,25 @@ function renderCinematicCases(casesToRender) {
     track.appendChild(card);
   });
 
+  // ── set explicit pixel width on every card after DOM insert ─────
+  // Must happen after appendChild so offsetWidth is available
+  const vpW = viewport ? viewport.offsetWidth : (document.getElementById('hero-swipe-viewport')?.offsetWidth || window.innerWidth);
+  _heroSwiper.cardW = vpW;
+  track.querySelectorAll('.hero-swipe-card').forEach(c => {
+    c.style.width = vpW + 'px';
+  });
+
   // ── dot indicators ────────────────────────────────────────────
   _renderHeroDots();
 
-  // ── position track at idx 0 ───────────────────────────────────
+  // ── position track at idx 0 (no animation) ───────────────────
   _positionHeroTrack(0, false);
 
-  // ── touch / mouse swipe ───────────────────────────────────────
-  _attachHeroSwipeListeners(track, viewport);
+  // ── attach swipe — only once per render ──────────────────────
+  if (!_heroSwiper._listenersAttached) {
+    _heroSwiper._listenersAttached = true;
+    _attachHeroSwipeListeners(track, viewport);
+  }
 }
 
 // ── Render dots ───────────────────────────────────────────────────
@@ -8705,109 +8703,94 @@ function goToHeroSlide(idx, animate = true) {
 function _positionHeroTrack(idx, animate) {
   const track = document.getElementById('hero-swipe-track');
   if (!track) return;
-  // cardW = full width of the viewport (cards are flex 0 0 100% of viewport)
-  // Read from the viewport element, not the card, to avoid flex-child sizing quirks
-  const viewport = document.getElementById('hero-swipe-viewport');
-  const cardW = viewport ? viewport.offsetWidth : (track.offsetWidth || window.innerWidth);
+  // cardW is viewport width — always read from viewport element, never from cards
+  const vp = document.getElementById('hero-swipe-viewport');
+  const cardW = _heroSwiper.cardW || (vp ? vp.offsetWidth : window.innerWidth);
   _heroSwiper.cardW = cardW;
-  track.style.transition = animate
-    ? 'transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    : 'none';
-  track.style.transform = `translateX(-${cardW * idx}px)`;
+  track.style.transition = animate ? 'transform 0.25s ease-out' : 'none';
+  track.style.transform  = `translateX(${-cardW * idx}px)`;
 }
 
-// ── Swipe listeners ───────────────────────────────────────────────
+// ── Swipe listeners (attached once) ──────────────────────────────
 function _attachHeroSwipeListeners(track, viewport) {
   const el = viewport || track;
+  let startX = 0, startY = 0, active = false, axisLocked = false, isHoriz = false;
 
-  let startX      = 0;
-  let startY      = 0;
-  let isDragging  = false;
-  let isScrolling = false;
-  let hasMoved    = false;
-  let cardW       = 0;
-
-  const onStart = (x, y) => {
-    // Lock card width at gesture start using viewport width — correct and stable
+  const getCardW = () => {
     const vp = document.getElementById('hero-swipe-viewport');
-    cardW = vp ? vp.offsetWidth : window.innerWidth;
-    _heroSwiper.cardW = cardW;
+    return vp ? vp.offsetWidth : window.innerWidth;
+  };
 
-    startX      = x;
-    startY      = y;
-    isDragging  = true;
-    isScrolling = false;
-    hasMoved    = false;
+  const start = (x, y) => {
+    _heroSwiper.cardW = getCardW(); // refresh on each gesture
+    startX   = x;
+    startY   = y;
+    active   = true;
+    axisLocked = false;
+    isHoriz  = false;
     track.style.transition = 'none';
   };
 
-  const onMove = (x, y) => {
-    if (!isDragging || isScrolling) return;
+  const move = (x, y) => {
+    if (!active) return;
     const dx = x - startX;
     const dy = y - startY;
 
-    if (!hasMoved) {
-      // Determine intent on first real movement
-      if (Math.abs(dy) > Math.abs(dx) + 5) {
-        // Vertical scroll intent — release the gesture cleanly
-        isScrolling = true;
-        isDragging  = false;
-        goToHeroSlide(_heroSwiper.current);
+    // Lock axis on first significant movement
+    if (!axisLocked) {
+      if (Math.abs(dx) < 3 && Math.abs(dy) < 3) return; // dead zone
+      isHoriz  = Math.abs(dx) >= Math.abs(dy);
+      axisLocked = true;
+      if (!isHoriz) {
+        // Vertical scroll — surrender gesture immediately
+        active = false;
+        goToHeroSlide(_heroSwiper.current); // restore snap
         return;
       }
-      if (Math.abs(dx) < 3) return; // tiny dead zone
-      hasMoved = true;
     }
+    if (!isHoriz) return;
 
-    const n    = _heroSwiper.ordered.length;
-    const base = -cardW * _heroSwiper.current;
+    const cardW = _heroSwiper.cardW;
+    const n     = _heroSwiper.ordered.length;
+    const base  = -cardW * _heroSwiper.current;
 
-    // 1:1 finger tracking — feels native, not laggy
+    // 1:1 finger tracking in the middle, rubber-band only at edges
     let offset = dx;
-
-    // Soft rubber-band only at the two ends (no resistance in the middle)
     if ((_heroSwiper.current === 0 && dx > 0) ||
         (_heroSwiper.current === n - 1 && dx < 0)) {
-      offset = dx * 0.25;
+      offset = dx * 0.2; // strong rubber-band at boundaries
     }
-
     track.style.transform = `translateX(${base + offset}px)`;
   };
 
-  const onEnd = (x) => {
-    if (!isDragging) return;
-    isDragging = false;
-    if (!hasMoved) return;
-
+  const end = (x) => {
+    if (!active || !isHoriz) { active = false; return; }
+    active = false;
     const dx = x - startX;
-    // Fixed 80px threshold — intentional but easy to clear
-    const THRESHOLD = 80;
-
-    if (dx < -THRESHOLD) {
-      goToHeroSlide(_heroSwiper.current + 1); // always +1, never more
-    } else if (dx > THRESHOLD) {
-      goToHeroSlide(_heroSwiper.current - 1); // always -1, never more
-    } else {
-      goToHeroSlide(_heroSwiper.current);     // snap back
-    }
+    // 80px fixed threshold — clear but intentional
+    if      (dx < -80) goToHeroSlide(_heroSwiper.current + 1);
+    else if (dx >  80) goToHeroSlide(_heroSwiper.current - 1);
+    else               goToHeroSlide(_heroSwiper.current);
   };
 
-  // Touch
-  el.addEventListener('touchstart', e => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-  el.addEventListener('touchmove',  e => onMove(e.touches[0].clientX,  e.touches[0].clientY), { passive: true });
-  el.addEventListener('touchend',   e => onEnd(e.changedTouches[0].clientX));
+  // Touch — passive start/move so browser can still scroll vertically
+  el.addEventListener('touchstart', e => start(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  el.addEventListener('touchmove',  e => move(e.touches[0].clientX,  e.touches[0].clientY), { passive: true });
+  el.addEventListener('touchend',   e => end(e.changedTouches[0].clientX));
+  el.addEventListener('touchcancel',() => { active = false; goToHeroSlide(_heroSwiper.current); });
 
   // Mouse
-  el.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
-  window.addEventListener('mousemove', e => { if (isDragging) { e.preventDefault(); onMove(e.clientX, e.clientY); } });
-  window.addEventListener('mouseup',   e => { if (isDragging) onEnd(e.clientX); });
+  el.addEventListener('mousedown', e => { start(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', e => { if (active && isHoriz) { e.preventDefault(); move(e.clientX, e.clientY); } });
+  window.addEventListener('mouseup',   e => { if (active) end(e.clientX); });
 
-  // Resize: re-snap with fresh measurement
+  // Resize — update card widths and re-snap
   window.addEventListener('resize', () => {
-    _heroSwiper.cardW = null;
-    if (document.getElementById('view-cases')?.classList.contains('active')) {
-      _positionHeroTrack(_heroSwiper.current, false);
-    }
+    const vp = document.getElementById('hero-swipe-viewport');
+    const w  = vp ? vp.offsetWidth : window.innerWidth;
+    _heroSwiper.cardW = w;
+    track.querySelectorAll('.hero-swipe-card').forEach(c => { c.style.width = w + 'px'; });
+    _positionHeroTrack(_heroSwiper.current, false);
   });
 }
 
