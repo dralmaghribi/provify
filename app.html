@@ -1294,9 +1294,52 @@ body::after {
 
 /* ─── CINEMATIC CASES ─── */
 #cases-feed-scroll::-webkit-scrollbar { display:none; }
-#cases-hero-card { will-change:transform; }
+
+/* Hero card — ambient edge glow */
+#cases-hero-card {
+  will-change:transform;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 20px 60px rgba(0,0,0,0.55),
+    0 0 40px rgba(124,111,255,0.06),
+    0 0 80px rgba(124,111,255,0.04);
+  transition:transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Hero image — slow Ken Burns */
+@keyframes heroPanZoom {
+  0%   { transform:scale(1.0) translate(0,0); }
+  50%  { transform:scale(1.06) translate(-1%,0.5%); }
+  100% { transform:scale(1.0) translate(0,0); }
+}
 @keyframes heroImgLoad { from{opacity:0} to{opacity:1} }
-#hero-img { animation:heroImgLoad 0.5s ease both; }
+#hero-img {
+  animation:
+    heroImgLoad 0.6s ease both,
+    heroPanZoom 18s ease-in-out infinite;
+  animation-delay:0s, 0.6s;
+  will-change:transform;
+}
+
+/* Hero title — sharper rendering */
+#hero-title {
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  text-shadow:0 2px 20px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.5);
+}
+
+/* Feed cards — elevated shadows */
+.cinematic-feed-card {
+  transition:transform 0.25s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.25s ease !important;
+}
+.cinematic-feed-card:hover {
+  transform:scale(1.04) !important;
+  box-shadow:0 12px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.09) !important;
+}
+.cinematic-feed-card:active {
+  transform:scale(0.97) !important;
+  transition:transform 0.1s ease !important;
+}
 
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
@@ -2746,7 +2789,9 @@ body::after {
               <img id="hero-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;transform-origin:center;transition:transform 8s ease;" />
             </div>
             <!-- gradient overlay bottom fade -->
-            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.15) 35%,rgba(5,4,12,0.72) 70%,rgba(5,4,12,0.95) 100%);pointer-events:none;"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.04) 0%,rgba(0,0,0,0.1) 28%,rgba(5,4,12,0.65) 60%,rgba(5,4,12,0.96) 100%);pointer-events:none;"></div>
+            <!-- noise texture overlay -->
+            <div style="position:absolute;inset:0;opacity:0.022;pointer-events:none;background-image:url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');background-size:180px;"></div>
             <!-- soft glow top accent -->
             <div id="hero-glow" style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:70%;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,255,0.12) 0%,transparent 65%);pointer-events:none;transition:background 0.5s;"></div>
             <!-- empty state art -->
@@ -8549,7 +8594,7 @@ function renderCinematicCases(casesToRender) {
   }
 
   feedScroll.innerHTML = '';
-  feedCases.forEach(c => {
+  feedCases.forEach((c, idx) => {
     const imgUrl = getImg(c);
     const specCol = SC[c.specialty] || '#7C6FFF';
     const specRgb = SR[c.specialty] || '124,111,255';
@@ -8558,8 +8603,11 @@ function renderCinematicCases(casesToRender) {
       ? (c.procedure || 'Smile Case')
       : (c.procedure || c.case_type || (c.tooth_number ? `T${c.tooth_number}` : label));
     const shortDate = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    // Vary brightness slightly so cards feel distinct
+    const brightness = [1, 0.92, 1.05, 0.88, 0.96][idx % 5];
 
     const card = document.createElement('div');
+    card.className = 'cinematic-feed-card';
     card.style.cssText = `
       flex:0 0 130px;
       height:170px;
@@ -8570,33 +8618,22 @@ function renderCinematicCases(casesToRender) {
       scroll-snap-align:start;
       background:var(--navy-3);
       border:1px solid rgba(255,255,255,0.06);
-      transition:transform 0.22s ease,box-shadow 0.22s ease;
-      box-shadow:0 4px 24px rgba(0,0,0,0.35);
+      box-shadow:0 6px 28px rgba(0,0,0,0.4),0 0 0 1px rgba(255,255,255,0.04);
     `;
     card.innerHTML = `
       <div style="position:absolute;inset:0;">
         ${imgUrl
-          ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;" />`
+          ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;display:block;filter:brightness(${brightness});transition:filter 0.25s ease;" />`
           : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(${specRgb},0.12),var(--navy-3));display:flex;align-items:center;justify-content:center;font-size:26px;opacity:0.35;">🦷</div>`
         }
       </div>
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(5,4,12,0.82) 100%);"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 25%,rgba(5,4,12,0.88) 100%);"></div>
       <div style="position:absolute;top:9px;left:9px;font-size:0.48rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;background:rgba(${specRgb},0.2);border:1px solid rgba(${specRgb},0.3);color:${specCol};padding:2px 7px;border-radius:20px;backdrop-filter:blur(6px);">${label}</div>
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:0 10px 10px;">
-        <div style="font-family:'Instrument Serif',serif;font-size:0.82rem;color:#FAFAFA;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">${title}</div>
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:0 10px 11px;">
+        <div style="font-family:'Instrument Serif',serif;font-size:0.82rem;color:#FAFAFA;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;text-shadow:0 1px 6px rgba(0,0,0,0.8);">${title}</div>
         <div style="font-size:0.56rem;color:rgba(250,250,250,0.32);">${shortDate}</div>
       </div>
     `;
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'scale(1.04)';
-      card.style.boxShadow = `0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(${specRgb},0.2)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'scale(1)';
-      card.style.boxShadow = '0 4px 24px rgba(0,0,0,0.35)';
-    });
-    card.addEventListener('touchstart', () => { card.style.transform = 'scale(0.97)'; }, {passive:true});
-    card.addEventListener('touchend',   () => { card.style.transform = 'scale(1)'; },   {passive:true});
     card.onclick = () => openCaseDetail(c.id);
     feedScroll.appendChild(card);
   });
