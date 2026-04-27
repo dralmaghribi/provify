@@ -8383,8 +8383,8 @@ function renderOrbConstellation(casesToRender) {
   field.innerHTML = '';
   field.style.position = 'relative';
 
-  orbData.forEach(orb => {
-    const { c, radius, recency, x, y } = orb;
+  orbData.forEach(orbItem => {
+    const { c, radius, recency, x, y, score } = orbItem;
     const color = specColors[c.specialty] || '#7C6FFF';
     const glowBase = specGlows[c.specialty] || 'rgba(124,111,255,';
     const glowAlpha = 0.25 + recency * 0.45;
@@ -8398,8 +8398,8 @@ function renderOrbConstellation(casesToRender) {
       ? (nickname || c.procedure || 'Smile')
       : (fdi ? `T${c.tooth_number}` : '?');
 
-    const orb = document.createElement('div');
-    orb.style.cssText = `
+    const orbEl = document.createElement('div');
+    orbEl.style.cssText = `
       position:absolute;
       left:${x - radius}px;
       top:${y - radius}px;
@@ -8412,7 +8412,7 @@ function renderOrbConstellation(casesToRender) {
       transition:transform 0.18s cubic-bezier(0.4,0,0.2,1),box-shadow 0.18s;
       animation:orbFloat ${animDuration}s ${animDelay}s ease-in-out infinite;
       display:flex;align-items:center;justify-content:center;
-      z-index:${Math.round(orb.score || 1)};
+      z-index:${Math.round(score || 1)};
       border:1px solid ${glowBase}0.4);
     `;
 
@@ -8421,37 +8421,35 @@ function renderOrbConstellation(casesToRender) {
       const lbl = document.createElement('span');
       lbl.textContent = label;
       lbl.style.cssText = `font-size:${Math.max(7, radius * 0.38)}px;color:rgba(255,255,255,0.9);font-weight:700;font-family:'Inter',sans-serif;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8);text-align:center;line-height:1.1;max-width:${radius*1.6}px;overflow:hidden;`;
-      orb.appendChild(lbl);
+      orbEl.appendChild(lbl);
     }
 
-    orb.addEventListener('mouseenter', (e) => {
-      orb.style.transform = 'scale(1.22)';
-      orb.style.zIndex = 999;
+    orbEl.addEventListener('mouseenter', (e) => {
+      orbEl.style.transform = 'scale(1.22)';
+      orbEl.style.zIndex = 999;
       const date = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
       const specLabel = { endo:'Endodontics', restorative:'Restorative', smile:'Smile', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho' }[c.specialty] || c.specialty;
       const fullLabel = isSmile ? (nickname || c.procedure || 'Smile Case') : (nickname || (fdi ? `${fdi} · Tooth ${c.tooth_number}` : '—'));
       tooltip.innerHTML = `<div style="font-weight:600;margin-bottom:3px;">${fullLabel}</div><div style="color:${color};font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${specLabel}</div><div style="color:rgba(255,255,255,0.4);font-size:0.65rem;">${date} · Score ${c.complexity_score||'–'}</div>`;
       tooltip.style.display = 'block';
-      // position tooltip
       const rect = field.getBoundingClientRect();
       const ex = e.clientX - rect.left;
       const ey = e.clientY - rect.top;
       tooltip.style.left = Math.min(ex + 14, W - 200) + 'px';
       tooltip.style.top = Math.max(ey - 60, 4) + 'px';
-      // update bg glow color
       if (bgGlow) bgGlow.style.background = `radial-gradient(circle,${glowBase}0.08) 0%,transparent 70%)`;
     });
 
-    orb.addEventListener('mouseleave', () => {
-      orb.style.transform = 'scale(1)';
-      orb.style.zIndex = Math.round(c.complexity_score || 1);
+    orbEl.addEventListener('mouseleave', () => {
+      orbEl.style.transform = 'scale(1)';
+      orbEl.style.zIndex = Math.round(c.complexity_score || 1);
       tooltip.style.display = 'none';
       if (bgGlow) bgGlow.style.background = 'radial-gradient(circle,rgba(124,111,255,0.06) 0%,transparent 70%)';
     });
 
-    orb.addEventListener('click', () => openCaseDetail(c.id));
-    orb.setAttribute('data-case-id', c.id);
-    field.appendChild(orb);
+    orbEl.addEventListener('click', () => openCaseDetail(c.id));
+    orbEl.setAttribute('data-case-id', c.id);
+    field.appendChild(orbEl);
   });
 }
 
