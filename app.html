@@ -1366,18 +1366,6 @@ body::after {
   padding: 5px 11px 5px 8px;
 }
 
-#hero-dots .hero-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  transition: all 0.25s ease;
-  cursor: pointer;
-}
-#hero-dots .hero-dot.active {
-  width: 18px;
-  border-radius: 3px;
-  background: rgba(255,255,255,0.75);
-}
 
 .swipe-card-counter {
   position: absolute;
@@ -2849,8 +2837,7 @@ body::after {
             </div>
           </div>
 
-          <!-- Dot indicators -->
-          <div id="hero-dots" style="display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;min-height:8px;"></div>
+
 
           <!-- Compat stubs: JS reads these ids — kept hidden -->
           <div id="cases-hero-card" style="display:none;"></div>
@@ -8556,9 +8543,8 @@ const _heroSwiper = {
 
 function renderCinematicCases(casesToRender) {
   const track    = document.getElementById('hero-swipe-track');
-  const dots     = document.getElementById('hero-dots');
   const viewport = document.getElementById('hero-swipe-viewport');
-  if (!track || !dots) return;
+  if (!track) return;
 
   // ── helpers ──────────────────────────────────────────────────
   const getImg = c => {
@@ -8651,9 +8637,6 @@ function renderCinematicCases(casesToRender) {
     c.style.width = vpW + 'px';
   });
 
-  // ── dot indicators ────────────────────────────────────────────
-  _renderHeroDots();
-
   // ── position track at idx 0 (no animation) ───────────────────
   _positionHeroTrack(0, false);
 
@@ -8664,23 +8647,6 @@ function renderCinematicCases(casesToRender) {
   }
 }
 
-// ── Render dots ───────────────────────────────────────────────────
-function _renderHeroDots() {
-  const dots = document.getElementById('hero-dots');
-  if (!dots) return;
-  const n = _heroSwiper.ordered.length;
-  // Show dots only when <= 10 cases; beyond that just show counter in card
-  if (n <= 1) { dots.innerHTML = ''; return; }
-  const max = Math.min(n, 10);
-  dots.innerHTML = '';
-  for (let i = 0; i < max; i++) {
-    const d = document.createElement('div');
-    d.className = 'hero-dot' + (i === _heroSwiper.current ? ' active' : '');
-    d.onclick = () => goToHeroSlide(i);
-    dots.appendChild(d);
-  }
-}
-
 // ── Go to slide ───────────────────────────────────────────────────
 function goToHeroSlide(idx, animate = true) {
   const n = _heroSwiper.ordered.length;
@@ -8688,14 +8654,8 @@ function goToHeroSlide(idx, animate = true) {
   idx = Math.max(0, Math.min(n - 1, idx));
   _heroSwiper.current = idx;
   _positionHeroTrack(idx, animate);
-
-  // Update active class on cards
   document.querySelectorAll('.hero-swipe-card').forEach((card, i) => {
     card.classList.toggle('active', i === idx);
-  });
-  // Update dots
-  document.querySelectorAll('#hero-dots .hero-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === idx);
   });
 }
 
