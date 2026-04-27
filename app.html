@@ -2729,42 +2729,55 @@ body::after {
           <div class="page-sub">Every case you've logged — tap any record to view details, get a clinical note, or share the verification link.</div>
         </div>
 
-        <!-- HEATMAP -->
-        <div class="card" style="margin-bottom:16px;padding:20px 24px;" id="cases-heatmap-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.72rem;color:var(--gray);">Activity — last 12 weeks</div>
-            <div style="display:flex;align-items:center;gap:6px;font-size:0.62rem;color:var(--gray);">
-              <div style="width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,0.06);"></div>
-              None
-              <div style="width:8px;height:8px;border-radius:2px;background:rgba(124,111,255,0.3);"></div>
-              1
-              <div style="width:8px;height:8px;border-radius:2px;background:rgba(124,111,255,0.6);"></div>
-              2-3
-              <div style="width:8px;height:8px;border-radius:2px;background:#7C6FFF;"></div>
-              4+
+        <!-- ORB CONSTELLATION AREA -->
+        <div id="orb-constellation-card" style="margin-bottom:16px;background:linear-gradient(145deg,var(--navy-2),var(--navy-3));border:1px solid rgba(255,255,255,0.06);border-radius:20px;overflow:hidden;position:relative;">
+          <!-- ambient glow bg -->
+          <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+            <div id="orb-bg-glow" style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,255,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);transition:background 0.4s;"></div>
+          </div>
+          <!-- header row -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0;position:relative;z-index:1;">
+            <div>
+              <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.2);font-weight:600;">Clinical Constellation</div>
+              <div id="orb-total-label" style="font-size:0.78rem;color:var(--gray);margin-top:2px;"></div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <div style="display:flex;align-items:center;gap:4px;font-size:0.55rem;color:rgba(255,255,255,0.2);">
+                <div style="width:7px;height:7px;border-radius:50%;background:var(--endo-color);opacity:0.8;box-shadow:0 0 4px var(--endo-color);"></div>Endo
+                <div style="width:7px;height:7px;border-radius:50%;background:var(--resto-color);opacity:0.8;box-shadow:0 0 4px var(--resto-color);margin-left:4px;"></div>Resto/Smile
+                <div style="width:7px;height:7px;border-radius:50%;background:var(--surg-color);opacity:0.8;box-shadow:0 0 4px var(--surg-color);margin-left:4px;"></div>Surg
+                <div style="width:7px;height:7px;border-radius:50%;background:var(--paeds-color);opacity:0.8;box-shadow:0 0 4px var(--paeds-color);margin-left:4px;"></div>Paeds
+              </div>
             </div>
           </div>
-          <div id="cases-heatmap" style="display:flex;gap:3px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
-          <div style="display:flex;justify-content:space-between;margin-top:8px;" id="heatmap-labels"></div>
+          <!-- orb canvas -->
+          <div id="orb-field" style="position:relative;width:100%;height:240px;overflow:hidden;cursor:default;"></div>
+          <!-- tooltip -->
+          <div id="orb-tooltip" style="display:none;position:absolute;background:rgba(10,10,14,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;font-size:0.72rem;color:var(--white);pointer-events:none;z-index:100;max-width:180px;backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>
         </div>
 
-        <!-- SPECIALTY BREAKDOWN — visual chart -->
-        <div id="cases-specialty-chart" style="margin-bottom:16px;display:none;"></div>
+        <!-- HIDDEN — kept for heatmap compat -->
+        <div id="cases-heatmap-card" style="display:none;">
+          <div id="cases-heatmap"></div>
+          <div id="heatmap-labels"></div>
+        </div>
+        <div id="cases-specialty-chart" style="display:none;"></div>
 
-        <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-          <div style="flex:1;min-width:180px;position:relative;">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:0.9rem;pointer-events:none;">🔍</span>
-            <input type="text" id="cases-search" placeholder="Search tooth, date, specialty..." oninput="filterCases()" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:9px 12px 9px 34px;border-radius:10px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
+        <!-- COMPACT CONTROLS -->
+        <div style="background:var(--navy-2);border:1px solid var(--white-faint);border-radius:14px;padding:10px 12px;margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <div style="flex:1;min-width:160px;position:relative;">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:0.8rem;pointer-events:none;">🔍</span>
+            <input type="text" id="cases-search" placeholder="Search tooth, date, specialty..." oninput="filterCases()" style="width:100%;background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.8rem;padding:7px 10px 7px 30px;border-radius:8px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--teal-mid)'" onblur="this.style.borderColor='var(--white-faint)'">
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button onclick="setCasesFilter('all',this)" class="cases-filter-btn" style="background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">All</button>
-            <button onclick="setCasesFilter('endo',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Endo</button>
-            <button onclick="setCasesFilter('restorative',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Restorative</button>
-            <button onclick="setCasesFilter('surgery',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Surgery</button>
-            <button onclick="setCasesFilter('paeds',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Paeds</button>
-            <button onclick="setCasesFilter('prostho',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;">Prostho</button>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <button onclick="setCasesFilter('all',this)" class="cases-filter-btn" style="background:var(--teal-dim);border:1px solid var(--teal-mid);color:var(--teal);font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;padding:5px 11px;border-radius:7px;cursor:pointer;transition:all 0.15s;">All</button>
+            <button onclick="setCasesFilter('endo',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;padding:5px 11px;border-radius:7px;cursor:pointer;transition:all 0.15s;">Endo</button>
+            <button onclick="setCasesFilter('restorative',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;padding:5px 11px;border-radius:7px;cursor:pointer;transition:all 0.15s;">Restorative</button>
+            <button onclick="setCasesFilter('surgery',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;padding:5px 11px;border-radius:7px;cursor:pointer;transition:all 0.15s;">Surgery</button>
+            <button onclick="setCasesFilter('paeds',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;padding:5px 11px;border-radius:7px;cursor:pointer;transition:all 0.15s;">Paeds</button>
+            <button onclick="setCasesFilter('prostho',this)" class="cases-filter-btn" style="background:var(--white-faint);border:1px solid var(--white-faint);color:var(--gray);font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;padding:5px 11px;border-radius:7px;cursor:pointer;transition:all 0.15s;">Prostho</button>
           </div>
-          <select id="cases-sort" onchange="filterCases()" style="background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.8rem;padding:8px 12px;border-radius:10px;outline:none;cursor:pointer;">
+          <select id="cases-sort" onchange="filterCases()" style="background:var(--navy);border:1px solid var(--white-faint);color:var(--white);font-family:'Inter',sans-serif;font-size:0.75rem;padding:6px 10px;border-radius:8px;outline:none;cursor:pointer;">
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
             <option value="highest">Highest Score</option>
@@ -3470,7 +3483,7 @@ function showView(view) {
   const navEl = document.getElementById('nav-' + view) || document.getElementById('nav-' + view + '-desktop');
   if (navEl) navEl.classList.add('active');
 
-  if (view === 'cases') { renderAllCases(); renderHeatmap(); renderSpecialtyChart(); }
+  if (view === 'cases') { renderAllCases(); renderHeatmap(); renderSpecialtyChart(); setTimeout(() => renderOrbConstellation(), 50); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderInAppPortfolio();
@@ -6518,6 +6531,9 @@ function filterCases() {
   caseList.className = 'cases-list';
   caseList.innerHTML = list.map(c => caseItemHTML(c, true)).join('');
   el.appendChild(caseList);
+
+  // Update orb constellation to reflect filtered list
+  setTimeout(() => renderOrbConstellation(list), 10);
 }
 
 // ─── CASE SIMULATION ENGINE ───
@@ -8283,6 +8299,160 @@ function renderHeatmap() {
     html += `</div>`;
   }
   heatmap.innerHTML = html;
+}
+
+// ─── ORB CONSTELLATION ───
+function renderOrbConstellation(casesToRender) {
+  const field = document.getElementById('orb-field');
+  const tooltip = document.getElementById('orb-tooltip');
+  const totalLabel = document.getElementById('orb-total-label');
+  const bgGlow = document.getElementById('orb-bg-glow');
+  if (!field) return;
+
+  const cases = casesToRender || allCases;
+  if (totalLabel) totalLabel.textContent = `${cases.length} case${cases.length !== 1 ? 's' : ''} logged`;
+
+  const specColors = {
+    endo: '#7C6FFF',
+    restorative: '#F59E0B',
+    smile: '#FBB424',
+    surgery: '#EF4444',
+    paeds: '#34D399',
+    prostho: '#38BDF8'
+  };
+  const specGlows = {
+    endo: 'rgba(124,111,255,',
+    restorative: 'rgba(245,158,11,',
+    smile: 'rgba(251,180,36,',
+    surgery: 'rgba(239,68,68,',
+    paeds: 'rgba(52,211,153,',
+    prostho: 'rgba(56,189,248,'
+  };
+
+  if (cases.length === 0) {
+    field.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:0.8rem;color:rgba(255,255,255,0.2);">Log your first case to see your constellation</div>`;
+    return;
+  }
+
+  const now = Date.now();
+  const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+  const maxScore = Math.max(...cases.map(c => c.complexity_score || 1), 1);
+  const W = field.offsetWidth || 340;
+  const H = 240;
+  const PAD = 28;
+
+  // Physics-based placement to avoid overlap
+  const placed = [];
+  const orbData = cases.map((c, i) => {
+    const score = c.complexity_score || 1;
+    const ageMs = now - new Date(c.created_at).getTime();
+    const recency = Math.max(0, 1 - ageMs / maxAge); // 0–1, recent = higher
+    const radius = Math.round(10 + (score / maxScore) * 22);
+    return { c, score, radius, recency, i };
+  });
+
+  // Sort by score desc so bigger orbs placed first
+  orbData.sort((a, b) => b.score - a.score);
+
+  // Attempt placement with simple repulsion
+  orbData.forEach(orb => {
+    let x, y, attempts = 0;
+    do {
+      x = PAD + orb.radius + Math.random() * (W - 2 * PAD - 2 * orb.radius);
+      y = PAD + orb.radius + Math.random() * (H - 2 * PAD - 2 * orb.radius);
+      attempts++;
+    } while (attempts < 80 && placed.some(p => {
+      const dx = p.x - x, dy = p.y - y;
+      return Math.sqrt(dx*dx + dy*dy) < (p.r + orb.radius + 4);
+    }));
+    orb.x = x; orb.y = y;
+    placed.push({ x, y, r: orb.radius });
+  });
+
+  const style = document.createElement('style');
+  style.id = 'orb-keyframes';
+  if (!document.getElementById('orb-keyframes')) {
+    style.textContent = `
+      @keyframes orbPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.06);opacity:0.85} }
+      @keyframes orbFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+      @keyframes orbGlow  { 0%,100%{box-shadow:var(--os)} 50%{box-shadow:var(--os2)} }
+    `;
+    document.head.appendChild(style);
+  }
+
+  field.innerHTML = '';
+  field.style.position = 'relative';
+
+  orbData.forEach(orb => {
+    const { c, radius, recency, x, y } = orb;
+    const color = specColors[c.specialty] || '#7C6FFF';
+    const glowBase = specGlows[c.specialty] || 'rgba(124,111,255,';
+    const glowAlpha = 0.25 + recency * 0.45;
+    const glowSize = radius * 1.6 + recency * 10;
+    const animDelay = Math.random() * 3;
+    const animDuration = 3 + Math.random() * 2;
+    const nickname = getCaseNickname(c.id);
+    const isSmile = c.specialty === 'smile';
+    const fdi = (!isSmile && c.tooth_number) ? toothQuadrant(c.tooth_number) : null;
+    const label = isSmile
+      ? (nickname || c.procedure || 'Smile')
+      : (fdi ? `T${c.tooth_number}` : '?');
+
+    const orb = document.createElement('div');
+    orb.style.cssText = `
+      position:absolute;
+      left:${x - radius}px;
+      top:${y - radius}px;
+      width:${radius * 2}px;
+      height:${radius * 2}px;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 35%, ${color}ee, ${color}77);
+      box-shadow:0 0 ${glowSize}px ${glowAlpha * 1.2}px ${glowBase}${glowAlpha}),0 0 ${glowSize*0.5}px ${glowBase}${glowAlpha*0.6}) inset;
+      cursor:pointer;
+      transition:transform 0.18s cubic-bezier(0.4,0,0.2,1),box-shadow 0.18s;
+      animation:orbFloat ${animDuration}s ${animDelay}s ease-in-out infinite;
+      display:flex;align-items:center;justify-content:center;
+      z-index:${Math.round(orb.score || 1)};
+      border:1px solid ${glowBase}0.4);
+    `;
+
+    // Tiny label inside big orbs
+    if (radius >= 18) {
+      const lbl = document.createElement('span');
+      lbl.textContent = label;
+      lbl.style.cssText = `font-size:${Math.max(7, radius * 0.38)}px;color:rgba(255,255,255,0.9);font-weight:700;font-family:'Inter',sans-serif;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8);text-align:center;line-height:1.1;max-width:${radius*1.6}px;overflow:hidden;`;
+      orb.appendChild(lbl);
+    }
+
+    orb.addEventListener('mouseenter', (e) => {
+      orb.style.transform = 'scale(1.22)';
+      orb.style.zIndex = 999;
+      const date = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      const specLabel = { endo:'Endodontics', restorative:'Restorative', smile:'Smile', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho' }[c.specialty] || c.specialty;
+      const fullLabel = isSmile ? (nickname || c.procedure || 'Smile Case') : (nickname || (fdi ? `${fdi} · Tooth ${c.tooth_number}` : '—'));
+      tooltip.innerHTML = `<div style="font-weight:600;margin-bottom:3px;">${fullLabel}</div><div style="color:${color};font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${specLabel}</div><div style="color:rgba(255,255,255,0.4);font-size:0.65rem;">${date} · Score ${c.complexity_score||'–'}</div>`;
+      tooltip.style.display = 'block';
+      // position tooltip
+      const rect = field.getBoundingClientRect();
+      const ex = e.clientX - rect.left;
+      const ey = e.clientY - rect.top;
+      tooltip.style.left = Math.min(ex + 14, W - 200) + 'px';
+      tooltip.style.top = Math.max(ey - 60, 4) + 'px';
+      // update bg glow color
+      if (bgGlow) bgGlow.style.background = `radial-gradient(circle,${glowBase}0.08) 0%,transparent 70%)`;
+    });
+
+    orb.addEventListener('mouseleave', () => {
+      orb.style.transform = 'scale(1)';
+      orb.style.zIndex = Math.round(c.complexity_score || 1);
+      tooltip.style.display = 'none';
+      if (bgGlow) bgGlow.style.background = 'radial-gradient(circle,rgba(124,111,255,0.06) 0%,transparent 70%)';
+    });
+
+    orb.addEventListener('click', () => openCaseDetail(c.id));
+    orb.setAttribute('data-case-id', c.id);
+    field.appendChild(orb);
+  });
 }
 
 // ─── PROVIFY SHIELD ───
