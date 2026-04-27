@@ -1292,6 +1292,12 @@ body::after {
   #view-dashboard .db-review-item { padding:9px 10px; }
 }
 
+/* ─── CINEMATIC CASES ─── */
+#cases-feed-scroll::-webkit-scrollbar { display:none; }
+#cases-hero-card { will-change:transform; }
+@keyframes heroImgLoad { from{opacity:0} to{opacity:1} }
+#hero-img { animation:heroImgLoad 0.5s ease both; }
+
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 
@@ -2729,60 +2735,45 @@ body::after {
           <div class="page-sub">Your clinical work, visualised.</div>
         </div>
 
-        <!-- FEATURED GALAXY -->
-        <!-- CLINICAL CASE MAP -->
-        <div id="orb-constellation-card" style="margin-bottom:14px;background:#09090e;border:1px solid rgba(255,255,255,0.07);border-radius:24px;overflow:hidden;position:relative;">
-          <!-- clinical grid -->
-          <div style="position:absolute;inset:0;pointer-events:none;opacity:0.028;">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="cgrid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0L0 0 0 32" fill="none" stroke="white" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#cgrid)"/></svg>
-          </div>
-          <!-- ambient center glow -->
-          <div id="orb-bg-glow" style="position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,255,0.11) 0%,transparent 58%);top:50%;left:50%;transform:translate(-50%,-60%);pointer-events:none;transition:background 0.9s;"></div>
-          <!-- particles -->
-          <canvas id="galaxy-particles" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.6;"></canvas>
-
-          <!-- header row -->
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 16px 0;position:relative;z-index:4;">
-            <div>
-              <div style="font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.2);font-weight:700;">Clinical Case Map</div>
-              <div id="orb-total-label" style="font-size:0.64rem;color:rgba(255,255,255,0.22);margin-top:1px;"></div>
+        <!-- CINEMATIC HERO CASE -->
+        <div id="cases-hero-section" style="margin-bottom:14px;">
+          <!-- Hero card -->
+          <div id="cases-hero-card" style="position:relative;width:100%;border-radius:22px;overflow:hidden;cursor:pointer;background:var(--navy-3);min-height:260px;box-shadow:0 0 0 1px rgba(255,255,255,0.05),0 20px 60px rgba(0,0,0,0.5);transition:transform 0.25s ease,box-shadow 0.25s ease;"
+            onmouseover="this.style.transform='scale(1.01)';this.style.boxShadow='0 0 0 1px rgba(124,111,255,0.18),0 24px 70px rgba(0,0,0,0.6)'"
+            onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 0 1px rgba(255,255,255,0.05),0 20px 60px rgba(0,0,0,0.5)'">
+            <!-- image fill layer -->
+            <div id="hero-img-layer" style="position:absolute;inset:0;background:linear-gradient(135deg,#1a1428,#0d0d14);transition:transform 0.6s ease;">
+              <img id="hero-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;transform-origin:center;transition:transform 8s ease;" />
             </div>
-            <div style="display:flex;align-items:center;gap:6px;font-size:0.46rem;color:rgba(255,255,255,0.16);">
-              <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#7C6FFF;display:inline-block;"></span>Endo</span>
-              <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#F59E0B;display:inline-block;"></span>Smile</span>
-              <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#EF4444;display:inline-block;"></span>Surg</span>
-              <span style="display:flex;align-items:center;gap:2px;"><span style="width:5px;height:5px;border-radius:50%;background:#34D399;display:inline-block;"></span>Paeds</span>
-            </div>
-          </div>
-
-          <!-- map stage -->
-          <div id="orb-field-wrap" style="position:relative;width:100%;height:70vw;max-height:450px;min-height:300px;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;">
-            <div id="orb-field" style="position:absolute;inset:0;width:100%;height:100%;"></div>
-          </div>
-
-          <!-- selected case info panel -->
-          <div id="case-map-panel" style="position:relative;z-index:4;margin:0 14px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:12px 14px;display:none;">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div id="cmp-img" style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);"></div>
-              <div style="flex:1;min-width:0;">
-                <div id="cmp-name" style="font-size:0.85rem;font-weight:600;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px;"></div>
-                <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-                  <span id="cmp-badge" style="font-size:0.54rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;padding:2px 8px;border-radius:20px;"></span>
-                  <span id="cmp-date" style="font-size:0.6rem;color:rgba(255,255,255,0.3);"></span>
-                  <span id="cmp-verified" style="display:none;font-size:0.54rem;color:rgba(52,211,153,0.7);background:rgba(52,211,153,0.08);padding:2px 7px;border-radius:20px;">✓ Protected</span>
-                </div>
-              </div>
-              <button id="cmp-open-btn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:500;padding:7px 13px;border-radius:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='white'" onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.7)'">Open →</button>
+            <!-- gradient overlay bottom fade -->
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.15) 35%,rgba(5,4,12,0.72) 70%,rgba(5,4,12,0.95) 100%);pointer-events:none;"></div>
+            <!-- soft glow top accent -->
+            <div id="hero-glow" style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:70%;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,255,0.12) 0%,transparent 65%);pointer-events:none;transition:background 0.5s;"></div>
+            <!-- empty state art -->
+            <div id="hero-empty-art" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.18;pointer-events:none;">🦷</div>
+            <!-- content -->
+            <div style="position:relative;z-index:2;padding:20px 18px 18px;display:flex;flex-direction:column;justify-content:flex-end;min-height:260px;">
+              <div style="flex:1;"></div>
+              <!-- specialty badge -->
+              <div id="hero-badge" style="display:inline-flex;align-items:center;gap:5px;background:rgba(124,111,255,0.18);border:1px solid rgba(124,111,255,0.3);color:#9B91FF;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;width:fit-content;margin-bottom:10px;backdrop-filter:blur(8px);transition:all 0.3s;"></div>
+              <!-- case title -->
+              <div id="hero-title" style="font-family:'Instrument Serif',serif;font-size:1.55rem;color:#FAFAFA;letter-spacing:-0.02em;line-height:1.15;margin-bottom:6px;text-shadow:0 2px 16px rgba(0,0,0,0.5);"></div>
+              <!-- date -->
+              <div id="hero-date" style="font-size:0.7rem;color:rgba(250,250,250,0.38);margin-bottom:16px;"></div>
+              <!-- open button -->
+              <button id="hero-open-btn" style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.1);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.18);color:#FAFAFA;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px 20px;border-radius:12px;cursor:pointer;width:fit-content;transition:all 0.22s ease;"
+                onmouseover="this.style.background='rgba(255,255,255,0.16)';this.style.borderColor='rgba(255,255,255,0.28)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.borderColor='rgba(255,255,255,0.18)'">
+                Open Case
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
             </div>
           </div>
 
-          <!-- swipe hint -->
-          <div id="cmp-swipe-hint" style="text-align:center;padding:0 0 12px;position:relative;z-index:4;">
-            <span style="font-size:0.48rem;color:rgba(255,255,255,0.1);letter-spacing:0.08em;">← Swipe to browse · Tap center to open →</span>
+          <!-- CASE FEED — horizontal scroll -->
+          <div id="cases-feed-label" style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.13em;color:rgba(255,255,255,0.18);font-weight:600;margin:18px 2px 10px;"></div>
+          <div id="cases-feed-scroll" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;">
           </div>
-
-          <!-- tooltip (secondary nodes) -->
-          <div id="orb-tooltip" style="display:none;position:absolute;background:rgba(5,5,9,0.96);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:9px 13px;font-size:0.68rem;color:white;pointer-events:none;z-index:200;max-width:180px;backdrop-filter:blur(18px);box-shadow:0 14px 36px rgba(0,0,0,0.75);"></div>
         </div>
         <!-- MINI SPECIALTY STRIP -->
         <div id="cases-mini-breakdown" style="margin-bottom:14px;"></div>
@@ -8457,16 +8448,23 @@ function renderHeatmap() {
 // ─── ORB CONSTELLATION ───
 let _galaxyDragging = false;
 function renderOrbConstellation(casesToRender) {
-  const wrap       = document.getElementById('orb-field-wrap');
-  const field      = document.getElementById('orb-field');
-  const tooltip    = document.getElementById('orb-tooltip');
-  const totalLabel = document.getElementById('orb-total-label');
-  const bgGlow     = document.getElementById('orb-bg-glow');
-  const panel      = document.getElementById('case-map-panel');
-  const swipeHint  = document.getElementById('cmp-swipe-hint');
-  if (!field || !wrap) return;
+  renderCinematicCases(casesToRender);
+}
 
-  // ── image helpers ──────────────────────────────────────────────────
+function renderCinematicCases(casesToRender) {
+  const heroCard    = document.getElementById('cases-hero-card');
+  const heroImg     = document.getElementById('hero-img');
+  const heroBadge   = document.getElementById('hero-badge');
+  const heroTitle   = document.getElementById('hero-title');
+  const heroDate    = document.getElementById('hero-date');
+  const heroBtn     = document.getElementById('hero-open-btn');
+  const heroGlow    = document.getElementById('hero-glow');
+  const heroEmpty   = document.getElementById('hero-empty-art');
+  const feedScroll  = document.getElementById('cases-feed-scroll');
+  const feedLabel   = document.getElementById('cases-feed-label');
+  if (!heroCard || !feedScroll) return;
+
+  // ── image helpers ──────────────────────────────────────────
   const getImg = c => {
     if (!c.photo_urls) return null;
     if (c.specialty === 'smile')
@@ -8474,380 +8472,136 @@ function renderOrbConstellation(casesToRender) {
              || Object.values(c.photo_urls).find(Boolean) || null;
     return Object.values(c.photo_urls).find(Boolean) || null;
   };
-  const hasImg = c => !!getImg(c);
 
-  // ── select featured cases (image-bearing only, up to 8) ────────────
+  // ── spec maps ──────────────────────────────────────────────
+  const SC  = {endo:'#7C6FFF',restorative:'#F59E0B',smile:'#F59E0B',surgery:'#EF4444',paeds:'#34D399',prostho:'#38BDF8'};
+  const SR  = {endo:'124,111,255',restorative:'245,158,11',smile:'245,158,11',surgery:'239,68,68',paeds:'52,211,153',prostho:'56,189,248'};
+  const SLB = {endo:'ENDODONTICS',restorative:'RESTORATIVE',smile:'SMILE DESIGN',surgery:'SURGERY',paeds:'PAEDIATRIC',prostho:'PROSTHO'};
+
   const src = allCases;
   const pinnedIds = JSON.parse(localStorage.getItem('provify_pinned_cases') || '[]');
-  const featured = []; const used = new Set();
-  const tryAdd = (c, role) => {
-    if (!c || used.has(c.id) || !hasImg(c)) return;
-    featured.push({ c, role }); used.add(c.id);
-  };
-  pinnedIds.slice(0,1).forEach(id => tryAdd(src.find(c => c.id===id), 'pinned'));
-  tryAdd(src[0], 'latest');
-  ['endo','smile','restorative','paeds','surgery','prostho'].forEach(sp =>
-    featured.length < 8 && tryAdd(src.find(c => c.specialty===sp && !used.has(c.id)), sp));
-  for (const c of src) { if (featured.length >= 8) break; tryAdd(c, 'recent'); }
 
-  const cases = featured;
-  if (totalLabel) totalLabel.textContent =
-    `${src.length} case${src.length!==1?'s':''} · ${cases.length} featured`;
+  // Build ordered list: pinned first, then by recency
+  const used = new Set();
+  const ordered = [];
+  pinnedIds.forEach(id => {
+    const c = src.find(x => x.id === id);
+    if (c && !used.has(c.id)) { ordered.push(c); used.add(c.id); }
+  });
+  src.forEach(c => { if (!used.has(c.id)) { ordered.push(c); used.add(c.id); } });
 
-  // ── empty state ────────────────────────────────────────────────────
-  if (cases.length === 0) {
-    field.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:0.78rem;color:rgba(255,255,255,0.12);">Add photos to cases to see your map</div>`;
-    if (panel) panel.style.display = 'none';
+  // ── EMPTY STATE ───────────────────────────────────────────
+  if (ordered.length === 0) {
+    heroTitle.textContent = 'No cases yet';
+    heroBadge.textContent = 'GET STARTED';
+    heroDate.textContent = 'Log your first case to see it here';
+    if (heroBtn) { heroBtn.style.display = 'none'; }
+    feedScroll.innerHTML = '';
+    if (feedLabel) feedLabel.textContent = '';
     return;
   }
 
-  // ── spec maps ──────────────────────────────────────────────────────
-  const SC  = {endo:'#7C6FFF',restorative:'#F59E0B',smile:'#F59E0B',surgery:'#EF4444',paeds:'#34D399',prostho:'#38BDF8'};
-  const SR  = {endo:'124,111,255',restorative:'245,158,11',smile:'245,158,11',surgery:'239,68,68',paeds:'52,211,153',prostho:'56,189,248'};
-  const SLB = {endo:'Endodontics',restorative:'Restorative',smile:'Smile Design',surgery:'Surgery',paeds:'Paediatric',prostho:'Prosthodontics'};
-  const RL  = {latest:'Latest',pinned:'⭐ Proud',endo:'Endo',smile:'Smile',restorative:'Resto',paeds:'Paeds',surgery:'Surgery',prostho:'Prostho',recent:'Recent'};
+  // ── HERO (first/pinned case) ──────────────────────────────
+  const hero = ordered[0];
+  const heroImgUrl = getImg(hero);
+  const heroSpecColor = SC[hero.specialty] || '#7C6FFF';
+  const heroSpecRgb   = SR[hero.specialty] || '124,111,255';
+  const heroSpecLabel = SLB[hero.specialty] || (hero.specialty||'CASE').toUpperCase();
+  const heroName = hero.specialty === 'smile'
+    ? (hero.procedure || 'Smile Case')
+    : (hero.procedure || hero.case_type || (hero.tooth_number ? `Tooth ${hero.tooth_number}` : heroSpecLabel));
+  const heroDateStr = new Date(hero.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
 
-  // ── keyframes (once) ──────────────────────────────────────────────
-  if (!document.getElementById('cmkf')) {
-    const s = document.createElement('style'); s.id = 'cmkf';
-    s.textContent = `
-      @keyframes cmPulseRing { 0%,100%{transform:scale(1);opacity:0.45} 50%{transform:scale(1.08);opacity:0.18} }
-      @keyframes cmFloat1    { 0%,100%{transform:translate(0,0)} 50%{transform:translate(2px,-4px)} }
-      @keyframes cmFloat2    { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-2px,3px)} }
-      @keyframes cmFloat3    { 0%,100%{transform:translate(0,0)} 50%{transform:translate(3px,2px)} }
-      @keyframes cmFloat4    { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-3px,-3px)} }
-      @keyframes cmFloat5    { 0%,100%{transform:translate(0,0)} 50%{transform:translate(1px,4px)} }
-      @keyframes cmNodeFadeIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
-    `;
-    document.head.appendChild(s);
+  // Image
+  heroImg.src = heroImgUrl || '';
+  heroImg.style.display = heroImgUrl ? 'block' : 'none';
+  heroEmpty.style.display = heroImgUrl ? 'none' : 'flex';
+  if (heroImgUrl) {
+    // subtle ken-burns
+    setTimeout(() => { heroImg.style.transform = 'scale(1.04)'; }, 60);
   }
 
-  // ── dimensions ────────────────────────────────────────────────────
-  const W = wrap.offsetWidth  || 340;
-  const H = wrap.offsetHeight || 320;
-  const CX = W * 0.5;
-  const CY = H * 0.46;   // slightly above center so info panel sits below
+  // Badge color
+  heroBadge.textContent = heroSpecLabel;
+  heroBadge.style.background = `rgba(${heroSpecRgb},0.15)`;
+  heroBadge.style.borderColor = `rgba(${heroSpecRgb},0.3)`;
+  heroBadge.style.color = heroSpecColor;
 
-  const CR = Math.min(W, H) * 0.195;  // center orb radius
-  const NR = CR * 0.52;               // node orb radius
-  const RING = CR + NR + Math.min(W,H)*0.045; // ring placement radius
+  // Glow
+  if (heroGlow) heroGlow.style.background = `radial-gradient(circle,rgba(${heroSpecRgb},0.13) 0%,transparent 65%)`;
 
-  // Node angles: 5 positions, avoid the bottom where panel sits
-  const NODE_ANGLES = [-Math.PI*0.58, -Math.PI*0.12, Math.PI*0.3, Math.PI*0.72, -Math.PI*0.98];
-  const NODE_FLOATS = ['cmFloat1','cmFloat2','cmFloat3','cmFloat4','cmFloat5'];
+  heroTitle.textContent = heroName;
+  heroDate.textContent  = heroDateStr;
 
-  // ── particle canvas ───────────────────────────────────────────────
-  const canvas = document.getElementById('galaxy-particles');
-  if (canvas) {
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, W, H);
-    for (let i = 0; i < 22; i++) {
-      ctx.beginPath();
-      ctx.arc(Math.random()*W, Math.random()*H, Math.random()*0.85+0.25, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.25+0.05})`;
-      ctx.fill();
-    }
+  if (heroBtn) {
+    heroBtn.style.display = 'inline-flex';
+    heroBtn.onclick = () => openCaseDetail(hero.id);
+  }
+  heroCard.onclick = (e) => {
+    if (e.target === heroBtn || heroBtn.contains(e.target)) return;
+    openCaseDetail(hero.id);
+  };
+
+  // ── FEED (remaining cases) ────────────────────────────────
+  const feedCases = ordered.slice(1);
+  if (feedLabel) {
+    feedLabel.textContent = feedCases.length > 0 ? `Recent cases` : '';
   }
 
-  // ── state ─────────────────────────────────────────────────────────
-  let selectedIdx = 0; // which case is in the center
-  const TRANSITION_MS = 380;
+  feedScroll.innerHTML = '';
+  feedCases.forEach(c => {
+    const imgUrl = getImg(c);
+    const specCol = SC[c.specialty] || '#7C6FFF';
+    const specRgb = SR[c.specialty] || '124,111,255';
+    const label   = SLB[c.specialty] || (c.specialty||'CASE').toUpperCase();
+    const title   = c.specialty === 'smile'
+      ? (c.procedure || 'Smile Case')
+      : (c.procedure || c.case_type || (c.tooth_number ? `T${c.tooth_number}` : label));
+    const shortDate = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 
-  // ── helpers ───────────────────────────────────────────────────────
-  const specColor  = c => SC[c.specialty]  || '#7C6FFF';
-  const specRgb    = c => SR[c.specialty]  || '124,111,255';
-  const specLabel  = c => SLB[c.specialty] || c.specialty;
-  const caseLabel  = c => {
-    const nick = getCaseNickname(c.id);
-    const isSmile = c.specialty === 'smile';
-    const fdi = !isSmile && c.tooth_number ? toothQuadrant(c.tooth_number) : null;
-    return nick || (isSmile ? (c.procedure||'Smile Case') : (fdi ? `${fdi} · T${c.tooth_number}` : specLabel(c)));
-  };
-  const shortLabel = c => {
-    const nick = getCaseNickname(c.id);
-    const isSmile = c.specialty === 'smile';
-    const fdi = !isSmile && c.tooth_number ? toothQuadrant(c.tooth_number) : null;
-    return nick ? nick.slice(0,10) : (isSmile ? (c.procedure||'Smile').slice(0,10) : (fdi ? `T${c.tooth_number}` : ''));
-  };
-
-  // ── update info panel ─────────────────────────────────────────────
-  const updatePanel = idx => {
-    if (!panel) return;
-    const { c } = cases[idx];
-    const color  = specColor(c);
-    const rgb    = specRgb(c);
-    const img    = getImg(c);
-    const date   = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-
-    const imgEl  = document.getElementById('cmp-img');
-    const nameEl = document.getElementById('cmp-name');
-    const bdgEl  = document.getElementById('cmp-badge');
-    const dtEl   = document.getElementById('cmp-date');
-    const vrEl   = document.getElementById('cmp-verified');
-    const btnEl  = document.getElementById('cmp-open-btn');
-
-    if (imgEl) {
-      if (img) imgEl.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
-      else imgEl.style.background = `${color}33`;
-      imgEl.style.borderColor = `rgba(${rgb},0.4)`;
-    }
-    if (nameEl) nameEl.textContent = caseLabel(c);
-    if (bdgEl) {
-      bdgEl.textContent = specLabel(c);
-      bdgEl.style.background = `rgba(${rgb},0.18)`;
-      bdgEl.style.color = color;
-    }
-    if (dtEl)  dtEl.textContent  = date;
-    if (vrEl)  vrEl.style.display = c.ai_report ? 'inline' : 'none';
-    if (btnEl) btnEl.onclick = () => openCaseDetail(c.id);
-    if (bgGlow) bgGlow.style.background = `radial-gradient(circle,rgba(${rgb},0.13) 0%,transparent 58%)`;
-    panel.style.display = 'block';
-  };
-
-  // ── build/update the entire map layout ───────────────────────────
-  const buildMap = (selIdx, animate) => {
-    field.innerHTML = '';
-    tooltip.style.display = 'none';
-
-    const center = cases[selIdx];
-    const cc     = center.c;
-    const ccolor = specColor(cc);
-    const crgb   = specRgb(cc);
-
-    // — center glow halo (behind everything) —
-    const halo = document.createElement('div');
-    halo.style.cssText = `
-      position:absolute;
-      width:${CR*3.2}px;height:${CR*3.2}px;
-      border-radius:50%;
-      left:${CX - CR*1.6}px;top:${CY - CR*1.6}px;
-      background:radial-gradient(circle,rgba(${crgb},0.18) 0%,transparent 62%);
-      pointer-events:none;
-      transition:background ${TRANSITION_MS}ms;
-    `;
-    field.appendChild(halo);
-
-    // — pulsing ring around center —
-    const ring = document.createElement('div');
-    ring.style.cssText = `
-      position:absolute;
-      width:${CR*2+16}px;height:${CR*2+16}px;
-      border-radius:50%;
-      left:${CX-CR-8}px;top:${CY-CR-8}px;
-      border:1.5px solid rgba(${crgb},0.35);
-      animation:cmPulseRing 3.5s ease-in-out infinite;
-      pointer-events:none;
-    `;
-    field.appendChild(ring);
-
-    // — connector lines to nodes —
-    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.style.cssText = `position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;`;
-    const nodeCount = Math.min(cases.length - 1, 5);
-    for (let i = 0; i < nodeCount; i++) {
-      const ang = NODE_ANGLES[i];
-      const nx = CX + RING * Math.cos(ang);
-      const ny = CY + RING * Math.sin(ang);
-      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1', CX); line.setAttribute('y1', CY);
-      line.setAttribute('x2', nx); line.setAttribute('y2', ny);
-      line.setAttribute('stroke', `rgba(${crgb},0.14)`);
-      line.setAttribute('stroke-width','1');
-      line.setAttribute('stroke-dasharray','3 5');
-      svg.appendChild(line);
-    }
-    field.appendChild(svg);
-
-    // — CENTER ORB —
-    const centerWrap = document.createElement('div');
-    centerWrap.style.cssText = `
-      position:absolute;
-      left:${CX-CR}px;top:${CY-CR}px;
-      width:${CR*2}px;height:${CR*2}px;
-      border-radius:50%;
+    const card = document.createElement('div');
+    card.style.cssText = `
+      flex:0 0 130px;
+      height:170px;
+      border-radius:16px;
+      overflow:hidden;
+      position:relative;
       cursor:pointer;
-      z-index:10;
-      ${animate ? 'animation:cmNodeFadeIn 0.35s ease-out both;' : ''}
-      transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+      scroll-snap-align:start;
+      background:var(--navy-3);
+      border:1px solid rgba(255,255,255,0.06);
+      transition:transform 0.22s ease,box-shadow 0.22s ease;
+      box-shadow:0 4px 24px rgba(0,0,0,0.35);
     `;
-    const centerCircle = document.createElement('div');
-    centerCircle.style.cssText = `
-      position:absolute;inset:0;border-radius:50%;overflow:hidden;
-      box-shadow:0 0 0 2.5px rgba(${crgb},0.55),0 0 ${CR*0.6}px rgba(${crgb},0.6),0 10px 36px rgba(0,0,0,0.65);
+    card.innerHTML = `
+      <div style="position:absolute;inset:0;">
+        ${imgUrl
+          ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;" />`
+          : `<div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(${specRgb},0.12),var(--navy-3));display:flex;align-items:center;justify-content:center;font-size:26px;opacity:0.35;">🦷</div>`
+        }
+      </div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(5,4,12,0.82) 100%);"></div>
+      <div style="position:absolute;top:9px;left:9px;font-size:0.48rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;background:rgba(${specRgb},0.2);border:1px solid rgba(${specRgb},0.3);color:${specCol};padding:2px 7px;border-radius:20px;backdrop-filter:blur(6px);">${label}</div>
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:0 10px 10px;">
+        <div style="font-family:'Instrument Serif',serif;font-size:0.82rem;color:#FAFAFA;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">${title}</div>
+        <div style="font-size:0.56rem;color:rgba(250,250,250,0.32);">${shortDate}</div>
+      </div>
     `;
-    const cimg = getImg(cc);
-    if (cimg) {
-      const im = document.createElement('img');
-      im.src = cimg; im.draggable = false;
-      im.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
-      const glass = document.createElement('div');
-      glass.style.cssText = 'position:absolute;inset:0;background:linear-gradient(180deg,transparent 38%,rgba(0,0,0,0.58) 100%);pointer-events:none;border-radius:50%;';
-      const shine = document.createElement('div');
-      shine.style.cssText = `position:absolute;inset:0;background:radial-gradient(circle at 27% 22%,rgba(255,255,255,0.18) 0%,transparent 44%);pointer-events:none;border-radius:50%;`;
-      const tint = document.createElement('div');
-      tint.style.cssText = `position:absolute;inset:0;background:radial-gradient(circle at 30% 28%,rgba(${crgb},0.12) 0%,transparent 52%);pointer-events:none;border-radius:50%;`;
-      centerCircle.append(im, glass, tint, shine);
-    } else {
-      centerCircle.style.background = `radial-gradient(circle at 32% 30%,${ccolor}cc,${ccolor}44)`;
-    }
-    // label bottom of center
-    const clbl = shortLabel(cc);
-    if (clbl) {
-      const lb = document.createElement('div');
-      lb.textContent = clbl;
-      lb.style.cssText = `position:absolute;bottom:11px;left:0;right:0;text-align:center;font-size:${Math.max(9,CR*0.15)}px;font-weight:700;color:rgba(255,255,255,0.92);font-family:'Inter',sans-serif;text-shadow:0 1px 6px rgba(0,0,0,0.95);pointer-events:none;padding:0 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
-      centerCircle.appendChild(lb);
-    }
-    // "Open" micro-label
-    const openLbl = document.createElement('div');
-    openLbl.textContent = 'Tap to open';
-    openLbl.style.cssText = `position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-size:8px;color:rgba(255,255,255,0.2);font-family:'Inter',sans-serif;pointer-events:none;letter-spacing:0.05em;`;
-    centerWrap.appendChild(centerCircle);
-    centerWrap.appendChild(openLbl);
-
-    centerWrap.addEventListener('mouseenter', () => centerWrap.style.transform = 'scale(1.06)');
-    centerWrap.addEventListener('mouseleave', () => centerWrap.style.transform = 'scale(1)');
-    centerWrap.addEventListener('click', () => {
-      if (_galaxyDragging) return;
-      openCaseDetail(cc.id);
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'scale(1.04)';
+      card.style.boxShadow = `0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(${specRgb},0.2)`;
     });
-    field.appendChild(centerWrap);
-
-    // — SURROUNDING NODES —
-    const remainingCases = cases.filter((_, i) => i !== selIdx);
-    const nodeCount2 = Math.min(remainingCases.length, 5);
-    for (let i = 0; i < nodeCount2; i++) {
-      const { c: nc, role: nrole } = remainingCases[i];
-      const ang = NODE_ANGLES[i];
-      const nx  = CX + RING * Math.cos(ang);
-      const ny  = CY + RING * Math.sin(ang);
-      const ncolor = specColor(nc);
-      const nrgb   = specRgb(nc);
-      const floatAnim = NODE_FLOATS[i % 5];
-      const floatDur  = (5 + i * 0.9).toFixed(1);
-      const floatDel  = (i * 0.6).toFixed(2);
-
-      const nwrap = document.createElement('div');
-      nwrap.style.cssText = `
-        position:absolute;
-        left:${nx-NR}px;top:${ny-NR}px;
-        width:${NR*2}px;height:${NR*2}px;
-        border-radius:50%;
-        cursor:pointer;
-        z-index:6;
-        animation:${floatAnim} ${floatDur}s ${floatDel}s ease-in-out infinite${animate?',cmNodeFadeIn 0.4s '+(i*0.06).toFixed(2)+'s ease-out both':''};
-        transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;
-        opacity:0.82;
-      `;
-      const ncirc = document.createElement('div');
-      ncirc.style.cssText = `
-        position:absolute;inset:0;border-radius:50%;overflow:hidden;
-        box-shadow:0 0 0 1.5px rgba(${nrgb},0.3),0 0 ${NR*0.7}px rgba(${nrgb},0.45),0 5px 18px rgba(0,0,0,0.55);
-        transition:box-shadow 0.2s;
-      `;
-      const nimg = getImg(nc);
-      if (nimg) {
-        const nim = document.createElement('img');
-        nim.src = nimg; nim.draggable = false;
-        nim.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
-        const nglass = document.createElement('div');
-        nglass.style.cssText = 'position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.55) 100%);pointer-events:none;border-radius:50%;';
-        const nshine = document.createElement('div');
-        nshine.style.cssText = 'position:absolute;inset:0;background:radial-gradient(circle at 28% 24%,rgba(255,255,255,0.16) 0%,transparent 44%);pointer-events:none;border-radius:50%;';
-        ncirc.append(nim, nglass, nshine);
-      } else {
-        ncirc.style.background = `radial-gradient(circle at 32% 30%,${ncolor}bb,${ncolor}33)`;
-      }
-      // node label
-      const nsl = shortLabel(nc);
-      if (nsl) {
-        const nlb = document.createElement('div');
-        nlb.textContent = nsl;
-        nlb.style.cssText = `position:absolute;bottom:${NR<30?3:5}px;left:0;right:0;text-align:center;font-size:${NR<30?6:7.5}px;font-weight:700;color:rgba(255,255,255,0.88);font-family:'Inter',sans-serif;text-shadow:0 1px 4px rgba(0,0,0,0.95);pointer-events:none;padding:0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
-        ncirc.appendChild(nlb);
-      }
-      nwrap.appendChild(ncirc);
-
-      // hover tooltip
-      nwrap.addEventListener('mouseenter', e => {
-        nwrap.style.transform = 'scale(1.12)';
-        nwrap.style.opacity = '1';
-        ncirc.style.boxShadow = `0 0 0 2px rgba(${nrgb},0.65),0 0 ${NR*1.1}px rgba(${nrgb},0.7),0 6px 20px rgba(0,0,0,0.6)`;
-        const date = new Date(nc.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-        tooltip.innerHTML = `<div style="font-weight:600;font-size:0.76rem;margin-bottom:4px;">${caseLabel(nc)}</div><div style="display:flex;gap:4px;align-items:center;margin-bottom:3px;"><span style="background:rgba(${nrgb},0.2);color:${ncolor};font-size:0.54rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;padding:2px 7px;border-radius:20px;">${specLabel(nc)}</span><span style="font-size:0.54rem;color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:20px;">${RL[nrole]||nrole}</span></div><div style="font-size:0.6rem;color:rgba(255,255,255,0.28);">${date}</div><div style="font-size:0.54rem;color:rgba(255,255,255,0.14);margin-top:3px;">Tap to make center</div>`;
-        tooltip.style.display = 'block';
-        const rect = wrap.getBoundingClientRect();
-        const tx = e.clientX - rect.left;
-        const ty = e.clientY - rect.top;
-        tooltip.style.left = Math.min(Math.max(tx+14, 4), (W||340)-190) + 'px';
-        tooltip.style.top  = Math.max(ty-80, 4) + 'px';
-      });
-      nwrap.addEventListener('mouseleave', () => {
-        nwrap.style.transform = 'scale(1)';
-        nwrap.style.opacity = '0.82';
-        ncirc.style.boxShadow = `0 0 0 1.5px rgba(${nrgb},0.3),0 0 ${NR*0.7}px rgba(${nrgb},0.45),0 5px 18px rgba(0,0,0,0.55)`;
-        tooltip.style.display = 'none';
-      });
-      // tap node = make it center
-      nwrap.addEventListener('click', e => {
-        if (_galaxyDragging) return;
-        tooltip.style.display = 'none';
-        // find real index in cases[]
-        const realIdx = cases.indexOf(remainingCases[i]);
-        if (realIdx >= 0) selectCase(realIdx, true);
-      });
-      field.appendChild(nwrap);
-    }
-
-    // swipe dots indicator
-    const dots = document.createElement('div');
-    dots.style.cssText = 'position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none;';
-    cases.forEach((_, di) => {
-      const dot = document.createElement('div');
-      dot.style.cssText = `width:${di===selIdx?14:5}px;height:5px;border-radius:3px;background:${di===selIdx?`rgba(${crgb},0.7)`:'rgba(255,255,255,0.15)'};transition:all 0.3s;`;
-      dots.appendChild(dot);
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'scale(1)';
+      card.style.boxShadow = '0 4px 24px rgba(0,0,0,0.35)';
     });
-    field.appendChild(dots);
-  };
-
-  const selectCase = (idx, animate) => {
-    selectedIdx = idx;
-    buildMap(idx, animate);
-    updatePanel(idx);
-  };
-
-  // initial render
-  selectCase(0, false);
-
-  // ── SWIPE ────────────────────────────────────────────────────────
-  _galaxyDragging = false;
-  let sx = 0, sy = 0, sActive = false;
-
-  const swipeStart = (x, y) => { sx = x; sy = y; sActive = true; _galaxyDragging = false; };
-  const swipeEnd   = (x, y) => {
-    if (!sActive) return;
-    sActive = false;
-    const dx = x - sx;
-    const dy = y - sy;
-    if (Math.abs(dx) < 30 || Math.abs(dy) > Math.abs(dx) * 1.1) { _galaxyDragging = false; return; }
-    _galaxyDragging = true;
-    tooltip.style.display = 'none';
-    if (dx < 0) {
-      // swipe left = next case
-      selectCase((selectedIdx + 1) % cases.length, true);
-    } else {
-      // swipe right = prev case
-      selectCase((selectedIdx - 1 + cases.length) % cases.length, true);
-    }
-    setTimeout(() => { _galaxyDragging = false; }, 80);
-  };
-
-  wrap.addEventListener('touchstart', e => swipeStart(e.touches[0].clientX, e.touches[0].clientY), {passive:true});
-  wrap.addEventListener('touchend',   e => swipeEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY), {passive:true});
-  wrap.addEventListener('mousedown',  e => swipeStart(e.clientX, e.clientY));
-  wrap.addEventListener('mouseup',    e => swipeEnd(e.clientX, e.clientY));
+    card.addEventListener('touchstart', () => { card.style.transform = 'scale(0.97)'; }, {passive:true});
+    card.addEventListener('touchend',   () => { card.style.transform = 'scale(1)'; },   {passive:true});
+    card.onclick = () => openCaseDetail(c.id);
+    feedScroll.appendChild(card);
+  });
 }
+
 
 
 // ─── PROVIFY SHIELD ───
