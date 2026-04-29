@@ -3004,6 +3004,12 @@ body::after {
         <!-- SPECIALTY BREAKDOWN -->
         <div id="port-specialty-card" style="margin-bottom:16px;"></div>
 
+        <!-- CAREER INTELLIGENCE — GPS ROADMAP -->
+        <div id="port-career-gps" style="margin-bottom:10px;"></div>
+
+        <!-- CAREER INTELLIGENCE — SALARY & MARKET -->
+        <div id="port-career-market" style="margin-bottom:20px;"></div>
+
         <!-- SHARE + PDF ACTIONS -->
         <div id="port-actions" style="margin-bottom:20px;"></div>
 
@@ -3695,6 +3701,8 @@ function showView(view) {
   if (view === 'badges') renderBadges();
   if (view === 'portfolio') renderInAppPortfolio();
   if (view === 'portfolio') renderPortfolioCases();
+  if (view === 'portfolio') renderCareerGPSInPortfolio();
+  if (view === 'portfolio') renderLiveCareerDashboardInPortfolio();
   if (view === 'profile') loadProfileForm();
   if (view === 'career') { renderCareerGPS(); renderLiveCareerDashboard(); }
 }
@@ -9491,6 +9499,90 @@ function getGPSContext() {
   const specCounts = ['endo','restorative','surgery','paeds','prostho'].map(s => ({ s, n: allCases.filter(c => c.specialty === s).length })).sort((a,b) => b.n - a.n);
   const dominant = total > 0 ? specCounts[0].n / total : 0;
   return { total, avg, dominant };
+}
+
+// ─── CAREER IN PORTFOLIO ───
+function renderCareerGPSInPortfolio() {
+  const container = document.getElementById('port-career-gps');
+  if (!container) return;
+
+  const gpsData = getGPSData();
+  const validGoals = ['specialist','owner','brand','gp'];
+  const isValid = gpsData && validGoals.includes(gpsData.goal);
+
+  if (!isValid) {
+    // Show compact setup prompt
+    container.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(52,211,153,0.03));border:1px solid rgba(124,111,255,0.2);border-radius:20px;padding:20px 22px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#7C6FFF,#34D399,transparent);"></div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:1.8rem;flex-shrink:0;">🗺</div>
+          <div style="flex:1;">
+            <div style="font-size:0.75rem;color:white;font-weight:600;margin-bottom:3px;">Career GPS not set up</div>
+            <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);line-height:1.5;">Set your goal and Provify builds your roadmap live from your cases.</div>
+          </div>
+          <button onclick="showView('career')" style="background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(124,111,255,0.1));border:1px solid rgba(124,111,255,0.35);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:all 0.2s;">Set up →</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Section label
+  const labelEl = document.createElement('div');
+  labelEl.style.cssText = 'font-size:0.5rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;';
+  labelEl.textContent = 'Career GPS';
+
+  const roadmapEl = document.createElement('div');
+  container.innerHTML = '';
+  container.appendChild(labelEl);
+  container.appendChild(roadmapEl);
+  renderGPSRoadmap(roadmapEl, gpsData);
+}
+
+function renderLiveCareerDashboardInPortfolio() {
+  const container = document.getElementById('port-career-market');
+  if (!container || allCases.length < 1) return;
+
+  const spec = getCareerSpecialty();
+  const total = allCases.length;
+
+  const specSalaries = CAREER_DATA.salaries[spec] || CAREER_DATA.salaries.general;
+  const specDemand   = CAREER_DATA.demand[spec]   || CAREER_DATA.demand.general;
+  const specLabel    = { endo:'Endodontics', surgery:'Oral Surgery', prostho:'Prosthodontics', paeds:'Paediatric Dentistry', general:'General Dentistry' }[spec] || 'General Dentistry';
+
+  const countryRanking = Object.keys(specSalaries).map(c => ({
+    name: c,
+    opportunity: ((specDemand[c] || 5) + ((CAREER_DATA.entry[spec]?.[c]) || 5)) / 2,
+    sal: specSalaries[c],
+  })).sort((a,b) => b.opportunity - a.opportunity);
+
+  const topCountry = countryRanking[0];
+  const flags = { 'UAE':'🇦🇪','Saudi Arabia':'🇸🇦','UK':'🇬🇧','Australia':'🇦🇺','Canada':'🇨🇦','USA':'🇺🇸','Germany':'🇩🇪','Qatar':'🇶🇦' };
+  const globalMax = Math.max(...Object.values(specSalaries).map(s => s.max));
+
+  container.innerHTML = `
+    <div style="font-size:0.5rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">Market Intelligence</div>
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:18px 20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:0.55rem;color:rgba(245,158,11,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;">💰 Monthly Salary — ${specLabel}</div>
+        ${specSalaries[topCountry?.name]?.taxFree ? '<div style="font-size:0.52rem;color:rgba(52,211,153,0.5);background:rgba(52,211,153,0.08);padding:2px 8px;border-radius:100px;">Tax-free highlighted</div>' : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${Object.entries(specSalaries).map(([country, sal]) => {
+          const barWidth = Math.round((sal.max / globalMax) * 100);
+          const isTop = country === topCountry?.name;
+          return `
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:20px;text-align:center;font-size:1rem;">${flags[country] || '🌍'}</div>
+              <div style="width:90px;font-size:0.7rem;color:rgba(255,255,255,${isTop ? '0.9' : '0.5'});font-weight:${isTop ? '600' : '400'};">${country}</div>
+              <div style="flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;">
+                <div style="height:100%;width:${barWidth}%;background:${isTop ? 'linear-gradient(90deg,#34D399,#7C6FFF)' : sal.taxFree ? 'rgba(52,211,153,0.4)' : 'rgba(124,111,255,0.35)'};border-radius:100px;"></div>
+              </div>
+              <div style="width:80px;text-align:right;font-size:0.65rem;color:${isTop ? '#34D399' : 'rgba(255,255,255,0.35)'};">${sal.min.toLocaleString()}–${sal.max.toLocaleString()} <span style="font-size:0.55rem;opacity:0.6;">${sal.currency}</span></div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`;
 }
 
 function renderCareerGPS() {
