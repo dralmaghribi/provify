@@ -1389,7 +1389,7 @@ body::after {
 
 
 </style>
-<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<!-- Lemon Squeezy payments -->
 
 <style>
 @keyframes orb1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-22px,16px) scale(1.08)}}
@@ -1763,7 +1763,7 @@ body::after {
         <div style="display:flex;align-items:center;gap:10px;font-size:0.8rem;color:rgba(255,255,255,0.8);"><div style="color:#7C6FFF;">✓</div>PDF portfolio export</div>
       </div>
     </div>
-    <button onclick="openPaddleCheckout()" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;padding:16px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">
+    <button onclick="openLemonCheckout()" style="width:100%;background:linear-gradient(135deg,#7C6FFF,#9B91FF);color:white;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;padding:16px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,111,255,0.4);margin-bottom:10px;">
       Upgrade to Pro — $29/month →
     </button>
     <button onclick="document.getElementById('paywall-modal').style.display='none';" style="background:none;border:none;color:var(--gray);font-family:'Inter',sans-serif;font-size:0.82rem;cursor:pointer;padding:8px;">
@@ -3130,7 +3130,7 @@ let currentProfile = null;
 let allCases = [];
 
 // ─── PADDLE PAYMENTS ───
-const PADDLE_PRICE_ID = 'pri_REPLACE_WITH_YOUR_PRICE_ID'; // Replace when Paddle approves
+
 const FREE_TIER_LIMIT = 3; // kept for backward compat but not used for paywall
 const TRIAL_DAYS = 14;
 
@@ -3538,7 +3538,7 @@ async function loadProfile() {
     document.getElementById('user-avatar').textContent = (data.first_name?.[0] || 'D') + (data.last_name?.[0] || 'R');
   }
   checkProStatus();
-  initPaddle();
+  // payments handled by Lemon Squeezy
   applyRoleBasedUI();
   initClinicNotifications();
 }
@@ -7307,23 +7307,18 @@ function openCaseVerification() {
   window.open(url, '_blank');
 }
 
-// ─── PADDLE PAYMENTS ───
-function initPaddle() {
-  if (typeof Paddle === 'undefined') return;
-  Paddle.Environment.set('sandbox'); // Change to 'production' when Paddle approves
-  Paddle.Initialize({ token: 'REPLACE_WITH_CLIENT_SIDE_TOKEN' });
-}
+// ─── LEMON SQUEEZY PAYMENTS ───
+const LS_CHECKOUT_URL = 'https://provifyapp.lemonsqueezy.com/checkout/buy/d6072717-a6b2-4f90-901b-ccc5017a03d4';
 
-function openPaddleCheckout() {
-  if (typeof Paddle === 'undefined') {
+function openLemonCheckout() {
     showToast('Payment system loading. Try again in a moment.');
     return;
   }
-  Paddle.Checkout.open({
-    items: [{ priceId: PADDLE_PRICE_ID, quantity: 1 }],
-    customer: { email: currentUser?.email || '' },
-    successUrl: 'https://provify.app/app.html?upgraded=true',
-  });
+  const email = currentUser?.email || '';
+  const url = email
+    ? `${LS_CHECKOUT_URL}?checkout[email]=${encodeURIComponent(email)}&checkout[custom][user_id]=${currentUser?.id || ''}`
+    : LS_CHECKOUT_URL;
+  window.open(url, '_blank');
 }
 
 function checkProStatus() {
