@@ -2995,34 +2995,28 @@ body::after {
       <!-- PORTFOLIO VIEW — IN-APP -->
       <div class="view" id="view-portfolio">
 
-        <!-- PROFILE HEADER -->
-        <div id="port-profile-header" style="margin-bottom:20px;"></div>
+        <!-- 1. COMPACT IDENTITY HEADER -->
+        <div id="port-identity" style="margin-bottom:14px;"></div>
 
-        <!-- STATS ROW -->
-        <div id="port-stats-row" style="margin-bottom:16px;"></div>
+        <!-- 2. PORTFOLIO STRENGTH HERO -->
+        <div id="port-strength" style="margin-bottom:14px;"></div>
 
-        <!-- SPECIALTY BREAKDOWN -->
-        <div id="port-specialty-card" style="margin-bottom:16px;"></div>
+        <!-- 3. CAREER GPS MINI-CARD -->
+        <div id="port-career-gps" style="margin-bottom:14px;"></div>
 
-        <!-- CAREER INTELLIGENCE — GPS ROADMAP -->
-        <div id="port-career-gps" style="margin-bottom:10px;"></div>
+        <!-- 4. FEATURED CLINICAL PROOF -->
+        <div id="port-featured" style="margin-bottom:14px;"></div>
 
-        <!-- CAREER INTELLIGENCE — SALARY & MARKET -->
-        <div id="port-career-market" style="margin-bottom:20px;"></div>
-
-        <!-- SHARE + PDF ACTIONS -->
-        <div id="port-actions" style="margin-bottom:20px;"></div>
-
-        <!-- CASES SECTION HEADER -->
-        <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">All Cases</div>
-          <div style="display:flex;gap:6px;" id="port-filter-pills"></div>
-        </div>
-
-        <!-- CASES GRID -->
-        <div id="port-cases-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:40px;"></div>
+        <!-- 5. ALL CASES ARCHIVE -->
+        <div id="port-archive" style="margin-bottom:80px;"></div>
 
         <!-- hidden — kept for PDF export compat -->
+        <div id="port-profile-header" style="display:none;"></div>
+        <div id="port-stats-row" style="display:none;"></div>
+        <div id="port-specialty-card" style="display:none;"></div>
+        <div id="port-actions" style="display:none;"></div>
+        <div id="port-filter-pills" style="display:none;"></div>
+        <div id="port-cases-grid" style="display:none;"></div>
         <div id="portfolio-cases-list" style="display:none;"></div>
         <span id="portfolio-selected-count" style="display:none;">0</span>
       </div>
@@ -3699,10 +3693,7 @@ function showView(view) {
   if (view === 'archive') { renderArchive(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
-  if (view === 'portfolio') renderInAppPortfolio();
-  if (view === 'portfolio') renderPortfolioCases();
-  if (view === 'portfolio') renderCareerGPSInPortfolio();
-  if (view === 'portfolio') renderLiveCareerDashboardInPortfolio();
+  if (view === 'portfolio') renderPortfolioPage();
   if (view === 'profile') loadProfileForm();
   if (view === 'career') { renderCareerGPS(); renderLiveCareerDashboard(); }
 }
@@ -5594,161 +5585,340 @@ function showToast(msg) {
 let selectedCaseIds = new Set();
 let portActiveFilter = 'all';
 
-function renderInAppPortfolio() {
-  if (!currentProfile || allCases.length === 0) {
-    const grid = document.getElementById('port-cases-grid');
-    if (grid) grid.innerHTML = `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.25);">
-      <div style="font-size:3rem;margin-bottom:16px;opacity:0.4;">📋</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.4);margin-bottom:8px;">No cases yet</div>
-      <div style="font-size:0.8rem;">Log your first case to build your portfolio.</div>
+// ─── PORTFOLIO PAGE — MASTER RENDER ───
+function renderPortfolioPage() {
+  renderPortIdentity();
+  renderPortStrength();
+  renderPortCareerGPS();
+  renderPortFeatured();
+  renderPortArchive();
+  renderPortfolioCases(); // keep hidden list in sync for PDF
+}
+
+// ─── 1. COMPACT IDENTITY HEADER ───
+function renderPortIdentity() {
+  const el = document.getElementById('port-identity');
+  if (!el || !currentProfile) return;
+
+  const total      = allCases.length;
+  const rank       = getComplexityRank(total);
+  const firstName  = currentProfile.first_name || '';
+  const lastName   = currentProfile.last_name  || '';
+  const fullName   = `Dr. ${firstName} ${lastName}`.trim();
+  const roleLabels = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
+  const role       = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
+  const initials   = (firstName[0]||'D') + (lastName[0]||'R');
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:18px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${rank.color}40,transparent);"></div>
+      <div style="width:44px;height:44px;border-radius:12px;background:${rank.color}22;border:1px solid ${rank.color}35;display:flex;align-items:center;justify-content:center;font-size:0.95rem;font-weight:700;color:${rank.color};flex-shrink:0;">${initials}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.15rem;color:white;letter-spacing:-0.02em;line-height:1.1;">${fullName}</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);margin-top:2px;">${role}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+        <div style="font-size:1.1rem;line-height:1;">${rank.emoji}</div>
+        <div style="font-size:0.58rem;font-weight:700;color:${rank.color};letter-spacing:0.04em;">${rank.rank}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:0 2px;">
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.8);"></div>
+        <span style="font-size:0.58rem;color:rgba(52,211,153,0.6);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Verified on Provify</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="copyPortfolioLinkInApp()" style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:600;padding:5px 11px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Share
+        </button>
+        <button onclick="selectAllCases();generatePortfolioPDF()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:500;padding:5px 11px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF
+        </button>
+      </div>
     </div>`;
+}
+
+// ─── 2. PORTFOLIO STRENGTH HERO ───
+function renderPortStrength() {
+  const el = document.getElementById('port-strength');
+  if (!el) return;
+
+  if (allCases.length === 0) {
+    el.innerHTML = `
+      <div style="padding:24px 20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:18px;text-align:center;">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.35);margin-bottom:6px;">Portfolio not yet built</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.2);">Log your first case to generate your strength score.</div>
+      </div>`;
     return;
   }
 
-  const total = allCases.length;
-  const rank = getComplexityRank(total);
-  const firstName = currentProfile.first_name || '';
-  const lastName = currentProfile.last_name || '';
-  const fullName = `Dr. ${firstName} ${lastName}`.trim();
-  const roleLabels = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
-  const role = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
-  const specLabels2 = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', perio:'Periodontics', ortho:'Orthodontics', general:'General Dentistry' };
-  const specName = specLabels2[currentProfile.primary_specialty] || '';
-  const avg = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
-  const highComp = allCases.filter(c => (c.complexity_score||0) >= 7).length;
-  const specKeys = ['endo','restorative','surgery','paeds','prostho','smile'];
-  const specCount = new Set(allCases.filter(c => specKeys.includes(c.specialty)).map(c => c.specialty)).size;
+  const total     = allCases.length;
+  const score     = getClinicianScore();
+  const avg       = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
+  const highComp  = allCases.filter(c => (c.complexity_score||0) >= 7).length;
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
+  const specLabels = { endo:'Endo', restorative:'Resto', surgery:'Surg', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
+  const specChips  = Object.entries(specColors)
+    .map(([k,c]) => ({ key:k, col:c, label:specLabels[k], count:allCases.filter(x=>x.specialty===k).length }))
+    .filter(s => s.count > 0)
+    .sort((a,b) => b.count - a.count);
 
-  // PROFILE HEADER
-  const header = document.getElementById('port-profile-header');
-  if (header) {
-    const avatarLetters = (firstName[0]||'D') + (lastName[0]||'R');
-    header.innerHTML = `
-      <div style="position:relative;border-radius:24px;overflow:hidden;background:linear-gradient(145deg,rgba(124,111,255,0.08),rgba(124,111,255,0.02));border:1px solid rgba(124,111,255,0.18);padding:28px 24px;">
-        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${rank.color}60,transparent);"></div>
-        <div style="position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,${rank.color}12,transparent 70%);pointer-events:none;"></div>
-        <div style="display:flex;align-items:center;gap:16px;">
-          <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,${rank.color}30,${rank.color}10);border:2px solid ${rank.color}40;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;color:${rank.color};flex-shrink:0;">${avatarLetters}</div>
-          <div style="flex:1;">
-            <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:white;letter-spacing:-0.02em;line-height:1.1;margin-bottom:4px;">${fullName}</div>
-            <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);">${role}${specName ? ' · ' + specName : ''}</div>
-            ${currentProfile.bio ? `<div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:6px;line-height:1.5;font-style:italic;">${currentProfile.bio}</div>` : ''}
-          </div>
-          <div style="text-align:center;flex-shrink:0;">
-            <div style="font-size:1.8rem;margin-bottom:2px;">${rank.emoji}</div>
-            <div style="font-size:0.68rem;font-weight:700;color:${rank.color};">${rank.rank}</div>
+  // Score ring
+  const r     = 28;
+  const circ  = 2 * Math.PI * r;
+  const dash  = (score / 100) * circ;
+  const scoreColor = score >= 70 ? '#34D399' : score >= 40 ? '#7C6FFF' : '#F59E0B';
+
+  el.innerHTML = `
+    <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${scoreColor}35,transparent);"></div>
+      <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:14px;">Portfolio Strength</div>
+
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <!-- Score ring -->
+        <div style="position:relative;flex-shrink:0;width:72px;height:72px;">
+          <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg);">
+            <circle cx="36" cy="36" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5"/>
+            <circle cx="36" cy="36" r="${r}" fill="none" stroke="${scoreColor}" stroke-width="5"
+              stroke-linecap="round"
+              stroke-dasharray="${circ}"
+              stroke-dashoffset="${circ - dash}"
+              style="transition:stroke-dashoffset 1s ease;"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;line-height:1;">${score}</div>
+            <div style="font-size:0.42rem;color:rgba(255,255,255,0.25);letter-spacing:0.05em;">/100</div>
           </div>
         </div>
-        <div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.9);"></div>
-          <span style="font-size:0.6rem;color:rgba(52,211,153,0.7);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Verified on Provify</span>
+        <!-- Quick stats -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+          ${[
+            { val: total,     label: 'cases logged',       col: 'rgba(255,255,255,0.7)' },
+            { val: avg,       label: 'avg complexity',     col: '#7C6FFF' },
+            { val: highComp,  label: 'high-complexity (7+)', col: scoreColor },
+          ].map(s => `
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <span style="font-family:'Instrument Serif',serif;font-size:1.05rem;color:${s.col};line-height:1;">${s.val}</span>
+              <span style="font-size:0.6rem;color:rgba(255,255,255,0.25);">${s.label}</span>
+            </div>`).join('')}
         </div>
-      </div>`;
-  }
+      </div>
 
-  // STATS ROW
-  const statsRow = document.getElementById('port-stats-row');
-  if (statsRow) {
-    const now2 = new Date();
-    const startDate = allCases.length ? new Date(Math.min(...allCases.map(c => new Date(c.created_at)))) : now2;
-    const monthsActive = Math.max(1, Math.round((now2 - startDate) / (1000*60*60*24*30)));
-    const thisMonth = allCases.filter(c => {
-      const d = new Date(c.created_at);
-      return d.getMonth() === now2.getMonth() && d.getFullYear() === now2.getFullYear();
-    }).length;
-    statsRow.innerHTML = `
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-        ${[
-          { val: total, label: 'Cases', color: 'rgba(255,255,255,0.8)' },
-          { val: rank.rank, label: 'Rank', color: rank.color },
-          { val: thisMonth, label: 'This Month', color: '#7C6FFF' },
-          { val: monthsActive, label: 'Months Active', color: '#34D399' },
-        ].map(s => `
-          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:14px 10px;text-align:center;">
-            <div style="font-family:'Instrument Serif',serif;font-size:${typeof s.val === 'string' ? '1.1' : '1.6'}rem;color:${s.color};line-height:1;letter-spacing:-0.02em;">${s.val}</div>
-            <div style="font-size:0.45rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;margin-top:5px;">${s.label}</div>
+      <!-- Specialty chips -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${specChips.map(s => `
+          <div style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;background:${s.col}12;border:1px solid ${s.col}28;">
+            <div style="width:5px;height:5px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>
+            <span style="font-size:0.62rem;color:${s.col};font-weight:600;">${s.label}</span>
+            <span style="font-size:0.58rem;color:rgba(255,255,255,0.25);">${s.count}</span>
           </div>`).join('')}
-      </div>`;
-  }
-
-  // SPECIALTY BREAKDOWN
-  const specCard = document.getElementById('port-specialty-card');
-  if (specCard) {
-    const specDef = [
-      { key:'endo', label:'Endo', color:'#7C6FFF' },
-      { key:'restorative', label:'Resto', color:'#F59E0B' },
-      { key:'surgery', label:'Surgery', color:'#EF4444' },
-      { key:'paeds', label:'Paeds', color:'#34D399' },
-      { key:'prostho', label:'Prostho', color:'#38BDF8' },
-      { key:'smile', label:'Smile', color:'#FBB424' },
-    ].map(s => ({ ...s, count: allCases.filter(c => c.specialty === s.key).length }))
-     .filter(s => s.count > 0).sort((a,b) => b.count - a.count);
-
-    specCard.innerHTML = `
-      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px 20px;">
-        <div style="font-size:0.5rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:14px;">Clinical Specialties</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          ${specDef.map(s => {
-            const pct = Math.round(s.count / total * 100);
-            return `<div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:48px;font-size:0.68rem;color:rgba(255,255,255,0.4);text-align:right;flex-shrink:0;">${s.label}</div>
-              <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);border-radius:100px;overflow:hidden;">
-                <div style="height:100%;width:${pct}%;background:${s.color};border-radius:100px;box-shadow:0 0 8px ${s.color}50;"></div>
-              </div>
-              <div style="width:24px;font-size:0.68rem;color:${s.color};font-weight:700;text-align:right;">${s.count}</div>
-              <div style="width:28px;font-size:0.58rem;color:rgba(255,255,255,0.2);">${pct}%</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
-  }
-
-  // ACTIONS
-  const actions = document.getElementById('port-actions');
-  if (actions) {
-    actions.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <button onclick="copyPortfolioLinkInApp()" style="background:linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.08));border:1px solid rgba(124,111,255,0.3);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;padding:13px;border-radius:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"
-          onmouseover="this.style.background='rgba(124,111,255,0.22)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(124,111,255,0.15),rgba(124,111,255,0.08))'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          Share Link
-        </button>
-        <button onclick="selectAllCases();generatePortfolioPDF()" id="generate-pdf-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;padding:13px;border-radius:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"
-          onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.6)'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export PDF
-        </button>
-      </div>`;
-  }
-
-  // FILTER PILLS
-  const filterPills = document.getElementById('port-filter-pills');
-  const availableFilters = [
-    { key:'all', label:'All' },
-    { key:'endo', label:'Endo' },
-    { key:'restorative', label:'Resto' },
-    { key:'surgery', label:'Surgery' },
-    { key:'paeds', label:'Paeds' },
-    { key:'prostho', label:'Prostho' },
-    { key:'smile', label:'✨ Smile' },
-  ].filter(s => s.key === 'all' || allCases.some(c => c.specialty === s.key));
-
-  if (filterPills) {
-    filterPills.innerHTML = availableFilters.map(s => `
-      <button onclick="setPortFilter('${s.key}')" style="
-        padding:5px 12px;border-radius:100px;border:1px solid ${portActiveFilter===s.key ? 'rgba(124,111,255,0.5)' : 'rgba(255,255,255,0.08)'};
-        background:${portActiveFilter===s.key ? 'rgba(124,111,255,0.15)' : 'rgba(255,255,255,0.03)'};
-        color:${portActiveFilter===s.key ? '#9B91FF' : 'rgba(255,255,255,0.35)'};
-        font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:${portActiveFilter===s.key?'700':'400'};
-        cursor:pointer;transition:all 0.15s;white-space:nowrap;">${s.label}</button>`).join('');
-  }
-
-  renderPortCasesGrid();
+      </div>
+    </div>`;
 }
 
-function setPortFilter(key) {
-  portActiveFilter = key;
-  renderInAppPortfolio();
+// ─── 3. CAREER GPS MINI-CARD ───
+function renderPortCareerGPS() {
+  const el = document.getElementById('port-career-gps');
+  if (!el) return;
+
+  const gpsData    = getGPSData();
+  const validGoals = ['specialist','owner','brand','gp'];
+  const isValid    = gpsData && validGoals.includes(gpsData.goal);
+
+  if (!isValid) {
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.15);border-radius:16px;">
+        <div style="font-size:1.4rem;flex-shrink:0;">🗺</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);font-weight:500;margin-bottom:2px;">Career GPS not set up</div>
+          <div style="font-size:0.62rem;color:rgba(255,255,255,0.25);">Pick your goal — Provify builds your roadmap from your cases.</div>
+        </div>
+        <button onclick="showView('career')" style="background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.3);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button>
+      </div>`;
+    return;
+  }
+
+  const stageIds  = GOAL_STAGES[gpsData.goal] || GOAL_STAGES.gp;
+  const stages    = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
+  const ctx       = getGPSContext();
+  const manualChecks  = gpsData.manualChecks || {};
+  const stagesWithState = stages.map(s => ({
+    ...s,
+    completed: s.auto(ctx) || (manualChecks[s.id] || false),
+  }));
+  const completedCount = stagesWithState.filter(s => s.completed).length;
+  const progress       = Math.round((completedCount / stages.length) * 100);
+  const nextStage      = stagesWithState.find(s => !s.completed);
+
+  const goalMeta = {
+    specialist: { label:'Become a Specialist', icon:'🔬', color:'#7C6FFF' },
+    owner:      { label:'Own My Own Clinic',    icon:'🏢', color:'#34D399' },
+    brand:      { label:'Build a Personal Brand', icon:'👑', color:'#F59E0B' },
+    gp:         { label:'Excel as a General Dentist', icon:'🦷', color:'#9B91FF' },
+  }[gpsData.goal] || { label:'Your Career', icon:'🎯', color:'#7C6FFF' };
+
+  const barFill = `width:${progress}%;background:${goalMeta.color};border-radius:100px;height:100%;transition:width 1s ease;`;
+
+  el.innerHTML = `
+    <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:16px 18px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${goalMeta.color}40,transparent);"></div>
+      <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:12px;">Career GPS</div>
+
+      <!-- Goal row + progress -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="font-size:1.2rem;flex-shrink:0;">${goalMeta.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.78rem;color:white;font-weight:600;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${goalMeta.label}</div>
+          <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+            <div style="${barFill}"></div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:right;">
+          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:${goalMeta.color};line-height:1;">${progress}<span style="font-size:0.55rem;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;">%</span></div>
+          <div style="font-size:0.5rem;color:rgba(255,255,255,0.2);">${completedCount}/${stages.length}</div>
+        </div>
+      </div>
+
+      ${nextStage ? `
+      <!-- Up next -->
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">
+        <div style="font-size:1rem;flex-shrink:0;margin-top:1px;">${nextStage.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.5rem;color:${goalMeta.color};text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:2px;">Up next</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:4px;">${nextStage.label}</div>
+          <div style="font-size:0.62rem;color:rgba(255,255,255,0.25);line-height:1.45;">${nextStage.provifyAction.length > 90 ? nextStage.provifyAction.slice(0,90)+'…' : nextStage.provifyAction}</div>
+        </div>
+      </div>` : `
+      <div style="text-align:center;padding:8px 0 2px;">
+        <span style="font-size:0.75rem;color:${goalMeta.color};font-weight:600;">🏆 Roadmap complete</span>
+      </div>`}
+    </div>`;
+}
+
+// ─── 4. FEATURED CLINICAL PROOF ───
+function renderPortFeatured() {
+  const el = document.getElementById('port-featured');
+  if (!el || allCases.length === 0) { if(el) el.innerHTML=''; return; }
+
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
+  const specLbls   = { endo:'Endo', restorative:'Resto', surgery:'Surg', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
+
+  // Pick best 3: prefer with photos, then highest complexity
+  const withPhotos = allCases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0);
+  const noPhotos   = allCases.filter(c => !c.photo_urls || Object.keys(c.photo_urls||{}).length === 0);
+  const sorted     = [...withPhotos, ...noPhotos].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0));
+  const featured   = sorted.slice(0, 3);
+
+  el.innerHTML = `
+    <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">Clinical Proof</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${featured.map((c, idx) => {
+        const isSmile    = c.specialty === 'smile';
+        const col        = specColors[c.specialty] || '#7C6FFF';
+        const specLabel  = specLbls[c.specialty]   || c.specialty;
+        const title      = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
+        const date       = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+        const score      = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
+        const smileBefore = c.photo_urls?.['smile-before'];
+        const smileAfter  = c.photo_urls?.['smile-after'];
+        const firstPhoto  = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
+        const hasPhoto    = isSmile ? (smileBefore || smileAfter) : !!firstPhoto;
+
+        const photoBlock = isSmile && (smileBefore || smileAfter) ? `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;height:72px;overflow:hidden;border-radius:10px;flex-shrink:0;">
+            <div style="overflow:hidden;position:relative;background:#000;">
+              ${smileBefore ? `<img src="${smileBefore}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : ''}
+              <div style="position:absolute;bottom:3px;left:4px;background:rgba(0,0,0,0.7);border-radius:2px;padding:1px 4px;font-size:0.4rem;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:0.06em;">BEF</div>
+            </div>
+            <div style="overflow:hidden;position:relative;background:#111;">
+              ${smileAfter ? `<img src="${smileAfter}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : ''}
+              <div style="position:absolute;bottom:3px;right:4px;background:rgba(251,191,36,0.9);border-radius:2px;padding:1px 4px;font-size:0.4rem;color:#000;font-weight:700;letter-spacing:0.04em;">AFT</div>
+            </div>
+          </div>` : firstPhoto ? `
+          <div style="width:72px;height:72px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#000;">
+            <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+          </div>` : `
+          <div style="width:72px;height:72px;border-radius:10px;background:${col}10;border:1px solid ${col}20;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem;opacity:0.5;">🦷</div>`;
+
+        return `
+          <div onclick="openCaseDetail('${c.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;cursor:pointer;transition:border-color 0.15s;position:relative;overflow:hidden;"
+            onmouseover="this.style.borderColor='${col}35'" onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'">
+            <div style="position:absolute;left:0;top:0;bottom:0;width:2px;background:${col};border-radius:0 2px 2px 0;opacity:0.7;"></div>
+            ${photoBlock}
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.82rem;color:white;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-size:0.55rem;font-weight:700;color:${col};background:${col}15;padding:2px 7px;border-radius:100px;text-transform:uppercase;">${isSmile ? '✨ '+specLabel : specLabel}</span>
+                <span style="font-size:0.58rem;color:rgba(255,255,255,0.2);">${date}</span>
+              </div>
+              ${score !== '—' ? `<div style="margin-top:5px;font-size:0.6rem;color:rgba(255,255,255,0.25);">Complexity <span style="color:${col};font-weight:600;">${score}</span></div>` : ''}
+            </div>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ─── 5. ALL CASES ARCHIVE (compact rows) ───
+function renderPortArchive() {
+  const el = document.getElementById('port-archive');
+  if (!el) return;
+
+  if (allCases.length === 0) { el.innerHTML = ''; return; }
+
+  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
+  const specLbls   = { endo:'Endo', restorative:'Resto', surgery:'Surg', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
+
+  // All cases sorted newest first, skip the 3 already featured
+  const specColors2 = specColors;
+  const featured3Ids = new Set(
+    [...allCases]
+      .filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0)
+      .sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))
+      .slice(0,3).map(c => c.id)
+  );
+  // if fewer than 3 with photos, pad from remainder
+  if (featured3Ids.size < 3) {
+    allCases
+      .filter(c => !featured3Ids.has(c.id))
+      .sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))
+      .slice(0, 3 - featured3Ids.size)
+      .forEach(c => featured3Ids.add(c.id));
+  }
+
+  const archiveCases = allCases.filter(c => !featured3Ids.has(c.id));
+
+  if (archiveCases.length === 0) { el.innerHTML = ''; return; }
+
+  el.innerHTML = `
+    <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">All Cases <span style="color:rgba(255,255,255,0.12);font-weight:400;">(${archiveCases.length})</span></div>
+    <div style="display:flex;flex-direction:column;gap:1px;border:1px solid rgba(255,255,255,0.06);border-radius:14px;overflow:hidden;">
+      ${archiveCases.map((c, i) => {
+        const isSmile   = c.specialty === 'smile';
+        const col       = specColors[c.specialty] || '#7C6FFF';
+        const specLabel = specLbls[c.specialty]   || c.specialty;
+        const title     = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
+        const date      = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'2-digit' });
+        const score     = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
+        const isLast    = i === archiveCases.length - 1;
+        return `
+          <div onclick="openCaseDetail('${c.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.015);cursor:pointer;transition:background 0.12s;${isLast ? '' : 'border-bottom:1px solid rgba(255,255,255,0.04);'}"
+            onmouseover="this.style.background='rgba(255,255,255,0.035)'" onmouseout="this.style.background='rgba(255,255,255,0.015)'">
+            <div style="width:3px;height:24px;border-radius:2px;background:${col};opacity:0.6;flex-shrink:0;"></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.75);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
+              <div style="font-size:0.58rem;color:rgba(255,255,255,0.22);margin-top:1px;">${isSmile ? '✨ '+specLabel : specLabel} · ${date}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-family:'Instrument Serif',serif;font-size:0.85rem;color:${col};line-height:1;">${score}</div>
+              <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);margin-top:1px;">score</div>
+            </div>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>`;
+      }).join('')}
+    </div>`;
 }
 
 function copyPortfolioLinkInApp() {
@@ -5759,65 +5929,8 @@ function copyPortfolioLinkInApp() {
   navigator.clipboard.writeText(url).then(() => showToast('Portfolio link copied ✓'));
 }
 
-function renderPortCasesGrid() {
-  const grid = document.getElementById('port-cases-grid');
-  if (!grid) return;
-
-  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
-  const specLabelMap = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric', prostho:'Prosthodontics', smile:'Smile Case' };
-
-  const filtered = portActiveFilter === 'all' ? allCases : allCases.filter(c => c.specialty === portActiveFilter);
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.2);font-size:0.85rem;">No cases in this specialty yet.</div>`;
-    return;
-  }
-
-  grid.innerHTML = filtered.map(c => {
-    const isSmile = c.specialty === 'smile';
-    const col = specColors[c.specialty] || '#7C6FFF';
-    const specLabel = specLabelMap[c.specialty] || c.specialty;
-    const date = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    const title = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '-'}`;
-    const smileBefore = c.photo_urls?.['smile-before'];
-    const smileAfter = c.photo_urls?.['smile-after'];
-    const firstPhoto = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
-
-    return `
-      <div onclick="openCaseDetail('${c.id}')" style="
-        background:${isSmile ? 'linear-gradient(145deg,rgba(251,191,36,0.05),rgba(251,146,60,0.02))' : 'rgba(255,255,255,0.025)'};
-        border:1px solid ${isSmile ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.07)'};
-        border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.2s;position:relative;"
-        onmouseover="this.style.borderColor='${col}50';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px ${col}12'"
-        onmouseout="this.style.borderColor='${isSmile?'rgba(251,191,36,0.15)':'rgba(255,255,255,0.07)'}';this.style.transform='none';this.style.boxShadow='none'">
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${col},${col}30,transparent);"></div>
-        ${isSmile && (smileBefore || smileAfter) ? `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;height:100px;overflow:hidden;background:#000;">
-            <div style="overflow:hidden;position:relative;">
-              ${smileBefore ? `<img src="${smileBefore}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : '<div style="height:100%;background:rgba(255,255,255,0.02);"></div>'}
-              <div style="position:absolute;bottom:4px;left:5px;background:rgba(0,0,0,0.7);border-radius:3px;padding:1px 5px;font-size:0.44rem;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
-            </div>
-            <div style="overflow:hidden;position:relative;">
-              ${smileAfter ? `<img src="${smileAfter}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : '<div style="height:100%;background:rgba(251,191,36,0.03);"></div>'}
-              <div style="position:absolute;bottom:4px;right:5px;background:rgba(251,191,36,0.9);border-radius:3px;padding:1px 5px;font-size:0.44rem;color:#000;font-weight:700;letter-spacing:0.06em;">AFTER ✨</div>
-            </div>
-          </div>` : firstPhoto ? `
-          <div style="height:80px;overflow:hidden;background:#000;">
-            <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
-          </div>` : ''}
-        <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:0.85rem;color:white;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:0.55rem;font-weight:700;color:${col};background:${col}18;padding:2px 7px;border-radius:100px;text-transform:uppercase;">${isSmile ? '✨ Smile' : specLabel}</span>
-              <span style="font-size:0.6rem;color:rgba(255,255,255,0.2);">${date}</span>
-            </div>
-          </div>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>`;
-  }).join('');
-}
+// kept for PDF compat — hidden list still needs populating
+function setPortFilter(key) { /* no-op — archive replaces filter grid */ }
 
 function renderPortfolioCases() {
   const el = document.getElementById('portfolio-cases-list');
@@ -9499,90 +9612,6 @@ function getGPSContext() {
   const specCounts = ['endo','restorative','surgery','paeds','prostho'].map(s => ({ s, n: allCases.filter(c => c.specialty === s).length })).sort((a,b) => b.n - a.n);
   const dominant = total > 0 ? specCounts[0].n / total : 0;
   return { total, avg, dominant };
-}
-
-// ─── CAREER IN PORTFOLIO ───
-function renderCareerGPSInPortfolio() {
-  const container = document.getElementById('port-career-gps');
-  if (!container) return;
-
-  const gpsData = getGPSData();
-  const validGoals = ['specialist','owner','brand','gp'];
-  const isValid = gpsData && validGoals.includes(gpsData.goal);
-
-  if (!isValid) {
-    // Show compact setup prompt
-    container.innerHTML = `
-      <div style="background:linear-gradient(135deg,rgba(124,111,255,0.08),rgba(52,211,153,0.03));border:1px solid rgba(124,111,255,0.2);border-radius:20px;padding:20px 22px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#7C6FFF,#34D399,transparent);"></div>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="font-size:1.8rem;flex-shrink:0;">🗺</div>
-          <div style="flex:1;">
-            <div style="font-size:0.75rem;color:white;font-weight:600;margin-bottom:3px;">Career GPS not set up</div>
-            <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);line-height:1.5;">Set your goal and Provify builds your roadmap live from your cases.</div>
-          </div>
-          <button onclick="showView('career')" style="background:linear-gradient(135deg,rgba(124,111,255,0.2),rgba(124,111,255,0.1));border:1px solid rgba(124,111,255,0.35);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:all 0.2s;">Set up →</button>
-        </div>
-      </div>`;
-    return;
-  }
-
-  // Section label
-  const labelEl = document.createElement('div');
-  labelEl.style.cssText = 'font-size:0.5rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;';
-  labelEl.textContent = 'Career GPS';
-
-  const roadmapEl = document.createElement('div');
-  container.innerHTML = '';
-  container.appendChild(labelEl);
-  container.appendChild(roadmapEl);
-  renderGPSRoadmap(roadmapEl, gpsData);
-}
-
-function renderLiveCareerDashboardInPortfolio() {
-  const container = document.getElementById('port-career-market');
-  if (!container || allCases.length < 1) return;
-
-  const spec = getCareerSpecialty();
-  const total = allCases.length;
-
-  const specSalaries = CAREER_DATA.salaries[spec] || CAREER_DATA.salaries.general;
-  const specDemand   = CAREER_DATA.demand[spec]   || CAREER_DATA.demand.general;
-  const specLabel    = { endo:'Endodontics', surgery:'Oral Surgery', prostho:'Prosthodontics', paeds:'Paediatric Dentistry', general:'General Dentistry' }[spec] || 'General Dentistry';
-
-  const countryRanking = Object.keys(specSalaries).map(c => ({
-    name: c,
-    opportunity: ((specDemand[c] || 5) + ((CAREER_DATA.entry[spec]?.[c]) || 5)) / 2,
-    sal: specSalaries[c],
-  })).sort((a,b) => b.opportunity - a.opportunity);
-
-  const topCountry = countryRanking[0];
-  const flags = { 'UAE':'🇦🇪','Saudi Arabia':'🇸🇦','UK':'🇬🇧','Australia':'🇦🇺','Canada':'🇨🇦','USA':'🇺🇸','Germany':'🇩🇪','Qatar':'🇶🇦' };
-  const globalMax = Math.max(...Object.values(specSalaries).map(s => s.max));
-
-  container.innerHTML = `
-    <div style="font-size:0.5rem;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">Market Intelligence</div>
-    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:18px 20px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-size:0.55rem;color:rgba(245,158,11,0.7);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;">💰 Monthly Salary — ${specLabel}</div>
-        ${specSalaries[topCountry?.name]?.taxFree ? '<div style="font-size:0.52rem;color:rgba(52,211,153,0.5);background:rgba(52,211,153,0.08);padding:2px 8px;border-radius:100px;">Tax-free highlighted</div>' : ''}
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${Object.entries(specSalaries).map(([country, sal]) => {
-          const barWidth = Math.round((sal.max / globalMax) * 100);
-          const isTop = country === topCountry?.name;
-          return `
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:20px;text-align:center;font-size:1rem;">${flags[country] || '🌍'}</div>
-              <div style="width:90px;font-size:0.7rem;color:rgba(255,255,255,${isTop ? '0.9' : '0.5'});font-weight:${isTop ? '600' : '400'};">${country}</div>
-              <div style="flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;">
-                <div style="height:100%;width:${barWidth}%;background:${isTop ? 'linear-gradient(90deg,#34D399,#7C6FFF)' : sal.taxFree ? 'rgba(52,211,153,0.4)' : 'rgba(124,111,255,0.35)'};border-radius:100px;"></div>
-              </div>
-              <div style="width:80px;text-align:right;font-size:0.65rem;color:${isTop ? '#34D399' : 'rgba(255,255,255,0.35)'};">${sal.min.toLocaleString()}–${sal.max.toLocaleString()} <span style="font-size:0.55rem;opacity:0.6;">${sal.currency}</span></div>
-            </div>`;
-        }).join('')}
-      </div>
-    </div>`;
 }
 
 function renderCareerGPS() {
