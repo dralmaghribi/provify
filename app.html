@@ -2994,23 +2994,8 @@ body::after {
 
       <!-- PORTFOLIO VIEW — IN-APP -->
       <div class="view" id="view-portfolio">
-
-        <!-- 1. COMPACT IDENTITY HEADER -->
-        <div id="port-identity" style="margin-bottom:14px;"></div>
-
-        <!-- 2. PORTFOLIO STRENGTH HERO -->
-        <div id="port-strength" style="margin-bottom:14px;"></div>
-
-        <!-- 3. CAREER GPS MINI-CARD -->
-        <div id="port-career-gps" style="margin-bottom:14px;"></div>
-
-        <!-- 4. FEATURED CLINICAL PROOF -->
-        <div id="port-featured" style="margin-bottom:14px;"></div>
-
-        <!-- 5. ALL CASES ARCHIVE -->
-        <div id="port-archive" style="margin-bottom:80px;"></div>
-
-        <!-- hidden — kept for PDF export compat -->
+        <div id="port-passport"></div>
+        <!-- hidden stubs for PDF compat -->
         <div id="port-profile-header" style="display:none;"></div>
         <div id="port-stats-row" style="display:none;"></div>
         <div id="port-specialty-card" style="display:none;"></div>
@@ -3693,7 +3678,8 @@ function showView(view) {
   if (view === 'archive') { renderArchive(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
-  if (view === 'portfolio') renderPortfolioPage();
+  if (view === 'portfolio') renderPortfolioPassport();
+  if (view === 'portfolio') renderPortfolioCases();
   if (view === 'profile') loadProfileForm();
   if (view === 'career') { renderCareerGPS(); renderLiveCareerDashboard(); }
 }
@@ -5585,340 +5571,645 @@ function showToast(msg) {
 let selectedCaseIds = new Set();
 let portActiveFilter = 'all';
 
-// ─── PORTFOLIO PAGE — MASTER RENDER ───
-function renderPortfolioPage() {
-  renderPortIdentity();
-  renderPortStrength();
-  renderPortCareerGPS();
-  renderPortFeatured();
-  renderPortArchive();
-  renderPortfolioCases(); // keep hidden list in sync for PDF
-}
+// ─── PORTFOLIO PASSPORT ───────────────────────────────────────────────────────
 
-// ─── 1. COMPACT IDENTITY HEADER ───
-function renderPortIdentity() {
-  const el = document.getElementById('port-identity');
-  if (!el || !currentProfile) return;
+function renderPortfolioPassport() {
+  const el = document.getElementById('port-passport');
+  if (!el) return;
+
+  if (!currentProfile || allCases.length === 0) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:80px 20px;color:rgba(255,255,255,0.2);">
+        <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(255,255,255,0.3);margin-bottom:8px;">No cases logged yet</div>
+        <div style="font-size:0.78rem;">Start logging to build your clinical passport.</div>
+      </div>`;
+    return;
+  }
 
   const total      = allCases.length;
   const rank       = getComplexityRank(total);
+  const score      = getClinicianScore();
+  const avg        = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '—';
+  const highComp   = allCases.filter(c => (c.complexity_score||0) >= 7).length;
   const firstName  = currentProfile.first_name || '';
   const lastName   = currentProfile.last_name  || '';
   const fullName   = `Dr. ${firstName} ${lastName}`.trim();
+  const initials   = (firstName[0]||'D') + (lastName[0]||'R');
   const roleLabels = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
   const role       = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
-  const initials   = (firstName[0]||'D') + (lastName[0]||'R');
-
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:18px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${rank.color}40,transparent);"></div>
-      <div style="width:44px;height:44px;border-radius:12px;background:${rank.color}22;border:1px solid ${rank.color}35;display:flex;align-items:center;justify-content:center;font-size:0.95rem;font-weight:700;color:${rank.color};flex-shrink:0;">${initials}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-family:'Instrument Serif',serif;font-size:1.15rem;color:white;letter-spacing:-0.02em;line-height:1.1;">${fullName}</div>
-        <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);margin-top:2px;">${role}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
-        <div style="font-size:1.1rem;line-height:1;">${rank.emoji}</div>
-        <div style="font-size:0.58rem;font-weight:700;color:${rank.color};letter-spacing:0.04em;">${rank.rank}</div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:0 2px;">
-      <div style="display:flex;align-items:center;gap:5px;">
-        <div style="width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.8);"></div>
-        <span style="font-size:0.58rem;color:rgba(52,211,153,0.6);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Verified on Provify</span>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button onclick="copyPortfolioLinkInApp()" style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:600;padding:5px 11px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          Share
-        </button>
-        <button onclick="selectAllCases();generatePortfolioPDF()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:500;padding:5px 11px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          PDF
-        </button>
-      </div>
-    </div>`;
-}
-
-// ─── 2. PORTFOLIO STRENGTH HERO ───
-function renderPortStrength() {
-  const el = document.getElementById('port-strength');
-  if (!el) return;
-
-  if (allCases.length === 0) {
-    el.innerHTML = `
-      <div style="padding:24px 20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:18px;text-align:center;">
-        <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:rgba(255,255,255,0.35);margin-bottom:6px;">Portfolio not yet built</div>
-        <div style="font-size:0.72rem;color:rgba(255,255,255,0.2);">Log your first case to generate your strength score.</div>
-      </div>`;
-    return;
-  }
-
-  const total     = allCases.length;
-  const score     = getClinicianScore();
-  const avg       = (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1);
-  const highComp  = allCases.filter(c => (c.complexity_score||0) >= 7).length;
   const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
-  const specLabels = { endo:'Endo', restorative:'Resto', surgery:'Surg', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
-  const specChips  = Object.entries(specColors)
-    .map(([k,c]) => ({ key:k, col:c, label:specLabels[k], count:allCases.filter(x=>x.specialty===k).length }))
-    .filter(s => s.count > 0)
-    .sort((a,b) => b.count - a.count);
+  const specNames  = { endo:'Endo', restorative:'Resto', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
+  const specBreakdown = Object.entries(specColors)
+    .map(([k,c]) => ({ key:k, col:c, name:specNames[k], n:allCases.filter(x=>x.specialty===k).length }))
+    .filter(s => s.n > 0).sort((a,b) => b.n - a.n);
 
-  // Score ring
-  const r     = 28;
-  const circ  = 2 * Math.PI * r;
-  const dash  = (score / 100) * circ;
   const scoreColor = score >= 70 ? '#34D399' : score >= 40 ? '#7C6FFF' : '#F59E0B';
 
-  el.innerHTML = `
-    <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${scoreColor}35,transparent);"></div>
-      <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:14px;">Portfolio Strength</div>
-
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-        <!-- Score ring -->
-        <div style="position:relative;flex-shrink:0;width:72px;height:72px;">
-          <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg);">
-            <circle cx="36" cy="36" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5"/>
-            <circle cx="36" cy="36" r="${r}" fill="none" stroke="${scoreColor}" stroke-width="5"
-              stroke-linecap="round"
-              stroke-dasharray="${circ}"
-              stroke-dashoffset="${circ - dash}"
-              style="transition:stroke-dashoffset 1s ease;"/>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:white;line-height:1;">${score}</div>
-            <div style="font-size:0.42rem;color:rgba(255,255,255,0.25);letter-spacing:0.05em;">/100</div>
-          </div>
-        </div>
-        <!-- Quick stats -->
-        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
-          ${[
-            { val: total,     label: 'cases logged',       col: 'rgba(255,255,255,0.7)' },
-            { val: avg,       label: 'avg complexity',     col: '#7C6FFF' },
-            { val: highComp,  label: 'high-complexity (7+)', col: scoreColor },
-          ].map(s => `
-            <div style="display:flex;align-items:baseline;gap:6px;">
-              <span style="font-family:'Instrument Serif',serif;font-size:1.05rem;color:${s.col};line-height:1;">${s.val}</span>
-              <span style="font-size:0.6rem;color:rgba(255,255,255,0.25);">${s.label}</span>
-            </div>`).join('')}
-        </div>
-      </div>
-
-      <!-- Specialty chips -->
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        ${specChips.map(s => `
-          <div style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;background:${s.col}12;border:1px solid ${s.col}28;">
-            <div style="width:5px;height:5px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>
-            <span style="font-size:0.62rem;color:${s.col};font-weight:600;">${s.label}</span>
-            <span style="font-size:0.58rem;color:rgba(255,255,255,0.25);">${s.count}</span>
-          </div>`).join('')}
-      </div>
-    </div>`;
-}
-
-// ─── 3. CAREER GPS MINI-CARD ───
-function renderPortCareerGPS() {
-  const el = document.getElementById('port-career-gps');
-  if (!el) return;
-
+  // GPS
   const gpsData    = getGPSData();
   const validGoals = ['specialist','owner','brand','gp'];
-  const isValid    = gpsData && validGoals.includes(gpsData.goal);
+  const gpsValid   = gpsData && validGoals.includes(gpsData.goal);
+  let gpsBlock = '';
+  if (gpsValid) {
+    const stageIds   = GOAL_STAGES[gpsData.goal] || GOAL_STAGES.gp;
+    const stages     = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
+    const ctx        = getGPSContext();
+    const mc         = gpsData.manualChecks || {};
+    const done       = stages.filter(s => s.auto(ctx) || mc[s.id]).length;
+    const pct        = Math.round((done / stages.length) * 100);
+    const next       = stages.find(s => !(s.auto(ctx) || mc[s.id]));
+    const goalMeta   = { specialist:{label:'Specialist',icon:'🔬',col:'#7C6FFF'}, owner:{label:'Clinic Owner',icon:'🏢',col:'#34D399'}, brand:{label:'Personal Brand',icon:'👑',col:'#F59E0B'}, gp:{label:'Expert GP',icon:'🦷',col:'#9B91FF'} }[gpsData.goal] || {label:'Career',icon:'🎯',col:'#7C6FFF'};
 
-  if (!isValid) {
-    el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.15);border-radius:16px;">
-        <div style="font-size:1.4rem;flex-shrink:0;">🗺</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);font-weight:500;margin-bottom:2px;">Career GPS not set up</div>
-          <div style="font-size:0.62rem;color:rgba(255,255,255,0.25);">Pick your goal — Provify builds your roadmap from your cases.</div>
+    gpsBlock = `
+      <!-- ── PASSPORT STAMP: CAREER GPS ── -->
+      <div class="pp-section">
+        <div class="pp-section-rule">
+          <span class="pp-section-label">Career GPS</span>
         </div>
-        <button onclick="showView('career')" style="background:rgba(124,111,255,0.15);border:1px solid rgba(124,111,255,0.3);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button>
+        <div class="pp-gps-row">
+          <div class="pp-gps-left">
+            <div class="pp-gps-icon">${goalMeta.icon}</div>
+            <div>
+              <div class="pp-gps-goal">${goalMeta.label}</div>
+              <div class="pp-gps-meta">${done} of ${stages.length} milestones</div>
+            </div>
+          </div>
+          <div class="pp-gps-pct" style="color:${goalMeta.col};">${pct}<span style="font-size:0.55rem;font-family:'Inter',sans-serif;opacity:0.6;">%</span></div>
+        </div>
+        <div class="pp-progress-track">
+          <div class="pp-progress-fill" style="width:${pct}%;background:${goalMeta.col};"></div>
+        </div>
+        ${next ? `
+        <div class="pp-next-milestone">
+          <div class="pp-next-icon">${next.icon}</div>
+          <div class="pp-next-body">
+            <div class="pp-next-label">Up next</div>
+            <div class="pp-next-title">${next.label}</div>
+            <div class="pp-next-hint">${next.provifyAction.length > 85 ? next.provifyAction.slice(0,85)+'…' : next.provifyAction}</div>
+          </div>
+        </div>` : `<div class="pp-complete-badge">🏆 Roadmap complete</div>`}
       </div>`;
-    return;
   }
 
-  const stageIds  = GOAL_STAGES[gpsData.goal] || GOAL_STAGES.gp;
-  const stages    = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
-  const ctx       = getGPSContext();
-  const manualChecks  = gpsData.manualChecks || {};
-  const stagesWithState = stages.map(s => ({
-    ...s,
-    completed: s.auto(ctx) || (manualChecks[s.id] || false),
-  }));
-  const completedCount = stagesWithState.filter(s => s.completed).length;
-  const progress       = Math.round((completedCount / stages.length) * 100);
-  const nextStage      = stagesWithState.find(s => !s.completed);
+  // Featured cases — top 3 by complexity, prefer with photos
+  const withP   = allCases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0);
+  const noP     = allCases.filter(c => !c.photo_urls || Object.keys(c.photo_urls||{}).length === 0);
+  const feat3   = [...withP, ...noP].sort((a,b)=>(b.complexity_score||0)-(a.complexity_score||0)).slice(0,3);
+  const feat3ids = new Set(feat3.map(c=>c.id));
 
-  const goalMeta = {
-    specialist: { label:'Become a Specialist', icon:'🔬', color:'#7C6FFF' },
-    owner:      { label:'Own My Own Clinic',    icon:'🏢', color:'#34D399' },
-    brand:      { label:'Build a Personal Brand', icon:'👑', color:'#F59E0B' },
-    gp:         { label:'Excel as a General Dentist', icon:'🦷', color:'#9B91FF' },
-  }[gpsData.goal] || { label:'Your Career', icon:'🎯', color:'#7C6FFF' };
+  const featCards = feat3.map((c,i) => {
+    const isSmile    = c.specialty === 'smile';
+    const col        = specColors[c.specialty] || '#7C6FFF';
+    const specName   = specNames[c.specialty] || c.specialty;
+    const title      = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
+    const date       = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const sc         = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
+    const sb         = c.photo_urls?.['smile-before'];
+    const sa         = c.photo_urls?.['smile-after'];
+    const fp         = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
 
-  const barFill = `width:${progress}%;background:${goalMeta.color};border-radius:100px;height:100%;transition:width 1s ease;`;
+    const thumb = isSmile && (sb||sa) ? `
+      <div class="pp-feat-thumb pp-feat-thumb--split">
+        <div class="pp-feat-half">
+          ${sb ? `<img src="${sb}" loading="lazy">` : ''}
+          <div class="pp-feat-stamp pp-feat-stamp--before">BEF</div>
+        </div>
+        <div class="pp-feat-half">
+          ${sa ? `<img src="${sa}" loading="lazy">` : ''}
+          <div class="pp-feat-stamp pp-feat-stamp--after">AFT</div>
+        </div>
+      </div>` : fp ? `
+      <div class="pp-feat-thumb">
+        <img src="${fp}" loading="lazy">
+      </div>` : `
+      <div class="pp-feat-thumb pp-feat-thumb--empty" style="background:${col}0d;border-color:${col}22;">
+        <span style="font-size:1.3rem;opacity:0.35;">🦷</span>
+      </div>`;
+
+    return `
+      <div class="pp-feat-card" onclick="openCaseDetail('${c.id}')"
+        style="--accent:${col};" data-idx="${i}">
+        <div class="pp-feat-accent-bar" style="background:${col};"></div>
+        ${thumb}
+        <div class="pp-feat-body">
+          <div class="pp-feat-title">${title}</div>
+          <div class="pp-feat-meta">
+            <span class="pp-feat-chip" style="color:${col};background:${col}18;">${isSmile?'✨ ':''} ${specName}</span>
+            <span class="pp-feat-date">${date}</span>
+          </div>
+          ${sc !== '—' ? `<div class="pp-feat-score" style="color:${col};">${sc}<span class="pp-feat-score-den">/10</span></div>` : ''}
+        </div>
+        <svg class="pp-feat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+  }).join('');
+
+  // Archive — all minus featured
+  const archiveCases = allCases.filter(c => !feat3ids.has(c.id));
+  const archiveRows = archiveCases.map((c,i) => {
+    const isSmile = c.specialty === 'smile';
+    const col     = specColors[c.specialty] || '#7C6FFF';
+    const name    = specNames[c.specialty]  || c.specialty;
+    const title   = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
+    const date    = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});
+    const sc      = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
+    return `
+      <div class="pp-row" onclick="openCaseDetail('${c.id}')">
+        <div class="pp-row-pip" style="background:${col};"></div>
+        <div class="pp-row-body">
+          <span class="pp-row-title">${title}</span>
+          <span class="pp-row-sub">${isSmile?'✨ ':''}${name} · ${date}</span>
+        </div>
+        <div class="pp-row-score" style="color:${col};">${sc}</div>
+        <svg class="pp-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+  }).join('');
 
   el.innerHTML = `
-    <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:16px 18px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${goalMeta.color}40,transparent);"></div>
-      <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:12px;">Career GPS</div>
+  <style>
+    /* ── PASSPORT SHELL ── */
+    .pp-passport {
+      max-width: 680px;
+      margin: 0 auto;
+      padding-bottom: 80px;
+      font-family: 'Inter', sans-serif;
+    }
 
-      <!-- Goal row + progress -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="font-size:1.2rem;flex-shrink:0;">${goalMeta.icon}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:0.78rem;color:white;font-weight:600;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${goalMeta.label}</div>
-          <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
-            <div style="${barFill}"></div>
-          </div>
+    /* ── COVER PAGE ── */
+    .pp-cover {
+      position: relative;
+      background: linear-gradient(160deg, #0f0f14 0%, #13131a 60%, #0c0c10 100%);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 24px 22px 20px;
+      margin-bottom: 10px;
+    }
+    .pp-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 28px,
+        rgba(255,255,255,0.012) 28px,
+        rgba(255,255,255,0.012) 29px
+      );
+      pointer-events: none;
+    }
+    .pp-cover-top-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent 0%, ${rank.color}80 30%, ${rank.color} 50%, ${rank.color}80 70%, transparent 100%);
+    }
+    .pp-cover-wordmark {
+      font-size: 0.52rem;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .pp-cover-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .pp-cover-avatar {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: ${rank.color}18;
+      border: 1px solid ${rank.color}30;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700;
+      color: ${rank.color};
+      flex-shrink: 0;
+      letter-spacing: -0.01em;
+    }
+    .pp-cover-info { flex: 1; min-width: 0; }
+    .pp-cover-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.55rem;
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .pp-cover-role {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .pp-cover-rank {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+      flex-shrink: 0;
+    }
+    .pp-cover-rank-emoji { font-size: 1.5rem; line-height: 1; }
+    .pp-cover-rank-label {
+      font-size: 0.58rem; font-weight: 700;
+      color: ${rank.color};
+      letter-spacing: 0.05em;
+    }
+
+    /* MRZ strip */
+    .pp-mrz {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .pp-mrz-verified {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .pp-mrz-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #34D399;
+      box-shadow: 0 0 6px rgba(52,211,153,0.7);
+    }
+    .pp-mrz-text {
+      font-size: 0.57rem; font-weight: 600;
+      color: rgba(52,211,153,0.65);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .pp-mrz-actions { display: flex; gap: 6px; }
+    .pp-mrz-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.45);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.62rem; font-weight: 500;
+      padding: 5px 11px; border-radius: 7px;
+      cursor: pointer; display: flex; align-items: center; gap: 5px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .pp-mrz-btn:hover { border-color: rgba(255,255,255,0.16); color: rgba(255,255,255,0.8); }
+    .pp-mrz-btn--primary {
+      background: rgba(124,111,255,0.1);
+      border-color: rgba(124,111,255,0.28);
+      color: #9B91FF;
+    }
+    .pp-mrz-btn--primary:hover { background: rgba(124,111,255,0.18); }
+
+    /* ── DATA GRID ── */
+    .pp-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .pp-grid-cell {
+      background: #0f0f14;
+      padding: 13px 12px;
+      text-align: center;
+    }
+    .pp-grid-val {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.45rem;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 3px;
+    }
+    .pp-grid-key {
+      font-size: 0.44rem;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+    }
+
+    /* strength bar */
+    .pp-strength-bar-wrap {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .pp-strength-label {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.25);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .pp-strength-track {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .pp-strength-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: ${scoreColor};
+      width: ${score}%;
+      transition: width 1.2s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .pp-strength-score {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.1rem;
+      color: ${scoreColor};
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    /* spec chips */
+    .pp-chips {
+      display: flex; flex-wrap: wrap; gap: 5px;
+      margin-bottom: 10px;
+    }
+    .pp-chip {
+      display: flex; align-items: center; gap: 4px;
+      padding: 3px 9px;
+      border-radius: 100px;
+      font-size: 0.6rem; font-weight: 600;
+      border: 1px solid;
+    }
+    .pp-chip-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+    }
+
+    /* ── SECTION DIVIDERS ── */
+    .pp-section { margin-bottom: 10px; }
+    .pp-section-rule {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .pp-section-rule::before,
+    .pp-section-rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+    .pp-section-label {
+      font-size: 0.48rem;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── GPS BLOCK ── */
+    .pp-gps-row {
+      display: flex; align-items: center;
+      gap: 12px; margin-bottom: 10px;
+    }
+    .pp-gps-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+    .pp-gps-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .pp-gps-goal { font-size: 0.82rem; color: #fff; font-weight: 600; margin-bottom: 1px; }
+    .pp-gps-meta { font-size: 0.6rem; color: rgba(255,255,255,0.25); }
+    .pp-gps-pct {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.5rem; line-height: 1;
+      flex-shrink: 0;
+    }
+    .pp-progress-track {
+      height: 3px; background: rgba(255,255,255,0.06);
+      border-radius: 100px; overflow: hidden; margin-bottom: 10px;
+    }
+    .pp-progress-fill {
+      height: 100%; border-radius: 100px;
+      transition: width 1s ease;
+    }
+    .pp-next-milestone {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+    }
+    .pp-next-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .pp-next-body { flex: 1; min-width: 0; }
+    .pp-next-label {
+      font-size: 0.48rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: rgba(124,111,255,0.8);
+      margin-bottom: 2px;
+    }
+    .pp-next-title { font-size: 0.75rem; color: rgba(255,255,255,0.8); font-weight: 600; margin-bottom: 3px; }
+    .pp-next-hint { font-size: 0.6rem; color: rgba(255,255,255,0.22); line-height: 1.5; }
+    .pp-complete-badge {
+      text-align: center; font-size: 0.72rem;
+      color: #34D399; font-weight: 600; padding: 6px 0;
+    }
+
+    /* ── FEATURED CARDS ── */
+    .pp-feat-list { display: flex; flex-direction: column; gap: 8px; }
+    .pp-feat-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px 11px 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .pp-feat-card:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.035); }
+    .pp-feat-accent-bar {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 2px; border-radius: 0 2px 2px 0;
+      opacity: 0.7;
+    }
+    .pp-feat-thumb {
+      width: 64px; height: 64px; border-radius: 10px;
+      overflow: hidden; flex-shrink: 0; background: #111;
+    }
+    .pp-feat-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pp-feat-thumb--split { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
+    .pp-feat-half { position: relative; overflow: hidden; background: #000; }
+    .pp-feat-half img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pp-feat-stamp {
+      position: absolute; bottom: 2px;
+      font-size: 0.38rem; font-weight: 700;
+      padding: 1px 3px; border-radius: 2px;
+      letter-spacing: 0.04em;
+    }
+    .pp-feat-stamp--before { left: 3px; background: rgba(0,0,0,0.75); color: rgba(255,255,255,0.7); }
+    .pp-feat-stamp--after  { right: 3px; background: rgba(251,191,36,0.9); color: #000; }
+    .pp-feat-thumb--empty {
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid;
+    }
+    .pp-feat-body { flex: 1; min-width: 0; }
+    .pp-feat-title {
+      font-size: 0.85rem; color: rgba(255,255,255,0.85); font-weight: 600;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      margin-bottom: 4px;
+    }
+    .pp-feat-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .pp-feat-chip {
+      font-size: 0.54rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 100px;
+      text-transform: uppercase;
+    }
+    .pp-feat-date { font-size: 0.58rem; color: rgba(255,255,255,0.2); }
+    .pp-feat-score {
+      font-family: 'Instrument Serif', serif;
+      font-size: 0.95rem; line-height: 1;
+      margin-top: 5px;
+    }
+    .pp-feat-score-den { font-family: 'Inter', sans-serif; font-size: 0.5rem; opacity: 0.4; }
+    .pp-feat-chevron {
+      width: 10px; height: 10px;
+      color: rgba(255,255,255,0.12); flex-shrink: 0;
+    }
+
+    /* ── ARCHIVE ROWS ── */
+    .pp-archive-shell {
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .pp-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px;
+      background: rgba(255,255,255,0.012);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .pp-row:last-child { border-bottom: none; }
+    .pp-row:hover { background: rgba(255,255,255,0.03); }
+    .pp-row-pip {
+      width: 3px; height: 22px;
+      border-radius: 2px;
+      flex-shrink: 0; opacity: 0.65;
+    }
+    .pp-row-body { flex: 1; min-width: 0; }
+    .pp-row-title {
+      font-size: 0.75rem; color: rgba(255,255,255,0.7); font-weight: 500;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      display: block;
+    }
+    .pp-row-sub {
+      font-size: 0.57rem; color: rgba(255,255,255,0.2);
+      display: block; margin-top: 1px;
+    }
+    .pp-row-score {
+      font-family: 'Instrument Serif', serif;
+      font-size: 0.88rem; flex-shrink: 0;
+    }
+    .pp-row-chevron {
+      width: 9px; height: 9px;
+      color: rgba(255,255,255,0.1); flex-shrink: 0;
+    }
+    .pp-archive-count {
+      font-size: 0.48rem; color: rgba(255,255,255,0.15);
+      font-weight: 400; margin-left: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .pp-grid { grid-template-columns: repeat(4, 1fr); }
+      .pp-cover-name { font-size: 1.3rem; }
+    }
+  </style>
+
+  <div class="pp-passport">
+
+    <!-- ══ COVER PAGE ══ -->
+    <div class="pp-cover">
+      <div class="pp-cover-top-bar"></div>
+      <div class="pp-cover-wordmark">Provify · Clinical Portfolio</div>
+      <div class="pp-cover-main">
+        <div class="pp-cover-avatar">${initials}</div>
+        <div class="pp-cover-info">
+          <div class="pp-cover-name">${fullName}</div>
+          <div class="pp-cover-role">${role}</div>
         </div>
-        <div style="flex-shrink:0;text-align:right;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:${goalMeta.color};line-height:1;">${progress}<span style="font-size:0.55rem;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;">%</span></div>
-          <div style="font-size:0.5rem;color:rgba(255,255,255,0.2);">${completedCount}/${stages.length}</div>
+        <div class="pp-cover-rank">
+          <div class="pp-cover-rank-emoji">${rank.emoji}</div>
+          <div class="pp-cover-rank-label">${rank.rank}</div>
         </div>
       </div>
-
-      ${nextStage ? `
-      <!-- Up next -->
-      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">
-        <div style="font-size:1rem;flex-shrink:0;margin-top:1px;">${nextStage.icon}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:0.5rem;color:${goalMeta.color};text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:2px;">Up next</div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:4px;">${nextStage.label}</div>
-          <div style="font-size:0.62rem;color:rgba(255,255,255,0.25);line-height:1.45;">${nextStage.provifyAction.length > 90 ? nextStage.provifyAction.slice(0,90)+'…' : nextStage.provifyAction}</div>
+      <div class="pp-mrz">
+        <div class="pp-mrz-verified">
+          <div class="pp-mrz-dot"></div>
+          <span class="pp-mrz-text">Verified on Provify</span>
         </div>
-      </div>` : `
-      <div style="text-align:center;padding:8px 0 2px;">
-        <span style="font-size:0.75rem;color:${goalMeta.color};font-weight:600;">🏆 Roadmap complete</span>
-      </div>`}
-    </div>`;
-}
+        <div class="pp-mrz-actions">
+          <button class="pp-mrz-btn pp-mrz-btn--primary" onclick="copyPortfolioLinkInApp()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Share
+          </button>
+          <button class="pp-mrz-btn" onclick="selectAllCases();generatePortfolioPDF()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            PDF
+          </button>
+        </div>
+      </div>
+    </div>
 
-// ─── 4. FEATURED CLINICAL PROOF ───
-function renderPortFeatured() {
-  const el = document.getElementById('port-featured');
-  if (!el || allCases.length === 0) { if(el) el.innerHTML=''; return; }
+    <!-- ══ DATA GRID ══ -->
+    <div class="pp-grid">
+      <div class="pp-grid-cell">
+        <div class="pp-grid-val" style="color:rgba(255,255,255,0.85);">${total}</div>
+        <div class="pp-grid-key">Cases</div>
+      </div>
+      <div class="pp-grid-cell">
+        <div class="pp-grid-val" style="color:#7C6FFF;font-size:${rank.rank.length > 6 ? '0.9rem':'1.45rem'};">${rank.rank}</div>
+        <div class="pp-grid-key">Rank</div>
+      </div>
+      <div class="pp-grid-cell">
+        <div class="pp-grid-val" style="color:rgba(255,255,255,0.6);">${avg}</div>
+        <div class="pp-grid-key">Avg Score</div>
+      </div>
+      <div class="pp-grid-cell">
+        <div class="pp-grid-val" style="color:#34D399;">${highComp}</div>
+        <div class="pp-grid-key">High Complex</div>
+      </div>
+    </div>
 
-  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
-  const specLbls   = { endo:'Endo', restorative:'Resto', surgery:'Surg', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
+    <!-- ══ PORTFOLIO STRENGTH ══ -->
+    <div class="pp-strength-bar-wrap">
+      <span class="pp-strength-label">Portfolio Strength</span>
+      <div class="pp-strength-track"><div class="pp-strength-fill"></div></div>
+      <span class="pp-strength-score">${score}<span style="font-size:0.5rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span>
+    </div>
 
-  // Pick best 3: prefer with photos, then highest complexity
-  const withPhotos = allCases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0);
-  const noPhotos   = allCases.filter(c => !c.photo_urls || Object.keys(c.photo_urls||{}).length === 0);
-  const sorted     = [...withPhotos, ...noPhotos].sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0));
-  const featured   = sorted.slice(0, 3);
+    <!-- ══ SPECIALTY CHIPS ══ -->
+    <div class="pp-chips">
+      ${specBreakdown.map(s => `
+        <div class="pp-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}25;">
+          <div class="pp-chip-dot" style="background:${s.col};"></div>
+          ${s.name} <span style="opacity:0.45;font-weight:400;margin-left:2px;">${s.n}</span>
+        </div>`).join('')}
+    </div>
 
-  el.innerHTML = `
-    <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">Clinical Proof</div>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      ${featured.map((c, idx) => {
-        const isSmile    = c.specialty === 'smile';
-        const col        = specColors[c.specialty] || '#7C6FFF';
-        const specLabel  = specLbls[c.specialty]   || c.specialty;
-        const title      = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
-        const date       = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-        const score      = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
-        const smileBefore = c.photo_urls?.['smile-before'];
-        const smileAfter  = c.photo_urls?.['smile-after'];
-        const firstPhoto  = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
-        const hasPhoto    = isSmile ? (smileBefore || smileAfter) : !!firstPhoto;
+    ${gpsBlock}
 
-        const photoBlock = isSmile && (smileBefore || smileAfter) ? `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;height:72px;overflow:hidden;border-radius:10px;flex-shrink:0;">
-            <div style="overflow:hidden;position:relative;background:#000;">
-              ${smileBefore ? `<img src="${smileBefore}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : ''}
-              <div style="position:absolute;bottom:3px;left:4px;background:rgba(0,0,0,0.7);border-radius:2px;padding:1px 4px;font-size:0.4rem;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:0.06em;">BEF</div>
-            </div>
-            <div style="overflow:hidden;position:relative;background:#111;">
-              ${smileAfter ? `<img src="${smileAfter}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : ''}
-              <div style="position:absolute;bottom:3px;right:4px;background:rgba(251,191,36,0.9);border-radius:2px;padding:1px 4px;font-size:0.4rem;color:#000;font-weight:700;letter-spacing:0.04em;">AFT</div>
-            </div>
-          </div>` : firstPhoto ? `
-          <div style="width:72px;height:72px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#000;">
-            <img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
-          </div>` : `
-          <div style="width:72px;height:72px;border-radius:10px;background:${col}10;border:1px solid ${col}20;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem;opacity:0.5;">🦷</div>`;
+    <!-- ══ CLINICAL PROOF ══ -->
+    <div class="pp-section">
+      <div class="pp-section-rule">
+        <span class="pp-section-label">Clinical Proof</span>
+      </div>
+      <div class="pp-feat-list">${featCards}</div>
+    </div>
 
-        return `
-          <div onclick="openCaseDetail('${c.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;cursor:pointer;transition:border-color 0.15s;position:relative;overflow:hidden;"
-            onmouseover="this.style.borderColor='${col}35'" onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'">
-            <div style="position:absolute;left:0;top:0;bottom:0;width:2px;background:${col};border-radius:0 2px 2px 0;opacity:0.7;"></div>
-            ${photoBlock}
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:0.82rem;color:white;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                <span style="font-size:0.55rem;font-weight:700;color:${col};background:${col}15;padding:2px 7px;border-radius:100px;text-transform:uppercase;">${isSmile ? '✨ '+specLabel : specLabel}</span>
-                <span style="font-size:0.58rem;color:rgba(255,255,255,0.2);">${date}</span>
-              </div>
-              ${score !== '—' ? `<div style="margin-top:5px;font-size:0.6rem;color:rgba(255,255,255,0.25);">Complexity <span style="color:${col};font-weight:600;">${score}</span></div>` : ''}
-            </div>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>`;
-      }).join('')}
-    </div>`;
-}
+    <!-- ══ ALL CASES ══ -->
+    ${archiveCases.length > 0 ? `
+    <div class="pp-section">
+      <div class="pp-section-rule">
+        <span class="pp-section-label">All Cases <span class="pp-archive-count">(${archiveCases.length})</span></span>
+      </div>
+      <div class="pp-archive-shell">${archiveRows}</div>
+    </div>` : ''}
 
-// ─── 5. ALL CASES ARCHIVE (compact rows) ───
-function renderPortArchive() {
-  const el = document.getElementById('port-archive');
-  if (!el) return;
-
-  if (allCases.length === 0) { el.innerHTML = ''; return; }
-
-  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
-  const specLbls   = { endo:'Endo', restorative:'Resto', surgery:'Surg', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
-
-  // All cases sorted newest first, skip the 3 already featured
-  const specColors2 = specColors;
-  const featured3Ids = new Set(
-    [...allCases]
-      .filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0)
-      .sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))
-      .slice(0,3).map(c => c.id)
-  );
-  // if fewer than 3 with photos, pad from remainder
-  if (featured3Ids.size < 3) {
-    allCases
-      .filter(c => !featured3Ids.has(c.id))
-      .sort((a,b) => (b.complexity_score||0) - (a.complexity_score||0))
-      .slice(0, 3 - featured3Ids.size)
-      .forEach(c => featured3Ids.add(c.id));
-  }
-
-  const archiveCases = allCases.filter(c => !featured3Ids.has(c.id));
-
-  if (archiveCases.length === 0) { el.innerHTML = ''; return; }
-
-  el.innerHTML = `
-    <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">All Cases <span style="color:rgba(255,255,255,0.12);font-weight:400;">(${archiveCases.length})</span></div>
-    <div style="display:flex;flex-direction:column;gap:1px;border:1px solid rgba(255,255,255,0.06);border-radius:14px;overflow:hidden;">
-      ${archiveCases.map((c, i) => {
-        const isSmile   = c.specialty === 'smile';
-        const col       = specColors[c.specialty] || '#7C6FFF';
-        const specLabel = specLbls[c.specialty]   || c.specialty;
-        const title     = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
-        const date      = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'2-digit' });
-        const score     = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
-        const isLast    = i === archiveCases.length - 1;
-        return `
-          <div onclick="openCaseDetail('${c.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.015);cursor:pointer;transition:background 0.12s;${isLast ? '' : 'border-bottom:1px solid rgba(255,255,255,0.04);'}"
-            onmouseover="this.style.background='rgba(255,255,255,0.035)'" onmouseout="this.style.background='rgba(255,255,255,0.015)'">
-            <div style="width:3px;height:24px;border-radius:2px;background:${col};opacity:0.6;flex-shrink:0;"></div>
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:0.75rem;color:rgba(255,255,255,0.75);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
-              <div style="font-size:0.58rem;color:rgba(255,255,255,0.22);margin-top:1px;">${isSmile ? '✨ '+specLabel : specLabel} · ${date}</div>
-            </div>
-            <div style="text-align:right;flex-shrink:0;">
-              <div style="font-family:'Instrument Serif',serif;font-size:0.85rem;color:${col};line-height:1;">${score}</div>
-              <div style="font-size:0.48rem;color:rgba(255,255,255,0.2);margin-top:1px;">score</div>
-            </div>
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>`;
-      }).join('')}
-    </div>`;
+  </div>`;
 }
 
 function copyPortfolioLinkInApp() {
@@ -5929,8 +6220,13 @@ function copyPortfolioLinkInApp() {
   navigator.clipboard.writeText(url).then(() => showToast('Portfolio link copied ✓'));
 }
 
-// kept for PDF compat — hidden list still needs populating
-function setPortFilter(key) { /* no-op — archive replaces filter grid */ }
+function setPortFilter(key) { /* no-op — kept for compat */ }
+
+function renderInAppPortfolio() {
+  renderPortfolioPassport();
+}
+
+// ─── END PORTFOLIO PASSPORT ───────────────────────────────────────────────────
 
 function renderPortfolioCases() {
   const el = document.getElementById('portfolio-cases-list');
