@@ -7311,9 +7311,6 @@ function openCaseVerification() {
 const LS_CHECKOUT_URL = 'https://provifyapp.lemonsqueezy.com/checkout/buy/d6072717-a6b2-4f90-901b-ccc5017a03d4';
 
 function openLemonCheckout() {
-    showToast('Payment system loading. Try again in a moment.');
-    return;
-  }
   const email = currentUser?.email || '';
   const url = email
     ? `${LS_CHECKOUT_URL}?checkout[email]=${encodeURIComponent(email)}&checkout[custom][user_id]=${currentUser?.id || ''}`
