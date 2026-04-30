@@ -5607,33 +5607,37 @@ function setPortFilter() {}
 async function uploadPassportPhoto(file) {
   if (!file || !currentUser) return null;
   try {
-    // Convert to base64 data URL first — works without bucket permissions
-    const dataUrl = await new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onload  = () => res(reader.result);
-      reader.onerror = () => rej(new Error('Read failed'));
-      reader.readAsDataURL(file);
+    // Resize to max 300px and compress — keeps base64 under ~30KB
+    const resized = await new Promise((res, rej) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX = 300;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(objectUrl);
+        res(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = () => rej(new Error('Image load failed'));
+      img.src = objectUrl;
     });
 
-    // Try Supabase storage first (better for large files)
-    const ext  = file.name.split('.').pop() || 'jpg';
-    const path = `avatars/${currentUser.id}.${ext}`;
-    const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
-
-    let finalUrl = dataUrl; // fallback to base64
-    if (!error) {
-      const { data } = sb.storage.from('case-images').getPublicUrl(path);
-      if (data?.publicUrl) finalUrl = data.publicUrl;
-    }
-
-    // Save to profile
-    await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: finalUrl });
-    currentProfile = { ...currentProfile, avatar_url: finalUrl };
+    // Save resized base64 to profile
+    const { error } = await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: resized });
+    if (error) throw error;
+    currentProfile = { ...currentProfile, avatar_url: resized };
     showToast('Photo updated ✓');
-    return finalUrl;
+    // Re-render portfolio to show new photo
+    if (document.getElementById('port-passport')) renderPortfolioPassport();
+    return resized;
   } catch(e) {
     console.error('Photo upload failed', e);
-    showToast('Photo upload failed');
+    showToast('Photo upload failed — try a smaller image');
     return null;
   }
 }
@@ -6603,9 +6607,27 @@ async function generatePortfolioPDF() {
   const specNameMap = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', perio:'Periodontics', ortho:'Orthodontics', general:'General Dentistry' };
   const primarySpec = specNameMap[currentProfile?.primary_specialty] || '';
   const bio = currentProfile?.bio || '';
-  const avatarUrl = currentProfile?.avatar_url || null;
+  const avatarRaw = currentProfile?.avatar_url || null;
   const initials = ((currentProfile?.first_name?.[0]||'D') + (currentProfile?.last_name?.[0]||'R')).toUpperCase();
   const total = cases.length;
+
+  // Convert avatar to base64 for PDF (avoids CORS in print window)
+  let avatarB64 = null;
+  if (avatarRaw) {
+    if (avatarRaw.startsWith('data:')) {
+      avatarB64 = avatarRaw; // already base64
+    } else {
+      try {
+        const resp = await fetch(avatarRaw);
+        const blob = await resp.blob();
+        avatarB64 = await new Promise(res => {
+          const r = new FileReader();
+          r.onload = () => res(r.result);
+          r.readAsDataURL(blob);
+        });
+      } catch(e) { avatarB64 = null; }
+    }
+  }
   const rank = getComplexityRank(allCases.length);
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
 
@@ -6884,9 +6906,9 @@ async function generatePortfolioPDF() {
     <div class="cover-pretitle">Professional Portfolio</div>
     <div class="cover-title">Clinical<br><span>Portfolio</span></div>
     <div class="cover-rule"></div>
-    ${avatarUrl ? `
+    ${avatarB64 ? `
     <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;margin:0 auto 14px;border:3px solid rgba(255,255,255,0.25);box-shadow:0 0 20px rgba(124,111,255,0.3);">
-      <img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;" crossorigin="anonymous">
+      <img src="${avatarB64}" style="width:100%;height:100%;object-fit:cover;">
     </div>` : ''}
     <div class="cover-name">${name}</div>
     <div class="cover-role">${role}${primarySpec ? ' · ' + primarySpec : ''}</div>
