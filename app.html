@@ -1268,24 +1268,17 @@ body::after {
   .view.active#view-dashboard .db-hero                             { order:1; margin-bottom:16px; }
   .view.active#view-dashboard #db-upgrade-banner                   { order:2; }
   .view.active#view-dashboard #db-ai-insight-card                  { order:3; }
-  .view.active#view-dashboard .db-section:has(#db-stat-protected)  { order:4; }
-  .view.active#view-dashboard .db-section:has(#db-activity-list)   { order:5; }
-  .view.active#view-dashboard .db-section:has(#db-rank-card)       { order:6; }
-  .view.active#view-dashboard .db-portfolio-strip                   { order:7; }
-  .view.active#view-dashboard .db-bottom-grid                       { order:8; }
+  .view.active#view-dashboard .db-section:has(#db-activity-list)   { order:4; }
+  .view.active#view-dashboard .db-section:has(#db-rank-card)       { order:5; }
+  .view.active#view-dashboard .db-portfolio-strip                   { order:6; }
+  .view.active#view-dashboard .db-bottom-grid                       { order:7; }
 
   /* ── HERO ── */
-  #view-dashboard .db-hero { border-radius:18px; padding:38px 20px 34px; }
+  #view-dashboard .db-hero { border-radius:18px; padding:38px 20px 0 !important; overflow:visible !important; }
   #view-dashboard .db-hero-title { font-size:48px; }
   #view-dashboard .db-hero-subtitle { font-size:24px; }
   #view-dashboard .db-mic-btn { width:96px; height:96px; }
   #view-dashboard .db-mic-svg { width:34px; height:34px; }
-
-  /* ── STAT PANEL → full width, stays 3-col ── */
-  #view-dashboard .db-stat-panel { border-radius:14px; }
-  #view-dashboard .db-stat-panel-item { padding:16px 14px 14px; }
-  #view-dashboard .db-stat-panel-val { font-size:26px; }
-  #view-dashboard .db-stat-panel-sub { font-size:10px; }
 
   /* ── PINNED CASES → swipeable carousel ── */
   #db-top-cases-container {
@@ -2682,6 +2675,39 @@ body::after {
               Start Speaking
             </button>
           </div>
+
+          <!-- VALUE STRIP — embedded at base of hero -->
+          <div style="position:relative;z-index:2;margin:24px -40px -64px;border-top:1px solid rgba(255,255,255,0.06);">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
+
+              <div onclick="navToShield()" style="padding:16px 16px 18px;cursor:pointer;transition:background 0.15s;border-right:1px solid rgba(255,255,255,0.05);text-align:center;"
+                onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);margin:0 auto 8px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2.2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div style="font-size:0.42rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:4px;">Shield</div>
+                <div style="font-size:0.72rem;font-weight:600;color:rgba(212,168,67,0.85);line-height:1.3;">Every case<br>protected</div>
+              </div>
+
+              <div onclick="viewMyPortfolio()" style="padding:16px 16px 18px;cursor:pointer;transition:background 0.15s;border-right:1px solid rgba(255,255,255,0.05);text-align:center;"
+                onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.2);margin:0 auto 8px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9B91FF" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div style="font-size:0.42rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:4px;">Portfolio</div>
+                <div style="font-size:0.72rem;font-weight:600;color:rgba(155,143,245,0.85);line-height:1.3;">Verified &<br>shareable</div>
+              </div>
+
+              <div style="padding:16px 16px 18px;text-align:center;">
+                <div style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);margin:0 auto 8px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                </div>
+                <div style="font-size:0.42rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:4px;">AI Docs</div>
+                <div style="font-size:0.72rem;font-weight:600;color:rgba(52,211,153,0.85);line-height:1.3;">Auto-written<br>instantly</div>
+              </div>
+
+            </div>
+          </div>
         </div>
 
         <!-- UPGRADE BANNER — hidden for Pro users -->
@@ -2721,37 +2747,9 @@ body::after {
           <strong id="micro-this-month">0</strong>
           <strong id="micro-rank">—</strong>
           <strong id="micro-streak">0</strong>
-        </div>
-
-        <!-- STAT PANEL — 3-col horizontal strip -->
-        <div class="db-stat-panel db-section">
-          <div class="db-stat-panel-item" onclick="navToShield()" style="cursor:pointer;">
-            <div class="db-stat-panel-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div class="db-stat-panel-label">Shield</div>
-            <span class="db-stat-panel-num db-gold" id="db-stat-protected">—</span>
-            <div class="db-stat-panel-val db-gold">cases protected</div>
-            <div class="db-stat-panel-sub">Complaint-ready in seconds</div>
-          </div>
-          <div class="db-stat-panel-divider"></div>
-          <div class="db-stat-panel-item" onclick="viewMyPortfolio()" style="cursor:pointer;">
-            <div class="db-stat-panel-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b8ff5" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
-            <div class="db-stat-panel-label">Portfolio</div>
-            <div class="db-stat-panel-val db-purple" id="db-stat-portfolio">Verified portfolio</div>
-            <div class="db-stat-panel-sub">Structured, shareable, career-ready</div>
-          </div>
-          <div class="db-stat-panel-divider"></div>
-          <div class="db-stat-panel-item" onclick="showView('progress')" style="cursor:pointer;">
-            <div class="db-stat-panel-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3dd68c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="db-stat-panel-label">AI Docs</div>
-            <div class="db-stat-panel-val db-green" id="db-stat-growth">AI documentation</div>
-            <div class="db-stat-panel-sub">Sessions auto-logged instantly</div>
-          </div>
+          <span id="db-stat-protected">—</span>
+          <span id="db-stat-portfolio">—</span>
+          <span id="db-stat-growth">—</span>
         </div>
 
         <!-- RECENT ACTIVITY (live from Supabase) -->
