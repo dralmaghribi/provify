@@ -5698,237 +5698,322 @@ function renderPortfolioPassport() {
     .pp3-chips{display:flex;flex-wrap:wrap;gap:5px;}
     .pp3-chip{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:0.58rem;font-weight:600;border:1px solid;}
 
-    /* ═══ PDF EXPORT HERO ═══ */
-    .pp3-export{
+    /* ═══ PDF EXPORT SEAL ═══ */
+    .pp3-seal-wrap{
       position:relative;
-      border-radius:20px;
-      overflow:hidden;
-      cursor:pointer;
       margin-bottom:4px;
+      cursor:pointer;
+    }
+    /* Animated ring on hover */
+    .pp3-seal-wrap::before{
+      content:'';
+      position:absolute;
+      inset:-1px;
+      border-radius:22px;
+      background:linear-gradient(135deg,rgba(124,111,255,0) 0%,rgba(124,111,255,0.5) 50%,rgba(52,211,153,0.3) 100%);
+      opacity:0;
+      transition:opacity 0.35s;
+      z-index:0;
+    }
+    .pp3-seal-wrap:hover::before{opacity:1;}
+    .pp3-seal-doc{
+      position:relative;
+      z-index:1;
+      background:#0b0b10;
       border:1px solid rgba(255,255,255,0.08);
-      transition:transform 0.2s,box-shadow 0.2s;
+      border-radius:21px;
+      overflow:hidden;
+      transition:transform 0.25s cubic-bezier(0.34,1.3,0.64,1),box-shadow 0.25s;
     }
-    .pp3-export:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,0.5);}
-    .pp3-export:active{transform:scale(0.98);}
-    .pp3-export-bg{
-      position:absolute;inset:0;
-      background:
-        linear-gradient(135deg,#0f0f18 0%,#13101f 40%,#0c0e16 100%);
+    .pp3-seal-wrap:hover .pp3-seal-doc{
+      transform:translateY(-3px);
+      box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(124,111,255,0.15);
     }
-    .pp3-export-shimmer{
-      position:absolute;inset:0;
-      background:
-        radial-gradient(ellipse 70% 50% at 85% 20%,rgba(124,111,255,0.12) 0%,transparent 60%),
-        radial-gradient(ellipse 50% 60% at 10% 80%,rgba(52,211,153,0.06) 0%,transparent 60%);
-      pointer-events:none;
-    }
-    .pp3-export-grid{
+    .pp3-seal-wrap:active .pp3-seal-doc{transform:scale(0.975);}
+
+    /* paper texture */
+    .pp3-seal-paper{
       position:absolute;inset:0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
-      background-size:24px 24px;
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events:none;
     }
-    .pp3-export-top-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),rgba(52,211,153,0.4),transparent);}
-    .pp3-export-inner{position:relative;padding:22px 22px 20px;}
-    .pp3-export-doc-icon{
-      width:44px;height:56px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.1);
-      border-radius:8px;
+    /* classification bar top */
+    .pp3-seal-classify{
+      background:linear-gradient(90deg,transparent,rgba(124,111,255,0.7) 20%,rgba(124,111,255,0.9) 50%,rgba(52,211,153,0.5) 80%,transparent);
+      height:2px;
+      width:100%;
+    }
+    /* classification text stripe */
+    .pp3-seal-classify-text{
+      background:rgba(124,111,255,0.06);
+      border-bottom:1px solid rgba(124,111,255,0.1);
+      padding:4px 20px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .pp3-seal-classify-label{
+      font-size:0.38rem;
+      font-weight:800;
+      letter-spacing:0.3em;
+      color:rgba(124,111,255,0.5);
+      text-transform:uppercase;
+    }
+    .pp3-seal-classify-id{
+      font-size:0.38rem;
+      color:rgba(255,255,255,0.15);
+      letter-spacing:0.1em;
+      font-family:monospace;
+    }
+
+    .pp3-seal-body{padding:20px 22px 0;}
+
+    /* header row: stats left, wax seal right */
+    .pp3-seal-header-row{
+      display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;
+    }
+    .pp3-seal-stats{flex:1;min-width:0;}
+    .pp3-seal-doc-label{
+      font-size:0.4rem;letter-spacing:0.28em;text-transform:uppercase;
+      color:rgba(255,255,255,0.2);font-weight:600;margin-bottom:10px;
+    }
+    /* stat columns */
+    .pp3-seal-stat-row{display:flex;gap:0;margin-bottom:16px;}
+    .pp3-seal-stat{
+      flex:1;padding-right:14px;margin-right:14px;
+      border-right:1px solid rgba(255,255,255,0.05);
+    }
+    .pp3-seal-stat:last-child{border-right:none;padding-right:0;margin-right:0;}
+    .pp3-seal-stat-val{
+      font-family:'Instrument Serif',serif;
+      font-size:1.5rem;line-height:1;
+      letter-spacing:-0.03em;
+      margin-bottom:2px;
+    }
+    .pp3-seal-stat-key{
+      font-size:0.4rem;color:rgba(255,255,255,0.2);
+      text-transform:uppercase;letter-spacing:0.14em;font-weight:600;
+    }
+
+    /* WAX SEAL */
+    .pp3-wax{
+      flex-shrink:0;
+      width:64px;height:64px;
+      position:relative;
       display:flex;align-items:center;justify-content:center;
-      font-size:1.4rem;
+      margin-top:4px;
+    }
+    .pp3-wax-ring{
+      position:absolute;inset:0;
+      border-radius:50%;
+      background:conic-gradient(
+        from 0deg,
+        rgba(124,111,255,0.0) 0deg,
+        rgba(124,111,255,0.6) 60deg,
+        rgba(52,211,153,0.4) 120deg,
+        rgba(124,111,255,0.6) 180deg,
+        rgba(52,211,153,0.3) 240deg,
+        rgba(124,111,255,0.5) 300deg,
+        rgba(124,111,255,0.0) 360deg
+      );
+      animation:pp3-spin 8s linear infinite;
+      opacity:0.7;
+    }
+    @keyframes pp3-spin{to{transform:rotate(360deg);}}
+    .pp3-wax-inner{
+      position:absolute;inset:3px;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 30%,#2a1f5e,#0f0d1a 70%);
+      border:1px solid rgba(124,111,255,0.25);
+      display:flex;align-items:center;justify-content:center;
+      flex-direction:column;gap:1px;
+    }
+    .pp3-wax-p{
+      font-family:'Instrument Serif',serif;
+      font-size:1.1rem;color:rgba(124,111,255,0.9);
+      line-height:1;letter-spacing:-0.04em;
+      text-shadow:0 0 12px rgba(124,111,255,0.6);
+    }
+    .pp3-wax-text{
+      font-size:0.3rem;letter-spacing:0.15em;
+      color:rgba(124,111,255,0.4);text-transform:uppercase;
+      font-weight:700;
+    }
+
+    /* signature line */
+    .pp3-seal-sig-row{
+      display:flex;align-items:flex-end;gap:12px;
+      padding:12px 0;
+      border-top:1px solid rgba(255,255,255,0.04);
+      border-bottom:1px solid rgba(255,255,255,0.04);
       margin-bottom:16px;
+    }
+    .pp3-seal-sig-left{flex:1;}
+    .pp3-seal-sig-label{
+      font-size:0.38rem;color:rgba(255,255,255,0.18);
+      text-transform:uppercase;letter-spacing:0.16em;font-weight:600;
+      margin-bottom:4px;
+    }
+    .pp3-seal-sig-line{
+      height:1px;background:rgba(255,255,255,0.07);
+      width:100%;margin-bottom:3px;
+    }
+    .pp3-seal-sig-name{
+      font-family:'Instrument Serif',serif;
+      font-size:0.95rem;color:rgba(255,255,255,0.5);
+      letter-spacing:0.02em;font-style:italic;
+    }
+    .pp3-seal-verified-mark{
+      display:flex;flex-direction:column;align-items:center;gap:3px;
+      flex-shrink:0;padding-bottom:2px;
+    }
+    .pp3-seal-verified-dot{
+      width:28px;height:28px;border-radius:50%;
+      background:rgba(52,211,153,0.08);
+      border:1px solid rgba(52,211,153,0.25);
+      display:flex;align-items:center;justify-content:center;
+      font-size:0.7rem;
+    }
+    .pp3-seal-verified-label{
+      font-size:0.36rem;color:rgba(52,211,153,0.45);
+      font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+    }
+
+    /* CTA button */
+    .pp3-seal-cta{
+      display:flex;align-items:center;gap:12px;
+      background:linear-gradient(135deg,rgba(124,111,255,0.14),rgba(124,111,255,0.07));
+      border:1px solid rgba(124,111,255,0.28);
+      border-radius:14px;
+      padding:13px 16px;
+      margin-bottom:16px;
+      transition:background 0.2s,border-color 0.2s,box-shadow 0.2s;
+    }
+    .pp3-seal-wrap:hover .pp3-seal-cta{
+      background:linear-gradient(135deg,rgba(124,111,255,0.22),rgba(124,111,255,0.12));
+      border-color:rgba(124,111,255,0.5);
+      box-shadow:0 0 20px rgba(124,111,255,0.12);
+    }
+    .pp3-seal-cta-left{
+      width:34px;height:42px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:5px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.1rem;
       position:relative;
       flex-shrink:0;
     }
-    .pp3-export-doc-icon::after{
+    .pp3-seal-cta-left::before{
       content:'';
       position:absolute;top:-1px;right:-1px;
-      width:12px;height:12px;
-      background:#0c0c11;
-      border-left:1px solid rgba(255,255,255,0.1);
-      border-bottom:1px solid rgba(255,255,255,0.1);
-      border-radius:0 0 0 4px;
+      width:9px;height:9px;
+      background:#0b0b10;
+      border-left:1px solid rgba(255,255,255,0.08);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      border-radius:0 0 0 3px;
     }
-    .pp3-export-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;}
-    .pp3-export-meta{}
-    .pp3-export-doc-title{font-size:0.48rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.22em;font-weight:600;margin-bottom:6px;}
-    .pp3-export-name{font-family:'Instrument Serif',serif;font-size:1.3rem;color:#fff;letter-spacing:-0.02em;line-height:1.1;margin-bottom:3px;}
-    .pp3-export-sub{font-size:0.65rem;color:rgba(255,255,255,0.3);}
-    .pp3-export-badges{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
-    .pp3-export-badge{font-size:0.52rem;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:0.04em;}
-    .pp3-export-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);margin-bottom:14px;}
-    .pp3-export-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
-    .pp3-export-field{text-align:center;padding:8px 6px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.04);}
-    .pp3-export-field-val{font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;line-height:1;margin-bottom:2px;}
-    .pp3-export-field-key{font-size:0.4rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;}
-    .pp3-export-cta{
-      display:flex;align-items:center;justify-content:center;gap:10px;
-      background:linear-gradient(135deg,rgba(124,111,255,0.18) 0%,rgba(124,111,255,0.1) 100%);
-      border:1px solid rgba(124,111,255,0.35);
-      border-radius:12px;
-      padding:14px 20px;
-      transition:background 0.2s,border-color 0.2s;
+    .pp3-seal-cta-text{flex:1;}
+    .pp3-seal-cta-title{
+      font-size:0.85rem;font-weight:700;color:#fff;
+      letter-spacing:-0.01em;margin-bottom:2px;
     }
-    .pp3-export:hover .pp3-export-cta{background:linear-gradient(135deg,rgba(124,111,255,0.28) 0%,rgba(124,111,255,0.18) 100%);border-color:rgba(124,111,255,0.55);}
-    .pp3-export-cta-icon{font-size:1rem;flex-shrink:0;}
-    .pp3-export-cta-text{flex:1;}
-    .pp3-export-cta-title{font-size:0.82rem;font-weight:700;color:#fff;letter-spacing:-0.01em;margin-bottom:1px;}
-    .pp3-export-cta-sub{font-size:0.58rem;color:rgba(255,255,255,0.35);}
-    .pp3-export-cta-arrow{font-size:1rem;color:rgba(124,111,255,0.7);flex-shrink:0;transition:transform 0.2s;}
-    .pp3-export:hover .pp3-export-cta-arrow{transform:translateX(3px);}
-    .pp3-export-date{font-size:0.48rem;color:rgba(255,255,255,0.15);text-align:center;margin-top:10px;letter-spacing:0.05em;}
-  </style>
+    .pp3-seal-cta-sub{font-size:0.58rem;color:rgba(255,255,255,0.3);}
+    .pp3-seal-cta-arrow{
+      font-size:1.1rem;color:rgba(124,111,255,0.6);
+      flex-shrink:0;
+      transition:transform 0.2s;
+    }
+    .pp3-seal-wrap:hover .pp3-seal-cta-arrow{transform:translateX(4px);}
 
-  <div class="pp3-wrap">
+    /* footer stripe */
+    .pp3-seal-footer{
+      background:rgba(255,255,255,0.015);
+      border-top:1px solid rgba(255,255,255,0.04);
+      padding:7px 22px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .pp3-seal-footer-l{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.08em;font-family:monospace;}
+    .pp3-seal-footer-r{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.08em;}
 
-    <!-- ══ COVER ══ -->
-    <div class="pp3-cover">
-      <div class="pp3-cover-glow"></div>
-      <div class="pp3-cover-lines"></div>
-      <div class="pp3-cover-bar"></div>
-      <div class="pp3-cover-inner">
-        <div class="pp3-doc-label">Provify · Clinical Portfolio</div>
-        <div class="pp3-identity">
-          <div class="pp3-avatar-wrap" onclick="document.getElementById('pp3-photo-input').click()" title="Tap to upload photo">
-            <div class="pp3-avatar">${avatarUrl?`<img src="${avatarUrl}" alt="">`:`<div class="pp3-avatar-initials">${initials}</div>`}</div>
-            <div class="pp3-avatar-cam">📷</div>
+    <!-- ══ PDF EXPORT SEAL ══ -->
+    <div class="pp3-seal-wrap" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
+      <div class="pp3-seal-doc">
+        <div class="pp3-seal-paper"></div>
+        <div class="pp3-seal-classify"></div>
+        <div class="pp3-seal-classify-text">
+          <span class="pp3-seal-classify-label">Verified Clinical Record</span>
+          <span class="pp3-seal-classify-id">PRV-${currentUser?.id?.slice(0,8).toUpperCase() || 'XXXXXXXX'}</span>
+        </div>
+
+        <div class="pp3-seal-body">
+          <div class="pp3-seal-header-row">
+            <div class="pp3-seal-stats">
+              <div class="pp3-seal-doc-label">Clinical Portfolio · Export Document</div>
+              <div class="pp3-seal-stat-row">
+                <div class="pp3-seal-stat">
+                  <div class="pp3-seal-stat-val" style="color:rgba(255,255,255,0.85);">${total}</div>
+                  <div class="pp3-seal-stat-key">Cases</div>
+                </div>
+                <div class="pp3-seal-stat">
+                  <div class="pp3-seal-stat-val" style="color:${scoreColor};">${score}</div>
+                  <div class="pp3-seal-stat-key">Strength</div>
+                </div>
+                <div class="pp3-seal-stat">
+                  <div class="pp3-seal-stat-val" style="color:${rank.color};">${specBreakdown.length}</div>
+                  <div class="pp3-seal-stat-key">Specialties</div>
+                </div>
+              </div>
+            </div>
+            <div class="pp3-wax">
+              <div class="pp3-wax-ring"></div>
+              <div class="pp3-wax-inner">
+                <div class="pp3-wax-p">P</div>
+                <div class="pp3-wax-text">SEAL</div>
+              </div>
+            </div>
           </div>
-          <input type="file" id="pp3-photo-input" accept="image/*" style="display:none;"
-            onchange="(async function(e){
-              const f=e.target.files[0];if(!f)return;
-              const a=document.querySelector('.pp3-avatar');
-              a.innerHTML='<div style=\\'font-size:0.6rem;color:rgba(255,255,255,0.3);\\'>...</div>';
-              const url=await uploadPassportPhoto(f);
-              if(url){a.innerHTML='<img src=\\''+url+'\\' style=\\'width:100%;height:100%;object-fit:cover;display:block;\\'>';}
-              else{a.innerHTML='<div class=\\'pp3-avatar-initials\\'>${initials}</div>';}
-            })(event)">
-          <div style="flex:1;min-width:0;">
-            <div class="pp3-name">${fullName}</div>
-            <div class="pp3-role">${role}</div>
+
+          <div class="pp3-seal-sig-row">
+            <div class="pp3-seal-sig-left">
+              <div class="pp3-seal-sig-label">Issued to</div>
+              <div class="pp3-seal-sig-line"></div>
+              <div class="pp3-seal-sig-name">${fullName}</div>
+            </div>
+            <div class="pp3-seal-verified-mark">
+              <div class="pp3-seal-verified-dot">✓</div>
+              <div class="pp3-seal-verified-label">Verified</div>
+            </div>
           </div>
-          <div class="pp3-rank-block">
-            <div class="pp3-rank-emoji">${rank.emoji}</div>
-            <div class="pp3-rank-label">${rank.rank}</div>
+
+          <div class="pp3-seal-cta">
+            <div class="pp3-seal-cta-left">📄</div>
+            <div class="pp3-seal-cta-text">
+              <div class="pp3-seal-cta-title" id="pp3-cta-title">Export Clinical Portfolio</div>
+              <div class="pp3-seal-cta-sub" id="pp3-cta-sub">PDF · ${total} cases · Tamper-proof</div>
+            </div>
+            <div class="pp3-seal-cta-arrow">→</div>
           </div>
         </div>
-        <div class="pp3-footer">
-          <div class="pp3-verified"><div class="pp3-dot"></div><span class="pp3-verified-text">Verified on Provify</span></div>
-          <div style="display:flex;gap:6px;">
-            <button class="pp3-share-btn pp3-share-btn--purple" onclick="copyPortfolioLinkInApp()">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              Share
-            </button>
-          </div>
+
+        <div class="pp3-seal-footer">
+          <span class="pp3-seal-footer-l">PROVIFY.APP · ${today.toUpperCase()}</span>
+          <span class="pp3-seal-footer-r">${rank.emoji} ${rank.rank} · Verified</span>
         </div>
       </div>
     </div>
 
-    <!-- ══ DATA GRID ══ -->
-    <div class="pp3-grid">
-      <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.85);">${total}</div><div class="pp3-cell-key">Cases</div></div>
-      <div class="pp3-cell"><div class="pp3-cell-val" style="color:${rank.color};font-size:${rank.rank.length>6?'0.8rem':'1.35rem'};">${rank.rank}</div><div class="pp3-cell-key">Rank</div></div>
-      <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pp3-cell-key">Avg Score</div></div>
-      <div class="pp3-cell"><div class="pp3-cell-val" style="color:#34D399;">${highComp}</div><div class="pp3-cell-key">High ≥7</div></div>
-    </div>
-
-    <!-- ══ STRENGTH ══ -->
-    <div class="pp3-card">
-      <div class="pp3-micro-label">Portfolio Strength</div>
-      <div class="pp3-strength-row">
-        <span class="pp3-strength-label">Score</span>
-        <div class="pp3-track"><div class="pp3-fill" style="width:${score}%;"></div></div>
-        <span class="pp3-score-num">${score}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span>
-      </div>
-      <div class="pp3-chips">
-        ${specBreakdown.map(s=>`<div class="pp3-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}22;"><div style="width:4px;height:4px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>${s.name}<span style="opacity:0.4;font-weight:400;margin-left:3px;">${s.n}</span></div>`).join('')}
-      </div>
-    </div>
-
-    <!-- ══ CAREER GPS ══ -->
-    ${gpsValid
-      ? `<div class="pp3-card">${gpsInner}</div>`
-      : `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(124,111,255,0.04);border:1px solid rgba(124,111,255,0.12);border-radius:14px;margin-bottom:10px;">
-           <span style="font-size:1rem;">🗺</span>
-           <div style="flex:1;font-size:0.68rem;color:rgba(255,255,255,0.35);">Set your Career GPS to unlock your roadmap.</div>
-           <button onclick="showView('career')" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button>
-         </div>`}
-
-    <!-- ══ PDF EXPORT HERO ══ -->
-    <div class="pp3-export" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
-      <div class="pp3-export-bg"></div>
-      <div class="pp3-export-shimmer"></div>
-      <div class="pp3-export-grid"></div>
-      <div class="pp3-export-top-line"></div>
-      <div class="pp3-export-inner">
-
-        <div class="pp3-export-header">
-          <div class="pp3-export-meta">
-            <div class="pp3-export-doc-title">Clinical Portfolio Document</div>
-            <div class="pp3-export-name">${fullName}</div>
-            <div class="pp3-export-sub">${role} · ${rank.rank} Rank</div>
-          </div>
-          <div class="pp3-export-badges">
-            <div class="pp3-export-badge" style="background:${rank.color}18;border:1px solid ${rank.color}35;color:${rank.color};">${rank.emoji} ${rank.rank}</div>
-            <div class="pp3-export-badge" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);color:rgba(52,211,153,0.7);">✓ Verified</div>
-          </div>
-        </div>
-
-        <div class="pp3-export-divider"></div>
-
-        <div class="pp3-export-fields">
-          <div class="pp3-export-field">
-            <div class="pp3-export-field-val">${total}</div>
-            <div class="pp3-export-field-key">Cases</div>
-          </div>
-          <div class="pp3-export-field">
-            <div class="pp3-export-field-val" style="font-size:${score>=100?'0.9rem':'1.1rem'};">${score}</div>
-            <div class="pp3-export-field-key">Strength</div>
-          </div>
-          <div class="pp3-export-field">
-            <div class="pp3-export-field-val">${specBreakdown.length}</div>
-            <div class="pp3-export-field-key">Specialties</div>
-          </div>
-        </div>
-
-        <div class="pp3-export-cta">
-          <div class="pp3-export-cta-icon">📄</div>
-          <div class="pp3-export-cta-text">
-            <div class="pp3-export-cta-title">Export Clinical Portfolio</div>
-            <div class="pp3-export-cta-sub">PDF · All ${total} cases · Tamper-proof</div>
-          </div>
-          <div class="pp3-export-cta-arrow">→</div>
-        </div>
-
-        <div class="pp3-export-date">Generated ${today}</div>
-      </div>
-    </div>
-
-  </div>`;
-}
-
-async function pp3TriggerExport() {
+  </div>`;\n}\n\nasync function pp3TriggerExport() {
   const card = document.getElementById('pp3-export-card');
-  if (card) {
-    const cta = card.querySelector('.pp3-export-cta-title');
-    const sub = card.querySelector('.pp3-export-cta-sub');
-    if (cta) { cta.textContent = 'Preparing PDF...'; }
-    if (sub) { sub.textContent = 'Compiling your cases...'; }
-    card.style.pointerEvents = 'none';
-    card.style.opacity = '0.7';
-  }
+  const title = document.getElementById('pp3-cta-title');
+  const sub   = document.getElementById('pp3-cta-sub');
+  if (card)  { card.style.pointerEvents='none'; card.style.opacity='0.75'; }
+  if (title) { title.textContent = 'Preparing PDF...'; }
+  if (sub)   { sub.textContent   = 'Compiling your cases...'; }
   selectAllCases();
   await generatePortfolioPDF();
-  if (card) {
-    card.style.pointerEvents = '';
-    card.style.opacity = '';
-    const cta = card.querySelector('.pp3-export-cta-title');
-    const sub = card.querySelector('.pp3-export-cta-sub');
-    if (cta) cta.textContent = 'Export Clinical Portfolio';
-    if (sub) sub.textContent = `PDF · All ${allCases.length} cases · Tamper-proof`;
-  }
+  if (card)  { card.style.pointerEvents=''; card.style.opacity=''; }
+  if (title) { title.textContent = 'Export Clinical Portfolio'; }
+  if (sub)   { sub.textContent   = `PDF · ${allCases.length} cases · Tamper-proof`; }
 }
 
 
