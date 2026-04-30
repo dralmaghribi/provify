@@ -2798,8 +2798,7 @@ body::after {
               <span class="db-rank-label-item" id="db-rl-apex">Apex</span>
             </div>
             <div class="db-rank-footer">
-              <span class="db-rank-pct" id="db-rank-pct">Loading...</span>
-              <span class="db-rank-cta" id="db-rank-cta"></span>
+              <span class="db-rank-cta" id="db-rank-cta" style="width:100%;"></span>
             </div>
           </div>
         </div>
@@ -12762,7 +12761,7 @@ function renderNewRankCard() {
   // Footer
   const pctEl = document.getElementById('db-rank-pct');
   const ctaEl = document.getElementById('db-rank-cta');
-  if (pctEl) {
+  if (false && pctEl) {
     // Rough percentile: higher rank = higher percentile
     const percentiles = { Bronze:15, Silver:35, Gold:58, Platinum:72, Diamond:85, Apex:95 };
     const pct = percentiles[rank.rank] || 15;
