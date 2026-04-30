@@ -2993,15 +2993,30 @@ body::after {
       </div>
 
       <!-- PORTFOLIO VIEW — IN-APP -->
-      <div class="view" id="view-portfolio" style="padding:0 0 100px 0;">
-        <div id="port-passport"></div>
-        <!-- PDF compat stubs -->
-        <div id="port-profile-header" style="display:none;"></div>
-        <div id="port-stats-row" style="display:none;"></div>
-        <div id="port-specialty-card" style="display:none;"></div>
-        <div id="port-actions" style="display:none;"></div>
-        <div id="port-filter-pills" style="display:none;"></div>
-        <div id="port-cases-grid" style="display:none;"></div>
+      <div class="view" id="view-portfolio">
+
+        <!-- PROFILE HEADER -->
+        <div id="port-profile-header" style="margin-bottom:20px;"></div>
+
+        <!-- STATS ROW -->
+        <div id="port-stats-row" style="margin-bottom:16px;"></div>
+
+        <!-- SPECIALTY BREAKDOWN -->
+        <div id="port-specialty-card" style="margin-bottom:16px;"></div>
+
+        <!-- SHARE + PDF ACTIONS -->
+        <div id="port-actions" style="margin-bottom:20px;"></div>
+
+        <!-- CASES SECTION HEADER -->
+        <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">All Cases</div>
+          <div style="display:flex;gap:6px;" id="port-filter-pills"></div>
+        </div>
+
+        <!-- CASES GRID -->
+        <div id="port-cases-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:40px;"></div>
+
+        <!-- hidden — kept for PDF export compat -->
         <div id="portfolio-cases-list" style="display:none;"></div>
         <span id="portfolio-selected-count" style="display:none;">0</span>
       </div>
@@ -3678,7 +3693,8 @@ function showView(view) {
   if (view === 'archive') { renderArchive(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
-  if (view === 'portfolio') { renderPortfolioPassport(); renderPortfolioCases(); }
+  if (view === 'portfolio') renderInAppPortfolio();
+  if (view === 'portfolio') renderPortfolioCases();
   if (view === 'profile') loadProfileForm();
   if (view === 'career') { renderCareerGPS(); renderLiveCareerDashboard(); }
 }
@@ -5566,11 +5582,9 @@ function showToast(msg) {
   setTimeout(() => { t.style.display = 'none'; }, 4000);
 }
 
-// ─── PORTFOLIO ───
+// ─── PORTFOLIO PASSPORT ──────────────────────────────────────────────────────
 let selectedCaseIds = new Set();
 let portActiveFilter = 'all';
-
-// ─── PORTFOLIO PASSPORT ──────────────────────────────────────────────────────
 
 function renderInAppPortfolio() { renderPortfolioPassport(); }
 function setPortFilter() {}
@@ -5587,190 +5601,6 @@ async function uploadPassportPhoto(file) {
   return publicUrl;
 }
 
-function renderPortfolioPassport() {
-  const el = document.getElementById('port-passport');
-  if (!el) return;
-
-  if (!currentProfile) { el.innerHTML = ''; return; }
-
-  const total      = allCases.length;
-  const rank       = getComplexityRank(total);
-  const score      = getClinicianScore();
-  const avg        = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '0.0';
-  const highComp   = allCases.filter(c => (c.complexity_score||0) >= 7).length;
-  const firstName  = currentProfile.first_name || '';
-  const lastName   = currentProfile.last_name  || '';
-  const fullName   = `Dr. ${firstName} ${lastName}`.trim();
-  const initials   = (firstName[0]||'D') + (lastName[0]||'R');
-  const roleLabels = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
-  const role       = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
-  const avatarUrl  = currentProfile.avatar_url || null;
-
-  const SPEC = {
-    endo:       { col:'#7C6FFF', name:'Endo' },
-    restorative:{ col:'#F59E0B', name:'Resto' },
-    surgery:    { col:'#EF4444', name:'Surgery' },
-    paeds:      { col:'#34D399', name:'Paeds' },
-    prostho:    { col:'#38BDF8', name:'Prostho' },
-    smile:      { col:'#FBB424', name:'Smile' },
-  };
-
-  const specBreakdown = Object.entries(SPEC)
-    .map(([k,v]) => ({ ...v, n: allCases.filter(c=>c.specialty===k).length }))
-    .filter(s => s.n > 0).sort((a,b) => b.n - a.n);
-
-  const scoreColor = score >= 70 ? '#34D399' : score >= 40 ? '#7C6FFF' : '#F59E0B';
-
-  const gpsData  = getGPSData();
-  const gpsValid = gpsData && ['specialist','owner','brand','gp'].includes(gpsData.goal);
-  let gpsInner = '';
-  if (gpsValid) {
-    const stageIds = GOAL_STAGES[gpsData.goal] || GOAL_STAGES.gp;
-    const stages   = stageIds.map(id => CAREER_STAGES.find(s=>s.id===id)).filter(Boolean);
-    const ctx      = getGPSContext();
-    const mc       = gpsData.manualChecks || {};
-    const done     = stages.filter(s => s.auto(ctx) || mc[s.id]).length;
-    const pct      = Math.round((done / stages.length) * 100);
-    const next     = stages.find(s => !(s.auto(ctx) || mc[s.id]));
-    const GM = {
-      specialist:{label:'Specialist',    icon:'🔬', col:'#7C6FFF'},
-      owner:     {label:'Clinic Owner',  icon:'🏢', col:'#34D399'},
-      brand:     {label:'Personal Brand',icon:'👑', col:'#F59E0B'},
-      gp:        {label:'Expert GP',     icon:'🦷', col:'#9B91FF'},
-    }[gpsData.goal];
-    gpsInner = `
-      <div class="pp2-label">Career GPS</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-        <div style="font-size:1.1rem;">${GM.icon}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:0.78rem;font-weight:600;color:#fff;margin-bottom:5px;">${GM.label}</div>
-          <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:${GM.col};border-radius:100px;"></div>
-          </div>
-        </div>
-        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${GM.col};line-height:1;flex-shrink:0;">${pct}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.5;">%</span></div>
-      </div>
-      ${next ? `
-      <div style="display:flex;gap:9px;align-items:flex-start;padding:9px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.055);border-radius:11px;">
-        <div style="font-size:0.9rem;flex-shrink:0;margin-top:1px;">${next.icon}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:0.48rem;color:${GM.col};text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:2px;">Up next</div>
-          <div style="font-size:0.72rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">${next.label}</div>
-          <div style="font-size:0.58rem;color:rgba(255,255,255,0.22);line-height:1.5;">${next.provifyAction.slice(0,80)}...</div>
-        </div>
-      </div>` : '<div style="text-align:center;padding:6px 0;font-size:0.72rem;color:#34D399;font-weight:600;">Roadmap complete</div>'}`;
-  }
-
-  const withP = allCases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0);
-  const noP   = allCases.filter(c => !c.photo_urls || !Object.keys(c.photo_urls||{}).length);
-  const feat3 = [...withP,...noP].sort((a,b)=>(b.complexity_score||0)-(a.complexity_score||0)).slice(0,3);
-
-  const stampCards = feat3.map(c => {
-    const isSmile = c.specialty === 'smile';
-    const col     = SPEC[c.specialty]?.col || '#7C6FFF';
-    const sname   = SPEC[c.specialty]?.name || c.specialty;
-    const title   = isSmile ? (c.procedure || 'Smile') : `T${c.tooth_number || '-'}`;
-    const sc      = c.complexity_score ? c.complexity_score.toFixed(1) : '-';
-    const sb2     = c.photo_urls?.['smile-before'];
-    const sa2     = c.photo_urls?.['smile-after'];
-    const fp      = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
-    const photoEl = isSmile && (sb2||sa2)
-      ? `<div style="position:relative;height:100%;display:grid;grid-template-rows:1fr 1fr;gap:1px;background:#111;"><div style="overflow:hidden;position:relative;">${sb2?`<img src="${sb2}" style="width:100%;height:100%;object-fit:cover;">`:''}<div style="position:absolute;bottom:2px;left:3px;font-size:0.38rem;font-weight:700;color:rgba(255,255,255,0.6);background:rgba(0,0,0,0.65);padding:1px 3px;border-radius:2px;">BEF</div></div><div style="overflow:hidden;position:relative;">${sa2?`<img src="${sa2}" style="width:100%;height:100%;object-fit:cover;">`:''}<div style="position:absolute;bottom:2px;right:3px;font-size:0.38rem;font-weight:700;color:#000;background:rgba(251,191,36,0.9);padding:1px 3px;border-radius:2px;">AFT</div></div></div>`
-      : fp ? `<img src="${fp}" style="width:100%;height:100%;object-fit:cover;">`
-      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${col}0d;font-size:1.8rem;opacity:0.3;">🦷</div>`;
-    return `<div onclick="openCaseDetail('${c.id}')" style="flex:1;min-width:0;background:#0d0d12;border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform 0.18s,border-color 0.18s;position:relative;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='${col}45'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,0.07)'"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:${col};opacity:0.8;"></div><div style="height:90px;overflow:hidden;background:#0a0a0f;">${photoEl}</div><div style="padding:9px 10px;"><div style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div><div style="font-size:0.54rem;font-weight:600;color:${col};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">${isSmile?'✨ ':''}${sname}</div><div style="font-family:'Instrument Serif',serif;font-size:1.05rem;color:${col};line-height:1;">${sc}<span style="font-size:0.42rem;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.2);"> /10</span></div></div></div>`;
-  }).join('');
-
-  el.innerHTML = `
-  <style>
-  .pp2-wrap{font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;}
-  .pp2-cover{position:relative;margin-bottom:10px;border-radius:22px;overflow:hidden;background:#0c0c11;border:1px solid rgba(255,255,255,0.07);}
-  .pp2-cover-gradient{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 0%,${rank.color}18 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 0% 100%,${rank.color}0a 0%,transparent 70%);pointer-events:none;}
-  .pp2-cover-lines{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 32px,rgba(255,255,255,0.022) 32px,rgba(255,255,255,0.022) 33px),repeating-linear-gradient(90deg,transparent,transparent 32px,rgba(255,255,255,0.012) 32px,rgba(255,255,255,0.012) 33px);pointer-events:none;}
-  .pp2-cover-top{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${rank.color},${rank.color}70,transparent);}
-  .pp2-cover-inner{position:relative;padding:22px 20px 20px;}
-  .pp2-cover-doc-label{font-size:0.44rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.18);font-weight:600;margin-bottom:20px;}
-  .pp2-cover-identity{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
-  .pp2-avatar-wrap{position:relative;flex-shrink:0;cursor:pointer;}
-  .pp2-avatar{width:64px;height:64px;border-radius:16px;overflow:hidden;border:2px solid ${rank.color}45;background:${rank.color}18;display:flex;align-items:center;justify-content:center;}
-  .pp2-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-  .pp2-avatar-initials{font-size:1.15rem;font-weight:700;color:${rank.color};letter-spacing:-0.01em;}
-  .pp2-avatar-edit{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:#1a1a24;border:1px solid rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;cursor:pointer;transition:background 0.15s;}
-  .pp2-avatar-edit:hover{background:#252535;}
-  .pp2-name-block{flex:1;min-width:0;}
-  .pp2-name{font-family:'Instrument Serif',serif;font-size:1.45rem;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:3px;}
-  .pp2-role{font-size:0.68rem;color:rgba(255,255,255,0.35);}
-  .pp2-rank-block{flex-shrink:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;}
-  .pp2-rank-emoji{font-size:1.6rem;line-height:1;}
-  .pp2-rank-label{font-size:0.6rem;font-weight:700;color:${rank.color};letter-spacing:0.04em;}
-  .pp2-footer-strip{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid rgba(255,255,255,0.055);}
-  .pp2-verified{display:flex;align-items:center;gap:5px;}
-  .pp2-verified-dot{width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.7);}
-  .pp2-verified-text{font-size:0.56rem;font-weight:600;color:rgba(52,211,153,0.6);text-transform:uppercase;letter-spacing:0.1em;}
-  .pp2-actions{display:flex;gap:6px;}
-  .pp2-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:500;padding:5px 11px;border-radius:8px;cursor:pointer;transition:border-color 0.15s,color 0.15s;}
-  .pp2-btn:hover{border-color:rgba(255,255,255,0.18);color:#fff;}
-  .pp2-btn--primary{background:rgba(124,111,255,0.1);border-color:rgba(124,111,255,0.3);color:#9B91FF;}
-  .pp2-btn--primary:hover{background:rgba(124,111,255,0.18);}
-  .pp2-data-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.06);border-radius:13px;overflow:hidden;margin-bottom:10px;}
-  .pp2-data-cell{background:#0f0f14;padding:12px 8px;text-align:center;}
-  .pp2-data-val{font-family:'Instrument Serif',serif;font-size:1.4rem;line-height:1;letter-spacing:-0.03em;margin-bottom:3px;}
-  .pp2-data-key{font-size:0.42rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.14em;font-weight:600;}
-  .pp2-card{background:#0c0c11;border:1px solid rgba(255,255,255,0.065);border-radius:18px;padding:16px 18px;margin-bottom:10px;position:relative;overflow:hidden;}
-  .pp2-label{font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:10px;}
-  .pp2-strength-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .pp2-strength-label{font-size:0.6rem;color:rgba(255,255,255,0.25);white-space:nowrap;}
-  .pp2-strength-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
-  .pp2-strength-fill{height:100%;border-radius:100px;background:${scoreColor};transition:width 1.4s cubic-bezier(0.34,1.2,0.64,1);}
-  .pp2-strength-score{font-family:'Instrument Serif',serif;font-size:1.05rem;color:${scoreColor};line-height:1;white-space:nowrap;}
-  .pp2-chips{display:flex;flex-wrap:wrap;gap:5px;}
-  .pp2-chip{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:0.58rem;font-weight:600;border:1px solid;}
-  .pp2-stamps{display:flex;gap:8px;}
-  .pp2-section-label{font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:8px;}
-  </style>
-  <div class="pp2-wrap">
-  ${total === 0 ? `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2);"><div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.3);margin-bottom:6px;">No cases logged yet</div><div style="font-size:0.75rem;">Start logging to build your clinical passport.</div></div>` : `
-  <div class="pp2-cover">
-    <div class="pp2-cover-gradient"></div>
-    <div class="pp2-cover-lines"></div>
-    <div class="pp2-cover-top"></div>
-    <div class="pp2-cover-inner">
-      <div class="pp2-cover-doc-label">Provify · Clinical Portfolio</div>
-      <div class="pp2-cover-identity">
-        <div class="pp2-avatar-wrap" onclick="document.getElementById('pp2-photo-input').click()" title="Tap to upload photo">
-          <div class="pp2-avatar">${avatarUrl ? `<img src="${avatarUrl}" alt="photo">` : `<div class="pp2-avatar-initials">${initials}</div>`}</div>
-          <div class="pp2-avatar-edit">📷</div>
-        </div>
-        <input type="file" id="pp2-photo-input" accept="image/*" style="display:none;" onchange="(async function(e){const f=e.target.files[0];if(!f)return;const a=document.querySelector('.pp2-avatar');a.innerHTML='<div style=\'font-size:0.7rem;color:rgba(255,255,255,0.4);padding:4px;\'>...</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>';}else{a.innerHTML='<div class=\'pp2-avatar-initials\'>${initials}</div>';}})(event)">
-        <div class="pp2-name-block"><div class="pp2-name">${fullName}</div><div class="pp2-role">${role}</div></div>
-        <div class="pp2-rank-block"><div class="pp2-rank-emoji">${rank.emoji}</div><div class="pp2-rank-label">${rank.rank}</div></div>
-      </div>
-      <div class="pp2-footer-strip">
-        <div class="pp2-verified"><div class="pp2-verified-dot"></div><span class="pp2-verified-text">Verified on Provify</span></div>
-        <div class="pp2-actions">
-          <button class="pp2-btn pp2-btn--primary" onclick="copyPortfolioLinkInApp()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Share</button>
-          <button class="pp2-btn" onclick="selectAllCases();generatePortfolioPDF()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="pp2-data-strip">
-    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:rgba(255,255,255,0.85);">${total}</div><div class="pp2-data-key">Cases</div></div>
-    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:${rank.color};font-size:${rank.rank.length>6?'0.85rem':'1.4rem'};">${rank.rank}</div><div class="pp2-data-key">Rank</div></div>
-    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pp2-data-key">Avg Score</div></div>
-    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:#34D399;">${highComp}</div><div class="pp2-data-key">High ≥7</div></div>
-  </div>
-  <div class="pp2-card">
-    <div class="pp2-label">Portfolio Strength</div>
-    <div class="pp2-strength-row"><span class="pp2-strength-label">Score</span><div class="pp2-strength-track"><div class="pp2-strength-fill" style="width:${score}%;"></div></div><span class="pp2-strength-score">${score}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span></div>
-    <div class="pp2-chips">${specBreakdown.map(s=>`<div class="pp2-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}22;"><div style="width:4px;height:4px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>${s.name}<span style="opacity:0.4;font-weight:400;margin-left:3px;">${s.n}</span></div>`).join('')}</div>
-  </div>
-  ${gpsValid ? `<div class="pp2-card">${gpsInner}</div>` : `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(124,111,255,0.04);border:1px solid rgba(124,111,255,0.12);border-radius:14px;margin-bottom:10px;"><span style="font-size:1.1rem;">🗺</span><div style="flex:1;font-size:0.7rem;color:rgba(255,255,255,0.4);">Set your Career GPS goal to unlock your roadmap.</div><button onclick="showView('career')" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;padding:6px 11px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button></div>`}
-  ${feat3.length > 0 ? `<div><div class="pp2-section-label">Clinical Proof</div><div class="pp2-stamps">${stampCards}</div></div>` : ''}
-  `}
-  </div>`;
-}
-
 function copyPortfolioLinkInApp() {
   if (!currentUser) return;
   const url = currentProfile?.username
@@ -5779,9 +5609,342 @@ function copyPortfolioLinkInApp() {
   navigator.clipboard.writeText(url).then(() => showToast('Portfolio link copied ✓'));
 }
 
-// ─── END PORTFOLIO PASSPORT ───────────────────────────────────────────────────
+function renderPortfolioPassport() {
+  const el = document.getElementById('port-passport');
+  if (!el) return;
+  if (!currentProfile) { el.innerHTML = ''; return; }
 
+  const total     = allCases.length;
+  const rank      = getComplexityRank(total);
+  const score     = getClinicianScore();
+  const avg       = total > 0 ? (allCases.reduce((s,c)=>s+(c.complexity_score||0),0)/total).toFixed(1) : '0.0';
+  const highComp  = allCases.filter(c=>(c.complexity_score||0)>=7).length;
+  const firstName = currentProfile.first_name || '';
+  const lastName  = currentProfile.last_name  || '';
+  const fullName  = `Dr. ${firstName} ${lastName}`.trim();
+  const initials  = (firstName[0]||'D')+(lastName[0]||'R');
+  const roleLabels= {student:'Dental Student',intern:'Intern / House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
+  const role      = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
+  const avatarUrl = currentProfile.avatar_url || null;
+  const today     = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
+  const SPEC = {
+    endo:{col:'#7C6FFF',name:'Endo'},restorative:{col:'#F59E0B',name:'Resto'},
+    surgery:{col:'#EF4444',name:'Surgery'},paeds:{col:'#34D399',name:'Paeds'},
+    prostho:{col:'#38BDF8',name:'Prostho'},smile:{col:'#FBB424',name:'Smile'},
+  };
+  const specBreakdown = Object.entries(SPEC)
+    .map(([k,v])=>({...v,n:allCases.filter(c=>c.specialty===k).length}))
+    .filter(s=>s.n>0).sort((a,b)=>b.n-a.n);
+  const scoreColor = score>=70?'#34D399':score>=40?'#7C6FFF':'#F59E0B';
+
+  // GPS
+  const gpsData  = getGPSData();
+  const gpsValid = gpsData && ['specialist','owner','brand','gp'].includes(gpsData.goal);
+  let gpsInner = '';
+  if (gpsValid) {
+    const stageIds = GOAL_STAGES[gpsData.goal]||GOAL_STAGES.gp;
+    const stages   = stageIds.map(id=>CAREER_STAGES.find(s=>s.id===id)).filter(Boolean);
+    const ctx      = getGPSContext();
+    const mc       = gpsData.manualChecks||{};
+    const done     = stages.filter(s=>s.auto(ctx)||mc[s.id]).length;
+    const pct      = Math.round((done/stages.length)*100);
+    const next     = stages.find(s=>!(s.auto(ctx)||mc[s.id]));
+    const GM = {specialist:{label:'Specialist',icon:'🔬',col:'#7C6FFF'},owner:{label:'Clinic Owner',icon:'🏢',col:'#34D399'},brand:{label:'Personal Brand',icon:'👑',col:'#F59E0B'},gp:{label:'Expert GP',icon:'🦷',col:'#9B91FF'}}[gpsData.goal];
+    gpsInner = `
+      <div class="pp3-micro-label">Career GPS</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <span style="font-size:1.1rem;">${GM.icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.78rem;font-weight:600;color:#fff;margin-bottom:5px;">${GM.label}</div>
+          <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${GM.col};border-radius:100px;"></div></div>
+        </div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${GM.col};line-height:1;flex-shrink:0;">${pct}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.5;">%</span></div>
+      </div>
+      ${next ? `<div style="display:flex;gap:9px;align-items:flex-start;padding:9px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.055);border-radius:11px;"><span style="font-size:0.9rem;flex-shrink:0;margin-top:1px;">${next.icon}</span><div style="flex:1;min-width:0;"><div style="font-size:0.44rem;color:${GM.col};text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:2px;">Up next</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">${next.label}</div><div style="font-size:0.58rem;color:rgba(255,255,255,0.22);line-height:1.5;">${next.provifyAction.slice(0,80)}...</div></div></div>`
+      : `<div style="text-align:center;padding:6px 0;font-size:0.72rem;color:#34D399;font-weight:600;">🏆 Roadmap complete</div>`}`;
+  }
+
+  el.innerHTML = `
+  <style>
+    .pp3-wrap{font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;}
+
+    /* COVER */
+    .pp3-cover{position:relative;margin-bottom:10px;border-radius:22px;overflow:hidden;background:#0c0c11;border:1px solid rgba(255,255,255,0.07);}
+    .pp3-cover-glow{position:absolute;inset:0;background:radial-gradient(ellipse 90% 55% at 65% -10%,${rank.color}1a 0%,transparent 65%),radial-gradient(ellipse 40% 35% at 5% 105%,${rank.color}0d 0%,transparent 65%);pointer-events:none;}
+    .pp3-cover-lines{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(255,255,255,0.018) 28px,rgba(255,255,255,0.018) 29px);pointer-events:none;}
+    .pp3-cover-bar{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${rank.color}cc,${rank.color}55,transparent);}
+    .pp3-cover-inner{position:relative;padding:20px 20px 18px;}
+    .pp3-doc-label{font-size:0.43rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.18);font-weight:600;margin-bottom:18px;}
+    .pp3-identity{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+    .pp3-avatar-wrap{position:relative;flex-shrink:0;cursor:pointer;}
+    .pp3-avatar{width:60px;height:60px;border-radius:15px;overflow:hidden;border:2px solid ${rank.color}40;background:${rank.color}15;display:flex;align-items:center;justify-content:center;}
+    .pp3-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+    .pp3-avatar-initials{font-size:1.1rem;font-weight:700;color:${rank.color};}
+    .pp3-avatar-cam{position:absolute;bottom:-5px;right:-5px;width:20px;height:20px;background:#181822;border:1px solid rgba(255,255,255,0.14);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.58rem;}
+    .pp3-name{font-family:'Instrument Serif',serif;font-size:1.4rem;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:3px;}
+    .pp3-role{font-size:0.67rem;color:rgba(255,255,255,0.33);}
+    .pp3-rank-block{flex-shrink:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;}
+    .pp3-rank-emoji{font-size:1.55rem;line-height:1;}
+    .pp3-rank-label{font-size:0.58rem;font-weight:700;color:${rank.color};letter-spacing:0.04em;}
+    .pp3-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);}
+    .pp3-verified{display:flex;align-items:center;gap:5px;}
+    .pp3-dot{width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 7px rgba(52,211,153,0.75);}
+    .pp3-verified-text{font-size:0.55rem;font-weight:600;color:rgba(52,211,153,0.6);text-transform:uppercase;letter-spacing:0.1em;}
+    .pp3-share-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:500;padding:5px 11px;border-radius:8px;cursor:pointer;transition:all 0.15s;}
+    .pp3-share-btn:hover{border-color:rgba(255,255,255,0.2);color:#fff;}
+    .pp3-share-btn--purple{background:rgba(124,111,255,0.1);border-color:rgba(124,111,255,0.28);color:#9B91FF;}
+    .pp3-share-btn--purple:hover{background:rgba(124,111,255,0.18);}
+
+    /* DATA STRIP */
+    .pp3-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.06);border-radius:13px;overflow:hidden;margin-bottom:10px;}
+    .pp3-cell{background:#0f0f14;padding:11px 8px;text-align:center;}
+    .pp3-cell-val{font-family:'Instrument Serif',serif;font-size:1.35rem;line-height:1;letter-spacing:-0.03em;margin-bottom:3px;}
+    .pp3-cell-key{font-size:0.41rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.14em;font-weight:600;}
+
+    /* CARDS */
+    .pp3-card{background:#0c0c11;border:1px solid rgba(255,255,255,0.065);border-radius:18px;padding:15px 16px;margin-bottom:10px;}
+    .pp3-micro-label{font-size:0.43rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:10px;}
+    .pp3-strength-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .pp3-strength-label{font-size:0.6rem;color:rgba(255,255,255,0.25);white-space:nowrap;}
+    .pp3-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
+    .pp3-fill{height:100%;border-radius:100px;background:${scoreColor};transition:width 1.4s cubic-bezier(0.34,1.2,0.64,1);}
+    .pp3-score-num{font-family:'Instrument Serif',serif;font-size:1.05rem;color:${scoreColor};line-height:1;white-space:nowrap;}
+    .pp3-chips{display:flex;flex-wrap:wrap;gap:5px;}
+    .pp3-chip{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:0.58rem;font-weight:600;border:1px solid;}
+
+    /* ═══ PDF EXPORT HERO ═══ */
+    .pp3-export{
+      position:relative;
+      border-radius:20px;
+      overflow:hidden;
+      cursor:pointer;
+      margin-bottom:4px;
+      border:1px solid rgba(255,255,255,0.08);
+      transition:transform 0.2s,box-shadow 0.2s;
+    }
+    .pp3-export:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,0.5);}
+    .pp3-export:active{transform:scale(0.98);}
+    .pp3-export-bg{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(135deg,#0f0f18 0%,#13101f 40%,#0c0e16 100%);
+    }
+    .pp3-export-shimmer{
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 70% 50% at 85% 20%,rgba(124,111,255,0.12) 0%,transparent 60%),
+        radial-gradient(ellipse 50% 60% at 10% 80%,rgba(52,211,153,0.06) 0%,transparent 60%);
+      pointer-events:none;
+    }
+    .pp3-export-grid{
+      position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+      background-size:24px 24px;
+      pointer-events:none;
+    }
+    .pp3-export-top-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.6),rgba(52,211,153,0.4),transparent);}
+    .pp3-export-inner{position:relative;padding:22px 22px 20px;}
+    .pp3-export-doc-icon{
+      width:44px;height:56px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:8px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.4rem;
+      margin-bottom:16px;
+      position:relative;
+      flex-shrink:0;
+    }
+    .pp3-export-doc-icon::after{
+      content:'';
+      position:absolute;top:-1px;right:-1px;
+      width:12px;height:12px;
+      background:#0c0c11;
+      border-left:1px solid rgba(255,255,255,0.1);
+      border-bottom:1px solid rgba(255,255,255,0.1);
+      border-radius:0 0 0 4px;
+    }
+    .pp3-export-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;}
+    .pp3-export-meta{}
+    .pp3-export-doc-title{font-size:0.48rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.22em;font-weight:600;margin-bottom:6px;}
+    .pp3-export-name{font-family:'Instrument Serif',serif;font-size:1.3rem;color:#fff;letter-spacing:-0.02em;line-height:1.1;margin-bottom:3px;}
+    .pp3-export-sub{font-size:0.65rem;color:rgba(255,255,255,0.3);}
+    .pp3-export-badges{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+    .pp3-export-badge{font-size:0.52rem;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:0.04em;}
+    .pp3-export-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);margin-bottom:14px;}
+    .pp3-export-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+    .pp3-export-field{text-align:center;padding:8px 6px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.04);}
+    .pp3-export-field-val{font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;line-height:1;margin-bottom:2px;}
+    .pp3-export-field-key{font-size:0.4rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;}
+    .pp3-export-cta{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      background:linear-gradient(135deg,rgba(124,111,255,0.18) 0%,rgba(124,111,255,0.1) 100%);
+      border:1px solid rgba(124,111,255,0.35);
+      border-radius:12px;
+      padding:14px 20px;
+      transition:background 0.2s,border-color 0.2s;
+    }
+    .pp3-export:hover .pp3-export-cta{background:linear-gradient(135deg,rgba(124,111,255,0.28) 0%,rgba(124,111,255,0.18) 100%);border-color:rgba(124,111,255,0.55);}
+    .pp3-export-cta-icon{font-size:1rem;flex-shrink:0;}
+    .pp3-export-cta-text{flex:1;}
+    .pp3-export-cta-title{font-size:0.82rem;font-weight:700;color:#fff;letter-spacing:-0.01em;margin-bottom:1px;}
+    .pp3-export-cta-sub{font-size:0.58rem;color:rgba(255,255,255,0.35);}
+    .pp3-export-cta-arrow{font-size:1rem;color:rgba(124,111,255,0.7);flex-shrink:0;transition:transform 0.2s;}
+    .pp3-export:hover .pp3-export-cta-arrow{transform:translateX(3px);}
+    .pp3-export-date{font-size:0.48rem;color:rgba(255,255,255,0.15);text-align:center;margin-top:10px;letter-spacing:0.05em;}
+  </style>
+
+  <div class="pp3-wrap">
+
+    <!-- ══ COVER ══ -->
+    <div class="pp3-cover">
+      <div class="pp3-cover-glow"></div>
+      <div class="pp3-cover-lines"></div>
+      <div class="pp3-cover-bar"></div>
+      <div class="pp3-cover-inner">
+        <div class="pp3-doc-label">Provify · Clinical Portfolio</div>
+        <div class="pp3-identity">
+          <div class="pp3-avatar-wrap" onclick="document.getElementById('pp3-photo-input').click()" title="Tap to upload photo">
+            <div class="pp3-avatar">${avatarUrl?`<img src="${avatarUrl}" alt="">`:`<div class="pp3-avatar-initials">${initials}</div>`}</div>
+            <div class="pp3-avatar-cam">📷</div>
+          </div>
+          <input type="file" id="pp3-photo-input" accept="image/*" style="display:none;"
+            onchange="(async function(e){
+              const f=e.target.files[0];if(!f)return;
+              const a=document.querySelector('.pp3-avatar');
+              a.innerHTML='<div style=\\'font-size:0.6rem;color:rgba(255,255,255,0.3);\\'>...</div>';
+              const url=await uploadPassportPhoto(f);
+              if(url){a.innerHTML='<img src=\\''+url+'\\' style=\\'width:100%;height:100%;object-fit:cover;display:block;\\'>';}
+              else{a.innerHTML='<div class=\\'pp3-avatar-initials\\'>${initials}</div>';}
+            })(event)">
+          <div style="flex:1;min-width:0;">
+            <div class="pp3-name">${fullName}</div>
+            <div class="pp3-role">${role}</div>
+          </div>
+          <div class="pp3-rank-block">
+            <div class="pp3-rank-emoji">${rank.emoji}</div>
+            <div class="pp3-rank-label">${rank.rank}</div>
+          </div>
+        </div>
+        <div class="pp3-footer">
+          <div class="pp3-verified"><div class="pp3-dot"></div><span class="pp3-verified-text">Verified on Provify</span></div>
+          <div style="display:flex;gap:6px;">
+            <button class="pp3-share-btn pp3-share-btn--purple" onclick="copyPortfolioLinkInApp()">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DATA GRID ══ -->
+    <div class="pp3-grid">
+      <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.85);">${total}</div><div class="pp3-cell-key">Cases</div></div>
+      <div class="pp3-cell"><div class="pp3-cell-val" style="color:${rank.color};font-size:${rank.rank.length>6?'0.8rem':'1.35rem'};">${rank.rank}</div><div class="pp3-cell-key">Rank</div></div>
+      <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pp3-cell-key">Avg Score</div></div>
+      <div class="pp3-cell"><div class="pp3-cell-val" style="color:#34D399;">${highComp}</div><div class="pp3-cell-key">High ≥7</div></div>
+    </div>
+
+    <!-- ══ STRENGTH ══ -->
+    <div class="pp3-card">
+      <div class="pp3-micro-label">Portfolio Strength</div>
+      <div class="pp3-strength-row">
+        <span class="pp3-strength-label">Score</span>
+        <div class="pp3-track"><div class="pp3-fill" style="width:${score}%;"></div></div>
+        <span class="pp3-score-num">${score}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span>
+      </div>
+      <div class="pp3-chips">
+        ${specBreakdown.map(s=>`<div class="pp3-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}22;"><div style="width:4px;height:4px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>${s.name}<span style="opacity:0.4;font-weight:400;margin-left:3px;">${s.n}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <!-- ══ CAREER GPS ══ -->
+    ${gpsValid
+      ? `<div class="pp3-card">${gpsInner}</div>`
+      : `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(124,111,255,0.04);border:1px solid rgba(124,111,255,0.12);border-radius:14px;margin-bottom:10px;">
+           <span style="font-size:1rem;">🗺</span>
+           <div style="flex:1;font-size:0.68rem;color:rgba(255,255,255,0.35);">Set your Career GPS to unlock your roadmap.</div>
+           <button onclick="showView('career')" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button>
+         </div>`}
+
+    <!-- ══ PDF EXPORT HERO ══ -->
+    <div class="pp3-export" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
+      <div class="pp3-export-bg"></div>
+      <div class="pp3-export-shimmer"></div>
+      <div class="pp3-export-grid"></div>
+      <div class="pp3-export-top-line"></div>
+      <div class="pp3-export-inner">
+
+        <div class="pp3-export-header">
+          <div class="pp3-export-meta">
+            <div class="pp3-export-doc-title">Clinical Portfolio Document</div>
+            <div class="pp3-export-name">${fullName}</div>
+            <div class="pp3-export-sub">${role} · ${rank.rank} Rank</div>
+          </div>
+          <div class="pp3-export-badges">
+            <div class="pp3-export-badge" style="background:${rank.color}18;border:1px solid ${rank.color}35;color:${rank.color};">${rank.emoji} ${rank.rank}</div>
+            <div class="pp3-export-badge" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);color:rgba(52,211,153,0.7);">✓ Verified</div>
+          </div>
+        </div>
+
+        <div class="pp3-export-divider"></div>
+
+        <div class="pp3-export-fields">
+          <div class="pp3-export-field">
+            <div class="pp3-export-field-val">${total}</div>
+            <div class="pp3-export-field-key">Cases</div>
+          </div>
+          <div class="pp3-export-field">
+            <div class="pp3-export-field-val" style="font-size:${score>=100?'0.9rem':'1.1rem'};">${score}</div>
+            <div class="pp3-export-field-key">Strength</div>
+          </div>
+          <div class="pp3-export-field">
+            <div class="pp3-export-field-val">${specBreakdown.length}</div>
+            <div class="pp3-export-field-key">Specialties</div>
+          </div>
+        </div>
+
+        <div class="pp3-export-cta">
+          <div class="pp3-export-cta-icon">📄</div>
+          <div class="pp3-export-cta-text">
+            <div class="pp3-export-cta-title">Export Clinical Portfolio</div>
+            <div class="pp3-export-cta-sub">PDF · All ${total} cases · Tamper-proof</div>
+          </div>
+          <div class="pp3-export-cta-arrow">→</div>
+        </div>
+
+        <div class="pp3-export-date">Generated ${today}</div>
+      </div>
+    </div>
+
+  </div>`;
+}
+
+async function pp3TriggerExport() {
+  const card = document.getElementById('pp3-export-card');
+  if (card) {
+    const cta = card.querySelector('.pp3-export-cta-title');
+    const sub = card.querySelector('.pp3-export-cta-sub');
+    if (cta) { cta.textContent = 'Preparing PDF...'; }
+    if (sub) { sub.textContent = 'Compiling your cases...'; }
+    card.style.pointerEvents = 'none';
+    card.style.opacity = '0.7';
+  }
+  selectAllCases();
+  await generatePortfolioPDF();
+  if (card) {
+    card.style.pointerEvents = '';
+    card.style.opacity = '';
+    const cta = card.querySelector('.pp3-export-cta-title');
+    const sub = card.querySelector('.pp3-export-cta-sub');
+    if (cta) cta.textContent = 'Export Clinical Portfolio';
+    if (sub) sub.textContent = `PDF · All ${allCases.length} cases · Tamper-proof`;
+  }
+}
 
 
 function renderPortfolioCases() {
