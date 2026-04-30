@@ -2993,30 +2993,15 @@ body::after {
       </div>
 
       <!-- PORTFOLIO VIEW — IN-APP -->
-      <div class="view" id="view-portfolio">
-
-        <!-- PROFILE HEADER -->
-        <div id="port-profile-header" style="margin-bottom:20px;"></div>
-
-        <!-- STATS ROW -->
-        <div id="port-stats-row" style="margin-bottom:16px;"></div>
-
-        <!-- SPECIALTY BREAKDOWN -->
-        <div id="port-specialty-card" style="margin-bottom:16px;"></div>
-
-        <!-- SHARE + PDF ACTIONS -->
-        <div id="port-actions" style="margin-bottom:20px;"></div>
-
-        <!-- CASES SECTION HEADER -->
-        <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;">All Cases</div>
-          <div style="display:flex;gap:6px;" id="port-filter-pills"></div>
-        </div>
-
-        <!-- CASES GRID -->
-        <div id="port-cases-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:40px;"></div>
-
-        <!-- hidden — kept for PDF export compat -->
+      <div class="view" id="view-portfolio" style="padding-bottom:100px;">
+        <div id="port-passport"></div>
+        <!-- PDF compat stubs -->
+        <div id="port-profile-header" style="display:none;"></div>
+        <div id="port-stats-row" style="display:none;"></div>
+        <div id="port-specialty-card" style="display:none;"></div>
+        <div id="port-actions" style="display:none;"></div>
+        <div id="port-filter-pills" style="display:none;"></div>
+        <div id="port-cases-grid" style="display:none;"></div>
         <div id="portfolio-cases-list" style="display:none;"></div>
         <span id="portfolio-selected-count" style="display:none;">0</span>
       </div>
