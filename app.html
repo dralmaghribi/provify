@@ -5989,6 +5989,7 @@ function renderPortfolioPassport() {
           <div class="pv-gps-track"><div class="pv-gps-fill" style="width:${gpsPct}%;background:${gpsGoalCol};"></div></div>
         </div>
         <div class="pv-gps-pct" style="color:${gpsGoalCol};">${gpsPct}<span style="font-size:0.45rem;font-family:'Inter',sans-serif;opacity:0.5;">%</span></div>
+        <button onclick="event.stopPropagation();pvOpenGPSModal()" style="flex-shrink:0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;font-size:0.58rem;font-weight:600;padding:4px 9px;border-radius:7px;cursor:pointer;margin-left:4px;white-space:nowrap;">View →</button>
       </div>
       ${gpsNextLabel ? `
       <div class="pv-next">
@@ -6003,7 +6004,7 @@ function renderPortfolioPassport() {
       <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid rgba(255,255,255,0.05);">
         <span style="font-size:0.9rem;">🗺</span>
         <span style="flex:1;font-size:0.68rem;color:rgba(255,255,255,0.3);">Set Career GPS to unlock your roadmap</span>
-        <button onclick="showView('career')" style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.6rem;font-weight:600;padding:4px 10px;border-radius:7px;cursor:pointer;flex-shrink:0;">Set up →</button>
+        <button onclick="pvOpenGPSModal()" style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.6rem;font-weight:600;padding:4px 10px;border-radius:7px;cursor:pointer;flex-shrink:0;">Set up →</button>
       </div>`}
 
       <!-- VERIFIED + SHARE — bottom bar of cover -->
@@ -6074,6 +6075,161 @@ function renderPortfolioPassport() {
 
 </div>`;
 }
+
+// ─── GPS MODAL ────────────────────────────────────────────────────────────────
+
+function pvOpenGPSModal() {
+  // Remove any existing modal
+  const existing = document.getElementById('pv-gps-modal');
+  if (existing) existing.remove();
+
+  const gpsData   = getGPSData() || {};
+  const curGoal   = gpsData.goal || null;
+  const ctx       = getGPSContext();
+  const mc        = gpsData.manualChecks || {};
+
+  const GOALS = [
+    { id:'specialist', icon:'🔬', label:'Become a Specialist',     col:'#7C6FFF' },
+    { id:'owner',      icon:'🏢', label:'Own My Clinic',           col:'#34D399' },
+    { id:'brand',      icon:'👑', label:'Build a Personal Brand',  col:'#F59E0B' },
+    { id:'gp',         icon:'🦷', label:'Excel as a General Dentist', col:'#9B91FF' },
+  ];
+
+  const goalButtons = GOALS.map(g => {
+    const active = curGoal === g.id;
+    return `<button onclick="pvSetGoal('${g.id}')"
+      style="display:flex;align-items:center;gap:10px;width:100%;
+        padding:11px 14px;border-radius:12px;cursor:pointer;
+        font-family:'Inter',sans-serif;text-align:left;
+        background:${active ? g.col+'18' : 'rgba(255,255,255,0.03)'};
+        border:1px solid ${active ? g.col+'50' : 'rgba(255,255,255,0.07)'};
+        transition:all 0.15s;margin-bottom:6px;">
+      <span style="font-size:1.1rem;flex-shrink:0;">${g.icon}</span>
+      <span style="font-size:0.78rem;font-weight:600;color:${active ? '#fff' : 'rgba(255,255,255,0.5)'};">${g.label}</span>
+      ${active ? `<span style="margin-left:auto;font-size:0.55rem;font-weight:700;color:${g.col};text-transform:uppercase;letter-spacing:0.1em;">Active</span>` : ''}
+    </button>`;
+  }).join('');
+
+  // Build timeline if goal is set
+  let timelineHTML = '';
+  if (curGoal && GOAL_STAGES[curGoal]) {
+    const stageIds = GOAL_STAGES[curGoal];
+    const stages   = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
+    const done     = stages.filter(s => s.auto(ctx) || mc[s.id]).length;
+
+    timelineHTML = `
+    <div style="margin-top:20px;">
+      <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:12px;">Roadmap · ${done}/${stages.length} complete</div>
+      ${stages.map((s, i) => {
+        const completed = s.auto(ctx) || mc[s.id];
+        const isNext    = !completed && stages.slice(0,i).every(p => p.auto(ctx) || mc[p.id]);
+        const col       = s.color || '#7C6FFF';
+        return `
+        <div style="display:flex;gap:12px;margin-bottom:${i < stages.length-1 ? '0' : '0'};">
+          <!-- spine -->
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;
+              background:${completed ? col+'25' : isNext ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)'};
+              border:2px solid ${completed ? col : isNext ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.07)'};
+              display:flex;align-items:center;justify-content:center;
+              font-size:${completed ? '0.7rem' : '0.85rem'};
+              transition:all 0.2s;flex-shrink:0;">
+              ${completed ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : s.icon}
+            </div>
+            ${i < stages.length-1 ? `<div style="width:1px;flex:1;min-height:16px;background:${completed ? col+'40' : 'rgba(255,255,255,0.05)'};margin:3px 0;"></div>` : ''}
+          </div>
+          <!-- content -->
+          <div style="flex:1;padding-bottom:${i < stages.length-1 ? '14px' : '0'};">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+              <div style="font-size:0.75rem;font-weight:${completed||isNext?'600':'400'};color:${completed ? '#fff' : isNext ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)'};">${s.label}</div>
+              ${isNext ? `<span style="font-size:0.42rem;font-weight:700;color:${col};background:${col}18;padding:2px 6px;border-radius:100px;text-transform:uppercase;letter-spacing:0.1em;">Next</span>` : ''}
+            </div>
+            ${isNext || completed ? `<div style="font-size:0.6rem;color:rgba(255,255,255,0.22);line-height:1.5;margin-bottom:${isNext?'6px':'0'};">${s.sublabel}</div>` : ''}
+            ${isNext ? `<div style="font-size:0.62rem;color:${col};line-height:1.5;background:${col}0d;border:1px solid ${col}20;border-radius:8px;padding:6px 9px;">${s.provifyAction.slice(0,100)}${s.provifyAction.length>100?'…':''}</div>` : ''}
+            ${!completed && !isNext ? '' : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'pv-gps-modal';
+  modal.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    display:flex;align-items:flex-end;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+    animation:pvModalBgIn 0.2s ease;
+  `;
+
+  modal.innerHTML = `
+    <style>
+      @keyframes pvModalBgIn{from{opacity:0}to{opacity:1}}
+      @keyframes pvSheetIn{from{transform:translateY(100%)}to{transform:translateY(0)}}
+      @keyframes pvSheetOut{from{transform:translateY(0)}to{transform:translateY(100%)}}
+    </style>
+    <div id="pv-gps-sheet" style="
+      width:100%;max-width:680px;margin:0 auto;
+      background:#0e0e18;
+      border-top:1px solid rgba(255,255,255,0.1);
+      border-radius:22px 22px 0 0;
+      max-height:88vh;overflow-y:auto;
+      animation:pvSheetIn 0.3s cubic-bezier(0.34,1.1,0.64,1);
+      -webkit-overflow-scrolling:touch;
+    ">
+      <!-- drag handle -->
+      <div style="display:flex;justify-content:center;padding:12px 0 4px;">
+        <div style="width:36px;height:4px;border-radius:100px;background:rgba(255,255,255,0.12);"></div>
+      </div>
+      <!-- header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 16px;">
+        <div>
+          <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:3px;">Career GPS</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;letter-spacing:-0.02em;">Your Roadmap</div>
+        </div>
+        <button onclick="pvCloseGPSModal()" style="
+          width:32px;height:32px;border-radius:50%;
+          background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+          color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;
+          font-family:'Inter',sans-serif;
+        ">×</button>
+      </div>
+      <!-- content -->
+      <div style="padding:0 20px 40px;">
+        <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">Your Goal</div>
+        ${goalButtons}
+        ${timelineHTML}
+      </div>
+    </div>`;
+
+  modal.addEventListener('click', e => { if (e.target === modal) pvCloseGPSModal(); });
+  document.body.appendChild(modal);
+}
+
+function pvCloseGPSModal() {
+  const modal = document.getElementById('pv-gps-modal');
+  const sheet = document.getElementById('pv-gps-sheet');
+  if (!modal) return;
+  if (sheet) sheet.style.animation = 'pvSheetOut 0.25s ease forwards';
+  modal.style.animation = 'pvModalBgIn 0.2s ease reverse forwards';
+  setTimeout(() => modal.remove(), 250);
+}
+
+function pvSetGoal(goalId) {
+  const existing = getGPSData() || {};
+  saveGPSData({ ...existing, goal: goalId });
+  pvCloseGPSModal();
+  setTimeout(() => {
+    renderPortfolioPassport();
+    renderPortfolioCases();
+    showToast('Goal updated ✓');
+  }, 280);
+}
+
+// ─── END GPS MODAL ────────────────────────────────────────────────────────────
 
 async function pp3TriggerExport() {
   const card = document.getElementById('pp3-export-card');
