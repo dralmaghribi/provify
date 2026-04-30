@@ -7927,367 +7927,282 @@ async function runInsightSilent() {
 async function buildInsightResult() {
   if (allCases.length < 3) return null;
 
-  const total   = allCases.length;
-  const specMap = { endo:'Endodontics', restorative:'Restorative', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', smile:'Aesthetic/Smile' };
-  const counts  = Object.fromEntries(Object.keys(specMap).map(k => [k, allCases.filter(c=>c.specialty===k).length]));
-  const avg     = (allCases.reduce((s,c)=>s+(c.complexity_score||0),0)/total).toFixed(1);
-  const recentAvg = (allCases.slice(0,5).reduce((s,c)=>s+(c.complexity_score||0),0)/Math.min(5,total)).toFixed(1);
-  const earlyAvg  = (allCases.slice(-5).reduce((s,c)=>s+(c.complexity_score||0),0)/Math.min(5,total)).toFixed(1);
-  const trend   = parseFloat(recentAvg) > parseFloat(earlyAvg)+0.3 ? 'increasing' : parseFloat(recentAvg) < parseFloat(earlyAvg)-0.3 ? 'declining' : 'stable';
-
+  const total    = allCases.length;
+  const specMap  = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', smile:'Aesthetic & Smile' };
+  const counts   = Object.fromEntries(Object.keys(specMap).map(k=>[k, allCases.filter(c=>c.specialty===k).length]));
+  const recent5  = allCases.slice(0,5).map(c=>specMap[c.specialty]||c.specialty).join(', ');
   const role     = currentProfile?.role || 'intern';
   const spec     = currentProfile?.primary_specialty || '';
   const gps      = getGPSData();
   const gpsGoal  = gps?.goal || null;
 
-  const roleLabels = {student:'Dental Student',intern:'Intern/House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
+  const roleLabels = {student:'Dental Student',intern:'Intern / House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
   const goalLabels = {specialist:'become a specialist',owner:'open their own clinic',brand:'build a personal brand',gp:'excel as a GP'};
 
   const isSpecialist = role === 'specialist';
-  const primarySpec  = spec ? (specMap[spec] || spec) : null;
-  const dominant     = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  const primarySpec  = spec ? (specMap[spec]||spec) : null;
+  const caseBreakdown = Object.entries(counts).filter(([,n])=>n>0)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([k,n])=>`${specMap[k]}: ${n} (${Math.round(n/total*100)}%)`).join(' | ');
 
   const scopeRule = isSpecialist && primarySpec
-    ? `CRITICAL: This dentist IS a ${primarySpec} specialist. NEVER suggest they should diversify into other specialties — that is inappropriate. Their "blind spot" must be about complexity, technique variety, or documentation depth WITHIN ${primarySpec} only. Do not mention breadth across specialties as a weakness.`
-    : `This is a ${roleLabels[role]||role} in general training. Breadth across specialties IS relevant feedback.`;
+    ? `CRITICAL: This dentist IS a ${primarySpec} specialist. NEVER mention complexity scores, diversifying into other specialties, or breadth as weaknesses. Their blind spot must be about case variety, technique depth, or documentation gaps WITHIN ${primarySpec} only.`
+    : `This is a ${roleLabels[role]||role} in general clinical training. Breadth across specialties is relevant. NEVER mention numerical complexity scores in your response.`;
 
   const gpsContext = gpsGoal
-    ? `Their career goal is to ${goalLabels[gpsGoal]||gpsGoal}. Tailor your next30 recommendations to support this goal specifically.`
+    ? `Career goal: ${goalLabels[gpsGoal]}. Make all 3 recommendations directly relevant to this goal.`
     : '';
 
-  const caseBreakdown = Object.entries(counts).filter(([,n])=>n>0).map(([k,n])=>`${specMap[k]}: ${n} cases (${Math.round(n/total*100)}%)`).join(', ');
-
-  const prompt = `You are a world-class dental educator and career coach analyzing a dentist's clinical record on Provify. Give them elite, specific, honest feedback — not generic.
+  const prompt = `You are a senior dental consultant reviewing a dentist's verified clinical record on Provify. Be direct, specific, and brutally honest — not generic or encouraging for its own sake.
 
 DENTIST PROFILE:
-- Role: ${roleLabels[role]||role}
-- Primary specialty: ${primarySpec || 'Not declared'}
-- Career goal: ${gpsGoal ? goalLabels[gpsGoal] : 'Not set'}
-- Total cases: ${total}
-- Case breakdown: ${caseBreakdown}
-- Complexity avg: ${avg}/10
-- Complexity trend: ${trend} (recent avg: ${recentAvg}, early avg: ${earlyAvg})
+Role: ${roleLabels[role]||role}
+${primarySpec ? `Primary specialty: ${primarySpec}` : ''}
+${gpsGoal ? `Career goal: ${goalLabels[gpsGoal]}` : ''}
+Total cases logged: ${total}
+Case breakdown: ${caseBreakdown}
+Most recent 5 cases: ${recent5}
 
-SCOPE RULE (follow strictly):
+RULES:
 ${scopeRule}
-
 ${gpsContext}
+NEVER use phrases like "complexity score", "complexity plateau", "2.2/10", or any numerical score in your text responses. Speak about clinical patterns and case types, not scores.
 
-Respond ONLY with a JSON object (no markdown, no backticks) with exactly these keys:
-- "score": integer 0-100 representing overall clinical readiness for their role and goal
-- "score_label": 3 words max describing the score (e.g. "Strong Foundation", "Ready to Lead", "Early Stage")
-- "strength": 1-2 sentences, specific to their actual data — mention real numbers
-- "blindspot": 1-2 sentences — honest gap, respecting the SCOPE RULE above
-- "trajectory": 1 sentence about their trend — direct and honest
-- "next30": array of exactly 3 strings — specific, actionable case types to seek this month, aligned to their goal
-- "verdict": ONE sentence — a powerful clinical verdict that sounds like it came from a senior consultant who reviewed their record. Make it memorable.`;
+Respond ONLY with a raw JSON object (no markdown, no backticks) with exactly these keys:
+- "score": integer 0-100, clinical readiness for their stated role and goal
+- "score_label": exactly 2-3 words, punchy label for the score (e.g. "Narrow Specialist", "Ready to Lead", "Building Momentum")
+- "verdict": ONE sentence — a powerful, memorable clinical verdict from a senior consultant. No fluff. Should make them think.
+- "strength": 1 sentence, specific — reference actual case counts/percentages
+- "blindspot": 1 sentence — the one most critical gap, direct and honest
+- "next30": array of exactly 3 strings — each under 12 words, specific case types to seek this month`;
 
   try {
     const response = await fetch('/api/analyze', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ mode:'clinical_note', notePrompt: prompt, caseData:{}, complexity:0 })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ mode:'clinical_note', notePrompt:prompt, caseData:{}, complexity:0 })
     });
     const data  = await response.json();
     const raw   = data.note || '{}';
     const clean = raw.replace(/```json|```/g,'').trim();
     return JSON.parse(clean);
   } catch(e) {
-    console.warn('Insight generation failed', e);
+    console.warn('Insight failed', e);
     return null;
   }
 }
+
 
 function renderInsightCard(result, state) {
   const el = document.getElementById('db-ai-insight-card');
   if (!el) return;
 
-  if (state === 'empty') {
-    el.innerHTML = '';
-    return;
-  }
+  if (state === 'empty') { el.innerHTML = ''; return; }
 
   if (state === 'loading') {
     el.innerHTML = `
-      <style>
-        @keyframes dbi-pulse{0%,100%{opacity:0.4}50%{opacity:0.9}}
-        @keyframes dbi-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-      </style>
-      <div style="margin:0 0 20px;padding:28px 22px;background:#080810;border:1px solid rgba(255,255,255,0.07);border-radius:24px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.5),transparent);"></div>
-        <div style="position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(124,111,255,0.04) 50%,transparent 60%);animation:dbi-shimmer 2s ease infinite;"></div>
-        <div style="font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:16px;">AI Clinical Insight</div>
-        <div style="height:12px;background:rgba(255,255,255,0.06);border-radius:6px;width:55%;margin-bottom:10px;animation:dbi-pulse 1.4s ease infinite;"></div>
-        <div style="height:52px;background:rgba(255,255,255,0.04);border-radius:10px;margin-bottom:10px;animation:dbi-pulse 1.4s ease infinite 0.1s;"></div>
-        <div style="height:9px;background:rgba(255,255,255,0.04);border-radius:6px;width:80%;animation:dbi-pulse 1.4s ease infinite 0.2s;"></div>
+      <style>@keyframes dbi-sk{0%,100%{opacity:0.35}50%{opacity:0.7}}</style>
+      <div style="background:#06060d;border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:24px 22px;margin-bottom:20px;">
+        <div style="height:10px;width:40%;background:rgba(255,255,255,0.06);border-radius:6px;margin-bottom:16px;animation:dbi-sk 1.4s ease infinite;"></div>
+        <div style="height:44px;background:rgba(255,255,255,0.04);border-radius:10px;margin-bottom:12px;animation:dbi-sk 1.4s ease infinite 0.1s;"></div>
+        <div style="height:9px;width:70%;background:rgba(255,255,255,0.04);border-radius:6px;animation:dbi-sk 1.4s ease infinite 0.2s;"></div>
       </div>`;
     return;
   }
 
   if (!result) return;
 
-  const score      = result.score || 0;
-  const scoreLabel = result.score_label || 'Clinical Insight';
-  const verdict    = result.verdict || '';
-  const strength   = result.strength || '';
-  const isFresh    = state === 'fresh';
+  const score     = result.score || 0;
+  const scoreCol  = score>=75?'#34D399':score>=50?'#7C6FFF':score>=30?'#F59E0B':'#EF4444';
+  const scoreBg   = score>=75?'rgba(52,211,153,0.07)':score>=50?'rgba(124,111,255,0.07)':score>=30?'rgba(245,158,11,0.07)':'rgba(239,68,68,0.07)';
+  const isFresh   = state === 'fresh';
 
-  const scoreCol  = score >= 75 ? '#34D399' : score >= 50 ? '#7C6FFF' : score >= 30 ? '#F59E0B' : '#EF4444';
-  const scoreBg   = score >= 75 ? 'rgba(52,211,153,0.08)'  : score >= 50 ? 'rgba(124,111,255,0.08)' : score >= 30 ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.08)';
+  const R = 28, circ = 2*Math.PI*R, dash = (score/100)*circ;
 
-  // Arc ring SVG — bigger, more dramatic
-  const R    = 30, circ = 2*Math.PI*R, dash = (score/100)*circ;
+  // Panel 1 — Verdict
+  const panel1 = `
+    <div class="dbi3-panel" id="dbi3-p1">
+      <div class="dbi3-verdict-wrap">
+        <div class="dbi3-verdict-label">Clinical Verdict</div>
+        <div class="dbi3-verdict-text">${result.verdict||'—'}</div>
+      </div>
+      <div class="dbi3-two-col">
+        <div class="dbi3-mini-block dbi3-strength">
+          <div class="dbi3-mini-label">✦ Strength</div>
+          <div class="dbi3-mini-text">${result.strength||'—'}</div>
+        </div>
+        <div class="dbi3-mini-block dbi3-blind">
+          <div class="dbi3-mini-label" style="color:#EF4444;">⚠ Blind Spot</div>
+          <div class="dbi3-mini-text">${result.blindspot||'—'}</div>
+        </div>
+      </div>
+    </div>`;
+
+  // Panel 2 — Next 30
+  const items = (result.next30||[]).slice(0,3);
+  const panel2 = `
+    <div class="dbi3-panel" id="dbi3-p2" style="display:none;">
+      <div class="dbi3-next-label">Your Next 30 Days</div>
+      <div class="dbi3-next-sub">Cases to actively seek this month</div>
+      <div class="dbi3-next-list">
+        ${items.map((item,i)=>`
+          <div class="dbi3-next-item">
+            <div class="dbi3-next-num" style="background:${scoreCol}18;border-color:${scoreCol}35;color:${scoreCol};">${i+1}</div>
+            <div class="dbi3-next-text">${item}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
 
   el.innerHTML = `
   <style>
-    @keyframes dbi-ring-in{from{stroke-dashoffset:${circ}}to{stroke-dashoffset:${circ-dash}}}
-    @keyframes dbi-fade-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .dbi2{
-      position:relative;
-      background:#06060d;
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:24px;
-      overflow:hidden;
-      cursor:pointer;
-      margin-bottom:20px;
-      transition:border-color 0.3s,box-shadow 0.3s,transform 0.25s cubic-bezier(0.34,1.2,0.64,1);
+    @keyframes dbi3-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes dbi3-ring{from{stroke-dashoffset:${circ}}to{stroke-dashoffset:${circ-dash}}}
+    .dbi3-card{
+      position:relative;background:#06060d;
+      border:1px solid rgba(255,255,255,0.08);border-radius:24px;
+      overflow:hidden;margin-bottom:20px;
+      animation:dbi3-in 0.5s ease;
+      transition:border-color 0.3s,box-shadow 0.3s;
     }
-    .dbi2:hover{
-      border-color:${scoreCol}35;
-      box-shadow:0 16px 48px rgba(0,0,0,0.5),0 0 0 1px ${scoreCol}18;
-      transform:translateY(-3px);
-    }
-    .dbi2:active{transform:scale(0.98);}
-    .dbi2-glow{
-      position:absolute;inset:0;
-      background:
-        radial-gradient(ellipse 100% 80% at 85% -20%, ${scoreCol}16 0%, transparent 55%),
-        radial-gradient(ellipse 60% 60% at -10% 110%, ${scoreCol}0a 0%, transparent 60%);
-      pointer-events:none;
-    }
-    .dbi2-lines{
-      position:absolute;inset:0;
-      background-image:repeating-linear-gradient(0deg,transparent,transparent 32px,rgba(255,255,255,0.012) 32px,rgba(255,255,255,0.012) 33px);
-      pointer-events:none;
-    }
-    .dbi2-topbar{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${scoreCol}cc,${scoreCol}55,transparent);}
+    .dbi3-card:hover{border-color:${scoreCol}30;box-shadow:0 12px 40px rgba(0,0,0,0.4);}
+    .dbi3-glow{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 80% -20%,${scoreCol}12 0%,transparent 55%);pointer-events:none;}
+    .dbi3-topbar{height:2px;background:linear-gradient(90deg,transparent,${scoreCol}cc,${scoreCol}55,transparent);}
 
-    .dbi2-inner{position:relative;padding:22px 22px 18px;}
+    /* Header */
+    .dbi3-header{padding:18px 20px 14px;display:flex;align-items:center;gap:14px;}
+    .dbi3-ring-wrap{position:relative;flex-shrink:0;width:64px;height:64px;}
+    .dbi3-ring-svg{transform:rotate(-90deg);}
+    .dbi3-ring-track{fill:none;stroke:rgba(255,255,255,0.05);stroke-width:5;}
+    .dbi3-ring-fill{fill:none;stroke:${scoreCol};stroke-width:5;stroke-linecap:round;
+      stroke-dasharray:${circ};stroke-dashoffset:${circ-dash};
+      animation:dbi3-ring 1.6s cubic-bezier(0.34,1.1,0.64,1) forwards;
+      filter:drop-shadow(0 0 5px ${scoreCol}80);}
+    .dbi3-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+    .dbi3-score{font-family:'Instrument Serif',serif;font-size:1.25rem;color:${scoreCol};line-height:1;}
+    .dbi3-denom{font-size:0.34rem;color:rgba(255,255,255,0.2);font-family:'Inter',sans-serif;}
+    .dbi3-head-right{flex:1;min-width:0;}
+    .dbi3-micro{font-size:0.42rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+    .dbi3-live{display:flex;align-items:center;gap:3px;color:${scoreCol};}
+    .dbi3-live-dot{width:4px;height:4px;border-radius:50%;background:${scoreCol};box-shadow:0 0 5px ${scoreCol};}
+    .dbi3-score-label{font-family:'Instrument Serif',serif;font-size:1.2rem;color:#fff;letter-spacing:-0.02em;line-height:1.1;margin-bottom:2px;}
+    .dbi3-cases-line{font-size:0.6rem;color:rgba(255,255,255,0.25);}
 
-    /* Top row: label + live badge */
-    .dbi2-toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-    .dbi2-section-label{font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;}
-    .dbi2-live{display:flex;align-items:center;gap:4px;font-size:0.44rem;font-weight:700;color:${scoreCol};text-transform:uppercase;letter-spacing:0.12em;}
-    .dbi2-live-dot{width:5px;height:5px;border-radius:50%;background:${scoreCol};box-shadow:0 0 6px ${scoreCol};}
+    /* Tab switcher */
+    .dbi3-tabs{display:flex;gap:0;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:0;}
+    .dbi3-tab{flex:1;padding:9px 0;text-align:center;font-size:0.58rem;font-weight:600;color:rgba(255,255,255,0.25);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;letter-spacing:0.04em;text-transform:uppercase;font-family:'Inter',sans-serif;}
+    .dbi3-tab.active{color:${scoreCol};border-bottom-color:${scoreCol};}
 
-    /* Score + label hero row */
-    .dbi2-hero{display:flex;align-items:center;gap:18px;margin-bottom:20px;}
-    .dbi2-ring-wrap{position:relative;flex-shrink:0;width:72px;height:72px;}
-    .dbi2-ring-svg{transform:rotate(-90deg);}
-    .dbi2-ring-track{fill:none;stroke:rgba(255,255,255,0.05);stroke-width:5;}
-    .dbi2-ring-fill{
-      fill:none;stroke:${scoreCol};stroke-width:5;stroke-linecap:round;
-      stroke-dasharray:${circ};
-      stroke-dashoffset:${circ - dash};
-      animation:dbi-ring-in 1.8s cubic-bezier(0.34,1.1,0.64,1) forwards;
-      filter:drop-shadow(0 0 6px ${scoreCol}80);
-    }
-    .dbi2-score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-    .dbi2-score-num{font-family:'Instrument Serif',serif;font-size:1.35rem;color:#fff;line-height:1;letter-spacing:-0.03em;}
-    .dbi2-score-denom{font-size:0.36rem;color:rgba(255,255,255,0.2);font-family:'Inter',sans-serif;margin-top:1px;}
-    .dbi2-score-label-block{flex:1;min-width:0;}
-    .dbi2-score-label{font-family:'Instrument Serif',serif;font-size:1.3rem;color:#fff;letter-spacing:-0.02em;line-height:1.1;margin-bottom:4px;animation:dbi-fade-up 0.5s ease 0.3s both;}
-    .dbi2-cases-line{font-size:0.62rem;color:rgba(255,255,255,0.25);animation:dbi-fade-up 0.5s ease 0.4s both;}
+    /* Panels */
+    .dbi3-panels{padding:18px 20px 16px;}
+    .dbi3-panel{animation:dbi3-in 0.3s ease;}
 
-    /* Verdict — the money line */
-    .dbi2-verdict{
-      font-family:'Instrument Serif',serif;
-      font-size:1.0rem;
-      color:rgba(255,255,255,0.82);
-      font-style:italic;
-      line-height:1.6;
-      padding:16px 18px;
-      background:${scoreBg};
-      border:1px solid ${scoreCol}22;
-      border-radius:14px;
-      margin-bottom:14px;
-      position:relative;
-      animation:dbi-fade-up 0.5s ease 0.5s both;
+    /* Panel 1 */
+    .dbi3-verdict-wrap{margin-bottom:14px;}
+    .dbi3-verdict-label{font-size:0.42rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:8px;}
+    .dbi3-verdict-text{
+      font-family:'Instrument Serif',serif;font-size:1.05rem;
+      color:rgba(255,255,255,0.88);font-style:italic;line-height:1.6;
+      padding:14px 16px;
+      background:${scoreBg};border:1px solid ${scoreCol}20;border-radius:14px;
     }
-    .dbi2-verdict::before{
-      content:'"';
-      position:absolute;top:-6px;left:12px;
-      font-family:'Instrument Serif',serif;
-      font-size:2.5rem;color:${scoreCol};
-      opacity:0.3;line-height:1;
-    }
+    .dbi3-two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .dbi3-mini-block{padding:11px 12px;border-radius:12px;border:1px solid;}
+    .dbi3-strength{background:rgba(124,111,255,0.05);border-color:rgba(124,111,255,0.14);}
+    .dbi3-blind{background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.14);}
+    .dbi3-mini-label{font-size:0.42rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:rgba(124,111,255,0.7);margin-bottom:5px;}
+    .dbi3-mini-text{font-size:0.68rem;color:rgba(255,255,255,0.6);line-height:1.5;}
 
-    /* Strength preview */
-    .dbi2-strength{
-      font-size:0.68rem;color:rgba(255,255,255,0.32);
-      line-height:1.6;
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-      margin-bottom:14px;
-      animation:dbi-fade-up 0.5s ease 0.6s both;
-    }
+    /* Panel 2 */
+    .dbi3-next-label{font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;margin-bottom:3px;}
+    .dbi3-next-sub{font-size:0.62rem;color:rgba(255,255,255,0.25);margin-bottom:14px;}
+    .dbi3-next-list{display:flex;flex-direction:column;gap:8px;}
+    .dbi3-next-item{display:flex;align-items:flex-start;gap:10px;}
+    .dbi3-next-num{width:24px;height:24px;border-radius:7px;border:1px solid;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0;}
+    .dbi3-next-text{font-size:0.75rem;color:rgba(255,255,255,0.72);line-height:1.5;padding-top:2px;}
 
     /* Footer */
-    .dbi2-footer{display:flex;align-items:center;justify-content:space-between;animation:dbi-fade-up 0.5s ease 0.7s both;}
-    .dbi2-tap{font-size:0.54rem;color:rgba(255,255,255,0.18);letter-spacing:0.05em;}
-    .dbi2-refresh-btn{
-      display:flex;align-items:center;gap:4px;
-      background:none;border:none;
-      font-size:0.54rem;color:rgba(255,255,255,0.2);
-      font-family:'Inter',sans-serif;cursor:pointer;padding:0;
-      transition:color 0.15s;
-    }
-    .dbi2-refresh-btn:hover{color:rgba(255,255,255,0.5);}
+    .dbi3-footer{padding:10px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.05);}
+    .dbi3-refresh{display:flex;align-items:center;gap:5px;background:none;border:none;font-size:0.58rem;color:rgba(255,255,255,0.22);font-family:'Inter',sans-serif;cursor:pointer;padding:0;transition:color 0.15s;}
+    .dbi3-refresh:hover{color:rgba(255,255,255,0.55);}
+    .dbi3-refresh:disabled{opacity:0.4;cursor:not-allowed;}
+    .dbi3-ts{font-size:0.52rem;color:rgba(255,255,255,0.15);}
   </style>
 
-  <div class="dbi2" onclick="pvOpenInsightModal()">
-    <div class="dbi2-glow"></div>
-    <div class="dbi2-lines"></div>
-    <div class="dbi2-topbar"></div>
-    <div class="dbi2-inner">
+  <div class="dbi3-card">
+    <div class="dbi3-glow"></div>
+    <div class="dbi3-topbar"></div>
 
-      <div class="dbi2-toprow">
-        <span class="dbi2-section-label">AI Clinical Insight</span>
-        <div class="dbi2-live">
-          <div class="dbi2-live-dot"></div>
-          ${isFresh ? 'Live' : 'Cached'}
+    <div class="dbi3-header">
+      <div class="dbi3-ring-wrap">
+        <svg class="dbi3-ring-svg" width="64" height="64" viewBox="0 0 64 64">
+          <circle class="dbi3-ring-track" cx="32" cy="32" r="${R}"/>
+          <circle class="dbi3-ring-fill" cx="32" cy="32" r="${R}"/>
+        </svg>
+        <div class="dbi3-ring-center">
+          <div class="dbi3-score">${score}</div>
+          <div class="dbi3-denom">/100</div>
         </div>
       </div>
-
-      <div class="dbi2-hero">
-        <div class="dbi2-ring-wrap">
-          <svg class="dbi2-ring-svg" width="72" height="72" viewBox="0 0 72 72">
-            <circle class="dbi2-ring-track" cx="36" cy="36" r="${R}"/>
-            <circle class="dbi2-ring-fill" cx="36" cy="36" r="${R}"/>
-          </svg>
-          <div class="dbi2-score-inner">
-            <div class="dbi2-score-num" style="color:${scoreCol};">${score}</div>
-            <div class="dbi2-score-denom">/100</div>
-          </div>
+      <div class="dbi3-head-right">
+        <div class="dbi3-micro">
+          AI Clinical Insight
+          <span class="dbi3-live"><span class="dbi3-live-dot"></span>${isFresh?'Live':'Cached'}</span>
         </div>
-        <div class="dbi2-score-label-block">
-          <div class="dbi2-score-label">${scoreLabel}</div>
-          <div class="dbi2-cases-line">${allCases.length} cases · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>
-        </div>
+        <div class="dbi3-score-label">${result.score_label||'—'}</div>
+        <div class="dbi3-cases-line">${allCases.length} cases · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>
       </div>
+    </div>
 
-      <div class="dbi2-verdict">${verdict}</div>
+    <div class="dbi3-tabs">
+      <div class="dbi3-tab active" id="dbi3-tab1" onclick="dbi3Switch(1)">Insight</div>
+      <div class="dbi3-tab" id="dbi3-tab2" onclick="dbi3Switch(2)">Next 30 Days</div>
+    </div>
 
-      <div class="dbi2-strength">${strength}</div>
+    <div class="dbi3-panels">
+      ${panel1}
+      ${panel2}
+    </div>
 
-      <div class="dbi2-footer">
-        <span class="dbi2-tap">Full analysis — tap to open →</span>
-        <button class="dbi2-refresh-btn" onclick="event.stopPropagation();runInsightSilent();">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Refresh
-        </button>
-      </div>
-
+    <div class="dbi3-footer">
+      <span class="dbi3-ts">${isFresh?'Just updated':'Auto-updates every 5 cases'}</span>
+      <button class="dbi3-refresh" id="dbi3-refresh-btn" onclick="dbi3Refresh()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh analysis
+      </button>
     </div>
   </div>`;
 }
 
-
-function pvOpenInsightModal() {
-  const result = currentProfile?.growth_analysis;
-  if (!result) { runInsightSilent(); return; }
-
-  const existing = document.getElementById('pv-insight-modal');
-  if (existing) existing.remove();
-
-  const score     = result.score || 0;
-  const scoreCol  = score >= 75 ? '#34D399' : score >= 50 ? '#7C6FFF' : score >= 30 ? '#F59E0B' : '#EF4444';
-  const r         = 28;
-  const circ      = 2*Math.PI*r;
-  const dash      = (score/100)*circ;
-
-  const next30HTML = (result.next30||[]).map((item,i) => `
-    <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.055);border-radius:11px;">
-      <div style="width:22px;height:22px;border-radius:7px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#34D399;flex-shrink:0;">${i+1}</div>
-      <div style="font-size:0.73rem;color:rgba(255,255,255,0.7);line-height:1.55;">${item}</div>
-    </div>`).join('');
-
-  const modal = document.createElement('div');
-  modal.id = 'pv-insight-modal';
-  modal.style.cssText = `position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:pvModalBgIn 0.2s ease;`;
-
-  modal.innerHTML = `
-    <div id="pv-insight-sheet" style="width:100%;max-width:680px;margin:0 auto;background:#0e0e18;border-top:1px solid rgba(255,255,255,0.1);border-radius:22px 22px 0 0;max-height:92vh;overflow-y:auto;animation:pvSheetIn 0.3s cubic-bezier(0.34,1.1,0.64,1);-webkit-overflow-scrolling:touch;">
-      <!-- handle -->
-      <div style="display:flex;justify-content:center;padding:12px 0 4px;">
-        <div style="width:36px;height:4px;border-radius:100px;background:rgba(255,255,255,0.12);"></div>
-      </div>
-      <!-- header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
-        <div>
-          <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:3px;">AI Clinical Insight</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.15rem;color:#fff;letter-spacing:-0.02em;">Your Growth Analysis</div>
-        </div>
-        <button onclick="document.getElementById('pv-insight-modal').remove()" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;">×</button>
-      </div>
-      <!-- score hero -->
-      <div style="padding:24px 20px 0;display:flex;align-items:center;gap:20px;margin-bottom:20px;">
-        <div style="position:relative;flex-shrink:0;width:72px;height:72px;">
-          <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg);">
-            <circle cx="36" cy="36" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5"/>
-            <circle cx="36" cy="36" r="${r}" fill="none" stroke="${scoreCol}" stroke-width="5"
-              stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ-dash}"
-              style="transition:stroke-dashoffset 1.5s ease;"/>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:${scoreCol};line-height:1;">${score}</div>
-            <div style="font-size:0.38rem;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;">/100</div>
-          </div>
-        </div>
-        <div style="flex:1;">
-          <div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:#fff;margin-bottom:4px;">${result.score_label||''}</div>
-          <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);">${allCases.length} cases · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
-        </div>
-      </div>
-      <!-- content -->
-      <div style="padding:0 20px 40px;display:flex;flex-direction:column;gap:12px;">
-        <!-- verdict -->
-        <div style="background:linear-gradient(135deg,rgba(124,111,255,0.07),rgba(124,111,255,0.03));border:1px solid rgba(124,111,255,0.15);border-radius:16px;padding:18px 18px;">
-          <div style="font-size:0.44rem;color:rgba(124,111,255,0.6);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:10px;">Clinical Verdict</div>
-          <div style="font-family:'Instrument Serif',serif;font-size:1.05rem;color:#fff;font-style:italic;line-height:1.6;">"${result.verdict||'—'}"</div>
-        </div>
-        <!-- strength -->
-        <div style="background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.15);border-radius:14px;padding:14px 16px;">
-          <div style="font-size:0.44rem;color:#9B91FF;text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:8px;">✦ Your Strength</div>
-          <div style="font-size:0.78rem;color:rgba(255,255,255,0.75);line-height:1.6;">${result.strength||'—'}</div>
-        </div>
-        <!-- blind spot -->
-        <div style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:14px 16px;">
-          <div style="font-size:0.44rem;color:#EF4444;text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:8px;">⚠ Blind Spot</div>
-          <div style="font-size:0.78rem;color:rgba(255,255,255,0.75);line-height:1.6;">${result.blindspot||'—'}</div>
-        </div>
-        <!-- trajectory -->
-        <div style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.15);border-radius:14px;padding:14px 16px;">
-          <div style="font-size:0.44rem;color:#F59E0B;text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:8px;">📈 Trajectory</div>
-          <div style="font-size:0.78rem;color:rgba(255,255,255,0.75);line-height:1.6;">${result.trajectory||'—'}</div>
-        </div>
-        <!-- next 30 -->
-        <div>
-          <div style="font-size:0.44rem;color:rgba(52,211,153,0.7);text-transform:uppercase;letter-spacing:0.18em;font-weight:700;margin-bottom:10px;">🎯 Your Next 30 Days</div>
-          <div style="display:flex;flex-direction:column;gap:7px;">${next30HTML}</div>
-        </div>
-        <!-- refresh -->
-        <button onclick="document.getElementById('pv-insight-modal').remove();runInsightSilent();" style="width:100%;padding:12px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.35);font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Re-analyze
-        </button>
-      </div>
-    </div>`;
-
-  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-  document.body.appendChild(modal);
+function dbi3Switch(panel) {
+  const p1 = document.getElementById('dbi3-p1');
+  const p2 = document.getElementById('dbi3-p2');
+  const t1 = document.getElementById('dbi3-tab1');
+  const t2 = document.getElementById('dbi3-tab2');
+  if (!p1||!p2||!t1||!t2) return;
+  if (panel===1) {
+    p1.style.display=''; p2.style.display='none';
+    t1.classList.add('active'); t2.classList.remove('active');
+  } else {
+    p1.style.display='none'; p2.style.display='';
+    t1.classList.remove('active'); t2.classList.add('active');
+  }
 }
 
-// ─── END AI CLINICAL INSIGHT SYSTEM ──────────────────────────────────────────
+async function dbi3Refresh() {
+  const btn = document.getElementById('dbi3-refresh-btn');
+  if (btn) { btn.disabled=true; btn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:dbi-sk 0.8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Analyzing…`; }
+  renderInsightCard(null,'loading');
+  const result = await buildInsightResult();
+  if (result) {
+    try {
+      await sb.from('profiles').update({ growth_analysis:result, growth_analysis_case_count:allCases.length }).eq('id',currentUser.id);
+      if (currentProfile) { currentProfile.growth_analysis=result; currentProfile.growth_analysis_case_count=allCases.length; }
+    } catch(e) {}
+    renderInsightCard(result,'fresh');
+  }
+}
+
+function pvOpenInsightModal() { /* no-op — swipeable card replaced modal */ }
+
 
 // ─── CLINICAL GROWTH ENGINE ───
 async function runGrowthEngine() {
