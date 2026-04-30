@@ -8870,7 +8870,7 @@ Generate a complete clinical note in 2-3 paragraphs. Professional, third person,
     if (note) {
       window._vrNote = note;
       const noteTextEl = document.getElementById('vr-note-text');
-      if (noteTextEl) noteTextEl.innerHTML = note.replace(/\n\n/g, '</p><p style="margin-bottom:12px">').replace(/\n/g, '<br>');
+      if (noteTextEl) noteTextEl.innerHTML = '<p style="margin-bottom:12px">' + note.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n\n/g, '</p><p style="margin-bottom:12px">').replace(/\n/g, '<br>') + '</p>';
       if (noteSection) noteSection.style.display = 'block';
 
       // Save note to case
