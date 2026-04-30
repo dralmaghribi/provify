@@ -5599,486 +5599,473 @@ function renderPortfolioPassport() {
   if (!el) return;
   if (!currentProfile) { el.innerHTML = ''; return; }
 
-  const total     = allCases.length;
-  const rank      = getComplexityRank(total);
-  const score     = getClinicianScore();
-  const avg       = total > 0 ? (allCases.reduce((s,c)=>s+(c.complexity_score||0),0)/total).toFixed(1) : '0.0';
-  const highComp  = allCases.filter(c=>(c.complexity_score||0)>=7).length;
-  const firstName = currentProfile.first_name || '';
-  const lastName  = currentProfile.last_name  || '';
-  const fullName  = `Dr. ${firstName} ${lastName}`.trim();
-  const initials  = (firstName[0]||'D')+(lastName[0]||'R');
-  const roleLabels= {student:'Dental Student',intern:'Intern / House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
-  const role      = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
-  const avatarUrl = currentProfile.avatar_url || null;
-  const today     = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const total      = allCases.length;
+  const rank       = getComplexityRank(total);
+  const score      = getClinicianScore();
+  const avg        = total > 0 ? (allCases.reduce((s,c)=>s+(c.complexity_score||0),0)/total).toFixed(1) : '0.0';
+  const highComp   = allCases.filter(c=>(c.complexity_score||0)>=7).length;
+  const firstName  = currentProfile.first_name || '';
+  const lastName   = currentProfile.last_name  || '';
+  const fullName   = `Dr. ${firstName} ${lastName}`.trim();
+  const initials   = (firstName[0]||'D')+(lastName[0]||'R');
+  const roleLabels = {student:'Dental Student',intern:'Intern / House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
+  const role       = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
+  const avatarUrl  = currentProfile.avatar_url || null;
+  const today      = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const scoreColor = score>=70?'#34D399':score>=40?'#7C6FFF':'#F59E0B';
+  const userId8    = (currentUser?.id||'').slice(0,8).toUpperCase() || 'XXXXXXXX';
 
   const SPEC = {
     endo:{col:'#7C6FFF',name:'Endo'},restorative:{col:'#F59E0B',name:'Resto'},
-    surgery:{col:'#EF4444',name:'Surgery'},paeds:{col:'#34D399',name:'Paeds'},
+    surgery:{col:'#EF4444',name:'Surg'},paeds:{col:'#34D399',name:'Paeds'},
     prostho:{col:'#38BDF8',name:'Prostho'},smile:{col:'#FBB424',name:'Smile'},
   };
   const specBreakdown = Object.entries(SPEC)
     .map(([k,v])=>({...v,n:allCases.filter(c=>c.specialty===k).length}))
     .filter(s=>s.n>0).sort((a,b)=>b.n-a.n);
-  const scoreColor = score>=70?'#34D399':score>=40?'#7C6FFF':'#F59E0B';
 
   // GPS
   const gpsData  = getGPSData();
   const gpsValid = gpsData && ['specialist','owner','brand','gp'].includes(gpsData.goal);
-  let gpsInner = '';
+  let gpsPct=0, gpsGoalLabel='', gpsGoalIcon='', gpsGoalCol='#7C6FFF', gpsNextLabel='', gpsNextHint='', gpsNextIcon='';
   if (gpsValid) {
     const stageIds = GOAL_STAGES[gpsData.goal]||GOAL_STAGES.gp;
     const stages   = stageIds.map(id=>CAREER_STAGES.find(s=>s.id===id)).filter(Boolean);
     const ctx      = getGPSContext();
     const mc       = gpsData.manualChecks||{};
     const done     = stages.filter(s=>s.auto(ctx)||mc[s.id]).length;
-    const pct      = Math.round((done/stages.length)*100);
+    gpsPct         = Math.round((done/stages.length)*100);
     const next     = stages.find(s=>!(s.auto(ctx)||mc[s.id]));
-    const GM = {specialist:{label:'Specialist',icon:'🔬',col:'#7C6FFF'},owner:{label:'Clinic Owner',icon:'🏢',col:'#34D399'},brand:{label:'Personal Brand',icon:'👑',col:'#F59E0B'},gp:{label:'Expert GP',icon:'🦷',col:'#9B91FF'}}[gpsData.goal];
-    gpsInner = `
-      <div class="pp3-micro-label">Career GPS</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-        <span style="font-size:1.1rem;">${GM.icon}</span>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:0.78rem;font-weight:600;color:#fff;margin-bottom:5px;">${GM.label}</div>
-          <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${GM.col};border-radius:100px;"></div></div>
-        </div>
-        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${GM.col};line-height:1;flex-shrink:0;">${pct}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.5;">%</span></div>
-      </div>
-      ${next ? `<div style="display:flex;gap:9px;align-items:flex-start;padding:9px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.055);border-radius:11px;"><span style="font-size:0.9rem;flex-shrink:0;margin-top:1px;">${next.icon}</span><div style="flex:1;min-width:0;"><div style="font-size:0.44rem;color:${GM.col};text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:2px;">Up next</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">${next.label}</div><div style="font-size:0.58rem;color:rgba(255,255,255,0.22);line-height:1.5;">${next.provifyAction.slice(0,80)}...</div></div></div>`
-      : `<div style="text-align:center;padding:6px 0;font-size:0.72rem;color:#34D399;font-weight:600;">🏆 Roadmap complete</div>`}`;
+    const GM       = {specialist:{label:'Specialist',icon:'🔬',col:'#7C6FFF'},owner:{label:'Clinic Owner',icon:'🏢',col:'#34D399'},brand:{label:'Personal Brand',icon:'👑',col:'#F59E0B'},gp:{label:'Expert GP',icon:'🦷',col:'#9B91FF'}}[gpsData.goal];
+    gpsGoalLabel   = GM.label; gpsGoalIcon=GM.icon; gpsGoalCol=GM.col;
+    if (next) { gpsNextLabel=next.label; gpsNextHint=next.provifyAction.slice(0,70)+'...'; gpsNextIcon=next.icon; }
   }
 
-  el.innerHTML = `
-  <style>
-    .pp3-wrap{font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;}
+  el.innerHTML = `<style>
+/* ── PASSPORT RESET ── */
+.pv-passport{font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;padding-bottom:8px;}
 
-    /* COVER */
-    .pp3-cover{position:relative;margin-bottom:10px;border-radius:22px;overflow:hidden;background:#0c0c11;border:1px solid rgba(255,255,255,0.07);}
-    .pp3-cover-glow{position:absolute;inset:0;background:radial-gradient(ellipse 90% 55% at 65% -10%,${rank.color}1a 0%,transparent 65%),radial-gradient(ellipse 40% 35% at 5% 105%,${rank.color}0d 0%,transparent 65%);pointer-events:none;}
-    .pp3-cover-lines{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(255,255,255,0.018) 28px,rgba(255,255,255,0.018) 29px);pointer-events:none;}
-    .pp3-cover-bar{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${rank.color}cc,${rank.color}55,transparent);}
-    .pp3-cover-inner{position:relative;padding:20px 20px 18px;}
-    .pp3-doc-label{font-size:0.43rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.18);font-weight:600;margin-bottom:18px;}
-    .pp3-identity{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
-    .pp3-avatar-wrap{position:relative;flex-shrink:0;cursor:pointer;}
-    .pp3-avatar{width:60px;height:60px;border-radius:15px;overflow:hidden;border:2px solid ${rank.color}40;background:${rank.color}15;display:flex;align-items:center;justify-content:center;}
-    .pp3-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-    .pp3-avatar-initials{font-size:1.1rem;font-weight:700;color:${rank.color};}
-    .pp3-avatar-cam{position:absolute;bottom:-5px;right:-5px;width:20px;height:20px;background:#181822;border:1px solid rgba(255,255,255,0.14);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.58rem;}
-    .pp3-name{font-family:'Instrument Serif',serif;font-size:1.4rem;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:3px;}
-    .pp3-role{font-size:0.67rem;color:rgba(255,255,255,0.33);}
-    .pp3-rank-block{flex-shrink:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;}
-    .pp3-rank-emoji{font-size:1.55rem;line-height:1;}
-    .pp3-rank-label{font-size:0.58rem;font-weight:700;color:${rank.color};letter-spacing:0.04em;}
-    .pp3-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);}
-    .pp3-verified{display:flex;align-items:center;gap:5px;}
-    .pp3-dot{width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 7px rgba(52,211,153,0.75);}
-    .pp3-verified-text{font-size:0.55rem;font-weight:600;color:rgba(52,211,153,0.6);text-transform:uppercase;letter-spacing:0.1em;}
-    .pp3-share-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:500;padding:5px 11px;border-radius:8px;cursor:pointer;transition:all 0.15s;}
-    .pp3-share-btn:hover{border-color:rgba(255,255,255,0.2);color:#fff;}
-    .pp3-share-btn--purple{background:rgba(124,111,255,0.1);border-color:rgba(124,111,255,0.28);color:#9B91FF;}
-    .pp3-share-btn--purple:hover{background:rgba(124,111,255,0.18);}
+/* ══ HERO COVER — full bleed document page ══ */
+.pv-cover{
+  position:relative;
+  border-radius:24px;
+  overflow:hidden;
+  margin-bottom:8px;
+  background:#080810;
+  border:1px solid rgba(255,255,255,0.09);
+  box-shadow:0 4px 40px rgba(0,0,0,0.5);
+}
+.pv-cover-noise{
+  position:absolute;inset:0;
+  opacity:0.4;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23f)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.pv-cover-glow{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 100% 70% at 80% -20%,${rank.color}22 0%,transparent 55%),
+    radial-gradient(ellipse 60% 50% at -10% 110%,${rank.color}0e 0%,transparent 60%);
+  pointer-events:none;
+}
+.pv-cover-lines{
+  position:absolute;inset:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 30px,rgba(255,255,255,0.016) 30px,rgba(255,255,255,0.016) 31px);
+  pointer-events:none;
+}
+.pv-cover-topbar{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,${rank.color}90 25%,${rank.color} 50%,${rank.color}60 75%,transparent 100%);}
 
-    /* DATA STRIP */
-    .pp3-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.06);border-radius:13px;overflow:hidden;margin-bottom:10px;}
-    .pp3-cell{background:#0f0f14;padding:11px 8px;text-align:center;}
-    .pp3-cell-val{font-family:'Instrument Serif',serif;font-size:1.35rem;line-height:1;letter-spacing:-0.03em;margin-bottom:3px;}
-    .pp3-cell-key{font-size:0.41rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.14em;font-weight:600;}
+.pv-cover-inner{position:relative;padding:20px 20px 0;}
 
-    /* CARDS */
-    .pp3-card{background:#0c0c11;border:1px solid rgba(255,255,255,0.065);border-radius:18px;padding:15px 16px;margin-bottom:10px;}
-    .pp3-micro-label{font-size:0.43rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:10px;}
-    .pp3-strength-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-    .pp3-strength-label{font-size:0.6rem;color:rgba(255,255,255,0.25);white-space:nowrap;}
-    .pp3-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
-    .pp3-fill{height:100%;border-radius:100px;background:${scoreColor};transition:width 1.4s cubic-bezier(0.34,1.2,0.64,1);}
-    .pp3-score-num{font-family:'Instrument Serif',serif;font-size:1.05rem;color:${scoreColor};line-height:1;white-space:nowrap;}
-    .pp3-chips{display:flex;flex-wrap:wrap;gap:5px;}
-    .pp3-chip{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:0.58rem;font-weight:600;border:1px solid;}
+/* wordmark */
+.pv-wordmark{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.pv-wordmark-left{font-size:0.42rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.2);font-weight:700;}
+.pv-wordmark-right{font-size:0.42rem;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.1);font-weight:500;}
 
-    /* ═══ PDF EXPORT SEAL ═══ */
-    .pp3-seal-wrap{
-      position:relative;
-      margin-bottom:4px;
-      cursor:pointer;
-    }
-    /* Animated ring on hover */
-    .pp3-seal-wrap::before{
-      content:'';
-      position:absolute;
-      inset:-1px;
-      border-radius:22px;
-      background:linear-gradient(135deg,rgba(124,111,255,0) 0%,rgba(124,111,255,0.5) 50%,rgba(52,211,153,0.3) 100%);
-      opacity:0;
-      transition:opacity 0.35s;
-      z-index:0;
-    }
-    .pp3-seal-wrap:hover::before{opacity:1;}
-    .pp3-seal-doc{
-      position:relative;
-      z-index:1;
-      background:#0b0b10;
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:21px;
-      overflow:hidden;
-      transition:transform 0.25s cubic-bezier(0.34,1.3,0.64,1),box-shadow 0.25s;
-    }
-    .pp3-seal-wrap:hover .pp3-seal-doc{
-      transform:translateY(-3px);
-      box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(124,111,255,0.15);
-    }
-    .pp3-seal-wrap:active .pp3-seal-doc{transform:scale(0.975);}
+/* identity row */
+.pv-id-row{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.pv-avatar-wrap{position:relative;flex-shrink:0;cursor:pointer;}
+.pv-avatar{
+  width:64px;height:64px;border-radius:18px;
+  overflow:hidden;
+  border:2px solid ${rank.color}50;
+  background:${rank.color}15;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px ${rank.color}20;
+}
+.pv-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.pv-avatar-initials{font-size:1.15rem;font-weight:800;color:${rank.color};letter-spacing:-0.02em;}
+.pv-avatar-cam{
+  position:absolute;bottom:-5px;right:-5px;
+  width:22px;height:22px;
+  background:#141420;border:1px solid rgba(255,255,255,0.15);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:0.58rem;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+.pv-name-col{flex:1;min-width:0;}
+.pv-name{font-family:'Instrument Serif',serif;font-size:1.5rem;color:#fff;letter-spacing:-0.03em;line-height:1.05;margin-bottom:3px;}
+.pv-role{font-size:0.68rem;color:rgba(255,255,255,0.32);}
+.pv-rank-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.pv-rank-emoji{font-size:1.7rem;line-height:1;filter:drop-shadow(0 0 8px ${rank.color}60);}
+.pv-rank-label{font-size:0.58rem;font-weight:800;color:${rank.color};letter-spacing:0.05em;}
 
-    /* paper texture */
-    .pp3-seal-paper{
-      position:absolute;inset:0;
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events:none;
-    }
-    /* classification bar top */
-    .pp3-seal-classify{
-      background:linear-gradient(90deg,transparent,rgba(124,111,255,0.7) 20%,rgba(124,111,255,0.9) 50%,rgba(52,211,153,0.5) 80%,transparent);
-      height:2px;
-      width:100%;
-    }
-    /* classification text stripe */
-    .pp3-seal-classify-text{
-      background:rgba(124,111,255,0.06);
-      border-bottom:1px solid rgba(124,111,255,0.1);
-      padding:4px 20px;
-      display:flex;align-items:center;justify-content:space-between;
-    }
-    .pp3-seal-classify-label{
-      font-size:0.38rem;
-      font-weight:800;
-      letter-spacing:0.3em;
-      color:rgba(124,111,255,0.5);
-      text-transform:uppercase;
-    }
-    .pp3-seal-classify-id{
-      font-size:0.38rem;
-      color:rgba(255,255,255,0.15);
-      letter-spacing:0.1em;
-      font-family:monospace;
-    }
+/* stat band — inline, no box */
+.pv-stat-band{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  border-top:1px solid rgba(255,255,255,0.06);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  margin:0 -20px;
+  padding:0 20px;
+  background:rgba(0,0,0,0.2);
+}
+.pv-stat{
+  padding:11px 0;
+  text-align:center;
+  border-right:1px solid rgba(255,255,255,0.05);
+}
+.pv-stat:last-child{border-right:none;}
+.pv-stat-v{font-family:'Instrument Serif',serif;font-size:1.3rem;line-height:1;letter-spacing:-0.03em;margin-bottom:2px;}
+.pv-stat-k{font-size:0.4rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;}
 
-    .pp3-seal-body{padding:20px 22px 0;}
+/* strength bar — flush inline */
+.pv-strength-row{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.pv-sl{font-size:0.58rem;color:rgba(255,255,255,0.22);white-space:nowrap;}
+.pv-st{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
+.pv-sf{height:100%;border-radius:100px;background:${scoreColor};transition:width 1.6s cubic-bezier(0.34,1.2,0.64,1);}
+.pv-sn{font-family:'Instrument Serif',serif;font-size:1rem;color:${scoreColor};line-height:1;white-space:nowrap;}
 
-    /* header row: stats left, wax seal right */
-    .pp3-seal-header-row{
-      display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;
-    }
-    .pp3-seal-stats{flex:1;min-width:0;}
-    .pp3-seal-doc-label{
-      font-size:0.4rem;letter-spacing:0.28em;text-transform:uppercase;
-      color:rgba(255,255,255,0.2);font-weight:600;margin-bottom:10px;
-    }
-    /* stat columns */
-    .pp3-seal-stat-row{display:flex;gap:0;margin-bottom:16px;}
-    .pp3-seal-stat{
-      flex:1;padding-right:14px;margin-right:14px;
-      border-right:1px solid rgba(255,255,255,0.05);
-    }
-    .pp3-seal-stat:last-child{border-right:none;padding-right:0;margin-right:0;}
-    .pp3-seal-stat-val{
-      font-family:'Instrument Serif',serif;
-      font-size:1.5rem;line-height:1;
-      letter-spacing:-0.03em;
-      margin-bottom:2px;
-    }
-    .pp3-seal-stat-key{
-      font-size:0.4rem;color:rgba(255,255,255,0.2);
-      text-transform:uppercase;letter-spacing:0.14em;font-weight:600;
-    }
+/* specialty chips row */
+.pv-chips-row{display:flex;flex-wrap:wrap;gap:5px;padding:12px 0;}
+.pv-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:100px;
+  font-size:0.57rem;font-weight:700;border:1px solid;
+  letter-spacing:0.01em;
+}
 
-    /* WAX SEAL */
-    .pp3-wax{
-      flex-shrink:0;
-      width:64px;height:64px;
-      position:relative;
-      display:flex;align-items:center;justify-content:center;
-      margin-top:4px;
-    }
-    .pp3-wax-ring{
-      position:absolute;inset:0;
-      border-radius:50%;
-      background:conic-gradient(
-        from 0deg,
-        rgba(124,111,255,0.0) 0deg,
-        rgba(124,111,255,0.6) 60deg,
-        rgba(52,211,153,0.4) 120deg,
-        rgba(124,111,255,0.6) 180deg,
-        rgba(52,211,153,0.3) 240deg,
-        rgba(124,111,255,0.5) 300deg,
-        rgba(124,111,255,0.0) 360deg
-      );
-      animation:pp3-spin 8s linear infinite;
-      opacity:0.7;
-    }
-    @keyframes pp3-spin{to{transform:rotate(360deg);}}
-    .pp3-wax-inner{
-      position:absolute;inset:3px;
-      border-radius:50%;
-      background:radial-gradient(circle at 35% 30%,#2a1f5e,#0f0d1a 70%);
-      border:1px solid rgba(124,111,255,0.25);
-      display:flex;align-items:center;justify-content:center;
-      flex-direction:column;gap:1px;
-    }
-    .pp3-wax-p{
-      font-family:'Instrument Serif',serif;
-      font-size:1.1rem;color:rgba(124,111,255,0.9);
-      line-height:1;letter-spacing:-0.04em;
-      text-shadow:0 0 12px rgba(124,111,255,0.6);
-    }
-    .pp3-wax-text{
-      font-size:0.3rem;letter-spacing:0.15em;
-      color:rgba(124,111,255,0.4);text-transform:uppercase;
-      font-weight:700;
-    }
+/* GPS band */
+.pv-gps-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 0;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+.pv-gps-icon{font-size:1rem;flex-shrink:0;}
+.pv-gps-mid{flex:1;min-width:0;}
+.pv-gps-label{font-size:0.78rem;font-weight:600;color:#fff;margin-bottom:5px;}
+.pv-gps-track{height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
+.pv-gps-fill{height:100%;border-radius:100px;}
+.pv-gps-pct{font-family:'Instrument Serif',serif;font-size:1.2rem;color:${gpsGoalCol};line-height:1;flex-shrink:0;}
 
-    /* signature line */
-    .pp3-seal-sig-row{
-      display:flex;align-items:flex-end;gap:12px;
-      padding:12px 0;
-      border-top:1px solid rgba(255,255,255,0.04);
-      border-bottom:1px solid rgba(255,255,255,0.04);
-      margin-bottom:16px;
-    }
-    .pp3-seal-sig-left{flex:1;}
-    .pp3-seal-sig-label{
-      font-size:0.38rem;color:rgba(255,255,255,0.18);
-      text-transform:uppercase;letter-spacing:0.16em;font-weight:600;
-      margin-bottom:4px;
-    }
-    .pp3-seal-sig-line{
-      height:1px;background:rgba(255,255,255,0.07);
-      width:100%;margin-bottom:3px;
-    }
-    .pp3-seal-sig-name{
-      font-family:'Instrument Serif',serif;
-      font-size:0.95rem;color:rgba(255,255,255,0.5);
-      letter-spacing:0.02em;font-style:italic;
-    }
-    .pp3-seal-verified-mark{
-      display:flex;flex-direction:column;align-items:center;gap:3px;
-      flex-shrink:0;padding-bottom:2px;
-    }
-    .pp3-seal-verified-dot{
-      width:28px;height:28px;border-radius:50%;
-      background:rgba(52,211,153,0.08);
-      border:1px solid rgba(52,211,153,0.25);
-      display:flex;align-items:center;justify-content:center;
-      font-size:0.7rem;
-    }
-    .pp3-seal-verified-label{
-      font-size:0.36rem;color:rgba(52,211,153,0.45);
-      font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
-    }
+/* up-next inside GPS band */
+.pv-next{
+  display:flex;gap:9px;align-items:flex-start;
+  padding:9px 12px;
+  background:rgba(255,255,255,0.02);
+  border-top:1px solid rgba(255,255,255,0.04);
+  margin:0 -20px;
+  padding-left:20px;padding-right:20px;
+}
+.pv-next-icon{font-size:0.85rem;flex-shrink:0;margin-top:1px;}
+.pv-next-label{font-size:0.44rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:2px;}
+.pv-next-title{font-size:0.72rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;}
+.pv-next-hint{font-size:0.57rem;color:rgba(255,255,255,0.2);line-height:1.5;}
 
-    /* CTA button */
-    .pp3-seal-cta{
-      display:flex;align-items:center;gap:12px;
-      background:linear-gradient(135deg,rgba(124,111,255,0.14),rgba(124,111,255,0.07));
-      border:1px solid rgba(124,111,255,0.28);
-      border-radius:14px;
-      padding:13px 16px;
-      margin-bottom:16px;
-      transition:background 0.2s,border-color 0.2s,box-shadow 0.2s;
-    }
-    .pp3-seal-wrap:hover .pp3-seal-cta{
-      background:linear-gradient(135deg,rgba(124,111,255,0.22),rgba(124,111,255,0.12));
-      border-color:rgba(124,111,255,0.5);
-      box-shadow:0 0 20px rgba(124,111,255,0.12);
-    }
-    .pp3-seal-cta-left{
-      width:34px;height:42px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:5px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:1.1rem;
-      position:relative;
-      flex-shrink:0;
-    }
-    .pp3-seal-cta-left::before{
-      content:'';
-      position:absolute;top:-1px;right:-1px;
-      width:9px;height:9px;
-      background:#0b0b10;
-      border-left:1px solid rgba(255,255,255,0.08);
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      border-radius:0 0 0 3px;
-    }
-    .pp3-seal-cta-text{flex:1;}
-    .pp3-seal-cta-title{
-      font-size:0.85rem;font-weight:700;color:#fff;
-      letter-spacing:-0.01em;margin-bottom:2px;
-    }
-    .pp3-seal-cta-sub{font-size:0.58rem;color:rgba(255,255,255,0.3);}
-    .pp3-seal-cta-arrow{
-      font-size:1.1rem;color:rgba(124,111,255,0.6);
-      flex-shrink:0;
-      transition:transform 0.2s;
-    }
-    .pp3-seal-wrap:hover .pp3-seal-cta-arrow{transform:translateX(4px);}
+/* verified + share bar */
+.pv-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 20px;
+  background:rgba(255,255,255,0.018);
+  border-top:1px solid rgba(255,255,255,0.05);
+  margin:0 -20px;
+}
+.pv-verified{display:flex;align-items:center;gap:5px;}
+.pv-vdot{width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 7px rgba(52,211,153,0.8);}
+.pv-vtext{font-size:0.54rem;font-weight:700;color:rgba(52,211,153,0.6);text-transform:uppercase;letter-spacing:0.1em;}
+.pv-share{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.28);
+  color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;
+  padding:5px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;
+}
+.pv-share:hover{background:rgba(124,111,255,0.2);}
 
-    /* footer stripe */
-    .pp3-seal-footer{
-      background:rgba(255,255,255,0.015);
-      border-top:1px solid rgba(255,255,255,0.04);
-      padding:7px 22px;
-      display:flex;align-items:center;justify-content:space-between;
-    }
-    .pp3-seal-footer-l{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.08em;font-family:monospace;}
-    .pp3-seal-footer-r{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.08em;}
-  </style>
+/* ══ SEAL CARD ══ */
+.pv-seal-outer{
+  position:relative;
+  cursor:pointer;
+  border-radius:22px;
+}
+.pv-seal-outer::before{
+  content:'';
+  position:absolute;inset:-1px;border-radius:23px;
+  background:conic-gradient(from 180deg,rgba(124,111,255,0) 0deg,rgba(124,111,255,0.6) 90deg,rgba(52,211,153,0.5) 180deg,rgba(124,111,255,0.6) 270deg,rgba(124,111,255,0) 360deg);
+  opacity:0;transition:opacity 0.4s;z-index:0;
+  animation:pv-seal-spin 6s linear infinite paused;
+}
+.pv-seal-outer:hover::before{opacity:1;animation-play-state:running;}
+@keyframes pv-seal-spin{to{transform:rotate(360deg);}}
+.pv-seal-inner{
+  position:relative;z-index:1;
+  background:#080810;
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:22px;overflow:hidden;
+  transition:transform 0.25s cubic-bezier(0.34,1.3,0.64,1),box-shadow 0.25s;
+  box-shadow:0 4px 30px rgba(0,0,0,0.4);
+}
+.pv-seal-outer:hover .pv-seal-inner{
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(124,111,255,0.12);
+}
+.pv-seal-outer:active .pv-seal-inner{transform:scale(0.975);}
 
-  <div class="pp3-wrap">
+/* top security stripe */
+.pv-seal-topline{height:2px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.8) 30%,rgba(52,211,153,0.5) 70%,transparent);}
+.pv-seal-classify{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 18px;
+  background:rgba(124,111,255,0.05);
+  border-bottom:1px solid rgba(124,111,255,0.1);
+}
+.pv-seal-cl{font-size:0.38rem;font-weight:800;letter-spacing:0.3em;color:rgba(124,111,255,0.5);text-transform:uppercase;}
+.pv-seal-id{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.1em;font-family:'Courier New',monospace;}
 
-  <!-- ══ COVER ══ -->
-  <div class="pp3-cover">
-    <div class="pp3-cover-glow"></div>
-    <div class="pp3-cover-lines"></div>
-    <div class="pp3-cover-bar"></div>
-    <div class="pp3-cover-inner">
-      <div class="pp3-doc-label">Provify · Clinical Portfolio</div>
-      <div class="pp3-identity">
-        <div class="pp3-avatar-wrap" onclick="document.getElementById('pp3-photo-input').click()" title="Tap to upload photo">
-          <div class="pp3-avatar">${avatarUrl?`<img src="${avatarUrl}" alt="">`:`<div class="pp3-avatar-initials">${initials}</div>`}</div>
-          <div class="pp3-avatar-cam">📷</div>
+/* body */
+.pv-seal-body{padding:18px 18px 0;}
+.pv-seal-main{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;}
+.pv-seal-stats{flex:1;min-width:0;}
+.pv-seal-doc-title{font-size:0.4rem;letter-spacing:0.24em;text-transform:uppercase;color:rgba(255,255,255,0.18);font-weight:700;margin-bottom:10px;}
+.pv-seal-nums{display:flex;gap:0;}
+.pv-seal-num{flex:1;padding-right:12px;margin-right:12px;border-right:1px solid rgba(255,255,255,0.06);}
+.pv-seal-num:last-child{border-right:none;padding-right:0;margin-right:0;}
+.pv-seal-nv{font-family:'Instrument Serif',serif;font-size:1.6rem;line-height:1;letter-spacing:-0.04em;margin-bottom:2px;}
+.pv-seal-nk{font-size:0.39rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.14em;font-weight:700;}
+
+/* wax seal */
+.pv-wax{width:56px;height:56px;position:relative;flex-shrink:0;}
+.pv-wax-bg{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#1e1550,#090714 70%);
+  border:1px solid rgba(124,111,255,0.3);
+  box-shadow:0 0 16px rgba(124,111,255,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.pv-wax-ring{
+  position:absolute;inset:2px;border-radius:50%;
+  border:1px dashed rgba(124,111,255,0.25);
+  animation:pv-wax-rot 12s linear infinite;
+}
+@keyframes pv-wax-rot{to{transform:rotate(360deg);}}
+.pv-wax-p{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+}
+.pv-wax-letter{font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(124,111,255,0.95);line-height:1;text-shadow:0 0 15px rgba(124,111,255,0.7);}
+.pv-wax-text{font-size:0.28rem;letter-spacing:0.2em;color:rgba(124,111,255,0.4);text-transform:uppercase;font-weight:700;}
+
+/* sig row */
+.pv-sig{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+  padding:10px 0;
+  border-top:1px solid rgba(255,255,255,0.04);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  margin-bottom:14px;
+}
+.pv-sig-left{flex:1;}
+.pv-sig-label{font-size:0.38rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.16em;font-weight:700;margin-bottom:4px;}
+.pv-sig-rule{height:1px;background:rgba(255,255,255,0.06);width:100%;margin-bottom:3px;}
+.pv-sig-name{font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(255,255,255,0.5);font-style:italic;letter-spacing:0.01em;}
+.pv-sig-right{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+.pv-sig-circle{
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.25);
+  display:flex;align-items:center;justify-content:center;font-size:0.75rem;
+}
+.pv-sig-v{font-size:0.35rem;color:rgba(52,211,153,0.5);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
+
+/* CTA */
+.pv-cta{
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,rgba(124,111,255,0.13),rgba(124,111,255,0.06));
+  border:1px solid rgba(124,111,255,0.3);border-radius:13px;
+  padding:12px 14px;margin-bottom:14px;
+  transition:background 0.2s,border-color 0.2s,box-shadow 0.2s;
+}
+.pv-seal-outer:hover .pv-cta{
+  background:linear-gradient(135deg,rgba(124,111,255,0.22),rgba(124,111,255,0.1));
+  border-color:rgba(124,111,255,0.55);
+  box-shadow:0 0 24px rgba(124,111,255,0.14);
+}
+.pv-cta-file{
+  width:32px;height:40px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;position:relative;flex-shrink:0;
+}
+.pv-cta-file::after{content:'';position:absolute;top:-1px;right:-1px;width:8px;height:8px;background:#080810;border-left:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);border-radius:0 0 0 3px;}
+.pv-cta-mid{flex:1;}
+.pv-cta-title{font-size:0.85rem;font-weight:700;color:#fff;letter-spacing:-0.01em;margin-bottom:2px;}
+.pv-cta-sub{font-size:0.57rem;color:rgba(255,255,255,0.28);}
+.pv-cta-arr{font-size:1.1rem;color:rgba(124,111,255,0.6);transition:transform 0.2s;}
+.pv-seal-outer:hover .pv-cta-arr{transform:translateX(5px);}
+
+/* footer strip */
+.pv-seal-foot{
+  background:rgba(255,255,255,0.014);border-top:1px solid rgba(255,255,255,0.04);
+  padding:6px 18px;display:flex;align-items:center;justify-content:space-between;
+}
+.pv-seal-fl{font-size:0.37rem;color:rgba(255,255,255,0.14);letter-spacing:0.07em;font-family:'Courier New',monospace;}
+.pv-seal-fr{font-size:0.37rem;color:rgba(255,255,255,0.14);letter-spacing:0.07em;}
+</style>
+
+<div class="pv-passport">
+
+  <!-- ══ HERO COVER ══ -->
+  <div class="pv-cover">
+    <div class="pv-cover-noise"></div>
+    <div class="pv-cover-glow"></div>
+    <div class="pv-cover-lines"></div>
+    <div class="pv-cover-topbar"></div>
+    <div class="pv-cover-inner">
+
+      <div class="pv-wordmark">
+        <span class="pv-wordmark-left">Provify · Clinical Portfolio</span>
+        <span class="pv-wordmark-right">Est. ${new Date(Math.min(...allCases.map(c=>new Date(c.created_at)),Date.now())).getFullYear()}</span>
+      </div>
+
+      <div class="pv-id-row">
+        <div class="pv-avatar-wrap" onclick="document.getElementById('pv-photo-in').click()">
+          <div class="pv-avatar">${avatarUrl?`<img src="${avatarUrl}">`:`<div class="pv-avatar-initials">${initials}</div>`}</div>
+          <div class="pv-avatar-cam">📷</div>
         </div>
-        <input type="file" id="pp3-photo-input" accept="image/*" style="display:none;"
-          onchange="(async function(e){
-            const f=e.target.files[0];if(!f)return;
-            const a=document.querySelector('.pp3-avatar');
-            a.innerHTML='<div style=\\'font-size:0.6rem;color:rgba(255,255,255,0.3);\\'>...</div>';
-            const url=await uploadPassportPhoto(f);
-            if(url){a.innerHTML='<img src=\\''+url+'\\' style=\\'width:100%;height:100%;object-fit:cover;display:block;\\'>';}
-            else{a.innerHTML='<div class=\\'pp3-avatar-initials\\'>${initials}</div>';}
-          })(event)">
-        <div style="flex:1;min-width:0;">
-          <div class="pp3-name">${fullName}</div>
-          <div class="pp3-role">${role}</div>
+        <input type="file" id="pv-photo-in" accept="image/*" style="display:none;"
+          onchange="(async function(e){const f=e.target.files[0];if(!f)return;const a=document.querySelector('.pv-avatar');a.innerHTML='<div style=\'padding:4px;font-size:0.6rem;color:rgba(255,255,255,0.3);\'>…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>';}else{a.innerHTML='<div class=\'pv-avatar-initials\'>${initials}</div>';}})(event)">
+        <div class="pv-name-col">
+          <div class="pv-name">${fullName}</div>
+          <div class="pv-role">${role}</div>
         </div>
-        <div class="pp3-rank-block">
-          <div class="pp3-rank-emoji">${rank.emoji}</div>
-          <div class="pp3-rank-label">${rank.rank}</div>
+        <div class="pv-rank-col">
+          <div class="pv-rank-emoji">${rank.emoji}</div>
+          <div class="pv-rank-label">${rank.rank}</div>
         </div>
       </div>
-      <div class="pp3-footer">
-        <div class="pp3-verified"><div class="pp3-dot"></div><span class="pp3-verified-text">Verified on Provify</span></div>
-        <div style="display:flex;gap:6px;">
-          <button class="pp3-share-btn pp3-share-btn--purple" onclick="copyPortfolioLinkInApp()">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            Share
-          </button>
+
+      <!-- STAT BAND — flush inside cover -->
+      <div class="pv-stat-band">
+        <div class="pv-stat"><div class="pv-stat-v" style="color:rgba(255,255,255,0.9);">${total}</div><div class="pv-stat-k">Cases</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" style="color:${rank.color};font-size:${rank.rank.length>6?'0.85rem':'1.3rem'};">${rank.rank}</div><div class="pv-stat-k">Rank</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pv-stat-k">Avg</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" style="color:#34D399;">${highComp}</div><div class="pv-stat-k">High≥7</div></div>
+      </div>
+
+      <!-- STRENGTH — flush inside cover -->
+      <div class="pv-strength-row">
+        <span class="pv-sl">Strength</span>
+        <div class="pv-st"><div class="pv-sf" style="width:${score}%;"></div></div>
+        <span class="pv-sn">${score}<span style="font-size:0.45rem;font-family:'Inter',sans-serif;opacity:0.35;">/100</span></span>
+      </div>
+
+      <!-- SPECIALTY CHIPS — flush inside cover -->
+      <div class="pv-chips-row">
+        ${specBreakdown.map(s=>`<span class="pv-chip" style="color:${s.col};background:${s.col}10;border-color:${s.col}28;"><span style="width:4px;height:4px;border-radius:50%;background:${s.col};display:inline-block;flex-shrink:0;"></span>${s.name} <span style="opacity:0.4;font-weight:400;">${s.n}</span></span>`).join('')}
+      </div>
+
+      <!-- GPS — flush inside cover -->
+      ${gpsValid ? `
+      <div class="pv-gps-row">
+        <span class="pv-gps-icon">${gpsGoalIcon}</span>
+        <div class="pv-gps-mid">
+          <div class="pv-gps-label">${gpsGoalLabel}</div>
+          <div class="pv-gps-track"><div class="pv-gps-fill" style="width:${gpsPct}%;background:${gpsGoalCol};"></div></div>
         </div>
+        <div class="pv-gps-pct" style="color:${gpsGoalCol};">${gpsPct}<span style="font-size:0.45rem;font-family:'Inter',sans-serif;opacity:0.5;">%</span></div>
+      </div>
+      ${gpsNextLabel ? `
+      <div class="pv-next">
+        <span class="pv-next-icon">${gpsNextIcon}</span>
+        <div>
+          <div class="pv-next-label" style="color:${gpsGoalCol};">Up next</div>
+          <div class="pv-next-title">${gpsNextLabel}</div>
+          <div class="pv-next-hint">${gpsNextHint}</div>
+        </div>
+      </div>` : ''}
+      ` : `
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid rgba(255,255,255,0.05);">
+        <span style="font-size:0.9rem;">🗺</span>
+        <span style="flex:1;font-size:0.68rem;color:rgba(255,255,255,0.3);">Set Career GPS to unlock your roadmap</span>
+        <button onclick="showView('career')" style="background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.6rem;font-weight:600;padding:4px 10px;border-radius:7px;cursor:pointer;flex-shrink:0;">Set up →</button>
+      </div>`}
+
+      <!-- VERIFIED + SHARE — bottom bar of cover -->
+    </div>
+    <div class="pv-foot">
+      <div class="pv-verified"><div class="pv-vdot"></div><span class="pv-vtext">Verified on Provify</span></div>
+      <button class="pv-share" onclick="copyPortfolioLinkInApp()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Share
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SEAL CARD ══ -->
+  <div class="pv-seal-outer" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
+    <div class="pv-seal-inner">
+      <div class="pv-seal-topline"></div>
+      <div class="pv-seal-classify">
+        <span class="pv-seal-cl">Verified Clinical Record</span>
+        <span class="pv-seal-id">PRV-${userId8}</span>
+      </div>
+      <div class="pv-seal-body">
+        <div class="pv-seal-main">
+          <div class="pv-seal-stats">
+            <div class="pv-seal-doc-title">Clinical Portfolio · Export Document</div>
+            <div class="pv-seal-nums">
+              <div class="pv-seal-num"><div class="pv-seal-nv" style="color:rgba(255,255,255,0.88);">${total}</div><div class="pv-seal-nk">Cases</div></div>
+              <div class="pv-seal-num"><div class="pv-seal-nv" style="color:${scoreColor};">${score}</div><div class="pv-seal-nk">Strength</div></div>
+              <div class="pv-seal-num"><div class="pv-seal-nv" style="color:${rank.color};">${specBreakdown.length}</div><div class="pv-seal-nk">Specialties</div></div>
+            </div>
+          </div>
+          <div class="pv-wax">
+            <div class="pv-wax-bg"></div>
+            <div class="pv-wax-ring"></div>
+            <div class="pv-wax-p">
+              <div class="pv-wax-letter">P</div>
+              <div class="pv-wax-text">SEAL</div>
+            </div>
+          </div>
+        </div>
+        <div class="pv-sig">
+          <div class="pv-sig-left">
+            <div class="pv-sig-label">Issued to</div>
+            <div class="pv-sig-rule"></div>
+            <div class="pv-sig-name">${fullName}</div>
+          </div>
+          <div class="pv-sig-right">
+            <div class="pv-sig-circle">✓</div>
+            <div class="pv-sig-v">Verified</div>
+          </div>
+        </div>
+        <div class="pv-cta">
+          <div class="pv-cta-file">📄</div>
+          <div class="pv-cta-mid">
+            <div class="pv-cta-title" id="pp3-cta-title">Export Clinical Portfolio</div>
+            <div class="pv-cta-sub" id="pp3-cta-sub">PDF · ${total} cases · Tamper-proof</div>
+          </div>
+          <div class="pv-cta-arr">→</div>
+        </div>
+      </div>
+      <div class="pv-seal-foot">
+        <span class="pv-seal-fl">PROVIFY.APP · ${today.toUpperCase()}</span>
+        <span class="pv-seal-fr">${rank.emoji} ${rank.rank} · Verified</span>
       </div>
     </div>
   </div>
 
-  <!-- ══ DATA GRID ══ -->
-  <div class="pp3-grid">
-    <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.85);">${total}</div><div class="pp3-cell-key">Cases</div></div>
-    <div class="pp3-cell"><div class="pp3-cell-val" style="color:${rank.color};font-size:${rank.rank.length>6?'0.8rem':'1.35rem'};">${rank.rank}</div><div class="pp3-cell-key">Rank</div></div>
-    <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pp3-cell-key">Avg Score</div></div>
-    <div class="pp3-cell"><div class="pp3-cell-val" style="color:#34D399;">${highComp}</div><div class="pp3-cell-key">High ≥7</div></div>
-  </div>
-
-  <!-- ══ STRENGTH ══ -->
-  <div class="pp3-card">
-    <div class="pp3-micro-label">Portfolio Strength</div>
-    <div class="pp3-strength-row">
-      <span class="pp3-strength-label">Score</span>
-      <div class="pp3-track"><div class="pp3-fill" style="width:${score}%;"></div></div>
-      <span class="pp3-score-num">${score}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span>
-    </div>
-    <div class="pp3-chips">
-      ${specBreakdown.map(s=>`<div class="pp3-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}22;"><div style="width:4px;height:4px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>${s.name}<span style="opacity:0.4;font-weight:400;margin-left:3px;">${s.n}</span></div>`).join('')}
-    </div>
-  </div>
-
-  <!-- ══ CAREER GPS ══ -->
-  ${gpsValid
-    ? `<div class="pp3-card">${gpsInner}</div>`
-    : `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(124,111,255,0.04);border:1px solid rgba(124,111,255,0.12);border-radius:14px;margin-bottom:10px;">
-         <span style="font-size:1rem;">🗺</span>
-         <div style="flex:1;font-size:0.68rem;color:rgba(255,255,255,0.35);">Set your Career GPS to unlock your roadmap.</div>
-         <button onclick="showView('career')" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button>
-       </div>`}
-
-  <!-- ══ PDF EXPORT SEAL ══ -->
-  <div class="pp3-seal-wrap" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
-      <div class="pp3-seal-doc">
-        <div class="pp3-seal-paper"></div>
-        <div class="pp3-seal-classify"></div>
-        <div class="pp3-seal-classify-text">
-          <span class="pp3-seal-classify-label">Verified Clinical Record</span>
-          <span class="pp3-seal-classify-id">PRV-${currentUser?.id?.slice(0,8).toUpperCase() || 'XXXXXXXX'}</span>
-        </div>
-
-        <div class="pp3-seal-body">
-          <div class="pp3-seal-header-row">
-            <div class="pp3-seal-stats">
-              <div class="pp3-seal-doc-label">Clinical Portfolio · Export Document</div>
-              <div class="pp3-seal-stat-row">
-                <div class="pp3-seal-stat">
-                  <div class="pp3-seal-stat-val" style="color:rgba(255,255,255,0.85);">${total}</div>
-                  <div class="pp3-seal-stat-key">Cases</div>
-                </div>
-                <div class="pp3-seal-stat">
-                  <div class="pp3-seal-stat-val" style="color:${scoreColor};">${score}</div>
-                  <div class="pp3-seal-stat-key">Strength</div>
-                </div>
-                <div class="pp3-seal-stat">
-                  <div class="pp3-seal-stat-val" style="color:${rank.color};">${specBreakdown.length}</div>
-                  <div class="pp3-seal-stat-key">Specialties</div>
-                </div>
-              </div>
-            </div>
-            <div class="pp3-wax">
-              <div class="pp3-wax-ring"></div>
-              <div class="pp3-wax-inner">
-                <div class="pp3-wax-p">P</div>
-                <div class="pp3-wax-text">SEAL</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="pp3-seal-sig-row">
-            <div class="pp3-seal-sig-left">
-              <div class="pp3-seal-sig-label">Issued to</div>
-              <div class="pp3-seal-sig-line"></div>
-              <div class="pp3-seal-sig-name">${fullName}</div>
-            </div>
-            <div class="pp3-seal-verified-mark">
-              <div class="pp3-seal-verified-dot">✓</div>
-              <div class="pp3-seal-verified-label">Verified</div>
-            </div>
-          </div>
-
-          <div class="pp3-seal-cta">
-            <div class="pp3-seal-cta-left">📄</div>
-            <div class="pp3-seal-cta-text">
-              <div class="pp3-seal-cta-title" id="pp3-cta-title">Export Clinical Portfolio</div>
-              <div class="pp3-seal-cta-sub" id="pp3-cta-sub">PDF · ${total} cases · Tamper-proof</div>
-            </div>
-            <div class="pp3-seal-cta-arrow">→</div>
-          </div>
-        </div>
-
-        <div class="pp3-seal-footer">
-          <span class="pp3-seal-footer-l">PROVIFY.APP · ${today.toUpperCase()}</span>
-          <span class="pp3-seal-footer-r">${rank.emoji} ${rank.rank} · Verified</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-  `;
+</div>`;
 }
 
 async function pp3TriggerExport() {
