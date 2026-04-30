@@ -5958,8 +5958,8 @@ function renderPortfolioPassport() {
       <div class="pv-stat-band">
         <div class="pv-stat"><div class="pv-stat-v" style="color:rgba(255,255,255,0.9);">${total}</div><div class="pv-stat-k">Cases</div></div>
         <div class="pv-stat"><div class="pv-stat-v" style="color:${rank.color};font-size:${rank.rank.length>6?'0.85rem':'1.3rem'};">${rank.rank}</div><div class="pv-stat-k">Rank</div></div>
-        <div class="pv-stat"><div class="pv-stat-v" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pv-stat-k">Avg</div></div>
         <div class="pv-stat"><div class="pv-stat-v" style="color:#34D399;">${highComp}</div><div class="pv-stat-k">High≥7</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" style="color:#7C6FFF;">${specBreakdown.length}</div><div class="pv-stat-k">Specialties</div></div>
       </div>
 
       <!-- STRENGTH — flush inside cover -->
@@ -6312,6 +6312,44 @@ async function generatePortfolioPDF() {
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; color: #1a1a2e; background: white; font-size: 11pt; line-height: 1.5; }
 
+  /* BACK BAR — screen only, hidden when printing */
+  .back-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #0a0818;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.8);
+    font-family: -apple-system, sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.12); }
+  .back-bar-title { font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; text-transform: uppercase; font-family: -apple-system, sans-serif; }
+  .save-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, rgba(124,111,255,0.25), rgba(124,111,255,0.15));
+    border: 1px solid rgba(124,111,255,0.45);
+    color: #9B91FF;
+    font-family: -apple-system, sans-serif;
+    font-size: 13px; font-weight: 700;
+    padding: 8px 18px; border-radius: 8px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .save-btn:hover { background: rgba(124,111,255,0.35); }
+  .print-spacer { height: 56px; }
+  @media print {
+    .back-bar { display: none !important; }
+    .print-spacer { display: none !important; }
+  }
+
   /* COVER */
   .cover { min-height: 100vh; display: flex; flex-direction: column; page-break-after: always; position: relative; overflow: hidden; }
   .cover-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: linear-gradient(180deg, #6458DC, #9B91FF); }
@@ -6392,6 +6430,12 @@ async function generatePortfolioPDF() {
 </style>
 </head>
 <body>
+<div class="back-bar">
+  <button class="back-btn" onclick="window.close()">← Back to Provify</button>
+  <span class="back-bar-title">${name} · Clinical Portfolio</span>
+  <button class="save-btn" onclick="window.print()">⬇ Save as PDF</button>
+</div>
+<div class="print-spacer"></div>
 
 <!-- COVER PAGE -->
 <div class="cover">
