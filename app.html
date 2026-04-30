@@ -2677,7 +2677,7 @@ body::after {
           </div>
 
           <!-- VALUE STRIP — embedded at base of hero -->
-          <div style="position:relative;z-index:2;margin:24px -40px -64px;border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;z-index:2;margin:24px -20px 0;border-top:1px solid rgba(255,255,255,0.06);">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
 
               <div onclick="navToShield()" style="padding:16px 16px 18px;cursor:pointer;transition:background 0.15s;border-right:1px solid rgba(255,255,255,0.05);text-align:center;"
@@ -5606,14 +5606,36 @@ function setPortFilter() {}
 
 async function uploadPassportPhoto(file) {
   if (!file || !currentUser) return null;
-  const ext  = file.name.split('.').pop();
-  const path = `avatars/${currentUser.id}.${ext}`;
-  const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
-  if (error) { showToast('Photo upload failed'); return null; }
-  const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
-  await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: publicUrl });
-  currentProfile = { ...currentProfile, avatar_url: publicUrl };
-  return publicUrl;
+  try {
+    // Convert to base64 data URL first — works without bucket permissions
+    const dataUrl = await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload  = () => res(reader.result);
+      reader.onerror = () => rej(new Error('Read failed'));
+      reader.readAsDataURL(file);
+    });
+
+    // Try Supabase storage first (better for large files)
+    const ext  = file.name.split('.').pop() || 'jpg';
+    const path = `avatars/${currentUser.id}.${ext}`;
+    const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
+
+    let finalUrl = dataUrl; // fallback to base64
+    if (!error) {
+      const { data } = sb.storage.from('case-images').getPublicUrl(path);
+      if (data?.publicUrl) finalUrl = data.publicUrl;
+    }
+
+    // Save to profile
+    await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: finalUrl });
+    currentProfile = { ...currentProfile, avatar_url: finalUrl };
+    showToast('Photo updated ✓');
+    return finalUrl;
+  } catch(e) {
+    console.error('Photo upload failed', e);
+    showToast('Photo upload failed');
+    return null;
+  }
 }
 
 function copyPortfolioLinkInApp() {
@@ -6581,6 +6603,8 @@ async function generatePortfolioPDF() {
   const specNameMap = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', perio:'Periodontics', ortho:'Orthodontics', general:'General Dentistry' };
   const primarySpec = specNameMap[currentProfile?.primary_specialty] || '';
   const bio = currentProfile?.bio || '';
+  const avatarUrl = currentProfile?.avatar_url || null;
+  const initials = ((currentProfile?.first_name?.[0]||'D') + (currentProfile?.last_name?.[0]||'R')).toUpperCase();
   const total = cases.length;
   const rank = getComplexityRank(allCases.length);
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
@@ -6860,6 +6884,10 @@ async function generatePortfolioPDF() {
     <div class="cover-pretitle">Professional Portfolio</div>
     <div class="cover-title">Clinical<br><span>Portfolio</span></div>
     <div class="cover-rule"></div>
+    ${avatarUrl ? `
+    <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;margin:0 auto 14px;border:3px solid rgba(255,255,255,0.25);box-shadow:0 0 20px rgba(124,111,255,0.3);">
+      <img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;" crossorigin="anonymous">
+    </div>` : ''}
     <div class="cover-name">${name}</div>
     <div class="cover-role">${role}${primarySpec ? ' · ' + primarySpec : ''}</div>
     ${bio ? `<div class="cover-bio">${bio}</div>` : ''}
