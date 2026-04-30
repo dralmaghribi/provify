@@ -5801,15 +5801,21 @@ function renderPortfolioPassport() {
   cursor:pointer;
   border-radius:22px;
 }
-.pv-seal-outer::before{
-  content:'';
+.pv-seal-ring{
   position:absolute;inset:-1px;border-radius:23px;
   background:conic-gradient(from 180deg,rgba(124,111,255,0) 0deg,rgba(124,111,255,0.6) 90deg,rgba(52,211,153,0.5) 180deg,rgba(124,111,255,0.6) 270deg,rgba(124,111,255,0) 360deg);
   opacity:0;transition:opacity 0.4s;z-index:0;
-  animation:pv-seal-spin 6s linear infinite paused;
+  animation:pv-seal-spin 5s linear infinite;
 }
-.pv-seal-outer:hover::before{opacity:1;animation-play-state:running;}
 @keyframes pv-seal-spin{to{transform:rotate(360deg);}}
+.pv-seal-outer:hover .pv-seal-ring,
+.pv-seal-outer:active .pv-seal-ring{opacity:1;}
+@media (hover:none){
+  .pv-seal-ring{
+    opacity:0.6;
+    animation:pv-seal-spin 5s linear infinite;
+  }
+}
 .pv-seal-inner{
   position:relative;z-index:1;
   background:#080810;
@@ -5958,8 +5964,8 @@ function renderPortfolioPassport() {
       <div class="pv-stat-band">
         <div class="pv-stat"><div class="pv-stat-v" style="color:rgba(255,255,255,0.9);">${total}</div><div class="pv-stat-k">Cases</div></div>
         <div class="pv-stat"><div class="pv-stat-v" style="color:${rank.color};font-size:${rank.rank.length>6?'0.85rem':'1.3rem'};">${rank.rank}</div><div class="pv-stat-k">Rank</div></div>
-        <div class="pv-stat"><div class="pv-stat-v" style="color:#34D399;">${highComp}</div><div class="pv-stat-k">High≥7</div></div>
         <div class="pv-stat"><div class="pv-stat-v" style="color:#7C6FFF;">${specBreakdown.length}</div><div class="pv-stat-k">Specialties</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" style="color:#34D399;">${Math.max(1,Math.round((Date.now()-new Date(allCases[allCases.length-1]?.created_at||Date.now()))/(1000*60*60*24*30)))}</div><div class="pv-stat-k">Months</div></div>
       </div>
 
       <!-- STRENGTH — flush inside cover -->
@@ -6013,6 +6019,7 @@ function renderPortfolioPassport() {
 
   <!-- ══ SEAL CARD ══ -->
   <div class="pv-seal-outer" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
+    <div class="pv-seal-ring"></div>
     <div class="pv-seal-inner">
       <div class="pv-seal-topline"></div>
       <div class="pv-seal-classify">
