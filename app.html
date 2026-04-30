@@ -7927,54 +7927,131 @@ async function runInsightSilent() {
 async function buildInsightResult() {
   if (allCases.length < 3) return null;
 
-  const total    = allCases.length;
-  const specMap  = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', smile:'Aesthetic & Smile' };
-  const counts   = Object.fromEntries(Object.keys(specMap).map(k=>[k, allCases.filter(c=>c.specialty===k).length]));
-  const recent5  = allCases.slice(0,5).map(c=>specMap[c.specialty]||c.specialty).join(', ');
-  const role     = currentProfile?.role || 'intern';
-  const spec     = currentProfile?.primary_specialty || '';
-  const gps      = getGPSData();
-  const gpsGoal  = gps?.goal || null;
+  const total   = allCases.length;
+  const specMap = {
+    endo:        { label:'Endodontics',           type:'specialty' },
+    restorative: { label:'Restorative Dentistry', type:'generalist_core' },
+    surgery:     { label:'Oral Surgery',          type:'generalist_core' },
+    paeds:       { label:'Paediatric Dentistry',  type:'generalist_core' },
+    prostho:     { label:'Prosthodontics',        type:'specialty' },
+    smile:       { label:'Aesthetic & Smile',     type:'elective' },
+  };
 
-  const roleLabels = {student:'Dental Student',intern:'Intern / House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
-  const goalLabels = {specialist:'become a specialist',owner:'open their own clinic',brand:'build a personal brand',gp:'excel as a GP'};
+  const counts = Object.fromEntries(
+    Object.keys(specMap).map(k => [k, allCases.filter(c=>c.specialty===k).length])
+  );
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const dominant = sorted[0];
+  const dominantPct = total > 0 ? Math.round((dominant[1]/total)*100) : 0;
+  const specBreakdown = sorted.filter(([,n])=>n>0)
+    .map(([k,n])=>`${specMap[k].label}: ${n} cases (${Math.round(n/total*100)}%)`).join(', ');
+  const recent5specs = allCases.slice(0,5).map(c=>specMap[c.specialty]?.label||c.specialty).join(', ');
 
-  const isSpecialist = role === 'specialist';
-  const primarySpec  = spec ? (specMap[spec]||spec) : null;
-  const caseBreakdown = Object.entries(counts).filter(([,n])=>n>0)
-    .sort((a,b)=>b[1]-a[1])
-    .map(([k,n])=>`${specMap[k]}: ${n} (${Math.round(n/total*100)}%)`).join(' | ');
+  // Role + specialty context
+  const role            = currentProfile?.role || 'intern';
+  const declaredSpec    = currentProfile?.primary_specialty || null;
+  const roleLabels      = {student:'Dental Student',intern:'Intern/House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
 
-  const scopeRule = isSpecialist && primarySpec
-    ? `CRITICAL: This dentist IS a ${primarySpec} specialist. NEVER mention complexity scores, diversifying into other specialties, or breadth as weaknesses. Their blind spot must be about case variety, technique depth, or documentation gaps WITHIN ${primarySpec} only.`
-    : `This is a ${roleLabels[role]||role} in general clinical training. Breadth across specialties is relevant. NEVER mention numerical complexity scores in your response.`;
+  // Specialty-focus detection: declared specialist OR intern with 65%+ dominant case type
+  const isSpecialistRole   = role === 'specialist';
+  const hasDominantFocus   = dominantPct >= 65;
+  const declaredSpecLabel  = declaredSpec ? specMap[declaredSpec]?.label : null;
+  const isSpecialtyFocused = isSpecialistRole || (declaredSpec && hasDominantFocus);
+  const focusArea          = declaredSpecLabel || (hasDominantFocus ? specMap[dominant[0]]?.label : null);
 
-  const gpsContext = gpsGoal
-    ? `Career goal: ${goalLabels[gpsGoal]}. Make all 3 recommendations directly relevant to this goal.`
-    : '';
+  // GPS context — deep injection
+  const gpsData  = getGPSData();
+  const gpsGoal  = gpsData?.goal || null;
+  const ctx      = getGPSContext();
+  const mc       = gpsData?.manualChecks || {};
+  const goalMeta = {
+    specialist: { label:'Become a Specialist',       reqs:'specialty focus (65%+ case concentration), case volume for application, documented complexity progression within their specialty' },
+    owner:      { label:'Own Their Own Clinic',      reqs:'breadth across all major treatment types (endo, resto, surgery, paeds), case volume to sustain a practice, documentation of a full-service clinical profile' },
+    brand:      { label:'Build a Personal Brand',    reqs:'a visually compelling case mix with strong before/after (smile cases), specialty depth for credibility, consistent logging for content' },
+    gp:         { label:'Excel as a General Dentist',reqs:'broad competency across endo, restorative, surgery, and paeds — no dangerous gaps in any foundational area' },
+  };
 
-  const prompt = `You are a senior dental consultant reviewing a dentist's verified clinical record on Provify. Be direct, specific, and brutally honest — not generic or encouraging for its own sake.
+  // Get current + next GPS milestone
+  let currentMilestone = null, nextMilestone = null, milestonesCompleted = 0, totalMilestones = 0;
+  if (gpsGoal && GOAL_STAGES[gpsGoal]) {
+    const stageIds = GOAL_STAGES[gpsGoal];
+    const stages   = stageIds.map(id=>CAREER_STAGES.find(s=>s.id===id)).filter(Boolean);
+    totalMilestones = stages.length;
+    const completedStages = stages.filter(s=>s.auto(ctx)||mc[s.id]);
+    milestonesCompleted   = completedStages.length;
+    currentMilestone      = completedStages[completedStages.length-1]?.label || null;
+    nextMilestone         = stages.find(s=>!(s.auto(ctx)||mc[s.id]));
+  }
 
-DENTIST PROFILE:
+  // Practice setting context
+  const practiceSettings = {
+    student:  'dental school — works with assigned patients, limited case control',
+    intern:   'hospital/clinic rotation — treats assigned patients, can request rotations',
+    resident: 'residency — structured training with some case selection control',
+    general:  'private/public practice — significant control over case mix',
+    specialist:'specialist practice — works entirely within their specialty',
+  };
+
+  const scopeBlock = isSpecialtyFocused && focusArea
+    ? `SPECIALIST SCOPE RULE (non-negotiable):
+This dentist is ${isSpecialistRole ? 'a declared' : 'training to be a'} ${focusArea} specialist.
+- NEVER suggest they need more cases in OTHER specialties as a weakness
+- NEVER mention that they avoid breadth — that is APPROPRIATE for a specialist
+- Blind spot must be about: case variety WITHIN ${focusArea}, documentation depth, technique progression, or cases that would strengthen their ${focusArea} application/practice
+- Next 30 days must be ENTIRELY within or supporting ${focusArea} specialization`
+    : `GENERALIST SCOPE RULE:
+This dentist is training as a ${roleLabels[role]||role} and needs breadth.
+- Gaps in any foundational specialty (restorative, endo, surgery, paeds) ARE valid blind spots
+- Breadth across specialties is a legitimate and important goal for them`;
+
+  const gpsBlock = gpsGoal && goalMeta[gpsGoal] ? `
+GPS GOAL: ${goalMeta[gpsGoal].label}
+GPS PROGRESS: ${milestonesCompleted}/${totalMilestones} milestones complete
+${currentMilestone ? `Last milestone achieved: "${currentMilestone}"` : 'No milestones completed yet'}
+${nextMilestone ? `Next GPS milestone to unlock: "${nextMilestone.label}" — requires: ${nextMilestone.provifyAction.slice(0,120)}` : 'All milestones complete'}
+What this goal REQUIRES from their case record: ${goalMeta[gpsGoal].reqs}
+
+CRITICAL: Your next30 recommendations MUST directly support unlocking the next GPS milestone. If the next milestone requires specific case types, those must be in the next30 list.` : '';
+
+  const contextBlock = `
+PRACTICE CONTEXT: ${practiceSettings[role]||'clinical setting'}
+This means "seek these cases" may not be fully in their control. Frame all next30 recommendations as:
+"When you see [patient type], prioritize logging it" OR "Request [rotation/case type] from your supervisor"
+— NOT as if they can simply choose their patients.`;
+
+  const prompt = `You are the most intelligent dental clinical coach on the planet. You are reviewing a dentist's verified case record on Provify. Your feedback must be hyper-personalized, brutally honest, and directly tied to their career goal. Generic advice is a failure.
+
+═══ DENTIST PROFILE ═══
 Role: ${roleLabels[role]||role}
-${primarySpec ? `Primary specialty: ${primarySpec}` : ''}
-${gpsGoal ? `Career goal: ${goalLabels[gpsGoal]}` : ''}
-Total cases logged: ${total}
-Case breakdown: ${caseBreakdown}
-Most recent 5 cases: ${recent5}
+${declaredSpecLabel ? `Declared specialty focus: ${declaredSpecLabel}` : 'No specialty declared'}
+Total verified cases: ${total}
+Case breakdown: ${specBreakdown}
+Most recent 5 cases: ${recent5specs}
+${contextBlock}
 
-RULES:
-${scopeRule}
-${gpsContext}
-NEVER use phrases like "complexity score", "complexity plateau", "2.2/10", or any numerical score in your text responses. Speak about clinical patterns and case types, not scores.
+═══ CAREER GOAL ═══
+${gpsBlock || 'No career goal set. Give general development advice.'}
 
-Respond ONLY with a raw JSON object (no markdown, no backticks) with exactly these keys:
-- "score": integer 0-100, clinical readiness for their stated role and goal
-- "score_label": exactly 2-3 words, punchy label for the score (e.g. "Narrow Specialist", "Ready to Lead", "Building Momentum")
-- "verdict": ONE sentence — a powerful, memorable clinical verdict from a senior consultant. No fluff. Should make them think.
-- "strength": 1 sentence, specific — reference actual case counts/percentages
-- "blindspot": 1 sentence — the one most critical gap, direct and honest
-- "next30": array of exactly 3 strings — each under 12 words, specific case types to seek this month`;
+═══ SCOPE RULES ═══
+${scopeBlock}
+
+ABSOLUTE RULES:
+- NEVER mention numerical complexity scores, "2.2/10", "complexity plateau", or any score number in your text
+- NEVER give advice that contradicts the specialty scope rules above
+- Be specific — reference actual case counts and percentages from their data
+- The verdict must be ONE sentence that would make them stop scrolling. Brutal and true.
+- The next30 must acknowledge their practice context (they can't always choose patients)
+
+═══ RESPONSE FORMAT ═══
+Respond ONLY with a raw JSON object (no markdown, no backticks):
+{
+  "score": integer 0-100 (readiness for their specific role+goal combination),
+  "score_label": "2-3 words, punchy, honest (e.g. 'Dangerously Narrow', 'Building Momentum', 'Specialty Ready')",
+  "verdict": "One sentence. The most important truth about where they stand. Should sting slightly if they're off track.",
+  "strength": "One sentence. Specific to their actual numbers. What they're genuinely doing well.",
+  "blindspot": "One sentence. The single most critical gap. Must respect specialty scope rules.",
+  "next30": ["action 1 — framed as opportunity, not obligation", "action 2", "action 3"]
+}`;
 
   try {
     const response = await fetch('/api/analyze', {
