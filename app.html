@@ -5934,9 +5934,10 @@ function renderPortfolioPassport() {
     }
     .pp3-seal-footer-l{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.08em;font-family:monospace;}
     .pp3-seal-footer-r{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.08em;}
+  </style>
 
-    <!-- ══ PDF EXPORT SEAL ══ -->
-    <div class="pp3-seal-wrap" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
+  <!-- ══ PDF EXPORT SEAL ══ -->
+  <div class="pp3-seal-wrap" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
       <div class="pp3-seal-doc">
         <div class="pp3-seal-paper"></div>
         <div class="pp3-seal-classify"></div>
@@ -6002,7 +6003,10 @@ function renderPortfolioPassport() {
       </div>
     </div>
 
-  </div>`;\n}\n\nasync function pp3TriggerExport() {
+  </div>`;
+}
+
+async function pp3TriggerExport() {
   const card = document.getElementById('pp3-export-card');
   const title = document.getElementById('pp3-cta-title');
   const sub   = document.getElementById('pp3-cta-sub');
