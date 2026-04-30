@@ -5936,6 +5936,80 @@ function renderPortfolioPassport() {
     .pp3-seal-footer-r{font-size:0.38rem;color:rgba(255,255,255,0.15);letter-spacing:0.08em;}
   </style>
 
+  <div class="pp3-wrap">
+
+  <!-- ══ COVER ══ -->
+  <div class="pp3-cover">
+    <div class="pp3-cover-glow"></div>
+    <div class="pp3-cover-lines"></div>
+    <div class="pp3-cover-bar"></div>
+    <div class="pp3-cover-inner">
+      <div class="pp3-doc-label">Provify · Clinical Portfolio</div>
+      <div class="pp3-identity">
+        <div class="pp3-avatar-wrap" onclick="document.getElementById('pp3-photo-input').click()" title="Tap to upload photo">
+          <div class="pp3-avatar">${avatarUrl?`<img src="${avatarUrl}" alt="">`:`<div class="pp3-avatar-initials">${initials}</div>`}</div>
+          <div class="pp3-avatar-cam">📷</div>
+        </div>
+        <input type="file" id="pp3-photo-input" accept="image/*" style="display:none;"
+          onchange="(async function(e){
+            const f=e.target.files[0];if(!f)return;
+            const a=document.querySelector('.pp3-avatar');
+            a.innerHTML='<div style=\\'font-size:0.6rem;color:rgba(255,255,255,0.3);\\'>...</div>';
+            const url=await uploadPassportPhoto(f);
+            if(url){a.innerHTML='<img src=\\''+url+'\\' style=\\'width:100%;height:100%;object-fit:cover;display:block;\\'>';}
+            else{a.innerHTML='<div class=\\'pp3-avatar-initials\\'>${initials}</div>';}
+          })(event)">
+        <div style="flex:1;min-width:0;">
+          <div class="pp3-name">${fullName}</div>
+          <div class="pp3-role">${role}</div>
+        </div>
+        <div class="pp3-rank-block">
+          <div class="pp3-rank-emoji">${rank.emoji}</div>
+          <div class="pp3-rank-label">${rank.rank}</div>
+        </div>
+      </div>
+      <div class="pp3-footer">
+        <div class="pp3-verified"><div class="pp3-dot"></div><span class="pp3-verified-text">Verified on Provify</span></div>
+        <div style="display:flex;gap:6px;">
+          <button class="pp3-share-btn pp3-share-btn--purple" onclick="copyPortfolioLinkInApp()">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Share
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DATA GRID ══ -->
+  <div class="pp3-grid">
+    <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.85);">${total}</div><div class="pp3-cell-key">Cases</div></div>
+    <div class="pp3-cell"><div class="pp3-cell-val" style="color:${rank.color};font-size:${rank.rank.length>6?'0.8rem':'1.35rem'};">${rank.rank}</div><div class="pp3-cell-key">Rank</div></div>
+    <div class="pp3-cell"><div class="pp3-cell-val" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pp3-cell-key">Avg Score</div></div>
+    <div class="pp3-cell"><div class="pp3-cell-val" style="color:#34D399;">${highComp}</div><div class="pp3-cell-key">High ≥7</div></div>
+  </div>
+
+  <!-- ══ STRENGTH ══ -->
+  <div class="pp3-card">
+    <div class="pp3-micro-label">Portfolio Strength</div>
+    <div class="pp3-strength-row">
+      <span class="pp3-strength-label">Score</span>
+      <div class="pp3-track"><div class="pp3-fill" style="width:${score}%;"></div></div>
+      <span class="pp3-score-num">${score}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span>
+    </div>
+    <div class="pp3-chips">
+      ${specBreakdown.map(s=>`<div class="pp3-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}22;"><div style="width:4px;height:4px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>${s.name}<span style="opacity:0.4;font-weight:400;margin-left:3px;">${s.n}</span></div>`).join('')}
+    </div>
+  </div>
+
+  <!-- ══ CAREER GPS ══ -->
+  ${gpsValid
+    ? `<div class="pp3-card">${gpsInner}</div>`
+    : `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(124,111,255,0.04);border:1px solid rgba(124,111,255,0.12);border-radius:14px;margin-bottom:10px;">
+         <span style="font-size:1rem;">🗺</span>
+         <div style="flex:1;font-size:0.68rem;color:rgba(255,255,255,0.35);">Set your Career GPS to unlock your roadmap.</div>
+         <button onclick="showView('career')" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button>
+       </div>`}
+
   <!-- ══ PDF EXPORT SEAL ══ -->
   <div class="pp3-seal-wrap" id="pp3-export-card" onclick="pp3TriggerExport()" role="button">
       <div class="pp3-seal-doc">
@@ -6003,7 +6077,8 @@ function renderPortfolioPassport() {
       </div>
     </div>
 
-  </div>`;
+  </div>
+  `;
 }
 
 async function pp3TriggerExport() {
