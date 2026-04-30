@@ -2993,9 +2993,9 @@ body::after {
       </div>
 
       <!-- PORTFOLIO VIEW — IN-APP -->
-      <div class="view" id="view-portfolio">
+      <div class="view" id="view-portfolio" style="padding:0 0 100px 0;">
         <div id="port-passport"></div>
-        <!-- hidden stubs for PDF compat -->
+        <!-- PDF compat stubs -->
         <div id="port-profile-header" style="display:none;"></div>
         <div id="port-stats-row" style="display:none;"></div>
         <div id="port-specialty-card" style="display:none;"></div>
@@ -3678,8 +3678,7 @@ function showView(view) {
   if (view === 'archive') { renderArchive(); }
   if (view === 'progress') updateProgress();
   if (view === 'badges') renderBadges();
-  if (view === 'portfolio') renderPortfolioPassport();
-  if (view === 'portfolio') renderPortfolioCases();
+  if (view === 'portfolio') { renderPortfolioPassport(); renderPortfolioCases(); }
   if (view === 'profile') loadProfileForm();
   if (view === 'career') { renderCareerGPS(); renderLiveCareerDashboard(); }
 }
@@ -5571,25 +5570,33 @@ function showToast(msg) {
 let selectedCaseIds = new Set();
 let portActiveFilter = 'all';
 
-// ─── PORTFOLIO PASSPORT ───────────────────────────────────────────────────────
+// ─── PORTFOLIO PASSPORT ──────────────────────────────────────────────────────
+
+function renderInAppPortfolio() { renderPortfolioPassport(); }
+function setPortFilter() {}
+
+async function uploadPassportPhoto(file) {
+  if (!file || !currentUser) return null;
+  const ext  = file.name.split('.').pop();
+  const path = `avatars/${currentUser.id}.${ext}`;
+  const { error } = await sb.storage.from('case-images').upload(path, file, { upsert: true });
+  if (error) { showToast('Photo upload failed'); return null; }
+  const { data: { publicUrl } } = sb.storage.from('case-images').getPublicUrl(path);
+  await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: publicUrl });
+  currentProfile = { ...currentProfile, avatar_url: publicUrl };
+  return publicUrl;
+}
 
 function renderPortfolioPassport() {
   const el = document.getElementById('port-passport');
   if (!el) return;
 
-  if (!currentProfile || allCases.length === 0) {
-    el.innerHTML = `
-      <div style="text-align:center;padding:80px 20px;color:rgba(255,255,255,0.2);">
-        <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:rgba(255,255,255,0.3);margin-bottom:8px;">No cases logged yet</div>
-        <div style="font-size:0.78rem;">Start logging to build your clinical passport.</div>
-      </div>`;
-    return;
-  }
+  if (!currentProfile) { el.innerHTML = ''; return; }
 
   const total      = allCases.length;
   const rank       = getComplexityRank(total);
   const score      = getClinicianScore();
-  const avg        = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '—';
+  const avg        = total > 0 ? (allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1) : '0.0';
   const highComp   = allCases.filter(c => (c.complexity_score||0) >= 7).length;
   const firstName  = currentProfile.first_name || '';
   const lastName   = currentProfile.last_name  || '';
@@ -5597,618 +5604,170 @@ function renderPortfolioPassport() {
   const initials   = (firstName[0]||'D') + (lastName[0]||'R');
   const roleLabels = { student:'Dental Student', intern:'Intern / House Officer', resident:'Resident', general:'General Dentist', specialist:'Specialist' };
   const role       = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
-  const specColors = { endo:'#7C6FFF', restorative:'#F59E0B', surgery:'#EF4444', paeds:'#34D399', prostho:'#38BDF8', smile:'#FBB424' };
-  const specNames  = { endo:'Endo', restorative:'Resto', surgery:'Surgery', paeds:'Paeds', prostho:'Prostho', smile:'Smile' };
-  const specBreakdown = Object.entries(specColors)
-    .map(([k,c]) => ({ key:k, col:c, name:specNames[k], n:allCases.filter(x=>x.specialty===k).length }))
+  const avatarUrl  = currentProfile.avatar_url || null;
+
+  const SPEC = {
+    endo:       { col:'#7C6FFF', name:'Endo' },
+    restorative:{ col:'#F59E0B', name:'Resto' },
+    surgery:    { col:'#EF4444', name:'Surgery' },
+    paeds:      { col:'#34D399', name:'Paeds' },
+    prostho:    { col:'#38BDF8', name:'Prostho' },
+    smile:      { col:'#FBB424', name:'Smile' },
+  };
+
+  const specBreakdown = Object.entries(SPEC)
+    .map(([k,v]) => ({ ...v, n: allCases.filter(c=>c.specialty===k).length }))
     .filter(s => s.n > 0).sort((a,b) => b.n - a.n);
 
   const scoreColor = score >= 70 ? '#34D399' : score >= 40 ? '#7C6FFF' : '#F59E0B';
 
-  // GPS
-  const gpsData    = getGPSData();
-  const validGoals = ['specialist','owner','brand','gp'];
-  const gpsValid   = gpsData && validGoals.includes(gpsData.goal);
-  let gpsBlock = '';
+  const gpsData  = getGPSData();
+  const gpsValid = gpsData && ['specialist','owner','brand','gp'].includes(gpsData.goal);
+  let gpsInner = '';
   if (gpsValid) {
-    const stageIds   = GOAL_STAGES[gpsData.goal] || GOAL_STAGES.gp;
-    const stages     = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
-    const ctx        = getGPSContext();
-    const mc         = gpsData.manualChecks || {};
-    const done       = stages.filter(s => s.auto(ctx) || mc[s.id]).length;
-    const pct        = Math.round((done / stages.length) * 100);
-    const next       = stages.find(s => !(s.auto(ctx) || mc[s.id]));
-    const goalMeta   = { specialist:{label:'Specialist',icon:'🔬',col:'#7C6FFF'}, owner:{label:'Clinic Owner',icon:'🏢',col:'#34D399'}, brand:{label:'Personal Brand',icon:'👑',col:'#F59E0B'}, gp:{label:'Expert GP',icon:'🦷',col:'#9B91FF'} }[gpsData.goal] || {label:'Career',icon:'🎯',col:'#7C6FFF'};
-
-    gpsBlock = `
-      <!-- ── PASSPORT STAMP: CAREER GPS ── -->
-      <div class="pp-section">
-        <div class="pp-section-rule">
-          <span class="pp-section-label">Career GPS</span>
-        </div>
-        <div class="pp-gps-row">
-          <div class="pp-gps-left">
-            <div class="pp-gps-icon">${goalMeta.icon}</div>
-            <div>
-              <div class="pp-gps-goal">${goalMeta.label}</div>
-              <div class="pp-gps-meta">${done} of ${stages.length} milestones</div>
-            </div>
+    const stageIds = GOAL_STAGES[gpsData.goal] || GOAL_STAGES.gp;
+    const stages   = stageIds.map(id => CAREER_STAGES.find(s=>s.id===id)).filter(Boolean);
+    const ctx      = getGPSContext();
+    const mc       = gpsData.manualChecks || {};
+    const done     = stages.filter(s => s.auto(ctx) || mc[s.id]).length;
+    const pct      = Math.round((done / stages.length) * 100);
+    const next     = stages.find(s => !(s.auto(ctx) || mc[s.id]));
+    const GM = {
+      specialist:{label:'Specialist',    icon:'🔬', col:'#7C6FFF'},
+      owner:     {label:'Clinic Owner',  icon:'🏢', col:'#34D399'},
+      brand:     {label:'Personal Brand',icon:'👑', col:'#F59E0B'},
+      gp:        {label:'Expert GP',     icon:'🦷', col:'#9B91FF'},
+    }[gpsData.goal];
+    gpsInner = `
+      <div class="pp2-label">Career GPS</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="font-size:1.1rem;">${GM.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.78rem;font-weight:600;color:#fff;margin-bottom:5px;">${GM.label}</div>
+          <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${GM.col};border-radius:100px;"></div>
           </div>
-          <div class="pp-gps-pct" style="color:${goalMeta.col};">${pct}<span style="font-size:0.55rem;font-family:'Inter',sans-serif;opacity:0.6;">%</span></div>
         </div>
-        <div class="pp-progress-track">
-          <div class="pp-progress-fill" style="width:${pct}%;background:${goalMeta.col};"></div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:${GM.col};line-height:1;flex-shrink:0;">${pct}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.5;">%</span></div>
+      </div>
+      ${next ? `
+      <div style="display:flex;gap:9px;align-items:flex-start;padding:9px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.055);border-radius:11px;">
+        <div style="font-size:0.9rem;flex-shrink:0;margin-top:1px;">${next.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.48rem;color:${GM.col};text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:2px;">Up next</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">${next.label}</div>
+          <div style="font-size:0.58rem;color:rgba(255,255,255,0.22);line-height:1.5;">${next.provifyAction.slice(0,80)}...</div>
         </div>
-        ${next ? `
-        <div class="pp-next-milestone">
-          <div class="pp-next-icon">${next.icon}</div>
-          <div class="pp-next-body">
-            <div class="pp-next-label">Up next</div>
-            <div class="pp-next-title">${next.label}</div>
-            <div class="pp-next-hint">${next.provifyAction.length > 85 ? next.provifyAction.slice(0,85)+'…' : next.provifyAction}</div>
-          </div>
-        </div>` : `<div class="pp-complete-badge">🏆 Roadmap complete</div>`}
-      </div>`;
+      </div>` : '<div style="text-align:center;padding:6px 0;font-size:0.72rem;color:#34D399;font-weight:600;">Roadmap complete</div>'}`;
   }
 
-  // Featured cases — top 3 by complexity, prefer with photos
-  const withP   = allCases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0);
-  const noP     = allCases.filter(c => !c.photo_urls || Object.keys(c.photo_urls||{}).length === 0);
-  const feat3   = [...withP, ...noP].sort((a,b)=>(b.complexity_score||0)-(a.complexity_score||0)).slice(0,3);
-  const feat3ids = new Set(feat3.map(c=>c.id));
+  const withP = allCases.filter(c => c.photo_urls && Object.keys(c.photo_urls||{}).length > 0);
+  const noP   = allCases.filter(c => !c.photo_urls || !Object.keys(c.photo_urls||{}).length);
+  const feat3 = [...withP,...noP].sort((a,b)=>(b.complexity_score||0)-(a.complexity_score||0)).slice(0,3);
 
-  const featCards = feat3.map((c,i) => {
-    const isSmile    = c.specialty === 'smile';
-    const col        = specColors[c.specialty] || '#7C6FFF';
-    const specName   = specNames[c.specialty] || c.specialty;
-    const title      = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
-    const date       = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    const sc         = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
-    const sb         = c.photo_urls?.['smile-before'];
-    const sa         = c.photo_urls?.['smile-after'];
-    const fp         = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
-
-    const thumb = isSmile && (sb||sa) ? `
-      <div class="pp-feat-thumb pp-feat-thumb--split">
-        <div class="pp-feat-half">
-          ${sb ? `<img src="${sb}" loading="lazy">` : ''}
-          <div class="pp-feat-stamp pp-feat-stamp--before">BEF</div>
-        </div>
-        <div class="pp-feat-half">
-          ${sa ? `<img src="${sa}" loading="lazy">` : ''}
-          <div class="pp-feat-stamp pp-feat-stamp--after">AFT</div>
-        </div>
-      </div>` : fp ? `
-      <div class="pp-feat-thumb">
-        <img src="${fp}" loading="lazy">
-      </div>` : `
-      <div class="pp-feat-thumb pp-feat-thumb--empty" style="background:${col}0d;border-color:${col}22;">
-        <span style="font-size:1.3rem;opacity:0.35;">🦷</span>
-      </div>`;
-
-    return `
-      <div class="pp-feat-card" onclick="openCaseDetail('${c.id}')"
-        style="--accent:${col};" data-idx="${i}">
-        <div class="pp-feat-accent-bar" style="background:${col};"></div>
-        ${thumb}
-        <div class="pp-feat-body">
-          <div class="pp-feat-title">${title}</div>
-          <div class="pp-feat-meta">
-            <span class="pp-feat-chip" style="color:${col};background:${col}18;">${isSmile?'✨ ':''} ${specName}</span>
-            <span class="pp-feat-date">${date}</span>
-          </div>
-          ${sc !== '—' ? `<div class="pp-feat-score" style="color:${col};">${sc}<span class="pp-feat-score-den">/10</span></div>` : ''}
-        </div>
-        <svg class="pp-feat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>`;
-  }).join('');
-
-  // Archive — all minus featured
-  const archiveCases = allCases.filter(c => !feat3ids.has(c.id));
-  const archiveRows = archiveCases.map((c,i) => {
+  const stampCards = feat3.map(c => {
     const isSmile = c.specialty === 'smile';
-    const col     = specColors[c.specialty] || '#7C6FFF';
-    const name    = specNames[c.specialty]  || c.specialty;
-    const title   = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
-    const date    = new Date(c.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});
-    const sc      = c.complexity_score ? c.complexity_score.toFixed(1) : '—';
-    return `
-      <div class="pp-row" onclick="openCaseDetail('${c.id}')">
-        <div class="pp-row-pip" style="background:${col};"></div>
-        <div class="pp-row-body">
-          <span class="pp-row-title">${title}</span>
-          <span class="pp-row-sub">${isSmile?'✨ ':''}${name} · ${date}</span>
-        </div>
-        <div class="pp-row-score" style="color:${col};">${sc}</div>
-        <svg class="pp-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>`;
+    const col     = SPEC[c.specialty]?.col || '#7C6FFF';
+    const sname   = SPEC[c.specialty]?.name || c.specialty;
+    const title   = isSmile ? (c.procedure || 'Smile') : `T${c.tooth_number || '-'}`;
+    const sc      = c.complexity_score ? c.complexity_score.toFixed(1) : '-';
+    const sb2     = c.photo_urls?.['smile-before'];
+    const sa2     = c.photo_urls?.['smile-after'];
+    const fp      = !isSmile && c.photo_urls ? Object.values(c.photo_urls).find(Boolean) : null;
+    const photoEl = isSmile && (sb2||sa2)
+      ? `<div style="position:relative;height:100%;display:grid;grid-template-rows:1fr 1fr;gap:1px;background:#111;"><div style="overflow:hidden;position:relative;">${sb2?`<img src="${sb2}" style="width:100%;height:100%;object-fit:cover;">`:''}<div style="position:absolute;bottom:2px;left:3px;font-size:0.38rem;font-weight:700;color:rgba(255,255,255,0.6);background:rgba(0,0,0,0.65);padding:1px 3px;border-radius:2px;">BEF</div></div><div style="overflow:hidden;position:relative;">${sa2?`<img src="${sa2}" style="width:100%;height:100%;object-fit:cover;">`:''}<div style="position:absolute;bottom:2px;right:3px;font-size:0.38rem;font-weight:700;color:#000;background:rgba(251,191,36,0.9);padding:1px 3px;border-radius:2px;">AFT</div></div></div>`
+      : fp ? `<img src="${fp}" style="width:100%;height:100%;object-fit:cover;">`
+      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${col}0d;font-size:1.8rem;opacity:0.3;">🦷</div>`;
+    return `<div onclick="openCaseDetail('${c.id}')" style="flex:1;min-width:0;background:#0d0d12;border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform 0.18s,border-color 0.18s;position:relative;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='${col}45'" onmouseout="this.style.transform='none';this.style.borderColor='rgba(255,255,255,0.07)'"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:${col};opacity:0.8;"></div><div style="height:90px;overflow:hidden;background:#0a0a0f;">${photoEl}</div><div style="padding:9px 10px;"><div style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div><div style="font-size:0.54rem;font-weight:600;color:${col};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">${isSmile?'✨ ':''}${sname}</div><div style="font-family:'Instrument Serif',serif;font-size:1.05rem;color:${col};line-height:1;">${sc}<span style="font-size:0.42rem;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.2);"> /10</span></div></div></div>`;
   }).join('');
 
   el.innerHTML = `
   <style>
-    /* ── PASSPORT SHELL ── */
-    .pp-passport {
-      max-width: 680px;
-      margin: 0 auto;
-      padding-bottom: 80px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    /* ── COVER PAGE ── */
-    .pp-cover {
-      position: relative;
-      background: linear-gradient(160deg, #0f0f14 0%, #13131a 60%, #0c0c10 100%);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 20px;
-      overflow: hidden;
-      padding: 24px 22px 20px;
-      margin-bottom: 10px;
-    }
-    .pp-cover::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 28px,
-        rgba(255,255,255,0.012) 28px,
-        rgba(255,255,255,0.012) 29px
-      );
-      pointer-events: none;
-    }
-    .pp-cover-top-bar {
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, transparent 0%, ${rank.color}80 30%, ${rank.color} 50%, ${rank.color}80 70%, transparent 100%);
-    }
-    .pp-cover-wordmark {
-      font-size: 0.52rem;
-      color: rgba(255,255,255,0.2);
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 18px;
-    }
-    .pp-cover-main {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-    .pp-cover-avatar {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      background: ${rank.color}18;
-      border: 1px solid ${rank.color}30;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; font-weight: 700;
-      color: ${rank.color};
-      flex-shrink: 0;
-      letter-spacing: -0.01em;
-    }
-    .pp-cover-info { flex: 1; min-width: 0; }
-    .pp-cover-name {
-      font-family: 'Instrument Serif', serif;
-      font-size: 1.55rem;
-      color: #fff;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      margin-bottom: 4px;
-    }
-    .pp-cover-role {
-      font-size: 0.68rem;
-      color: rgba(255,255,255,0.35);
-    }
-    .pp-cover-rank {
-      display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
-      flex-shrink: 0;
-    }
-    .pp-cover-rank-emoji { font-size: 1.5rem; line-height: 1; }
-    .pp-cover-rank-label {
-      font-size: 0.58rem; font-weight: 700;
-      color: ${rank.color};
-      letter-spacing: 0.05em;
-    }
-
-    /* MRZ strip */
-    .pp-mrz {
-      border-top: 1px solid rgba(255,255,255,0.05);
-      padding-top: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .pp-mrz-verified {
-      display: flex; align-items: center; gap: 5px;
-    }
-    .pp-mrz-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: #34D399;
-      box-shadow: 0 0 6px rgba(52,211,153,0.7);
-    }
-    .pp-mrz-text {
-      font-size: 0.57rem; font-weight: 600;
-      color: rgba(52,211,153,0.65);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-    .pp-mrz-actions { display: flex; gap: 6px; }
-    .pp-mrz-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.45);
-      font-family: 'Inter', sans-serif;
-      font-size: 0.62rem; font-weight: 500;
-      padding: 5px 11px; border-radius: 7px;
-      cursor: pointer; display: flex; align-items: center; gap: 5px;
-      transition: border-color 0.15s, color 0.15s;
-    }
-    .pp-mrz-btn:hover { border-color: rgba(255,255,255,0.16); color: rgba(255,255,255,0.8); }
-    .pp-mrz-btn--primary {
-      background: rgba(124,111,255,0.1);
-      border-color: rgba(124,111,255,0.28);
-      color: #9B91FF;
-    }
-    .pp-mrz-btn--primary:hover { background: rgba(124,111,255,0.18); }
-
-    /* ── DATA GRID ── */
-    .pp-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-    .pp-grid-cell {
-      background: #0f0f14;
-      padding: 13px 12px;
-      text-align: center;
-    }
-    .pp-grid-val {
-      font-family: 'Instrument Serif', serif;
-      font-size: 1.45rem;
-      line-height: 1;
-      letter-spacing: -0.03em;
-      margin-bottom: 3px;
-    }
-    .pp-grid-key {
-      font-size: 0.44rem;
-      color: rgba(255,255,255,0.2);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      font-weight: 600;
-    }
-
-    /* strength bar */
-    .pp-strength-bar-wrap {
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .pp-strength-label {
-      font-size: 0.6rem;
-      color: rgba(255,255,255,0.25);
-      white-space: nowrap;
-      font-weight: 500;
-    }
-    .pp-strength-track {
-      flex: 1;
-      height: 4px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 100px;
-      overflow: hidden;
-    }
-    .pp-strength-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: ${scoreColor};
-      width: ${score}%;
-      transition: width 1.2s cubic-bezier(0.34,1.2,0.64,1);
-    }
-    .pp-strength-score {
-      font-family: 'Instrument Serif', serif;
-      font-size: 1.1rem;
-      color: ${scoreColor};
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    /* spec chips */
-    .pp-chips {
-      display: flex; flex-wrap: wrap; gap: 5px;
-      margin-bottom: 10px;
-    }
-    .pp-chip {
-      display: flex; align-items: center; gap: 4px;
-      padding: 3px 9px;
-      border-radius: 100px;
-      font-size: 0.6rem; font-weight: 600;
-      border: 1px solid;
-    }
-    .pp-chip-dot {
-      width: 4px; height: 4px;
-      border-radius: 50%;
-    }
-
-    /* ── SECTION DIVIDERS ── */
-    .pp-section { margin-bottom: 10px; }
-    .pp-section-rule {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 10px;
-    }
-    .pp-section-rule::before,
-    .pp-section-rule::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.06);
-    }
-    .pp-section-label {
-      font-size: 0.48rem;
-      color: rgba(255,255,255,0.2);
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    /* ── GPS BLOCK ── */
-    .pp-gps-row {
-      display: flex; align-items: center;
-      gap: 12px; margin-bottom: 10px;
-    }
-    .pp-gps-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-    .pp-gps-icon { font-size: 1.2rem; flex-shrink: 0; }
-    .pp-gps-goal { font-size: 0.82rem; color: #fff; font-weight: 600; margin-bottom: 1px; }
-    .pp-gps-meta { font-size: 0.6rem; color: rgba(255,255,255,0.25); }
-    .pp-gps-pct {
-      font-family: 'Instrument Serif', serif;
-      font-size: 1.5rem; line-height: 1;
-      flex-shrink: 0;
-    }
-    .pp-progress-track {
-      height: 3px; background: rgba(255,255,255,0.06);
-      border-radius: 100px; overflow: hidden; margin-bottom: 10px;
-    }
-    .pp-progress-fill {
-      height: 100%; border-radius: 100px;
-      transition: width 1s ease;
-    }
-    .pp-next-milestone {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-    }
-    .pp-next-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-    .pp-next-body { flex: 1; min-width: 0; }
-    .pp-next-label {
-      font-size: 0.48rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.12em;
-      color: rgba(124,111,255,0.8);
-      margin-bottom: 2px;
-    }
-    .pp-next-title { font-size: 0.75rem; color: rgba(255,255,255,0.8); font-weight: 600; margin-bottom: 3px; }
-    .pp-next-hint { font-size: 0.6rem; color: rgba(255,255,255,0.22); line-height: 1.5; }
-    .pp-complete-badge {
-      text-align: center; font-size: 0.72rem;
-      color: #34D399; font-weight: 600; padding: 6px 0;
-    }
-
-    /* ── FEATURED CARDS ── */
-    .pp-feat-list { display: flex; flex-direction: column; gap: 8px; }
-    .pp-feat-card {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 14px 11px 16px;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      position: relative;
-      overflow: hidden;
-    }
-    .pp-feat-card:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.035); }
-    .pp-feat-accent-bar {
-      position: absolute; left: 0; top: 0; bottom: 0;
-      width: 2px; border-radius: 0 2px 2px 0;
-      opacity: 0.7;
-    }
-    .pp-feat-thumb {
-      width: 64px; height: 64px; border-radius: 10px;
-      overflow: hidden; flex-shrink: 0; background: #111;
-    }
-    .pp-feat-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .pp-feat-thumb--split { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
-    .pp-feat-half { position: relative; overflow: hidden; background: #000; }
-    .pp-feat-half img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .pp-feat-stamp {
-      position: absolute; bottom: 2px;
-      font-size: 0.38rem; font-weight: 700;
-      padding: 1px 3px; border-radius: 2px;
-      letter-spacing: 0.04em;
-    }
-    .pp-feat-stamp--before { left: 3px; background: rgba(0,0,0,0.75); color: rgba(255,255,255,0.7); }
-    .pp-feat-stamp--after  { right: 3px; background: rgba(251,191,36,0.9); color: #000; }
-    .pp-feat-thumb--empty {
-      display: flex; align-items: center; justify-content: center;
-      border: 1px solid;
-    }
-    .pp-feat-body { flex: 1; min-width: 0; }
-    .pp-feat-title {
-      font-size: 0.85rem; color: rgba(255,255,255,0.85); font-weight: 600;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      margin-bottom: 4px;
-    }
-    .pp-feat-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .pp-feat-chip {
-      font-size: 0.54rem; font-weight: 700;
-      padding: 2px 7px; border-radius: 100px;
-      text-transform: uppercase;
-    }
-    .pp-feat-date { font-size: 0.58rem; color: rgba(255,255,255,0.2); }
-    .pp-feat-score {
-      font-family: 'Instrument Serif', serif;
-      font-size: 0.95rem; line-height: 1;
-      margin-top: 5px;
-    }
-    .pp-feat-score-den { font-family: 'Inter', sans-serif; font-size: 0.5rem; opacity: 0.4; }
-    .pp-feat-chevron {
-      width: 10px; height: 10px;
-      color: rgba(255,255,255,0.12); flex-shrink: 0;
-    }
-
-    /* ── ARCHIVE ROWS ── */
-    .pp-archive-shell {
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      overflow: hidden;
-    }
-    .pp-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 14px;
-      background: rgba(255,255,255,0.012);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      cursor: pointer;
-      transition: background 0.12s;
-    }
-    .pp-row:last-child { border-bottom: none; }
-    .pp-row:hover { background: rgba(255,255,255,0.03); }
-    .pp-row-pip {
-      width: 3px; height: 22px;
-      border-radius: 2px;
-      flex-shrink: 0; opacity: 0.65;
-    }
-    .pp-row-body { flex: 1; min-width: 0; }
-    .pp-row-title {
-      font-size: 0.75rem; color: rgba(255,255,255,0.7); font-weight: 500;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      display: block;
-    }
-    .pp-row-sub {
-      font-size: 0.57rem; color: rgba(255,255,255,0.2);
-      display: block; margin-top: 1px;
-    }
-    .pp-row-score {
-      font-family: 'Instrument Serif', serif;
-      font-size: 0.88rem; flex-shrink: 0;
-    }
-    .pp-row-chevron {
-      width: 9px; height: 9px;
-      color: rgba(255,255,255,0.1); flex-shrink: 0;
-    }
-    .pp-archive-count {
-      font-size: 0.48rem; color: rgba(255,255,255,0.15);
-      font-weight: 400; margin-left: 4px;
-    }
-
-    @media (max-width: 480px) {
-      .pp-grid { grid-template-columns: repeat(4, 1fr); }
-      .pp-cover-name { font-size: 1.3rem; }
-    }
+  .pp2-wrap{font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;}
+  .pp2-cover{position:relative;margin-bottom:10px;border-radius:22px;overflow:hidden;background:#0c0c11;border:1px solid rgba(255,255,255,0.07);}
+  .pp2-cover-gradient{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 0%,${rank.color}18 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 0% 100%,${rank.color}0a 0%,transparent 70%);pointer-events:none;}
+  .pp2-cover-lines{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 32px,rgba(255,255,255,0.022) 32px,rgba(255,255,255,0.022) 33px),repeating-linear-gradient(90deg,transparent,transparent 32px,rgba(255,255,255,0.012) 32px,rgba(255,255,255,0.012) 33px);pointer-events:none;}
+  .pp2-cover-top{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${rank.color},${rank.color}70,transparent);}
+  .pp2-cover-inner{position:relative;padding:22px 20px 20px;}
+  .pp2-cover-doc-label{font-size:0.44rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.18);font-weight:600;margin-bottom:20px;}
+  .pp2-cover-identity{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+  .pp2-avatar-wrap{position:relative;flex-shrink:0;cursor:pointer;}
+  .pp2-avatar{width:64px;height:64px;border-radius:16px;overflow:hidden;border:2px solid ${rank.color}45;background:${rank.color}18;display:flex;align-items:center;justify-content:center;}
+  .pp2-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+  .pp2-avatar-initials{font-size:1.15rem;font-weight:700;color:${rank.color};letter-spacing:-0.01em;}
+  .pp2-avatar-edit{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:#1a1a24;border:1px solid rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;cursor:pointer;transition:background 0.15s;}
+  .pp2-avatar-edit:hover{background:#252535;}
+  .pp2-name-block{flex:1;min-width:0;}
+  .pp2-name{font-family:'Instrument Serif',serif;font-size:1.45rem;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:3px;}
+  .pp2-role{font-size:0.68rem;color:rgba(255,255,255,0.35);}
+  .pp2-rank-block{flex-shrink:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .pp2-rank-emoji{font-size:1.6rem;line-height:1;}
+  .pp2-rank-label{font-size:0.6rem;font-weight:700;color:${rank.color};letter-spacing:0.04em;}
+  .pp2-footer-strip{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid rgba(255,255,255,0.055);}
+  .pp2-verified{display:flex;align-items:center;gap:5px;}
+  .pp2-verified-dot{width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,0.7);}
+  .pp2-verified-text{font-size:0.56rem;font-weight:600;color:rgba(52,211,153,0.6);text-transform:uppercase;letter-spacing:0.1em;}
+  .pp2-actions{display:flex;gap:6px;}
+  .pp2-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:500;padding:5px 11px;border-radius:8px;cursor:pointer;transition:border-color 0.15s,color 0.15s;}
+  .pp2-btn:hover{border-color:rgba(255,255,255,0.18);color:#fff;}
+  .pp2-btn--primary{background:rgba(124,111,255,0.1);border-color:rgba(124,111,255,0.3);color:#9B91FF;}
+  .pp2-btn--primary:hover{background:rgba(124,111,255,0.18);}
+  .pp2-data-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.06);border-radius:13px;overflow:hidden;margin-bottom:10px;}
+  .pp2-data-cell{background:#0f0f14;padding:12px 8px;text-align:center;}
+  .pp2-data-val{font-family:'Instrument Serif',serif;font-size:1.4rem;line-height:1;letter-spacing:-0.03em;margin-bottom:3px;}
+  .pp2-data-key{font-size:0.42rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.14em;font-weight:600;}
+  .pp2-card{background:#0c0c11;border:1px solid rgba(255,255,255,0.065);border-radius:18px;padding:16px 18px;margin-bottom:10px;position:relative;overflow:hidden;}
+  .pp2-label{font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:10px;}
+  .pp2-strength-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .pp2-strength-label{font-size:0.6rem;color:rgba(255,255,255,0.25);white-space:nowrap;}
+  .pp2-strength-track{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
+  .pp2-strength-fill{height:100%;border-radius:100px;background:${scoreColor};transition:width 1.4s cubic-bezier(0.34,1.2,0.64,1);}
+  .pp2-strength-score{font-family:'Instrument Serif',serif;font-size:1.05rem;color:${scoreColor};line-height:1;white-space:nowrap;}
+  .pp2-chips{display:flex;flex-wrap:wrap;gap:5px;}
+  .pp2-chip{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:0.58rem;font-weight:600;border:1px solid;}
+  .pp2-stamps{display:flex;gap:8px;}
+  .pp2-section-label{font-size:0.44rem;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;margin-bottom:8px;}
   </style>
-
-  <div class="pp-passport">
-
-    <!-- ══ COVER PAGE ══ -->
-    <div class="pp-cover">
-      <div class="pp-cover-top-bar"></div>
-      <div class="pp-cover-wordmark">Provify · Clinical Portfolio</div>
-      <div class="pp-cover-main">
-        <div class="pp-cover-avatar">${initials}</div>
-        <div class="pp-cover-info">
-          <div class="pp-cover-name">${fullName}</div>
-          <div class="pp-cover-role">${role}</div>
+  <div class="pp2-wrap">
+  ${total === 0 ? `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2);"><div style="font-family:'Instrument Serif',serif;font-size:1.2rem;color:rgba(255,255,255,0.3);margin-bottom:6px;">No cases logged yet</div><div style="font-size:0.75rem;">Start logging to build your clinical passport.</div></div>` : `
+  <div class="pp2-cover">
+    <div class="pp2-cover-gradient"></div>
+    <div class="pp2-cover-lines"></div>
+    <div class="pp2-cover-top"></div>
+    <div class="pp2-cover-inner">
+      <div class="pp2-cover-doc-label">Provify · Clinical Portfolio</div>
+      <div class="pp2-cover-identity">
+        <div class="pp2-avatar-wrap" onclick="document.getElementById('pp2-photo-input').click()" title="Tap to upload photo">
+          <div class="pp2-avatar">${avatarUrl ? `<img src="${avatarUrl}" alt="photo">` : `<div class="pp2-avatar-initials">${initials}</div>`}</div>
+          <div class="pp2-avatar-edit">📷</div>
         </div>
-        <div class="pp-cover-rank">
-          <div class="pp-cover-rank-emoji">${rank.emoji}</div>
-          <div class="pp-cover-rank-label">${rank.rank}</div>
-        </div>
+        <input type="file" id="pp2-photo-input" accept="image/*" style="display:none;" onchange="(async function(e){const f=e.target.files[0];if(!f)return;const a=document.querySelector('.pp2-avatar');a.innerHTML='<div style=\'font-size:0.7rem;color:rgba(255,255,255,0.4);padding:4px;\'>...</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>';}else{a.innerHTML='<div class=\'pp2-avatar-initials\'>${initials}</div>';}})(event)">
+        <div class="pp2-name-block"><div class="pp2-name">${fullName}</div><div class="pp2-role">${role}</div></div>
+        <div class="pp2-rank-block"><div class="pp2-rank-emoji">${rank.emoji}</div><div class="pp2-rank-label">${rank.rank}</div></div>
       </div>
-      <div class="pp-mrz">
-        <div class="pp-mrz-verified">
-          <div class="pp-mrz-dot"></div>
-          <span class="pp-mrz-text">Verified on Provify</span>
-        </div>
-        <div class="pp-mrz-actions">
-          <button class="pp-mrz-btn pp-mrz-btn--primary" onclick="copyPortfolioLinkInApp()">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            Share
-          </button>
-          <button class="pp-mrz-btn" onclick="selectAllCases();generatePortfolioPDF()">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            PDF
-          </button>
+      <div class="pp2-footer-strip">
+        <div class="pp2-verified"><div class="pp2-verified-dot"></div><span class="pp2-verified-text">Verified on Provify</span></div>
+        <div class="pp2-actions">
+          <button class="pp2-btn pp2-btn--primary" onclick="copyPortfolioLinkInApp()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Share</button>
+          <button class="pp2-btn" onclick="selectAllCases();generatePortfolioPDF()"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</button>
         </div>
       </div>
     </div>
-
-    <!-- ══ DATA GRID ══ -->
-    <div class="pp-grid">
-      <div class="pp-grid-cell">
-        <div class="pp-grid-val" style="color:rgba(255,255,255,0.85);">${total}</div>
-        <div class="pp-grid-key">Cases</div>
-      </div>
-      <div class="pp-grid-cell">
-        <div class="pp-grid-val" style="color:#7C6FFF;font-size:${rank.rank.length > 6 ? '0.9rem':'1.45rem'};">${rank.rank}</div>
-        <div class="pp-grid-key">Rank</div>
-      </div>
-      <div class="pp-grid-cell">
-        <div class="pp-grid-val" style="color:rgba(255,255,255,0.6);">${avg}</div>
-        <div class="pp-grid-key">Avg Score</div>
-      </div>
-      <div class="pp-grid-cell">
-        <div class="pp-grid-val" style="color:#34D399;">${highComp}</div>
-        <div class="pp-grid-key">High Complex</div>
-      </div>
-    </div>
-
-    <!-- ══ PORTFOLIO STRENGTH ══ -->
-    <div class="pp-strength-bar-wrap">
-      <span class="pp-strength-label">Portfolio Strength</span>
-      <div class="pp-strength-track"><div class="pp-strength-fill"></div></div>
-      <span class="pp-strength-score">${score}<span style="font-size:0.5rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span>
-    </div>
-
-    <!-- ══ SPECIALTY CHIPS ══ -->
-    <div class="pp-chips">
-      ${specBreakdown.map(s => `
-        <div class="pp-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}25;">
-          <div class="pp-chip-dot" style="background:${s.col};"></div>
-          ${s.name} <span style="opacity:0.45;font-weight:400;margin-left:2px;">${s.n}</span>
-        </div>`).join('')}
-    </div>
-
-    ${gpsBlock}
-
-    <!-- ══ CLINICAL PROOF ══ -->
-    <div class="pp-section">
-      <div class="pp-section-rule">
-        <span class="pp-section-label">Clinical Proof</span>
-      </div>
-      <div class="pp-feat-list">${featCards}</div>
-    </div>
-
-    <!-- ══ ALL CASES ══ -->
-    ${archiveCases.length > 0 ? `
-    <div class="pp-section">
-      <div class="pp-section-rule">
-        <span class="pp-section-label">All Cases <span class="pp-archive-count">(${archiveCases.length})</span></span>
-      </div>
-      <div class="pp-archive-shell">${archiveRows}</div>
-    </div>` : ''}
-
+  </div>
+  <div class="pp2-data-strip">
+    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:rgba(255,255,255,0.85);">${total}</div><div class="pp2-data-key">Cases</div></div>
+    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:${rank.color};font-size:${rank.rank.length>6?'0.85rem':'1.4rem'};">${rank.rank}</div><div class="pp2-data-key">Rank</div></div>
+    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:rgba(255,255,255,0.6);">${avg}</div><div class="pp2-data-key">Avg Score</div></div>
+    <div class="pp2-data-cell"><div class="pp2-data-val" style="color:#34D399;">${highComp}</div><div class="pp2-data-key">High ≥7</div></div>
+  </div>
+  <div class="pp2-card">
+    <div class="pp2-label">Portfolio Strength</div>
+    <div class="pp2-strength-row"><span class="pp2-strength-label">Score</span><div class="pp2-strength-track"><div class="pp2-strength-fill" style="width:${score}%;"></div></div><span class="pp2-strength-score">${score}<span style="font-size:0.48rem;font-family:'Inter',sans-serif;opacity:0.4;">/100</span></span></div>
+    <div class="pp2-chips">${specBreakdown.map(s=>`<div class="pp2-chip" style="color:${s.col};background:${s.col}0f;border-color:${s.col}22;"><div style="width:4px;height:4px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>${s.name}<span style="opacity:0.4;font-weight:400;margin-left:3px;">${s.n}</span></div>`).join('')}</div>
+  </div>
+  ${gpsValid ? `<div class="pp2-card">${gpsInner}</div>` : `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(124,111,255,0.04);border:1px solid rgba(124,111,255,0.12);border-radius:14px;margin-bottom:10px;"><span style="font-size:1.1rem;">🗺</span><div style="flex:1;font-size:0.7rem;color:rgba(255,255,255,0.4);">Set your Career GPS goal to unlock your roadmap.</div><button onclick="showView('career')" style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:#9B91FF;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;padding:6px 11px;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Set up →</button></div>`}
+  ${feat3.length > 0 ? `<div><div class="pp2-section-label">Clinical Proof</div><div class="pp2-stamps">${stampCards}</div></div>` : ''}
+  `}
   </div>`;
 }
 
@@ -6220,13 +5779,10 @@ function copyPortfolioLinkInApp() {
   navigator.clipboard.writeText(url).then(() => showToast('Portfolio link copied ✓'));
 }
 
-function setPortFilter(key) { /* no-op — kept for compat */ }
-
-function renderInAppPortfolio() {
-  renderPortfolioPassport();
-}
-
 // ─── END PORTFOLIO PASSPORT ───────────────────────────────────────────────────
+
+
+
 
 function renderPortfolioCases() {
   const el = document.getElementById('portfolio-cases-list');
