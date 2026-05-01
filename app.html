@@ -4835,6 +4835,8 @@ async function openCaseDetail(id) {
       'cp-intraoral': 'Intra-oral Photo',
       'smile-before': 'Before',
       'smile-after': 'After ✨',
+      'vl-xr-1': 'X-ray', 'vl-xr-2': 'X-ray', 'vl-xr-3': 'X-ray', 'vl-xr-4': 'X-ray',
+      'vl-cp-1': 'Clinical Photo', 'vl-cp-2': 'Clinical Photo', 'vl-cp-3': 'Clinical Photo', 'vl-cp-4': 'Clinical Photo',
     };
 
     try {
@@ -6041,7 +6043,7 @@ function renderPortfolioPassport() {
           <div class="pv-avatar-cam">📷</div>
         </div>
         <input type="file" id="pv-photo-in" accept="image/*" style="display:none;"
-          onchange="(async function(e){const f=e.target.files[0];if(!f)return;const a=document.querySelector('.pv-avatar');a.innerHTML='<div style=\'padding:4px;font-size:0.6rem;color:rgba(255,255,255,0.3);\'>…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>';}else{a.innerHTML='<div class=\'pv-avatar-initials\'>${initials}</div>';}})(event)">
+          onchange="(async function(e){const f=e.target.files[0];if(!f)return;const a=document.querySelector('.pv-avatar');a.innerHTML='<div style=\'padding:4px;font-size:0.6rem;color:rgba(255,255,255,0.3);\'>…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>'; renderPortfolioPassport();}else{a.innerHTML='<div class=\'pv-avatar-initials\'>${initials}</div>';}})(event)">
         <div class="pv-name-col">
           <div class="pv-name">${fullName}</div>
           <div class="pv-role">${role}</div>
@@ -6751,7 +6753,9 @@ async function generatePortfolioPDF() {
       'xr-preop':'Pre-op X-ray','xr-wl':'Working Length','xr-mc':'Master Cone',
       'xr-obturation':'Obturation','xr-postop':'Post-op X-ray',
       'xr-gen-preop':'Pre-op X-ray','xr-gen-postop':'Post-op X-ray',
-      'cp-preop':'Pre-op Photo','cp-postop':'Post-op Photo','cp-intraoral':'Intraoral'
+      'cp-preop':'Pre-op Photo','cp-postop':'Post-op Photo','cp-intraoral':'Intraoral',
+      'vl-xr-1':'X-ray','vl-xr-2':'X-ray','vl-xr-3':'X-ray','vl-xr-4':'X-ray',
+      'vl-cp-1':'Clinical Photo','vl-cp-2':'Clinical Photo','vl-cp-3':'Clinical Photo','vl-cp-4':'Clinical Photo',
     };
 
     return `
@@ -6783,7 +6787,7 @@ async function generatePortfolioPDF() {
       ${otherPhotos.length > 0 ? `
       <div class="section-label">Clinical Photography</div>
       <div class="photos-grid">
-        ${otherPhotos.map(([k,url]) => `<div class="photo-item"><img src="${url}" alt="${photoLabels[k]||k}"><div class="photo-caption">${photoLabels[k]||k}</div></div>`).join('')}
+        ${otherPhotos.map(([k,url]) => { const lbl = photoLabels[k]; return `<div class="photo-item"><img src="${url}" alt="${lbl||'Clinical Photo'}">${lbl && !k.startsWith('vl-') ? `<div class="photo-caption">${lbl}</div>` : ''}</div>`; }).join('')}
       </div>` : ''}
 
       ${note ? `
