@@ -5666,7 +5666,7 @@ async function uploadPassportPhoto(file) {
     });
 
     // Save resized base64 to profile
-    const { error } = await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: resized });
+    const { error } = await sb.from('profiles').update({ avatar_url: resized }).eq('id', currentUser.id);
     if (error) throw error;
     currentProfile = { ...currentProfile, avatar_url: resized };
     showToast('Photo updated ✓');
