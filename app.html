@@ -836,7 +836,7 @@ body::after {
 .photo-slot.has-photo { border-color: rgba(124,111,255,0.5); border-style: solid; background: rgba(124,111,255,0.04); }
 .photo-slot-label { font-size: 0.68rem; color: var(--gray); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.02em; }
 .photo-slot-preview { font-size: 1.4rem; color: var(--gray); }
-.photo-slot-img { width: 100%; height: 80px; object-fit: contain; background:#0a0a0f; border-radius: 8px; }
+.photo-slot-img { width: 100%; height: 80px; object-fit: contain; background:#09090B; border-radius: 8px; }
 
 /* ─── CANAL FIELDS ─── */
 .canal-field-row {
@@ -921,8 +921,8 @@ body::after {
 .vl-photo-slot.has-photo { border-color:rgba(124,111,255,0.4); }
 .vl-slot-icon { font-size:1.1rem;opacity:0.5; }
 .vl-slot-label { font-size:0.55rem;color:var(--gray);text-align:center; }
-.vl-slot-img { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f; }
-.vl-slot-remove { position:absolute;top:4px;right:4px;width:18px;height:18px;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.6rem;color:white;cursor:pointer;z-index:10;line-height:1; }
+.vl-slot-img { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090B; }
+.vl-slot-remove { position:absolute;top:4px;right:4px;width:18px;height:18px;background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.25);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.58rem;color:white;cursor:pointer;z-index:10;line-height:1; }
 .vl-photo-slot.has-photo .vl-slot-remove { display:flex; }
 
 .ql-tag {
@@ -1550,7 +1550,7 @@ body::after {
         </div>
       </button>
 
-      <!-- TOP ROW: Share only (no edit — verified cases are tamper-proof) -->
+      <!-- Share Case — full width (no edit, verified cases are tamper-proof) -->
       <div style="margin-bottom:4px;">
         <button onclick="shareCase()" id="share-case-btn" style="width:100%;background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);color:#34D399;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.background='rgba(52,211,153,0.14)'" onmouseout="this.style.background='rgba(52,211,153,0.07)'">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -1687,14 +1687,14 @@ body::after {
       <div id="smile-reveal-split" style="display:flex;gap:3px;border-radius:20px;overflow:hidden;margin-bottom:14px;background:#000;min-height:280px;">
 
         <div id="smile-reveal-before-panel" style="flex:1;position:relative;">
-          <img id="smile-reveal-before-img" style="width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:block;min-height:280px;" src="">
+          <img id="smile-reveal-before-img" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;min-height:280px;" src="">
           <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;">
             <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
           </div>
         </div>
 
         <div id="smile-reveal-after-panel" style="flex:1;position:relative;">
-          <img id="smile-reveal-after-img" style="width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:block;min-height:280px;" src="">
+          <img id="smile-reveal-after-img" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;min-height:280px;" src="">
           <div style="position:absolute;top:12px;right:12px;background:rgba(251,191,36,0.85);border-radius:8px;padding:4px 10px;">
             <div style="font-size:0.65rem;color:#000;font-weight:700;letter-spacing:0.08em;">AFTER ✨</div>
           </div>
@@ -2221,7 +2221,7 @@ body::after {
           <div>
             <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;text-align:center;">Before Smile</div>
             <div onclick="document.getElementById('vl-smile-before').click()" id="vl-smile-before-zone" style="border:2px dashed rgba(255,255,255,0.12);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);">
-              <img id="vl-smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
+              <img id="vl-smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090B;display:none;">
               <div id="vl-smile-before-ph"><div style="font-size:2rem;">📷</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:4px;">Tap to upload</div></div>
             </div>
             <input type="file" id="vl-smile-before" accept="image/*" style="display:none" onchange="handleVLSmileBefore(this)">
@@ -2229,7 +2229,7 @@ body::after {
           <div>
             <div style="font-size:0.62rem;color:rgba(251,191,36,0.65);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px;text-align:center;">After Smile ✨</div>
             <div onclick="document.getElementById('vl-smile-after').click()" id="vl-smile-after-zone" style="border:2px dashed rgba(251,191,36,0.25);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(251,191,36,0.02);">
-              <img id="vl-smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
+              <img id="vl-smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090B;display:none;">
               <div id="vl-smile-after-ph"><div style="font-size:2rem;">✨</div><div style="font-size:0.65rem;color:rgba(251,191,36,0.35);margin-top:4px;">The result</div></div>
             </div>
             <input type="file" id="vl-smile-after" accept="image/*" style="display:none" onchange="handleVLSmileAfter(this)">
@@ -2241,17 +2241,17 @@ body::after {
           <div style="font-size:0.58rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Additional angles</div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
             <div onclick="document.getElementById('vl-smile-extra1').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-              <img id="vl-extra1-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
+              <img id="vl-extra1-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090B;display:none;">
               <div id="vl-extra1-ph"><div style="font-size:1.2rem;">🦷</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Side</div></div>
               <input type="file" id="vl-smile-extra1" accept="image/*" style="display:none" onchange="handleVLSmileExtra(1,this)">
             </div>
             <div onclick="document.getElementById('vl-smile-extra2').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-              <img id="vl-extra2-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
+              <img id="vl-extra2-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090B;display:none;">
               <div id="vl-extra2-ph"><div style="font-size:1.2rem;">😊</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Full face</div></div>
               <input type="file" id="vl-smile-extra2" accept="image/*" style="display:none" onchange="handleVLSmileExtra(2,this)">
             </div>
             <div onclick="document.getElementById('vl-smile-extra3').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-              <img id="vl-extra3-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
+              <img id="vl-extra3-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090B;display:none;">
               <div id="vl-extra3-ph"><div style="font-size:1.2rem;">🔬</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Detail</div></div>
               <input type="file" id="vl-smile-extra3" accept="image/*" style="display:none" onchange="handleVLSmileExtra(3,this)">
             </div>
@@ -4637,8 +4637,8 @@ function caseItemHTML(c, showDelete = false) {
 
         <!-- Thumbnail: 40×40 circle -->
         <div style="width:40px;height:40px;flex-shrink:0;border-radius:50%;overflow:hidden;border:1.5px solid ${color}40;background:${color}18;position:relative;">
-          ${(isSmile && (smileAfterURL || smileBeforeURL)) ? `<img src="${smileAfterURL || smileBeforeURL}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">` :
-            firstPhoto ? `<img src="${firstPhoto}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">` :
+          ${(isSmile && (smileAfterURL || smileBeforeURL)) ? `<img src="${smileAfterURL || smileBeforeURL}" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;" loading="lazy">` :
+            firstPhoto ? `<img src="${firstPhoto}" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;" loading="lazy">` :
             `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:${color};font-family:'Inter',sans-serif;">${isSmile ? '✨' : (c.tooth_number || (c.specialty||'').slice(0,2).toUpperCase())}</div>`
           }
         </div>
@@ -4878,11 +4878,11 @@ async function openCaseDetail(id) {
               <div style="font-size:0.6rem;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:10px;">✨ Before & After</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;border-radius:16px;overflow:hidden;background:#000;">
                 <div style="position:relative;aspect-ratio:1;overflow:hidden;cursor:pointer;" onclick="window.open('${smileBefore?.url || ''}','_blank')">
-                  ${smileBefore ? `<img src="${smileBefore.url}" style="width:100%;height:100%;object-fit:cover;display:block;">` : '<div style="height:100%;min-height:120px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">📷</div>'}
+                  ${smileBefore ? `<img src="${smileBefore.url}" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;">` : '<div style="height:100%;min-height:120px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">📷</div>'}
                   <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.7);border-radius:6px;padding:3px 8px;font-size:0.55rem;color:rgba(255,255,255,0.8);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
                 </div>
                 <div style="position:relative;aspect-ratio:1;overflow:hidden;cursor:pointer;" onclick="window.open('${smileAfter?.url || ''}','_blank')">
-                  ${smileAfter ? `<img src="${smileAfter.url}" style="width:100%;height:100%;object-fit:cover;display:block;">` : '<div style="height:100%;min-height:120px;background:rgba(251,191,36,0.04);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">✨</div>'}
+                  ${smileAfter ? `<img src="${smileAfter.url}" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;">` : '<div style="height:100%;min-height:120px;background:rgba(251,191,36,0.04);display:flex;align-items:center;justify-content:center;font-size:1.5rem;opacity:0.3;">✨</div>'}
                   <div style="position:absolute;bottom:8px;right:8px;background:rgba(251,191,36,0.9);border-radius:6px;padding:3px 8px;font-size:0.55rem;color:#000;font-weight:700;letter-spacing:0.08em;">AFTER ✨</div>
                 </div>
               </div>
@@ -4898,7 +4898,7 @@ async function openCaseDetail(id) {
               <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;">
                 ${otherPhotos.map(({ url, label }) => `
                   <div style="border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);cursor:pointer;position:relative;" onclick="window.open('${url}','_blank')">
-                    <img src="${url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" loading="lazy">
+                    <img src="${url}" style="width:100%;aspect-ratio:1;object-fit:contain;background:#09090B;display:block;" loading="lazy">
                     <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));padding:6px 8px;">
                       <div style="font-size:0.55rem;color:rgba(255,255,255,0.9);font-weight:500;">${label}</div>
                     </div>
@@ -5417,7 +5417,7 @@ async function loadBestWork() {
         const img = new Image();
         img.onload = () => {
           const pd = document.getElementById(`pinned-photo-${c.id}`);
-          if (pd) pd.innerHTML = `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+          if (pd) pd.innerHTML = `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;">`;
         };
         img.src = photoUrl;
       }
@@ -6241,7 +6241,7 @@ function pvOpenProfileModal() {
       <div style="padding:20px 20px 0;display:flex;align-items:center;gap:14px;margin-bottom:4px;">
         <div style="position:relative;cursor:pointer;flex-shrink:0;" onclick="document.getElementById('pm-photo-in').click()">
           <div style="width:56px;height:56px;border-radius:14px;overflow:hidden;border:2px solid ${rankData.color}40;background:${rankData.color}15;display:flex;align-items:center;justify-content:center;" id="pm-avatar">
-            ${avatarUrl ? `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;display:block;">` : `<div style="font-size:1rem;font-weight:700;color:${rankData.color};">${initials}</div>`}
+            ${avatarUrl ? `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;">` : `<div style="font-size:1rem;font-weight:700;color:${rankData.color};">${initials}</div>`}
           </div>
           <div style="position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:#141420;border:1px solid rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.58rem;">📷</div>
         </div>
@@ -8979,21 +8979,20 @@ function openVoiceLog() {
   // Default specialty to last used
   const lastSpec = selectedSpecialty || 'endo';
   setVLSpecialty(lastSpec, null);
-  // Reset xray + clinical photo slots
+  // Reset xray + clinical photo slots every time VL opens
   vlPhotoFiles = {};
   ['vl-xr-1','vl-xr-2','vl-xr-3','vl-xr-4','vl-cp-1','vl-cp-2','vl-cp-3','vl-cp-4'].forEach(id => {
-    const slot = document.getElementById(`vl-slot-${id}`);
-    const img = document.getElementById(`vl-img-${id}`);
+    const slot = document.getElementById('vl-slot-'+id);
+    const img = document.getElementById('vl-img-'+id);
     const input = document.getElementById(id);
     if (slot) { slot.classList.remove('has-photo'); slot.style.opacity=''; }
-    if (img) { img.src = ''; img.style.display = 'none'; }
-    if (input) input.value = '';
-    // Restore icon/label
+    if (img) { img.src=''; img.style.display='none'; }
+    if (input) input.value='';
     if (slot) {
       const icon = slot.querySelector('.vl-slot-icon');
       const label = slot.querySelector('.vl-slot-label');
-      if (icon) icon.style.display = '';
-      if (label) label.style.display = '';
+      if (icon) icon.style.display='';
+      if (label) label.style.display='';
     }
   });
 }
@@ -9798,6 +9797,7 @@ function handleVLPhoto(input, id, slotId, imgId) {
   }
 }
 
+
 function removeVLPhoto(e, id, slotId, imgId) {
   e.stopPropagation();
   delete vlPhotoFiles[id];
@@ -9815,6 +9815,8 @@ function removeVLPhoto(e, id, slotId, imgId) {
   if (img) { img.src = ''; img.style.display = 'none'; }
   if (input) input.value = '';
 }
+
+// ─── CASE NICKNAMES ───
 function getCaseNickname(caseId) {
   try { return localStorage.getItem(`nick_${caseId}`) || ''; } catch(e) { return ''; }
 }
@@ -12922,7 +12924,7 @@ function renderTopCaseThisMonth(thisMonth) {
         photoUrl = Object.values(c.photo_urls).find(v => v && typeof v === 'string') || null;
       }
       const imgContent = photoUrl
-        ? `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        ? `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:contain;background:#09090B;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
            <div style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:28px;opacity:0.45;">${art}</div>`
         : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;opacity:0.45;">${art}</div>`;
       return `<div onclick="openCaseDetail('${c.id}')" style="flex:1;min-width:0;background:rgba(255,255,255,0.025);border:1px solid rgba(212,168,67,0.15);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(212,168,67,0.3)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(212,168,67,0.15)';this.style.transform='none'">
@@ -12955,7 +12957,7 @@ function renderTopCaseThisMonth(thisMonth) {
     photoUrl = Object.values(c.photo_urls).find(v => v && typeof v === 'string') || null;
   }
   const imgContent = photoUrl
-    ? `<img src="${photoUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    ? `<img src="${photoUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090B;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
        <div style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:42px;opacity:0.5;">${art}</div>`
     : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;opacity:0.5;">${art}</div>`;
 
