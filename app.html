@@ -836,7 +836,7 @@ body::after {
 .photo-slot.has-photo { border-color: rgba(124,111,255,0.5); border-style: solid; background: rgba(124,111,255,0.04); }
 .photo-slot-label { font-size: 0.68rem; color: var(--gray); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.02em; }
 .photo-slot-preview { font-size: 1.4rem; color: var(--gray); }
-.photo-slot-img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; }
+.photo-slot-img { width: 100%; height: 80px; object-fit: contain; background:#0a0a0f; border-radius: 8px; }
 
 /* ─── CANAL FIELDS ─── */
 .canal-field-row {
@@ -921,7 +921,9 @@ body::after {
 .vl-photo-slot.has-photo { border-color:rgba(124,111,255,0.4); }
 .vl-slot-icon { font-size:1.1rem;opacity:0.5; }
 .vl-slot-label { font-size:0.55rem;color:var(--gray);text-align:center; }
-.vl-slot-img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover; }
+.vl-slot-img { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f; }
+.vl-slot-remove { position:absolute;top:4px;right:4px;width:18px;height:18px;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:0.6rem;color:white;cursor:pointer;z-index:10;line-height:1; }
+.vl-photo-slot.has-photo .vl-slot-remove { display:flex; }
 
 .ql-tag {
   padding: 7px 14px; border-radius: 8px;
@@ -1548,12 +1550,9 @@ body::after {
         </div>
       </button>
 
-      <!-- TOP ROW: Edit + Share -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;">
-        <button onclick="toggleCaseEdit()" id="edit-case-btn" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.55);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.borderColor='rgba(124,111,255,0.3)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.55)'">
-          ✏️ Edit Case
-        </button>
-        <button onclick="shareCase()" id="share-case-btn" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);color:#34D399;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.background='rgba(52,211,153,0.14)'" onmouseout="this.style.background='rgba(52,211,153,0.07)'">
+      <!-- TOP ROW: Share only (no edit — verified cases are tamper-proof) -->
+      <div style="margin-bottom:4px;">
+        <button onclick="shareCase()" id="share-case-btn" style="width:100%;background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);color:#34D399;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;padding:10px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;" onmouseover="this.style.background='rgba(52,211,153,0.14)'" onmouseout="this.style.background='rgba(52,211,153,0.07)'">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           Share Case
         </button>
@@ -1688,14 +1687,14 @@ body::after {
       <div id="smile-reveal-split" style="display:flex;gap:3px;border-radius:20px;overflow:hidden;margin-bottom:14px;background:#000;min-height:280px;">
 
         <div id="smile-reveal-before-panel" style="flex:1;position:relative;">
-          <img id="smile-reveal-before-img" style="width:100%;height:100%;object-fit:cover;display:block;min-height:280px;" src="">
+          <img id="smile-reveal-before-img" style="width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:block;min-height:280px;" src="">
           <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:4px 10px;">
             <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);font-weight:600;letter-spacing:0.08em;">BEFORE</div>
           </div>
         </div>
 
         <div id="smile-reveal-after-panel" style="flex:1;position:relative;">
-          <img id="smile-reveal-after-img" style="width:100%;height:100%;object-fit:cover;display:block;min-height:280px;" src="">
+          <img id="smile-reveal-after-img" style="width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:block;min-height:280px;" src="">
           <div style="position:absolute;top:12px;right:12px;background:rgba(251,191,36,0.85);border-radius:8px;padding:4px 10px;">
             <div style="font-size:0.65rem;color:#000;font-weight:700;letter-spacing:0.08em;">AFTER ✨</div>
           </div>
@@ -2222,7 +2221,7 @@ body::after {
           <div>
             <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:6px;text-align:center;">Before Smile</div>
             <div onclick="document.getElementById('vl-smile-before').click()" id="vl-smile-before-zone" style="border:2px dashed rgba(255,255,255,0.12);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.02);">
-              <img id="vl-smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <img id="vl-smile-before-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
               <div id="vl-smile-before-ph"><div style="font-size:2rem;">📷</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:4px;">Tap to upload</div></div>
             </div>
             <input type="file" id="vl-smile-before" accept="image/*" style="display:none" onchange="handleVLSmileBefore(this)">
@@ -2230,7 +2229,7 @@ body::after {
           <div>
             <div style="font-size:0.62rem;color:rgba(251,191,36,0.65);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px;text-align:center;">After Smile ✨</div>
             <div onclick="document.getElementById('vl-smile-after').click()" id="vl-smile-after-zone" style="border:2px dashed rgba(251,191,36,0.25);border-radius:14px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(251,191,36,0.02);">
-              <img id="vl-smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <img id="vl-smile-after-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
               <div id="vl-smile-after-ph"><div style="font-size:2rem;">✨</div><div style="font-size:0.65rem;color:rgba(251,191,36,0.35);margin-top:4px;">The result</div></div>
             </div>
             <input type="file" id="vl-smile-after" accept="image/*" style="display:none" onchange="handleVLSmileAfter(this)">
@@ -2242,17 +2241,17 @@ body::after {
           <div style="font-size:0.58rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px;">Additional angles</div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
             <div onclick="document.getElementById('vl-smile-extra1').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-              <img id="vl-extra1-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <img id="vl-extra1-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
               <div id="vl-extra1-ph"><div style="font-size:1.2rem;">🦷</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Side</div></div>
               <input type="file" id="vl-smile-extra1" accept="image/*" style="display:none" onchange="handleVLSmileExtra(1,this)">
             </div>
             <div onclick="document.getElementById('vl-smile-extra2').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-              <img id="vl-extra2-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <img id="vl-extra2-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
               <div id="vl-extra2-ph"><div style="font-size:1.2rem;">😊</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Full face</div></div>
               <input type="file" id="vl-smile-extra2" accept="image/*" style="display:none" onchange="handleVLSmileExtra(2,this)">
             </div>
             <div onclick="document.getElementById('vl-smile-extra3').click()" style="border:1.5px dashed rgba(255,255,255,0.08);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:rgba(255,255,255,0.01);">
-              <img id="vl-extra3-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;">
+              <img id="vl-extra3-preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0a0a0f;display:none;">
               <div id="vl-extra3-ph"><div style="font-size:1.2rem;">🔬</div><div style="font-size:0.5rem;color:rgba(255,255,255,0.18);margin-top:2px;">Detail</div></div>
               <input type="file" id="vl-smile-extra3" accept="image/*" style="display:none" onchange="handleVLSmileExtra(3,this)">
             </div>
@@ -2279,24 +2278,28 @@ body::after {
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">X-ray 1</div>
               <img class="vl-slot-img" id="vl-img-xr-1" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-xr-1','vl-slot-xr-1','vl-img-xr-1')">✕</button>
               <input type="file" id="vl-xr-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-1','vl-slot-xr-1','vl-img-xr-1')">
             </div>
             <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-2')" id="vl-slot-xr-2">
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">X-ray 2</div>
               <img class="vl-slot-img" id="vl-img-xr-2" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-xr-2','vl-slot-xr-2','vl-img-xr-2')">✕</button>
               <input type="file" id="vl-xr-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-2','vl-slot-xr-2','vl-img-xr-2')">
             </div>
             <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-3')" id="vl-slot-xr-3">
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">X-ray 3</div>
               <img class="vl-slot-img" id="vl-img-xr-3" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-xr-3','vl-slot-xr-3','vl-img-xr-3')">✕</button>
               <input type="file" id="vl-xr-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-3','vl-slot-xr-3','vl-img-xr-3')">
             </div>
             <div class="vl-photo-slot" onclick="triggerVLUpload('vl-xr-4')" id="vl-slot-xr-4">
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">X-ray 4</div>
               <img class="vl-slot-img" id="vl-img-xr-4" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-xr-4','vl-slot-xr-4','vl-img-xr-4')">✕</button>
               <input type="file" id="vl-xr-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-xr-4','vl-slot-xr-4','vl-img-xr-4')">
             </div>
           </div>
@@ -2309,24 +2312,28 @@ body::after {
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">Photo 1</div>
               <img class="vl-slot-img" id="vl-img-cp-1" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-cp-1','vl-slot-cp-1','vl-img-cp-1')">✕</button>
               <input type="file" id="vl-cp-1" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-1','vl-slot-cp-1','vl-img-cp-1')">
             </div>
             <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-2')" id="vl-slot-cp-2">
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">Photo 2</div>
               <img class="vl-slot-img" id="vl-img-cp-2" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-cp-2','vl-slot-cp-2','vl-img-cp-2')">✕</button>
               <input type="file" id="vl-cp-2" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-2','vl-slot-cp-2','vl-img-cp-2')">
             </div>
             <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-3')" id="vl-slot-cp-3">
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">Photo 3</div>
               <img class="vl-slot-img" id="vl-img-cp-3" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-cp-3','vl-slot-cp-3','vl-img-cp-3')">✕</button>
               <input type="file" id="vl-cp-3" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-3','vl-slot-cp-3','vl-img-cp-3')">
             </div>
             <div class="vl-photo-slot" onclick="triggerVLUpload('vl-cp-4')" id="vl-slot-cp-4">
               <div class="vl-slot-icon">📷</div>
               <div class="vl-slot-label">Photo 4</div>
               <img class="vl-slot-img" id="vl-img-cp-4" style="display:none;">
+              <button class="vl-slot-remove" onclick="removeVLPhoto(event,'vl-cp-4','vl-slot-cp-4','vl-img-cp-4')">✕</button>
               <input type="file" id="vl-cp-4" accept="image/*" style="display:none" onchange="handleVLPhoto(this,'vl-cp-4','vl-slot-cp-4','vl-img-cp-4')">
             </div>
           </div>
@@ -2678,26 +2685,6 @@ body::after {
         <!-- HERO -->
         <div class="db-hero" id="voice-cta-area">
           <div class="db-hero-grid"></div>
-          <!-- Dental identity background — tooth cross-section anatomy -->
-          <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.055;z-index:0;" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-            <path d="M130 60 C115 40,95 38,88 58 C82 72,90 85,98 90 C88 95,80 108,82 125 C84 145,100 158,118 160 L140 162 L160 162 L178 160 C196 158,212 145,214 125 C216 108,208 95,198 90 C206 85,214 72,208 58 C201 38,181 40,166 60 C162 52,156 46,150 44 C144 46,138 52,130 60Z" fill="none" stroke="#9B91FF" stroke-width="2.5" stroke-linejoin="round"/>
-            <path d="M118 62 C112 55,106 54,103 62" fill="none" stroke="#9B91FF" stroke-width="1.5"/>
-            <path d="M178 62 C184 55,190 54,193 62" fill="none" stroke="#9B91FF" stroke-width="1.5"/>
-            <path d="M150 50 L150 44" fill="none" stroke="#9B91FF" stroke-width="1.5"/>
-            <path d="M100 92 C115 98,135 101,150 101 C165 101,185 98,200 92" fill="none" stroke="#7C6FFF" stroke-width="1.2" stroke-dasharray="3,3"/>
-            <path d="M135 105 C132 112,131 125,132 138 L136 160" fill="none" stroke="#9B91FF" stroke-width="2"/>
-            <path d="M165 105 C168 112,169 125,168 138 L164 160" fill="none" stroke="#9B91FF" stroke-width="2"/>
-            <path d="M135 105 C140 102,145 101,150 101 C155 101,160 102,165 105" fill="none" stroke="#9B91FF" stroke-width="2"/>
-            <path d="M136 160 C135 178,134 200,136 225 C137 238,140 248,143 255" fill="none" stroke="#7C6FFF" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M164 160 C165 178,166 200,164 225 C163 238,160 248,157 255" fill="none" stroke="#7C6FFF" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="143" cy="257" r="3" fill="none" stroke="#9B91FF" stroke-width="1.5"/>
-            <circle cx="157" cy="257" r="3" fill="none" stroke="#9B91FF" stroke-width="1.5"/>
-            <path d="M130 168 C118 175,110 195,112 220 C113 235,118 248,126 258" fill="none" stroke="#7C6FFF" stroke-width="1" stroke-dasharray="2,4"/>
-            <path d="M170 168 C182 175,190 195,188 220 C187 235,182 248,174 258" fill="none" stroke="#7C6FFF" stroke-width="1" stroke-dasharray="2,4"/>
-            <path d="M230 75 C220 58,205 56,200 72 C196 83,202 93,208 97 C200 102,194 113,196 128 C198 145,210 156,224 157 L242 159 L258 157 C272 156,282 145,282 128 C282 113,276 102,268 97 C274 93,280 83,276 72 C271 56,256 58,248 75 C244 68,239 63,234 62 C229 63,232 68,230 75Z" fill="none" stroke="#7C6FFF" stroke-width="1.5" opacity="0.5"/>
-            <path d="M222 159 C221 180,220 205,222 228 C223 240,226 250,228 256" fill="none" stroke="#7C6FFF" stroke-width="1.2" opacity="0.5"/>
-            <path d="M258 159 C259 180,260 205,258 228 C257 240,254 250,252 256" fill="none" stroke="#7C6FFF" stroke-width="1.2" opacity="0.5"/>
-          </svg>
           <div class="db-mic-wrap">
             <div class="db-mic-ring-3"></div>
             <div class="db-mic-ring-2"></div>
@@ -8992,6 +8979,23 @@ function openVoiceLog() {
   // Default specialty to last used
   const lastSpec = selectedSpecialty || 'endo';
   setVLSpecialty(lastSpec, null);
+  // Reset xray + clinical photo slots
+  vlPhotoFiles = {};
+  ['vl-xr-1','vl-xr-2','vl-xr-3','vl-xr-4','vl-cp-1','vl-cp-2','vl-cp-3','vl-cp-4'].forEach(id => {
+    const slot = document.getElementById(`vl-slot-${id}`);
+    const img = document.getElementById(`vl-img-${id}`);
+    const input = document.getElementById(id);
+    if (slot) { slot.classList.remove('has-photo'); slot.style.opacity=''; }
+    if (img) { img.src = ''; img.style.display = 'none'; }
+    if (input) input.value = '';
+    // Restore icon/label
+    if (slot) {
+      const icon = slot.querySelector('.vl-slot-icon');
+      const label = slot.querySelector('.vl-slot-label');
+      if (icon) icon.style.display = '';
+      if (label) label.style.display = '';
+    }
+  });
 }
 
 function closeVoiceLog() {
@@ -9794,7 +9798,23 @@ function handleVLPhoto(input, id, slotId, imgId) {
   }
 }
 
-// ─── CASE NICKNAMES ───
+function removeVLPhoto(e, id, slotId, imgId) {
+  e.stopPropagation();
+  delete vlPhotoFiles[id];
+  const slot = document.getElementById(slotId);
+  const img = document.getElementById(imgId);
+  const input = document.getElementById(id);
+  if (slot) {
+    slot.classList.remove('has-photo');
+    slot.style.opacity = '';
+    const icon = slot.querySelector('.vl-slot-icon');
+    const label = slot.querySelector('.vl-slot-label');
+    if (icon) icon.style.display = '';
+    if (label) label.style.display = '';
+  }
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  if (input) input.value = '';
+}
 function getCaseNickname(caseId) {
   try { return localStorage.getItem(`nick_${caseId}`) || ''; } catch(e) { return ''; }
 }
