@@ -6650,11 +6650,11 @@ async function generatePortfolioPDF() {
   const initials = ((currentProfile?.first_name?.[0]||'D') + (currentProfile?.last_name?.[0]||'R')).toUpperCase();
   const total = cases.length;
 
-  // Convert avatar to base64 for PDF (avoids CORS in print window)
+  // Convert avatar to base64 for PDF
   let avatarB64 = null;
   if (avatarRaw) {
     if (avatarRaw.startsWith('data:')) {
-      avatarB64 = avatarRaw; // already base64
+      avatarB64 = avatarRaw;
     } else {
       try {
         const resp = await fetch(avatarRaw);
@@ -6670,7 +6670,6 @@ async function generatePortfolioPDF() {
   const rank = getComplexityRank(allCases.length);
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
 
-  // Strip markdown from text
   function stripMd(text) {
     if (!text) return '';
     return text
@@ -6682,13 +6681,39 @@ async function generatePortfolioPDF() {
       .trim();
   }
 
-  // Specialty breakdown
+  // Truncate note to ~3 lines for PDF
+  function truncateNote(note, caseId) {
+    if (!note) return '';
+    const words = note.split(' ');
+    if (words.length <= 45) return note;
+    return words.slice(0, 45).join(' ') + `... <span style="color:#9B91FF;font-style:normal;font-size:8pt;">Full note: provify.app/case/${caseId?.substring(0,8) || ''}</span>`;
+  }
+
   const specBreakdown = ['endo','restorative','surgery','paeds','prostho','smile']
     .map(k => ({ key:k, label: specLabels[k], count: cases.filter(c=>c.specialty===k).length, color: specColors[k] }))
     .filter(s => s.count > 0)
     .sort((a,b) => b.count - a.count);
 
-  // Build case pages HTML
+  // Complexity score data for sparkline
+  const complexityData = cases.slice().reverse().map(c => c.complexity_score || 0);
+  const avgComplexity = cases.length ? (cases.reduce((a,c) => a + (c.complexity_score||0), 0) / cases.length).toFixed(1) : '—';
+
+  // Build sparkline SVG
+  function buildSparkline(data, color) {
+    if (!data.length) return '';
+    const w = 200, h = 40, pad = 4;
+    const max = Math.max(...data, 1);
+    const pts = data.map((v,i) => {
+      const x = pad + (i / Math.max(data.length-1,1)) * (w - 2*pad);
+      const y = h - pad - (v/max) * (h - 2*pad);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+      <circle cx="${parseFloat(pts.split(' ').pop().split(',')[0])}" cy="${parseFloat(pts.split(' ').pop().split(',')[1])}" r="3" fill="${color}"/>
+    </svg>`;
+  }
+
   function buildCaseHTML(c, idx) {
     const isSmile = c.specialty === 'smile';
     const col = specColors[c.specialty] || '#6458DC';
@@ -6696,8 +6721,8 @@ async function generatePortfolioPDF() {
     const caseDate = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
     const caseTitle = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
     const narrative = stripMd(c.narrative);
+    const complexity = c.complexity_score;
 
-    // Clinical fields
     const fields = [];
     if (c.age_range) fields.push(['Patient Age', c.age_range]);
     if (c.complaint) fields.push(['Chief Complaint', c.complaint]);
@@ -6736,14 +6761,11 @@ async function generatePortfolioPDF() {
       if (c.material) fields.push(['Material', c.material]);
     }
     if (c.post_op && c.post_op !== 'None') fields.push(['Post-op', c.post_op]);
-    if (c.follow_up && c.follow_up !== 'No') fields.push(['Follow-up', c.follow_up]);
 
-    // Note — strip markdown and ML record boilerplate
     let note = c.note || '';
     if (note.includes('|| ML_RECORD:')) note = note.split('|| ML_RECORD:')[0].trim();
-    note = stripMd(note);
+    note = truncateNote(stripMd(note), c.id);
 
-    // Photos
     const smileBefore = c.photo_urls?.['smile-before'];
     const smileAfter = c.photo_urls?.['smile-after'];
     const otherPhotos = c.photo_urls
@@ -6754,51 +6776,76 @@ async function generatePortfolioPDF() {
       'xr-preop':'Pre-op X-ray','xr-wl':'Working Length','xr-mc':'Master Cone',
       'xr-obturation':'Obturation','xr-postop':'Post-op X-ray',
       'xr-gen-preop':'Pre-op X-ray','xr-gen-postop':'Post-op X-ray',
-      'cp-preop':'Pre-op Photo','cp-postop':'Post-op Photo','cp-intraoral':'Intraoral',
-      'vl-xr-1':'X-ray','vl-xr-2':'X-ray','vl-xr-3':'X-ray','vl-xr-4':'X-ray',
+      'cp-preop':'Pre-op','cp-postop':'Post-op','cp-intraoral':'Intraoral',
       'vl-cp-1':'Clinical Photo','vl-cp-2':'Clinical Photo','vl-cp-3':'Clinical Photo','vl-cp-4':'Clinical Photo',
+      'vl-xr-1':'X-ray','vl-xr-2':'X-ray','vl-xr-3':'X-ray','vl-xr-4':'X-ray',
     };
 
+    // Complexity pill
+    const complexityPill = complexity != null
+      ? `<div class="complexity-pill" style="background:${col}18;border:1px solid ${col}44;color:${col};">
+          <span style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Complexity</span>
+          <span style="font-size:13pt;font-weight:900;line-height:1;">${complexity.toFixed(1)}</span>
+          <span style="font-size:6.5pt;color:#aaa;">/10</span>
+        </div>`
+      : '';
+
     return `
-    <div class="case-page page-break">
-      <div class="case-header" style="border-left:4px solid ${col};">
-        <div class="case-meta">
-          <span class="case-num" style="color:${col};">Case ${idx + 1}</span>
-          <span class="case-spec" style="color:${col};">${specLabel.toUpperCase()}</span>
+    <div class="case-page">
+      <div class="case-stripe" style="background:${col};"></div>
+
+      <div class="case-inner">
+        <div class="case-top-row">
+          <div class="case-header-left">
+            <div class="case-meta-row">
+              <span class="case-badge" style="background:${col}18;color:${col};border:1px solid ${col}33;">${specLabel.toUpperCase()}</span>
+              <span class="case-num-label" style="color:#bbb;">CASE ${idx + 1}</span>
+            </div>
+            <div class="case-title">${caseTitle}</div>
+            <div class="case-date">${caseDate}</div>
+          </div>
+          ${complexityPill}
         </div>
-        <div class="case-title">${caseTitle}</div>
-        <div class="case-date">${caseDate}</div>
-      </div>
 
-      ${narrative ? `<div class="narrative">"${narrative}"</div>` : ''}
+        ${narrative ? `<div class="narrative" style="border-left-color:${col};">"${narrative}"</div>` : ''}
 
-      ${fields.length > 0 ? `
-      <div class="section-label">Clinical Details</div>
-      <table class="fields-table">
-        ${fields.map(([l,v],i) => `<tr class="${i%2===0?'row-even':''}"><td class="field-label">${l}</td><td class="field-value">${v}</td></tr>`).join('')}
-      </table>` : ''}
+        <div class="two-col">
+          ${fields.length > 0 ? `
+          <div class="col-fields">
+            <div class="section-label" style="color:${col};">Clinical Details</div>
+            <table class="fields-table">
+              ${fields.map(([l,v],i) => `<tr class="${i%2===0?'row-even':''}"><td class="field-label">${l}</td><td class="field-value">${v}</td></tr>`).join('')}
+            </table>
+          </div>` : ''}
 
-      ${isSmile && (smileBefore || smileAfter) ? `
-      <div class="section-label">Before &amp; After</div>
-      <div class="smile-grid">
-        ${smileBefore ? `<div class="smile-photo"><img src="${smileBefore}" alt="Before"><div class="photo-label">BEFORE</div></div>` : ''}
-        ${smileAfter ? `<div class="smile-photo"><img src="${smileAfter}" alt="After"><div class="photo-label after-label">AFTER</div></div>` : ''}
-      </div>` : ''}
+          ${otherPhotos.length > 0 ? `
+          <div class="col-photos">
+            <div class="section-label" style="color:${col};">Clinical Photography</div>
+            <div class="photos-grid-${Math.min(otherPhotos.length,2)}">
+              ${otherPhotos.slice(0,4).map(([k,url]) => {
+                const lbl = photoLabels[k] || 'Photo';
+                return `<div class="photo-item"><img src="${url}" alt="${lbl}"><div class="photo-cap">${lbl}</div></div>`;
+              }).join('')}
+            </div>
+          </div>` : ''}
+        </div>
 
-      ${otherPhotos.length > 0 ? `
-      <div class="section-label">Clinical Photography</div>
-      <div class="photos-grid">
-        ${otherPhotos.map(([k,url]) => { const lbl = photoLabels[k]; return `<div class="photo-item"><img src="${url}" alt="${lbl||'Clinical Photo'}">${lbl && !k.startsWith('vl-') ? `<div class="photo-caption">${lbl}</div>` : ''}</div>`; }).join('')}
-      </div>` : ''}
+        ${isSmile && (smileBefore || smileAfter) ? `
+        <div class="section-label" style="color:${col};">Before &amp; After</div>
+        <div class="smile-grid">
+          ${smileBefore ? `<div class="smile-photo"><img src="${smileBefore}" alt="Before"><div class="photo-label">BEFORE</div></div>` : ''}
+          ${smileAfter ? `<div class="smile-photo"><img src="${smileAfter}" alt="After"><div class="photo-label after-label">AFTER</div></div>` : ''}
+        </div>` : ''}
 
-      ${note ? `
-      <div class="section-label">Clinician Note</div>
-      <div class="note-box">${note}</div>` : ''}
+        ${note ? `
+        <div class="section-label" style="color:${col};margin-top:12px;">Clinician Note</div>
+        <div class="note-box">${note}</div>` : ''}
 
-      <div class="case-footer">
-        <span>Case ID: ${c.id?.substring(0,8).toUpperCase()}</span>
-        <span>Logged: ${new Date(c.created_at).toLocaleString('en-GB')}</span>
-        <span style="color:#6458DC;font-weight:600;">✓ Verified on Provify</span>
+        <div class="case-footer">
+          <span>Case ID: ${c.id?.substring(0,8).toUpperCase()}</span>
+          <span>Logged: ${new Date(c.created_at).toLocaleString('en-GB')}</span>
+          <span class="verified-tag">✓ Verified on Provify</span>
+        </div>
       </div>
     </div>`;
   }
@@ -6811,199 +6858,283 @@ async function generatePortfolioPDF() {
 <meta charset="UTF-8">
 <title>${name} — Clinical Portfolio</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; color: #1a1a2e; background: white; font-size: 11pt; line-height: 1.5; }
+  body { font-family: 'Inter', -apple-system, sans-serif; color: #1a1a2e; background: white; font-size: 10pt; line-height: 1.5; }
 
-  /* BACK BAR — screen only, hidden when printing */
+  /* ── NAV BAR ── */
   .back-bar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-    background: #0a0818;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 12px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px;
+    background: #08061a; border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 11px 24px; display: flex; align-items: center; justify-content: space-between;
   }
   .back-btn {
-    display: flex; align-items: center; gap: 8px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.14);
-    color: rgba(255,255,255,0.8);
-    font-family: -apple-system, sans-serif;
-    font-size: 13px; font-weight: 600;
-    padding: 8px 16px; border-radius: 8px;
-    cursor: pointer; transition: background 0.15s;
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.75); font-family: inherit;
+    font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 7px; cursor: pointer;
   }
-  .back-btn:hover { background: rgba(255,255,255,0.12); }
-  .back-bar-title { font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; text-transform: uppercase; font-family: -apple-system, sans-serif; }
   .save-btn {
-    display: flex; align-items: center; gap: 8px;
-    background: linear-gradient(135deg, rgba(124,111,255,0.25), rgba(124,111,255,0.15));
-    border: 1px solid rgba(124,111,255,0.45);
-    color: #9B91FF;
-    font-family: -apple-system, sans-serif;
-    font-size: 13px; font-weight: 700;
-    padding: 8px 18px; border-radius: 8px;
-    cursor: pointer; transition: background 0.15s;
+    background: #6458DC; border: none; color: #fff;
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    padding: 8px 18px; border-radius: 7px; cursor: pointer;
   }
-  .save-btn:hover { background: rgba(124,111,255,0.35); }
-  .print-spacer { height: 56px; }
-  @media print {
-    .back-bar { display: none !important; }
-    .print-spacer { display: none !important; }
+  .bar-title { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; font-family: inherit; }
+  .print-spacer { height: 54px; }
+
+  /* ── COVER ── */
+  .cover { min-height: 100vh; display: flex; flex-direction: column; background: white; }
+  .cover-hero {
+    background: #08061a; flex: 1;
+    display: flex; flex-direction: column;
+    padding: 64px 56px 56px;
+    position: relative; overflow: hidden;
+  }
+  .cover-hero::before {
+    content: ''; position: absolute; top: -120px; right: -80px;
+    width: 480px; height: 480px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(100,88,220,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-hero::after {
+    content: ''; position: absolute; bottom: -60px; left: -40px;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,149,10,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-wordmark { font-size: 9pt; font-weight: 800; color: #6458DC; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 64px; display: flex; align-items: center; gap: 8px; }
+  .cover-wordmark-dot { width: 6px; height: 6px; border-radius: 50%; background: #6458DC; }
+  .cover-eyebrow { font-size: 8pt; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 14px; }
+  .cover-h1 { font-size: 52pt; font-weight: 900; color: white; letter-spacing: -0.04em; line-height: 0.92; margin-bottom: 32px; }
+  .cover-h1 em { font-style: normal; color: #9B91FF; }
+  .cover-divider { width: 48px; height: 3px; background: linear-gradient(90deg, #6458DC, #9B91FF); border-radius: 2px; margin-bottom: 28px; }
+
+  .cover-profile { display: flex; align-items: center; gap: 18px; margin-bottom: 32px; }
+  .cover-avatar {
+    width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+    border: 2px solid rgba(155,145,255,0.4); flex-shrink: 0;
+    background: linear-gradient(135deg, #2d2060, #1a1040);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22pt; font-weight: 900; color: #9B91FF;
+  }
+  .cover-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .cover-name { font-size: 22pt; font-weight: 800; color: white; letter-spacing: -0.02em; line-height: 1.1; }
+  .cover-role { font-size: 10pt; color: rgba(255,255,255,0.45); margin-top: 3px; font-weight: 400; }
+  .cover-bio { font-size: 9.5pt; color: rgba(255,255,255,0.3); margin-top: 8px; font-style: italic; max-width: 400px; line-height: 1.6; }
+
+  .cover-verified { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; }
+  .verified-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+  .verified-text { font-size: 8pt; font-weight: 700; color: #22c55e; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .cover-stats {
+    background: white; padding: 28px 56px;
+    display: grid; grid-template-columns: repeat(4,1fr);
+    border-top: 4px solid #6458DC;
+  }
+  .cover-stat { padding-right: 24px; border-right: 1px solid #ede9ff; margin-right: 0; }
+  .cover-stat:last-child { border-right: none; }
+  .cstat-val { font-size: 28pt; font-weight: 900; color: #6458DC; letter-spacing: -0.03em; line-height: 1; }
+  .cstat-val.gold { color: #B47800; }
+  .cstat-label { font-size: 7.5pt; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 5px; }
+
+  /* ── OVERVIEW PAGE ── */
+  .overview-page { padding: 48px 56px; background: white; }
+  .page-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 2px solid #6458DC; margin-bottom: 32px; }
+  .ph-logo { font-size: 10pt; font-weight: 900; color: #6458DC; letter-spacing: 0.15em; }
+  .ph-name { font-size: 8.5pt; color: #aaa; font-weight: 500; }
+
+  .ov-section-title { font-size: 18pt; font-weight: 900; color: #1a1a2e; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .ov-subtitle { font-size: 9pt; color: #888; margin-bottom: 28px; }
+
+  .spec-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+  .spec-row { display: flex; align-items: center; gap: 12px; }
+  .spec-name { width: 96px; font-size: 8.5pt; font-weight: 600; color: #444; text-align: right; }
+  .spec-track { flex: 1; height: 8px; background: #f0eff8; border-radius: 100px; overflow: hidden; }
+  .spec-fill { height: 100%; border-radius: 100px; }
+  .spec-count { width: 22px; font-size: 9pt; font-weight: 800; text-align: right; }
+  .spec-pct { width: 34px; font-size: 8pt; color: #bbb; }
+
+  .metrics-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+  .metric-card {
+    background: #faf9ff; border: 1px solid #e8e7f5; border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .metric-val { font-size: 22pt; font-weight: 900; color: #6458DC; letter-spacing: -0.03em; line-height: 1; }
+  .metric-label { font-size: 7.5pt; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 5px; }
+  .metric-sub { font-size: 8pt; color: #bbb; margin-top: 3px; }
+
+  .sparkline-row { display: flex; align-items: center; gap: 16px; margin-top: 4px; }
+  .sparkline-label { font-size: 8pt; color: #aaa; }
+
+  .ov-footer { font-size: 8pt; color: #ccc; text-align: center; padding-top: 20px; border-top: 1px solid #f0eff8; margin-top: 24px; }
+
+  /* ── CASE PAGES ── */
+  .case-page { background: white; position: relative; display: flex; page-break-before: always; page-break-inside: avoid; min-height: 100vh; }
+  .case-stripe { width: 5px; flex-shrink: 0; }
+  .case-inner { flex: 1; padding: 36px 48px 28px; }
+
+  .case-top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .case-meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .case-badge { font-size: 7pt; font-weight: 800; padding: 3px 9px; border-radius: 100px; letter-spacing: 0.1em; }
+  .case-num-label { font-size: 7.5pt; font-weight: 500; letter-spacing: 0.08em; }
+  .case-title { font-size: 26pt; font-weight: 900; color: #1a1a2e; letter-spacing: -0.03em; line-height: 1; }
+  .case-date { font-size: 9pt; color: #aaa; margin-top: 5px; font-weight: 400; }
+
+  .complexity-pill {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 8px 14px; border-radius: 10px; text-align: center; min-width: 64px; flex-shrink: 0;
+    gap: 2px;
   }
 
-  /* COVER */
-  .cover { min-height: 100vh; display: flex; flex-direction: column; page-break-after: always; position: relative; overflow: hidden; }
-  .cover-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: linear-gradient(180deg, #6458DC, #9B91FF); }
-  .cover-top { background: linear-gradient(135deg, #0a0818 0%, #0f0d1f 100%); padding: 60px 50px 50px 66px; color: white; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-  .cover-provify { font-size: 10pt; font-weight: 700; color: #9B91FF; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 48px; }
-  .cover-pretitle { font-size: 9pt; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; }
-  .cover-title { font-size: 42pt; font-weight: 800; color: white; letter-spacing: -0.03em; line-height: 1; margin-bottom: 8px; }
-  .cover-title span { color: #9B91FF; }
-  .cover-rule { width: 60px; height: 3px; background: #9B91FF; margin: 24px 0; border-radius: 2px; }
-  .cover-name { font-size: 22pt; font-weight: 700; color: white; margin-bottom: 6px; }
-  .cover-role { font-size: 11pt; color: rgba(255,255,255,0.5); }
-  .cover-bio { font-size: 10pt; color: rgba(255,255,255,0.35); margin-top: 12px; font-style: italic; max-width: 420px; line-height: 1.6; }
-  .cover-bottom { background: #f8f7ff; padding: 36px 50px 36px 66px; display: flex; gap: 0; border-top: 3px solid #6458DC; }
-  .cover-stat { flex: 1; padding-right: 28px; border-right: 1px solid #e0dff5; margin-right: 28px; }
-  .cover-stat:last-child { border-right: none; margin-right: 0; }
-  .cover-stat-val { font-size: 26pt; font-weight: 800; color: #6458DC; line-height: 1; }
-  .cover-stat-label { font-size: 8pt; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
-  .cover-rank { display: inline-flex; align-items: center; gap: 8px; background: rgba(100,88,220,0.1); border: 1px solid rgba(100,88,220,0.25); border-radius: 100px; padding: 6px 16px; margin-top: 10px; }
-  .cover-rank-text { font-size: 9pt; font-weight: 700; color: #6458DC; }
-  .verified-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 20px; }
-  .verified-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.3); }
-  .verified-text { font-size: 8pt; font-weight: 700; color: #22c55e; letter-spacing: 0.1em; text-transform: uppercase; }
+  .narrative {
+    background: #faf9ff; border-left: 3px solid #6458DC;
+    padding: 11px 16px; border-radius: 0 8px 8px 0;
+    font-style: italic; font-size: 10pt; color: #444; line-height: 1.6; margin-bottom: 18px;
+  }
 
-  /* SPECIALTY PAGE */
-  .spec-page { padding: 50px 50px 40px; page-break-after: always; }
-  .spec-header { margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid #f0eff8; }
-  .spec-header-label { font-size: 8pt; color: #9B91FF; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700; margin-bottom: 6px; }
-  .spec-header-title { font-size: 20pt; font-weight: 800; color: #1a1a2e; }
-  .spec-bars { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
-  .spec-bar-row { display: flex; align-items: center; gap: 14px; }
-  .spec-bar-label { width: 80px; font-size: 9pt; color: #555; text-align: right; font-weight: 500; }
-  .spec-bar-track { flex: 1; height: 10px; background: #f0eff8; border-radius: 100px; overflow: hidden; }
-  .spec-bar-fill { height: 100%; border-radius: 100px; }
-  .spec-bar-count { width: 30px; font-size: 9pt; font-weight: 700; text-align: right; }
-  .spec-bar-pct { width: 36px; font-size: 8pt; color: #aaa; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .two-col.single { grid-template-columns: 1fr; }
 
-  /* CASE PAGES */
-  .case-page { padding: 40px 50px; page-break-after: always; }
-  .page-break { page-break-before: always; }
-  .case-page:first-of-type { page-break-before: always; }
-  .case-header { padding: 16px 18px; background: #faf9ff; border-radius: 8px; margin-bottom: 18px; }
-  .case-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .case-num { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
-  .case-spec { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
-  .case-spec::before { content: '·'; margin-right: 10px; color: #ccc; }
-  .case-title { font-size: 20pt; font-weight: 800; color: #1a1a2e; letter-spacing: -0.02em; line-height: 1.1; }
-  .case-date { font-size: 9pt; color: #999; margin-top: 4px; }
-  .narrative { background: #f5f4ff; border-left: 3px solid #6458DC; padding: 12px 16px; border-radius: 0 8px 8px 0; font-style: italic; font-size: 10pt; color: #333; line-height: 1.6; margin-bottom: 18px; }
-  .section-label { font-size: 7.5pt; font-weight: 700; color: #6458DC; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px; margin-top: 16px; padding-bottom: 4px; border-bottom: 1px solid #e8e7f5; }
-  .fields-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
-  .fields-table td { padding: 6px 10px; font-size: 9.5pt; vertical-align: top; }
-  .field-label { color: #888; width: 38%; font-weight: 400; }
-  .field-value { color: #1a1a2e; font-weight: 500; }
+  .section-label {
+    font-size: 7pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.18em;
+    margin-bottom: 8px; margin-top: 14px; padding-bottom: 5px;
+    border-bottom: 1px solid #ede9ff;
+  }
+  .fields-table { width: 100%; border-collapse: collapse; }
+  .fields-table td { padding: 5.5px 8px; font-size: 9pt; vertical-align: top; }
+  .field-label { color: #999; width: 44%; font-weight: 400; }
+  .field-value { color: #1a1a2e; font-weight: 600; }
   .row-even { background: #faf9ff; }
-  .smile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
-  .smile-photo { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; background: #f0f0f0; }
-  .smile-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo-label { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.7); color: white; font-size: 7pt; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.08em; }
-  .after-label { left: auto; right: 6px; background: rgba(212,149,10,0.9); color: #000; }
-  .photos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 4px; }
-  .photo-item { border-radius: 6px; overflow: hidden; background: #f0f0f0; }
-  .photo-item img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
-  .photo-caption { font-size: 7pt; color: #888; padding: 4px 6px; text-align: center; background: #faf9ff; }
-  .note-box { background: #faf9ff; border: 1px solid #e8e7f5; border-radius: 6px; padding: 12px 14px; font-size: 9.5pt; color: #333; line-height: 1.65; }
-  .case-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 10px; border-top: 1px solid #f0eff8; font-size: 8pt; color: #bbb; }
 
-  /* GLOBAL HEADER/FOOTER via @page not widely supported, use div */
-  .page-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 2px solid #6458DC; margin-bottom: 24px; }
-  .page-header-logo { font-size: 11pt; font-weight: 800; color: #6458DC; letter-spacing: 0.05em; }
-  .page-header-info { font-size: 8.5pt; color: #aaa; }
+  .photos-grid-1, .photos-grid-2 { display: grid; gap: 8px; }
+  .photos-grid-1 { grid-template-columns: 1fr; }
+  .photos-grid-2 { grid-template-columns: 1fr 1fr; }
+  .photo-item { border-radius: 7px; overflow: hidden; background: #f0f0f0; }
+  .photo-item img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+  .photo-cap { font-size: 6.5pt; color: #999; padding: 3px 6px; text-align: center; background: #fafafa; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  .smile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  .smile-photo { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 4/3; background: #f0f0f0; }
+  .smile-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-label { position: absolute; bottom: 7px; left: 8px; background: rgba(0,0,0,0.65); color: white; font-size: 7pt; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.1em; }
+  .after-label { left: auto; right: 8px; background: rgba(212,149,10,0.92); color: #000; }
+
+  .note-box { background: #faf9ff; border: 1px solid #ede9ff; border-radius: 7px; padding: 10px 14px; font-size: 9pt; color: #444; line-height: 1.65; }
+
+  .case-footer {
+    display: flex; justify-content: space-between; margin-top: 18px;
+    padding-top: 10px; border-top: 1px solid #f0eff8;
+    font-size: 7.5pt; color: #ccc;
+  }
+  .verified-tag { color: #6458DC; font-weight: 700; }
 
   @media print {
+    .back-bar, .print-spacer { display: none !important; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .cover { page-break-after: always; }
+    .cover { page-break-after: always; min-height: auto; }
+    .overview-page { page-break-after: always; }
     .case-page { page-break-before: always; page-break-inside: avoid; }
-    .spec-page { page-break-after: always; }
   }
 </style>
 </head>
 <body>
 <div class="back-bar">
   <button class="back-btn" onclick="window.close()">← Back to Provify</button>
-  <span class="back-bar-title">${name} · Clinical Portfolio</span>
+  <span class="bar-title">${name} · Clinical Portfolio</span>
   <button class="save-btn" onclick="window.print()">⬇ Save as PDF</button>
 </div>
 <div class="print-spacer"></div>
 
-<!-- COVER PAGE -->
+<!-- COVER -->
 <div class="cover">
-  <div class="cover-accent"></div>
-  <div class="cover-top">
-    <div class="cover-provify">Provify · Clinical Case Intelligence</div>
-    <div class="cover-pretitle">Professional Portfolio</div>
-    <div class="cover-title">Clinical<br><span>Portfolio</span></div>
-    <div class="cover-rule"></div>
-    ${avatarB64 ? `
-    <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;margin:0 auto 14px;border:3px solid rgba(255,255,255,0.25);box-shadow:0 0 20px rgba(124,111,255,0.3);">
-      <img src="${avatarB64}" style="width:100%;height:100%;object-fit:cover;">
-    </div>` : ''}
-    <div class="cover-name">${name}</div>
-    <div class="cover-role">${role}${primarySpec ? ' · ' + primarySpec : ''}</div>
-    ${bio ? `<div class="cover-bio">${bio}</div>` : ''}
-    <div class="verified-badge">
+  <div class="cover-hero">
+    <div class="cover-wordmark"><div class="cover-wordmark-dot"></div>Provify</div>
+    <div class="cover-eyebrow">Clinical Case Record</div>
+    <div class="cover-h1">Clinical<br><em>Portfolio</em></div>
+    <div class="cover-divider"></div>
+    <div class="cover-profile">
+      <div class="cover-avatar">
+        ${avatarB64 ? `<img src="${avatarB64}" alt="${name}">` : initials}
+      </div>
+      <div>
+        <div class="cover-name">${name}</div>
+        <div class="cover-role">${role}${primarySpec ? ' · ' + primarySpec : ''}</div>
+        ${bio ? `<div class="cover-bio">${bio}</div>` : ''}
+      </div>
+    </div>
+    <div class="cover-verified">
       <div class="verified-dot"></div>
       <div class="verified-text">Verified on Provify</div>
     </div>
   </div>
-  <div class="cover-bottom">
+  <div class="cover-stats">
     <div class="cover-stat">
-      <div class="cover-stat-val">${total}</div>
-      <div class="cover-stat-label">Total Cases</div>
+      <div class="cstat-val">${total}</div>
+      <div class="cstat-label">Total Cases</div>
     </div>
     <div class="cover-stat">
-      <div class="cover-stat-val">${specBreakdown.length}</div>
-      <div class="cover-stat-label">Specialties</div>
+      <div class="cstat-val">${specBreakdown.length}</div>
+      <div class="cstat-label">Specialties</div>
     </div>
     <div class="cover-stat">
-      <div class="cover-rank">
-        <span style="font-size:14pt;">${rank.emoji}</span>
-        <span class="cover-rank-text">${rank.rank} Rank</span>
-      </div>
-      <div class="cover-stat-label" style="margin-top:8px;">Current Rank</div>
+      <div class="cstat-val gold">${rank.rank}</div>
+      <div class="cstat-label">Current Rank</div>
     </div>
-    <div class="cover-stat" style="border-right:none;">
-      <div class="cover-stat-val" style="font-size:10pt;color:#666;padding-top:4px;">${today}</div>
-      <div class="cover-stat-label">Generated</div>
+    <div class="cover-stat">
+      <div class="cstat-val" style="font-size:14pt;color:#888;padding-top:6px;">${today}</div>
+      <div class="cstat-label">Generated</div>
     </div>
   </div>
 </div>
 
-<!-- SPECIALTY BREAKDOWN PAGE -->
-<div class="spec-page">
+<!-- OVERVIEW PAGE -->
+<div class="overview-page">
   <div class="page-header">
-    <div class="page-header-logo">PROVIFY</div>
-    <div class="page-header-info">${name} · Clinical Portfolio</div>
+    <div class="ph-logo">PROVIFY</div>
+    <div class="ph-name">${name} · Clinical Portfolio</div>
   </div>
-  <div class="spec-header">
-    <div class="spec-header-label">Overview</div>
-    <div class="spec-header-title">Clinical Specialties</div>
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-val">${total}</div>
+      <div class="metric-label">Logged Cases</div>
+      <div class="metric-sub">${specBreakdown.length} specialties</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:#B47800;">${avgComplexity}</div>
+      <div class="metric-label">Avg Complexity</div>
+      <div class="metric-sub">out of 10</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:#22c55e;">${rank.rank}</div>
+      <div class="metric-label">Current Rank</div>
+      <div class="metric-sub">${rank.emoji} Verified record</div>
+    </div>
   </div>
-  <div class="spec-bars">
+
+  <div class="ov-section-title">Clinical Specialties</div>
+  <div class="ov-subtitle">Breakdown of cases by specialty</div>
+  <div class="spec-grid">
     ${specBreakdown.map(s => `
-      <div class="spec-bar-row">
-        <div class="spec-bar-label">${s.label}</div>
-        <div class="spec-bar-track">
-          <div class="spec-bar-fill" style="width:${Math.round(s.count/total*100)}%;background:${s.color};"></div>
+      <div class="spec-row">
+        <div class="spec-name">${s.label}</div>
+        <div class="spec-track">
+          <div class="spec-fill" style="width:${Math.round(s.count/total*100)}%;background:${s.color};"></div>
         </div>
-        <div class="spec-bar-count" style="color:${s.color};">${s.count}</div>
-        <div class="spec-bar-pct">${Math.round(s.count/total*100)}%</div>
+        <div class="spec-count" style="color:${s.color};">${s.count}</div>
+        <div class="spec-pct">${Math.round(s.count/total*100)}%</div>
       </div>`).join('')}
   </div>
-  <div style="font-size:8.5pt;color:#aaa;text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #f0eff8;">
+
+  ${complexityData.length > 1 ? `
+  <div class="ov-section-title" style="margin-top:24px;">Complexity Growth</div>
+  <div class="ov-subtitle">Complexity score trend across all logged cases</div>
+  <div class="sparkline-row">
+    ${buildSparkline(complexityData, '#6458DC')}
+    <div class="sparkline-label">Avg: <strong>${avgComplexity}/10</strong></div>
+  </div>` : ''}
+
+  <div class="ov-footer">
     This portfolio was generated by Provify — provify.app · All cases are timestamped and tamper-proof
   </div>
 </div>
@@ -7014,12 +7145,10 @@ ${casePages}
 </body>
 </html>`;
 
-  // Open print window
   const printWin = window.open('', '_blank', 'width=900,height=700');
   printWin.document.write(html);
   printWin.document.close();
 
-  // Wait for images to load then print
   printWin.onload = () => {
     setTimeout(() => {
       printWin.focus();
@@ -7034,6 +7163,7 @@ ${casePages}
     btn.disabled = false;
   }
 }
+
 
 // ─── AUTO CLINICAL NOTE (runs after every case submission) ───
 async function autoGenerateClinicalNote(c) {
@@ -9428,13 +9558,36 @@ async function submitVoiceCase() {
   if (!currentUser) { showToast('Please sign in first.'); return; }
   if (!isPro && !isTrialActive()) { showPaywall(); closeVoiceLog(); return; }
 
+  // ── VOICE LOG VALIDATION ──
+  // Only block if the recording was genuinely unintelligible
+  const d = vlExtractedData || {};
+
+  const narrativeText = (d.narrative || d.corrected_transcript || '').trim();
+  const unintelligibleMarkers = [
+    'unable to determine',
+    'unintelligible',
+    'could not determine',
+    'not recorded',
+    'incomplete clinical'
+  ];
+  const isUnintelligible = unintelligibleMarkers.some(m => narrativeText.toLowerCase().includes(m))
+    || narrativeText.length < 20;
+
+  if (isUnintelligible) {
+    showVLScreen('review');
+    showToast('⚠️ Recording unclear. Please re-record and speak closer to the mic.');
+    const btn = document.querySelector('#vl-screen-review button');
+    if (btn) { btn.textContent = 'Log Case'; btn.disabled = false; }
+    return;
+  }
+  // ── END VALIDATION ──
+
   const btn = document.querySelector('#vl-screen-review button');
   if (btn) { btn.textContent = 'Logging...'; btn.disabled = true; }
 
   showVLScreen('processing');
   document.getElementById('vl-processing-msg').textContent = 'Saving your case...';
 
-  const d = vlExtractedData;
   const complexity = Math.min(10, 2 +
     (d.case_type === 'Retreatment' ? 2 : 0) +
     (d.curvature === 'Severe' ? 2 : d.curvature === 'Moderate' ? 1 : 0) +
