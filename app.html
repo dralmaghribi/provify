@@ -1400,7 +1400,6 @@ body::after {
   padding: 5px 11px 5px 8px;
 }
 
-
 .swipe-card-counter {
   position: absolute;
   top: 14px; left: 14px;
@@ -1420,7 +1419,6 @@ body::after {
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.1);
 }
-
 
 </style>
 <!-- Lemon Squeezy payments -->
@@ -2777,7 +2775,6 @@ body::after {
           </div>
         </div>
 
-
         <!-- MICRO STATS (hidden from UI but IDs preserved for JS compatibility) -->
         <div style="display:none;" aria-hidden="true">
           <strong id="micro-total">0</strong>
@@ -2930,8 +2927,6 @@ body::after {
               <!-- Cards injected here by JS -->
             </div>
           </div>
-
-
 
           <!-- Compat stubs: JS reads these ids — kept hidden -->
           <div id="cases-hero-card" style="display:none;"></div>
@@ -6562,7 +6557,6 @@ async function pp3TriggerExport() {
   if (sub)   { sub.textContent   = `PDF · ${allCases.length} cases · Tamper-proof`; }
 }
 
-
 function renderPortfolioCases() {
   const el = document.getElementById('portfolio-cases-list');
   if (!el) return;
@@ -6694,26 +6688,6 @@ async function generatePortfolioPDF() {
     .filter(s => s.count > 0)
     .sort((a,b) => b.count - a.count);
 
-  // Complexity score data for sparkline
-  const complexityData = cases.slice().reverse().map(c => c.complexity_score || 0);
-  const avgComplexity = cases.length ? (cases.reduce((a,c) => a + (c.complexity_score||0), 0) / cases.length).toFixed(1) : '—';
-
-  // Build sparkline SVG
-  function buildSparkline(data, color) {
-    if (!data.length) return '';
-    const w = 200, h = 40, pad = 4;
-    const max = Math.max(...data, 1);
-    const pts = data.map((v,i) => {
-      const x = pad + (i / Math.max(data.length-1,1)) * (w - 2*pad);
-      const y = h - pad - (v/max) * (h - 2*pad);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(' ');
-    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
-      <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
-      <circle cx="${parseFloat(pts.split(' ').pop().split(',')[0])}" cy="${parseFloat(pts.split(' ').pop().split(',')[1])}" r="3" fill="${color}"/>
-    </svg>`;
-  }
-
   function buildCaseHTML(c, idx) {
     const isSmile = c.specialty === 'smile';
     const col = specColors[c.specialty] || '#6458DC';
@@ -6721,7 +6695,6 @@ async function generatePortfolioPDF() {
     const caseDate = new Date(c.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
     const caseTitle = isSmile ? (c.procedure || 'Smile Case') : `Tooth ${c.tooth_number || '—'}`;
     const narrative = stripMd(c.narrative);
-    const complexity = c.complexity_score;
 
     const fields = [];
     if (c.age_range) fields.push(['Patient Age', c.age_range]);
@@ -6781,15 +6754,6 @@ async function generatePortfolioPDF() {
       'vl-xr-1':'X-ray','vl-xr-2':'X-ray','vl-xr-3':'X-ray','vl-xr-4':'X-ray',
     };
 
-    // Complexity pill
-    const complexityPill = complexity != null
-      ? `<div class="complexity-pill" style="background:${col}18;border:1px solid ${col}44;color:${col};">
-          <span style="font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Complexity</span>
-          <span style="font-size:13pt;font-weight:900;line-height:1;">${complexity.toFixed(1)}</span>
-          <span style="font-size:6.5pt;color:#aaa;">/10</span>
-        </div>`
-      : '';
-
     return `
     <div class="case-page">
       <div class="case-stripe" style="background:${col};"></div>
@@ -6804,7 +6768,6 @@ async function generatePortfolioPDF() {
             <div class="case-title">${caseTitle}</div>
             <div class="case-date">${caseDate}</div>
           </div>
-          ${complexityPill}
         </div>
 
         ${narrative ? `<div class="narrative" style="border-left-color:${col};">"${narrative}"</div>` : ''}
@@ -6928,7 +6891,7 @@ async function generatePortfolioPDF() {
 
   .cover-stats {
     background: white; padding: 28px 56px;
-    display: grid; grid-template-columns: repeat(4,1fr);
+    display: grid; grid-template-columns: repeat(3,1fr);
     border-top: 4px solid #6458DC;
   }
   .cover-stat { padding-right: 24px; border-right: 1px solid #ede9ff; margin-right: 0; }
@@ -6954,24 +6917,12 @@ async function generatePortfolioPDF() {
   .spec-count { width: 22px; font-size: 9pt; font-weight: 800; text-align: right; }
   .spec-pct { width: 34px; font-size: 8pt; color: #bbb; }
 
-  .metrics-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
-  .metric-card {
-    background: #faf9ff; border: 1px solid #e8e7f5; border-radius: 10px;
-    padding: 16px 20px;
-  }
-  .metric-val { font-size: 22pt; font-weight: 900; color: #6458DC; letter-spacing: -0.03em; line-height: 1; }
-  .metric-label { font-size: 7.5pt; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 5px; }
-  .metric-sub { font-size: 8pt; color: #bbb; margin-top: 3px; }
-
-  .sparkline-row { display: flex; align-items: center; gap: 16px; margin-top: 4px; }
-  .sparkline-label { font-size: 8pt; color: #aaa; }
-
   .ov-footer { font-size: 8pt; color: #ccc; text-align: center; padding-top: 20px; border-top: 1px solid #f0eff8; margin-top: 24px; }
 
   /* ── CASE PAGES ── */
-  .case-page { background: white; position: relative; display: flex; page-break-before: always; page-break-inside: avoid; min-height: 100vh; }
+  .case-page { background: white; position: relative; display: flex; page-break-before: always; page-break-inside: avoid; }
   .case-stripe { width: 5px; flex-shrink: 0; }
-  .case-inner { flex: 1; padding: 36px 48px 28px; }
+  .case-inner { flex: 1; padding: 24px 48px 20px; }
 
   .case-top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
   .case-meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -6979,12 +6930,6 @@ async function generatePortfolioPDF() {
   .case-num-label { font-size: 7.5pt; font-weight: 500; letter-spacing: 0.08em; }
   .case-title { font-size: 26pt; font-weight: 900; color: #1a1a2e; letter-spacing: -0.03em; line-height: 1; }
   .case-date { font-size: 9pt; color: #aaa; margin-top: 5px; font-weight: 400; }
-
-  .complexity-pill {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 8px 14px; border-radius: 10px; text-align: center; min-width: 64px; flex-shrink: 0;
-    gap: 2px;
-  }
 
   .narrative {
     background: #faf9ff; border-left: 3px solid #6458DC;
@@ -7076,13 +7021,9 @@ async function generatePortfolioPDF() {
       <div class="cstat-val">${specBreakdown.length}</div>
       <div class="cstat-label">Specialties</div>
     </div>
-    <div class="cover-stat">
+    <div class="cover-stat" style="border-right:none;">
       <div class="cstat-val gold">${rank.rank}</div>
       <div class="cstat-label">Current Rank</div>
-    </div>
-    <div class="cover-stat">
-      <div class="cstat-val" style="font-size:14pt;color:#888;padding-top:6px;">${today}</div>
-      <div class="cstat-label">Generated</div>
     </div>
   </div>
 </div>
@@ -7092,24 +7033,6 @@ async function generatePortfolioPDF() {
   <div class="page-header">
     <div class="ph-logo">PROVIFY</div>
     <div class="ph-name">${name} · Clinical Portfolio</div>
-  </div>
-
-  <div class="metrics-row">
-    <div class="metric-card">
-      <div class="metric-val">${total}</div>
-      <div class="metric-label">Logged Cases</div>
-      <div class="metric-sub">${specBreakdown.length} specialties</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-val" style="color:#B47800;">${avgComplexity}</div>
-      <div class="metric-label">Avg Complexity</div>
-      <div class="metric-sub">out of 10</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-val" style="color:#22c55e;">${rank.rank}</div>
-      <div class="metric-label">Current Rank</div>
-      <div class="metric-sub">${rank.emoji} Verified record</div>
-    </div>
   </div>
 
   <div class="ov-section-title">Clinical Specialties</div>
@@ -7125,14 +7048,6 @@ async function generatePortfolioPDF() {
         <div class="spec-pct">${Math.round(s.count/total*100)}%</div>
       </div>`).join('')}
   </div>
-
-  ${complexityData.length > 1 ? `
-  <div class="ov-section-title" style="margin-top:24px;">Complexity Growth</div>
-  <div class="ov-subtitle">Complexity score trend across all logged cases</div>
-  <div class="sparkline-row">
-    ${buildSparkline(complexityData, '#6458DC')}
-    <div class="sparkline-label">Avg: <strong>${avgComplexity}/10</strong></div>
-  </div>` : ''}
 
   <div class="ov-footer">
     This portfolio was generated by Provify — provify.app · All cases are timestamped and tamper-proof
@@ -7163,7 +7078,6 @@ ${casePages}
     btn.disabled = false;
   }
 }
-
 
 // ─── AUTO CLINICAL NOTE (runs after every case submission) ───
 async function autoGenerateClinicalNote(c) {
@@ -8257,7 +8171,6 @@ Respond ONLY with a raw JSON object (no markdown, no backticks):
   }
 }
 
-
 function renderInsightCard(result, state) {
   const el = document.getElementById('db-ai-insight-card');
   if (!el) return;
@@ -8468,7 +8381,6 @@ async function dbi3Refresh() {
 }
 
 function pvOpenInsightModal() { /* no-op — swipeable card replaced modal */ }
-
 
 // ─── CLINICAL GROWTH ENGINE ───
 async function runGrowthEngine() {
@@ -9955,7 +9867,6 @@ function handleVLPhoto(input, id, slotId, imgId) {
   }
 }
 
-
 function removeVLPhoto(e, id, slotId, imgId) {
   e.stopPropagation();
   delete vlPhotoFiles[id];
@@ -10250,9 +10161,6 @@ function _attachHeroSwipeListeners(track, viewport) {
   });
 }
 
-
-
-
 // ─── PROVIFY SHIELD ───
 async function openShield() {
   const c = currentModalCase;
@@ -10541,7 +10449,6 @@ function copyCelebrationNote() {
     showToast('Note not ready yet — check the case in My Cases');
   }
 }
-
 
 // ─── ONBOARDING ───
 let obSelectedRole = '';
@@ -11092,7 +10999,6 @@ function showGPSUnlockMoment(stage) {
   }, 3000);
 }
 
-
 function renderGPSRoadmap(el, data) {
   const stageIds = GOAL_STAGES[data.goal] || GOAL_STAGES.gp;
   const stages = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
@@ -11520,7 +11426,6 @@ function renderLiveCareerDashboard() {
       }).join('')}
     </div>
   </div>
-
 
   </div>`;
 }
@@ -12034,7 +11939,6 @@ function getMonthlyObjectives() {
 
   return { month, objectives };
 }
-
 
 // ─── VALUE STRIP ───
 function renderValueStrip() {
