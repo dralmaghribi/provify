@@ -6462,14 +6462,15 @@ function pvOpenGPSModal() {
   if (curGoal && GOAL_STAGES[curGoal]) {
     const stageIds = GOAL_STAGES[curGoal];
     const stages   = stageIds.map(id => CAREER_STAGES.find(s => s.id === id)).filter(Boolean);
-    const done     = stages.filter(s => s.auto(ctx) || mc[s.id]).length;
+    const surpassed = getRoleSurpassedStages(ctx.role);
+    const done     = stages.filter(s => s.auto(ctx) || mc[s.id] || surpassed.includes(s.id)).length;
 
     timelineHTML = `
     <div style="margin-top:20px;">
       <div style="font-size:0.44rem;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:12px;">Roadmap · ${done}/${stages.length} complete</div>
       ${stages.map((s, i) => {
-        const completed = s.auto(ctx) || mc[s.id];
-        const isNext    = !completed && stages.slice(0,i).every(p => p.auto(ctx) || mc[p.id]);
+        const completed = s.auto(ctx) || mc[s.id] || surpassed.includes(s.id);
+        const isNext    = !completed && stages.slice(0,i).every(p => p.auto(ctx) || mc[p.id] || surpassed.includes(p.id));
         const col       = s.color || '#7C6FFF';
         return `
         <div style="display:flex;gap:12px;margin-bottom:${i < stages.length-1 ? '0' : '0'};">
