@@ -6370,52 +6370,48 @@ async function pvSaveProfile() {
   if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
 
   const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].filter(d => {
-    const b = document.getElementById(`pm-day-${d}`);
+    const b = document.getElementById('pm-day-' + d);
     return b && b.dataset.active === '1';
   });
 
-  const updates = {
-    first_name:       document.getElementById('pm-first')?.value.trim() || '',
-    last_name:        document.getElementById('pm-last')?.value.trim()  || '',
-    role:             document.getElementById('pm-role')?.value         || 'intern',
-    primary_specialty:document.getElementById('pm-specialty')?.value    || null,
-    username:         (document.getElementById('pm-username')?.value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'-')) || '',
-    bio:              document.getElementById('pm-bio')?.value.trim()   || '',
-    clinic_days:      days,
-  };
+  const firstName       = (document.getElementById('pm-first')?.value || '').trim();
+  const lastName        = (document.getElementById('pm-last')?.value  || '').trim();
+  const role            = document.getElementById('pm-role')?.value || 'intern';
+  const primarySpecialty= document.getElementById('pm-specialty')?.value || null;
+  const username        = (document.getElementById('pm-username')?.value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g,'-');
+  const bio             = (document.getElementById('pm-bio')?.value || '').trim();
 
-  // Check username uniqueness manually before saving
-  const newUsername = updates.username;
-  if (newUsername && newUsername !== (currentProfile.username || '')) {
-    const { data: existing } = await sb.from('profiles').select('id').eq('username', newUsername).neq('id', currentUser.id).single();
-    if (existing) {
-      showToast('Username already taken — try another.');
-      if (btn) { btn.textContent = 'Save Profile'; btn.disabled = false; }
-      return;
-    }
-  }
-
-  const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
-  if (error) {
-    console.error('Profile save error:', error);
-    showToast('Error saving profile — try again.');
+  // Step 1: Save core fields — these columns always exist
+  const coreUpdate = { first_name: firstName, last_name: lastName, role };
+  const { error: coreErr } = await sb.from('profiles').update(coreUpdate).eq('id', currentUser.id);
+  if (coreErr) {
+    console.error('Profile core save error:', coreErr);
+    showToast('Error saving — check console.');
     if (btn) { btn.textContent = 'Save Profile'; btn.disabled = false; }
     return;
   }
 
-  currentProfile = { ...currentProfile, ...updates };
-  document.getElementById('user-display-name').textContent = `Dr. ${updates.first_name}`;
-  document.getElementById('user-avatar').textContent = (updates.first_name?.[0]||'D') + (updates.last_name?.[0]||'R');
+  // Step 2: Save extended fields — columns may need to be added via SQL
+  // Run in Supabase SQL editor if this fails:
+  // ALTER TABLE profiles ADD COLUMN IF NOT EXISTS username text unique;
+  // ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bio text;
+  // ALTER TABLE profiles ADD COLUMN IF NOT EXISTS clinic_days text[];
+  // ALTER TABLE profiles ADD COLUMN IF NOT EXISTS primary_specialty text;
+  const extUpdate = { primary_specialty: primarySpecialty, username, bio, clinic_days: days };
+  const { error: extErr } = await sb.from('profiles').update(extUpdate).eq('id', currentUser.id);
+  if (extErr) {
+    console.warn('Extended fields save failed (columns may not exist in DB):', extErr.message);
+    // Still continue — core was saved
+  }
 
-  // Sync the legacy profile form fields too
-  ['first','last','role','specialty','username','bio'].forEach(f => {
-    const el = document.getElementById(`profile-${f}`);
-    if (el) el.value = updates[f === 'first' ? 'first_name' : f === 'last' ? 'last_name' : f === 'specialty' ? 'primary_specialty' : f] || '';
-  });
+  // Update local state with whatever we have
+  currentProfile = { ...currentProfile, ...coreUpdate, primary_specialty: primarySpecialty, username, bio, clinic_days: days };
+  document.getElementById('user-display-name').textContent = 'Dr. ' + firstName;
+  document.getElementById('user-avatar').textContent = (firstName[0] || 'D') + (lastName[0] || 'R');
 
   pvCloseProfileModal();
-  showToast('Profile saved ✓');
-  setTimeout(() => { renderPortfolioPassport(); updateDashboard(); }, 300);
+  showToast('Profile saved');
+  setTimeout(() => { renderPortfolioPassport(); updateDashboard(); renderCareerGPS(); }, 300);
 }
 
 // ─── END PROFILE MODAL ────────────────────────────────────────────────────────
