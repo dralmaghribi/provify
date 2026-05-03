@@ -3654,10 +3654,7 @@ async function loadProfile() {
   currentProfile = data;
   if (data) {
     if (!currentProfile.avatar_url) {
-      try {
-        var _local = localStorage.getItem('provify_avatar_' + currentUser.id);
-        if (_local) currentProfile = Object.assign({}, currentProfile, { avatar_url: _local });
-      } catch(_) {}
+      try { var _local = localStorage.getItem('provify_avatar_' + currentUser.id); if (_local) currentProfile = Object.assign({}, currentProfile, { avatar_url: _local }); } catch(_) {}
     }
     document.getElementById('user-display-name').textContent = 'Dr. ' + (data.first_name || 'User');
     document.getElementById('user-avatar').textContent = (data.first_name && data.first_name[0] || 'D') + (data.last_name && data.last_name[0] || 'R');
@@ -5666,11 +5663,8 @@ async function uploadPassportPhoto(file) {
     try { localStorage.setItem('provify_avatar_' + currentUser.id, resized); } catch(_) {}
     currentProfile = { ...currentProfile, avatar_url: resized };
     const { data: updData, error } = await sb.from('profiles').update({ avatar_url: resized }).eq('id', currentUser.id).select();
-    if (error) {
-      console.warn('Avatar DB error (saved locally):', error.message);
-    } else if (!updData || updData.length === 0) {
-      console.warn('Avatar: 0 rows updated. Run in Supabase SQL: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url text;');
-    }
+    if (error) console.warn('Avatar DB error (saved locally):', error.message);
+    else if (!updData || updData.length === 0) console.warn('Avatar: 0 rows updated. Run: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url text;');
     showToast('Photo updated');
     if (document.getElementById('port-passport')) renderPortfolioPassport();
     return resized;
@@ -6222,7 +6216,7 @@ function pvOpenProfileModal() {
   const clinicDays = p.clinic_days || [];
   const dayPills = days.map(d=>{
     const active = clinicDays.includes(d);
-    return `<button type="button" id="pm-day-${d}" onclick="pvToggleDay('${d}',this)"
+    return `<button type="button" id="pm-day-${d}" data-active="${active?'1':'0'}" onclick="pvToggleDay('${d}',this)"
       style="padding:7px 12px;border-radius:8px;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:500;cursor:pointer;transition:all 0.15s;
         background:${active?'rgba(124,111,255,0.15)':'rgba(255,255,255,0.04)'};
         border:1px solid ${active?'rgba(124,111,255,0.45)':'rgba(255,255,255,0.08)'};
@@ -6363,10 +6357,12 @@ function pvCloseProfileModal() {
 }
 
 function pvToggleDay(day, btn) {
-  const active = btn.style.background.includes('124,111,255');
-  btn.style.background = active ? 'rgba(255,255,255,0.04)' : 'rgba(124,111,255,0.15)';
-  btn.style.borderColor = active ? 'rgba(255,255,255,0.08)' : 'rgba(124,111,255,0.45)';
-  btn.style.color       = active ? 'rgba(255,255,255,0.4)' : '#9B91FF';
+  const active = btn.dataset.active === '1';
+  const nowActive = !active;
+  btn.dataset.active = nowActive ? '1' : '0';
+  btn.style.background  = nowActive ? 'rgba(124,111,255,0.15)' : 'rgba(255,255,255,0.04)';
+  btn.style.borderColor = nowActive ? 'rgba(124,111,255,0.45)' : 'rgba(255,255,255,0.08)';
+  btn.style.color       = nowActive ? '#9B91FF' : 'rgba(255,255,255,0.4)';
 }
 
 async function pvSaveProfile() {
@@ -6375,7 +6371,7 @@ async function pvSaveProfile() {
 
   const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].filter(d => {
     const b = document.getElementById(`pm-day-${d}`);
-    return b && b.style.background.includes('124,111,255');
+    return b && b.dataset.active === '1';
   });
 
   const updates = {
@@ -6389,9 +6385,21 @@ async function pvSaveProfile() {
     clinic_days:      days,
   };
 
-  const { error } = await sb.from('profiles').upsert(updates);
+  // Check username uniqueness manually before saving
+  const newUsername = updates.username;
+  if (newUsername && newUsername !== (currentProfile.username || '')) {
+    const { data: existing } = await sb.from('profiles').select('id').eq('username', newUsername).neq('id', currentUser.id).single();
+    if (existing) {
+      showToast('Username already taken — try another.');
+      if (btn) { btn.textContent = 'Save Profile'; btn.disabled = false; }
+      return;
+    }
+  }
+
+  const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
   if (error) {
-    showToast('Error saving — username may be taken.');
+    console.error('Profile save error:', error);
+    showToast('Error saving profile — try again.');
     if (btn) { btn.textContent = 'Save Profile'; btn.disabled = false; }
     return;
   }
@@ -10840,13 +10848,7 @@ function getGPSContext() {
 }
 
 function getRoleSurpassedStages(role) {
-  const surpassed = {
-    student:    [],
-    intern:     ['student'],
-    resident:   ['student', 'intern'],
-    general:    ['student', 'intern', 'gp'],
-    specialist: ['student', 'intern', 'gp'],
-  };
+  const surpassed = { student:[], intern:['student'], resident:['student','intern'], general:['student','intern','gp'], specialist:['student','intern','gp'] };
   return surpassed[role] || [];
 }
 
