@@ -3653,15 +3653,15 @@ async function loadProfile() {
   const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   currentProfile = data;
   if (data) {
-    // If DB has no avatar_url, seed from localStorage (local fallback)
+    // Seed avatar from localStorage if DB has nothing
     if (!currentProfile.avatar_url) {
       try {
-        const local = localStorage.getItem(`provify_avatar_${currentUser.id}`);
-        if (local) currentProfile = { ...currentProfile, avatar_url: local };
+        var local = localStorage.getItem('provify_avatar_' + currentUser.id);
+        if (local) currentProfile = Object.assign({}, currentProfile, { avatar_url: local });
       } catch(_) {}
     }
-    document.getElementById('user-display-name').textContent = `Dr. ${data.first_name || 'User'}`;
-    document.getElementById('user-avatar').textContent = (data.first_name?.[0] || 'D') + (data.last_name?.[0] || 'R');
+    document.getElementById('user-display-name').textContent = 'Dr. ' + (data.first_name || 'User');
+    document.getElementById('user-avatar').textContent = (data.first_name && data.first_name[0] || 'D') + (data.last_name && data.last_name[0] || 'R');
   }
   checkProStatus();
   // payments handled by Lemon Squeezy
@@ -5647,7 +5647,6 @@ function setPortFilter() {}
 async function uploadPassportPhoto(file) {
   if (!file || !currentUser) return null;
   try {
-    // Resize to max 300px and compress — keeps base64 under ~30KB
     const resized = await new Promise((res, rej) => {
       const img = new Image();
       const objectUrl = URL.createObjectURL(file);
@@ -5658,8 +5657,7 @@ async function uploadPassportPhoto(file) {
         const h = Math.round(img.height * scale);
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         URL.revokeObjectURL(objectUrl);
         res(canvas.toDataURL('image/jpeg', 0.82));
       };
@@ -5667,45 +5665,50 @@ async function uploadPassportPhoto(file) {
       img.src = objectUrl;
     });
 
-    // Always persist locally first — instant display, survives any DB failure
-    const localKey = `provify_avatar_${currentUser.id}`;
-    try { localStorage.setItem(localKey, resized); } catch(_) {}
-
-    // Update in-memory profile immediately so UI reflects the change
+    // Always save locally first so it survives any DB failure
+    try { localStorage.setItem('provify_avatar_' + currentUser.id, resized); } catch(_) {}
     currentProfile = { ...currentProfile, avatar_url: resized };
 
-    // Save resized base64 to Supabase profile
     const { data: updData, error } = await sb.from('profiles').update({ avatar_url: resized }).eq('id', currentUser.id).select();
-    console.log('Avatar update result:', updData, 'Error:', error);
-
     if (error) {
-      // DB failed but we have it locally — still show it, warn in console
-      console.warn('Avatar saved locally only. DB error:', error.message, '| Code:', error.code);
-      showToast('Photo updated ✓');
+      console.warn('Avatar DB error (saved locally):', error.message);
     } else if (!updData || updData.length === 0) {
-      // No error but 0 rows updated = RLS blocked the write silently
-      console.warn('Avatar DB update returned 0 rows — likely RLS policy blocking UPDATE. Photo saved locally.');
-      showToast('Photo updated ✓');
-    } else {
-      showToast('Photo updated ✓');
+      console.warn('Avatar: 0 rows updated - check RLS or missing avatar_url column. Run: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url text;');
     }
 
-    // Re-render portfolio to show new photo
+    showToast('Photo updated');
     if (document.getElementById('port-passport')) renderPortfolioPassport();
     return resized;
   } catch(e) {
     console.error('Photo upload failed', e);
-    showToast('Photo upload failed — try a smaller image');
+    showToast('Photo upload failed - try a smaller image');
     return null;
   }
 }
 
-// Helper: load avatar from localStorage as fallback when DB has nothing
+// Load avatar from localStorage if DB has nothing
 function getAvatarUrl() {
-  const dbUrl = currentProfile?.avatar_url || null;
+  const dbUrl = currentProfile && currentProfile.avatar_url ? currentProfile.avatar_url : null;
   if (dbUrl) return dbUrl;
   if (!currentUser) return null;
-  try { return localStorage.getItem(`provify_avatar_${currentUser.id}`) || null; } catch(_) { return null; }
+  try { return localStorage.getItem('provify_avatar_' + currentUser.id) || null; } catch(_) { return null; }
+}
+
+// Clean handler called by both photo inputs
+async function handleAvatarUpload(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  // Show loading state on all avatar elements
+  document.querySelectorAll('.pv-avatar, #pm-avatar').forEach(function(a) {
+    a.innerHTML = '<div style="font-size:0.6rem;color:rgba(255,255,255,0.3);padding:4px;">...</div>';
+  });
+  const url = await uploadPassportPhoto(f);
+  if (url) {
+    document.querySelectorAll('.pv-avatar, #pm-avatar').forEach(function(a) {
+      a.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
+    });
+    renderPortfolioPassport();
+  }
 }
 
 function copyPortfolioLinkInApp() {
@@ -6070,8 +6073,7 @@ function renderPortfolioPassport() {
           <div class="pv-avatar">${avatarUrl?`<img src="${avatarUrl}">`:`<div class="pv-avatar-initials">${initials}</div>`}</div>
           <div class="pv-avatar-cam">📷</div>
         </div>
-        <input type="file" id="pv-photo-in" accept="image/*" style="display:none;"
-          onchange="(async function(e){const f=e.target.files[0];if(!f)return;const a=document.querySelector('.pv-avatar');a.innerHTML='<div style=\'padding:4px;font-size:0.6rem;color:rgba(255,255,255,0.3);\'>…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>'; renderPortfolioPassport();}else{a.innerHTML='<div class=\'pv-avatar-initials\'>${initials}</div>';}})(event)">
+        <input type="file" id="pv-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
         <div class="pv-name-col">
           <div class="pv-name">${fullName}</div>
           <div class="pv-role">${role}</div>
@@ -6205,7 +6207,7 @@ function pvOpenProfileModal() {
   if (existing) existing.remove();
 
   const p = currentProfile || {};
-  const avatarUrl = getAvatarUrl();
+  const avatarUrl = p.avatar_url || null;
   const initials  = (p.first_name?.[0]||'D') + (p.last_name?.[0]||'R');
   const rankData  = getComplexityRank(allCases.length);
 
@@ -6275,8 +6277,7 @@ function pvOpenProfileModal() {
           </div>
           <div style="position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:#141420;border:1px solid rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.58rem;">📷</div>
         </div>
-        <input type="file" id="pm-photo-in" accept="image/*" style="display:none;"
-          onchange="(async function(e){const f=e.target.files[0];if(!f)return;const a=document.getElementById('pm-avatar');a.innerHTML='<div style=\'font-size:0.6rem;color:rgba(255,255,255,0.3);\'>…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>';renderPortfolioPassport();}else{a.innerHTML='<div style=\'font-size:1rem;font-weight:700;color:${rankData.color};\'>${initials}</div>';}})(event)">
+        <input type="file" id="pm-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
         <div>
           <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;letter-spacing:-0.02em;">${(p.first_name||'')+(p.last_name?' '+p.last_name:'') || 'Your Name'}</div>
           <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:2px;">${rankData.emoji} ${rankData.rank} · ${allCases.length} cases</div>
