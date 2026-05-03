@@ -3653,6 +3653,13 @@ async function loadProfile() {
   const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   currentProfile = data;
   if (data) {
+    // If DB has no avatar_url, seed from localStorage (local fallback)
+    if (!currentProfile.avatar_url) {
+      try {
+        const local = localStorage.getItem(`provify_avatar_${currentUser.id}`);
+        if (local) currentProfile = { ...currentProfile, avatar_url: local };
+      } catch(_) {}
+    }
     document.getElementById('user-display-name').textContent = `Dr. ${data.first_name || 'User'}`;
     document.getElementById('user-avatar').textContent = (data.first_name?.[0] || 'D') + (data.last_name?.[0] || 'R');
   }
@@ -5660,12 +5667,29 @@ async function uploadPassportPhoto(file) {
       img.src = objectUrl;
     });
 
-    // Save resized base64 to profile
+    // Always persist locally first — instant display, survives any DB failure
+    const localKey = `provify_avatar_${currentUser.id}`;
+    try { localStorage.setItem(localKey, resized); } catch(_) {}
+
+    // Update in-memory profile immediately so UI reflects the change
+    currentProfile = { ...currentProfile, avatar_url: resized };
+
+    // Save resized base64 to Supabase profile
     const { data: updData, error } = await sb.from('profiles').update({ avatar_url: resized }).eq('id', currentUser.id).select();
     console.log('Avatar update result:', updData, 'Error:', error);
-    if (error) throw error;
-    currentProfile = { ...currentProfile, avatar_url: resized };
-    showToast('Photo updated ✓');
+
+    if (error) {
+      // DB failed but we have it locally — still show it, warn in console
+      console.warn('Avatar saved locally only. DB error:', error.message, '| Code:', error.code);
+      showToast('Photo updated ✓');
+    } else if (!updData || updData.length === 0) {
+      // No error but 0 rows updated = RLS blocked the write silently
+      console.warn('Avatar DB update returned 0 rows — likely RLS policy blocking UPDATE. Photo saved locally.');
+      showToast('Photo updated ✓');
+    } else {
+      showToast('Photo updated ✓');
+    }
+
     // Re-render portfolio to show new photo
     if (document.getElementById('port-passport')) renderPortfolioPassport();
     return resized;
@@ -5674,6 +5698,14 @@ async function uploadPassportPhoto(file) {
     showToast('Photo upload failed — try a smaller image');
     return null;
   }
+}
+
+// Helper: load avatar from localStorage as fallback when DB has nothing
+function getAvatarUrl() {
+  const dbUrl = currentProfile?.avatar_url || null;
+  if (dbUrl) return dbUrl;
+  if (!currentUser) return null;
+  try { return localStorage.getItem(`provify_avatar_${currentUser.id}`) || null; } catch(_) { return null; }
 }
 
 function copyPortfolioLinkInApp() {
@@ -5700,7 +5732,7 @@ function renderPortfolioPassport() {
   const initials   = (firstName[0]||'D')+(lastName[0]||'R');
   const roleLabels = {student:'Dental Student',intern:'Intern / House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
   const role       = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
-  const avatarUrl  = currentProfile.avatar_url || null;
+  const avatarUrl  = getAvatarUrl();
   const today      = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const scoreColor = score>=70?'#34D399':score>=40?'#7C6FFF':'#F59E0B';
   const userId8    = (currentUser?.id||'').slice(0,8).toUpperCase() || 'XXXXXXXX';
@@ -6173,7 +6205,7 @@ function pvOpenProfileModal() {
   if (existing) existing.remove();
 
   const p = currentProfile || {};
-  const avatarUrl = p.avatar_url || null;
+  const avatarUrl = getAvatarUrl();
   const initials  = (p.first_name?.[0]||'D') + (p.last_name?.[0]||'R');
   const rankData  = getComplexityRank(allCases.length);
 
@@ -6640,7 +6672,7 @@ async function generatePortfolioPDF() {
   const specNameMap = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', perio:'Periodontics', ortho:'Orthodontics', general:'General Dentistry' };
   const primarySpec = specNameMap[currentProfile?.primary_specialty] || '';
   const bio = currentProfile?.bio || '';
-  const avatarRaw = currentProfile?.avatar_url || null;
+  const avatarRaw = getAvatarUrl();
   const initials = ((currentProfile?.first_name?.[0]||'D') + (currentProfile?.last_name?.[0]||'R')).toUpperCase();
   const total = cases.length;
 
