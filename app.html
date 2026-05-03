@@ -3655,8 +3655,8 @@ async function loadProfile() {
   if (data) {
     if (!currentProfile.avatar_url) {
       try {
-        var local = localStorage.getItem('provify_avatar_' + currentUser.id);
-        if (local) currentProfile = Object.assign({}, currentProfile, { avatar_url: local });
+        var _local = localStorage.getItem('provify_avatar_' + currentUser.id);
+        if (_local) currentProfile = Object.assign({}, currentProfile, { avatar_url: _local });
       } catch(_) {}
     }
     document.getElementById('user-display-name').textContent = 'Dr. ' + (data.first_name || 'User');
@@ -5663,17 +5663,14 @@ async function uploadPassportPhoto(file) {
       img.onerror = () => rej(new Error('Image load failed'));
       img.src = objectUrl;
     });
-
     try { localStorage.setItem('provify_avatar_' + currentUser.id, resized); } catch(_) {}
     currentProfile = { ...currentProfile, avatar_url: resized };
-
     const { data: updData, error } = await sb.from('profiles').update({ avatar_url: resized }).eq('id', currentUser.id).select();
     if (error) {
       console.warn('Avatar DB error (saved locally):', error.message);
     } else if (!updData || updData.length === 0) {
-      console.warn('Avatar: 0 rows updated. Run: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url text;');
+      console.warn('Avatar: 0 rows updated. Run in Supabase SQL: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url text;');
     }
-
     showToast('Photo updated');
     if (document.getElementById('port-passport')) renderPortfolioPassport();
     return resized;
@@ -6068,7 +6065,7 @@ function renderPortfolioPassport() {
           <div class="pv-avatar">${avatarUrl?`<img src="${avatarUrl}">`:`<div class="pv-avatar-initials">${initials}</div>`}</div>
           <div class="pv-avatar-cam">📷</div>
         </div>
-        <input type="file" id="pv-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>'; renderPortfolioPassport();}else{a.innerHTML='<div class=\'pv-avatar-initials\'>${initials}</div>';}})(event)">
+        <input type="file" id="pv-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
         <div class="pv-name-col">
           <div class="pv-name">${fullName}</div>
           <div class="pv-role">${role}</div>
@@ -6272,7 +6269,7 @@ function pvOpenProfileModal() {
           </div>
           <div style="position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:#141420;border:1px solid rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.58rem;">📷</div>
         </div>
-        <input type="file" id="pm-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>';renderPortfolioPassport();}else{a.innerHTML='<div style=\'font-size:1rem;font-weight:700;color:${rankData.color};\'>${initials}</div>';}})(event)">
+        <input type="file" id="pm-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
         <div>
           <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;letter-spacing:-0.02em;">${(p.first_name||'')+(p.last_name?' '+p.last_name:'') || 'Your Name'}</div>
           <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:2px;">${rankData.emoji} ${rankData.rank} · ${allCases.length} cases</div>
@@ -10007,24 +10004,11 @@ function renderCinematicCases(casesToRender) {
 
   // ── empty state ───────────────────────────────────────────────
   if (ordered.length === 0) {
-    // Use compact card so the empty state doesn't look like a broken full-screen void
-    viewport.style.borderRadius = '20px';
-    track.innerHTML = `
-      <div class="hero-swipe-card active" style="
-        height:200px;min-height:unset;max-height:200px;
-        display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;
-        background:linear-gradient(135deg,rgba(124,111,255,0.06),rgba(10,10,16,1));
-        border:1px solid rgba(124,111,255,0.12);
-      ">
-        <div style="font-size:36px;opacity:0.25;">🦷</div>
-        <div style="font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:-0.01em;">No cases logged yet</div>
-        <div style="font-size:0.7rem;color:rgba(255,255,255,0.2);">Tap the button below to log your first case</div>
-      </div>`;
-    // Override the CSS height only on the empty card
-    const emptyCard = track.querySelector('.hero-swipe-card');
-    if (emptyCard) {
-      emptyCard.style.width = (viewport.offsetWidth || window.innerWidth) + 'px';
-    }
+    track.innerHTML = '';
+    const emptyCard = document.createElement('div');
+    emptyCard.style.cssText = 'width:100%;height:180px;border-radius:20px;background:linear-gradient(135deg,rgba(124,111,255,0.06),rgba(10,10,16,1));border:1px solid rgba(124,111,255,0.12);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;';
+    emptyCard.innerHTML = '<div style="font-size:32px;opacity:0.2;">🦷</div><div style="font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:-0.01em;">No cases logged yet</div><div style="font-size:0.7rem;color:rgba(255,255,255,0.2);">Tap the button below to log your first case</div>';
+    track.appendChild(emptyCard);
     dots.innerHTML = '';
     return;
   }
@@ -10855,9 +10839,7 @@ function getGPSContext() {
   return { total, avg, dominant, role };
 }
 
-// Stages that a given profile role has already surpassed — pre-completed on join
 function getRoleSurpassedStages(role) {
-  // Each role means the user has already lived through these stages
   const surpassed = {
     student:    [],
     intern:     ['student'],
