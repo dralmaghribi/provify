@@ -6411,7 +6411,14 @@ async function pvSaveProfile() {
 
   pvCloseProfileModal();
   showToast('Profile saved');
-  setTimeout(() => { renderPortfolioPassport(); updateDashboard(); renderCareerGPS(); }, 300);
+  // Reload profile from DB so GPS reads the freshly saved role
+  setTimeout(async () => {
+    const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    if (data) currentProfile = { ...currentProfile, ...data };
+    renderPortfolioPassport();
+    updateDashboard();
+    renderCareerGPS();
+  }, 300);
 }
 
 // ─── END PROFILE MODAL ────────────────────────────────────────────────────────
@@ -10838,7 +10845,8 @@ function getGPSContext() {
   const avg = total > 0 ? parseFloat((allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1)) : 0;
   const specCounts = ['endo','restorative','surgery','paeds','prostho'].map(s => ({ s, n: allCases.filter(c => c.specialty === s).length })).sort((a,b) => b.n - a.n);
   const dominant = total > 0 ? specCounts[0].n / total : 0;
-  const role = currentProfile && currentProfile.role ? currentProfile.role : 'student';
+  const role = (currentProfile && currentProfile.role) ? currentProfile.role : 'student';
+  console.log('[GPS] role from profile:', role, '| surpassed:', getRoleSurpassedStages(role));
   return { total, avg, dominant, role };
 }
 
