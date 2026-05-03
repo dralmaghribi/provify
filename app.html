@@ -3653,7 +3653,6 @@ async function loadProfile() {
   const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   currentProfile = data;
   if (data) {
-    // Seed avatar from localStorage if DB has nothing
     if (!currentProfile.avatar_url) {
       try {
         var local = localStorage.getItem('provify_avatar_' + currentUser.id);
@@ -5665,7 +5664,6 @@ async function uploadPassportPhoto(file) {
       img.src = objectUrl;
     });
 
-    // Always save locally first so it survives any DB failure
     try { localStorage.setItem('provify_avatar_' + currentUser.id, resized); } catch(_) {}
     currentProfile = { ...currentProfile, avatar_url: resized };
 
@@ -5673,7 +5671,7 @@ async function uploadPassportPhoto(file) {
     if (error) {
       console.warn('Avatar DB error (saved locally):', error.message);
     } else if (!updData || updData.length === 0) {
-      console.warn('Avatar: 0 rows updated - check RLS or missing avatar_url column. Run: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url text;');
+      console.warn('Avatar: 0 rows updated. Run: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url text;');
     }
 
     showToast('Photo updated');
@@ -5686,7 +5684,6 @@ async function uploadPassportPhoto(file) {
   }
 }
 
-// Load avatar from localStorage if DB has nothing
 function getAvatarUrl() {
   const dbUrl = currentProfile && currentProfile.avatar_url ? currentProfile.avatar_url : null;
   if (dbUrl) return dbUrl;
@@ -5694,11 +5691,9 @@ function getAvatarUrl() {
   try { return localStorage.getItem('provify_avatar_' + currentUser.id) || null; } catch(_) { return null; }
 }
 
-// Clean handler called by both photo inputs
 async function handleAvatarUpload(e) {
   const f = e.target.files[0];
   if (!f) return;
-  // Show loading state on all avatar elements
   document.querySelectorAll('.pv-avatar, #pm-avatar').forEach(function(a) {
     a.innerHTML = '<div style="font-size:0.6rem;color:rgba(255,255,255,0.3);padding:4px;">...</div>';
   });
@@ -5735,7 +5730,7 @@ function renderPortfolioPassport() {
   const initials   = (firstName[0]||'D')+(lastName[0]||'R');
   const roleLabels = {student:'Dental Student',intern:'Intern / House Officer',resident:'Resident',general:'General Dentist',specialist:'Specialist'};
   const role       = roleLabels[currentProfile.role] || currentProfile.role || 'Dentist';
-  const avatarUrl  = getAvatarUrl();
+  const avatarUrl  = currentProfile.avatar_url || null;
   const today      = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const scoreColor = score>=70?'#34D399':score>=40?'#7C6FFF':'#F59E0B';
   const userId8    = (currentUser?.id||'').slice(0,8).toUpperCase() || 'XXXXXXXX';
@@ -6073,7 +6068,7 @@ function renderPortfolioPassport() {
           <div class="pv-avatar">${avatarUrl?`<img src="${avatarUrl}">`:`<div class="pv-avatar-initials">${initials}</div>`}</div>
           <div class="pv-avatar-cam">📷</div>
         </div>
-        <input type="file" id="pv-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+        <input type="file" id="pv-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>'; renderPortfolioPassport();}else{a.innerHTML='<div class=\'pv-avatar-initials\'>${initials}</div>';}})(event)">
         <div class="pv-name-col">
           <div class="pv-name">${fullName}</div>
           <div class="pv-role">${role}</div>
@@ -6277,7 +6272,7 @@ function pvOpenProfileModal() {
           </div>
           <div style="position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:#141420;border:1px solid rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.58rem;">📷</div>
         </div>
-        <input type="file" id="pm-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+        <input type="file" id="pm-photo-in" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">…</div>';const url=await uploadPassportPhoto(f);if(url){a.innerHTML='<img src=\''+url+'\' style=\'width:100%;height:100%;object-fit:cover;display:block;\'>';renderPortfolioPassport();}else{a.innerHTML='<div style=\'font-size:1rem;font-weight:700;color:${rankData.color};\'>${initials}</div>';}})(event)">
         <div>
           <div style="font-family:'Instrument Serif',serif;font-size:1.1rem;color:#fff;letter-spacing:-0.02em;">${(p.first_name||'')+(p.last_name?' '+p.last_name:'') || 'Your Name'}</div>
           <div style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:2px;">${rankData.emoji} ${rankData.rank} · ${allCases.length} cases</div>
@@ -6673,7 +6668,7 @@ async function generatePortfolioPDF() {
   const specNameMap = { endo:'Endodontics', restorative:'Restorative Dentistry', surgery:'Oral Surgery', paeds:'Paediatric Dentistry', prostho:'Prosthodontics', perio:'Periodontics', ortho:'Orthodontics', general:'General Dentistry' };
   const primarySpec = specNameMap[currentProfile?.primary_specialty] || '';
   const bio = currentProfile?.bio || '';
-  const avatarRaw = getAvatarUrl();
+  const avatarRaw = currentProfile?.avatar_url || null;
   const initials = ((currentProfile?.first_name?.[0]||'D') + (currentProfile?.last_name?.[0]||'R')).toUpperCase();
   const total = cases.length;
 
@@ -10012,12 +10007,24 @@ function renderCinematicCases(casesToRender) {
 
   // ── empty state ───────────────────────────────────────────────
   if (ordered.length === 0) {
+    // Use compact card so the empty state doesn't look like a broken full-screen void
+    viewport.style.borderRadius = '20px';
     track.innerHTML = `
-      <div class="hero-swipe-card active" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
-        <div style="font-size:48px;opacity:0.15;">🦷</div>
-        <div style="font-size:1rem;color:rgba(255,255,255,0.3);">No cases yet</div>
-        <div style="font-size:0.75rem;color:rgba(255,255,255,0.18);">Log your first case to see it here</div>
+      <div class="hero-swipe-card active" style="
+        height:200px;min-height:unset;max-height:200px;
+        display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;
+        background:linear-gradient(135deg,rgba(124,111,255,0.06),rgba(10,10,16,1));
+        border:1px solid rgba(124,111,255,0.12);
+      ">
+        <div style="font-size:36px;opacity:0.25;">🦷</div>
+        <div style="font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:-0.01em;">No cases logged yet</div>
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.2);">Tap the button below to log your first case</div>
       </div>`;
+    // Override the CSS height only on the empty card
+    const emptyCard = track.querySelector('.hero-swipe-card');
+    if (emptyCard) {
+      emptyCard.style.width = (viewport.offsetWidth || window.innerWidth) + 'px';
+    }
     dots.innerHTML = '';
     return;
   }
@@ -10844,7 +10851,21 @@ function getGPSContext() {
   const avg = total > 0 ? parseFloat((allCases.reduce((s,c) => s + (c.complexity_score||0), 0) / total).toFixed(1)) : 0;
   const specCounts = ['endo','restorative','surgery','paeds','prostho'].map(s => ({ s, n: allCases.filter(c => c.specialty === s).length })).sort((a,b) => b.n - a.n);
   const dominant = total > 0 ? specCounts[0].n / total : 0;
-  return { total, avg, dominant };
+  const role = currentProfile && currentProfile.role ? currentProfile.role : 'student';
+  return { total, avg, dominant, role };
+}
+
+// Stages that a given profile role has already surpassed — pre-completed on join
+function getRoleSurpassedStages(role) {
+  // Each role means the user has already lived through these stages
+  const surpassed = {
+    student:    [],
+    intern:     ['student'],
+    resident:   ['student', 'intern'],
+    general:    ['student', 'intern', 'gp'],
+    specialist: ['student', 'intern', 'gp'],
+  };
+  return surpassed[role] || [];
 }
 
 function renderCareerGPS() {
@@ -11039,11 +11060,13 @@ function renderGPSRoadmap(el, data) {
   const manualChecks = data.manualChecks || {};
   const unlockedAt = data.unlockedAt || {};
 
+  const surpassedByRole = getRoleSurpassedStages(ctx.role);
   const stagesWithState = stages.map((s, i) => {
     const autoComplete = s.auto(ctx);
     const manualComplete = manualChecks[s.id] || false;
-    const completed = autoComplete || manualComplete;
-    return { ...s, completed, autoComplete, index: i };
+    const roleSurpassed = surpassedByRole.includes(s.id);
+    const completed = autoComplete || manualComplete || roleSurpassed;
+    return { ...s, completed, autoComplete: autoComplete || roleSurpassed, index: i };
   });
 
   const completedCount = stagesWithState.filter(s => s.completed).length;
